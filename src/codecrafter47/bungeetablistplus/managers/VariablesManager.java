@@ -105,10 +105,11 @@ public final class VariablesManager {
             String arg = null;
             if (var.contains(":")) {
                 arg = var.substring(var.indexOf(":"), var.length());
+                var = var.substring(0, var.indexOf(":"));
             }
 
             Variable variable = this.variables.get(var);
-            String replacement = "?";
+            String replacement = "{" + var + "}";
             if (variable != null) {
                 replacement = variable.getReplacement(arg);
             }
@@ -134,10 +135,11 @@ public final class VariablesManager {
             String arg = null;
             if (var.contains(":")) {
                 arg = var.substring(var.indexOf(":"), var.length());
+                var = var.substring(0, var.indexOf(":"));
             }
 
             PlayerVariable variable = this.playerVariables.get(var);
-            String replacement = "?";
+            String replacement = "{" + var + "}";
             if (variable != null) {
                 replacement = variable.getReplacement(arg, player);
             }
@@ -159,10 +161,11 @@ public final class VariablesManager {
             String arg = null;
             if (var.contains(":")) {
                 arg = var.substring(var.indexOf(":"), var.length());
+                var = var.substring(0, var.indexOf(":"));
             }
 
             ServerVariable variable = this.serverVariables.get(var);
-            String replacement = "?";
+            String replacement = "{" + var + "}";
             if (variable != null) {
                 replacement = variable.getReplacement(arg, server);
             }
