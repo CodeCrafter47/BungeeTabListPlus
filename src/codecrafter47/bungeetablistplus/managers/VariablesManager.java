@@ -1,7 +1,11 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
+import codecrafter47.bungeetablistplus.api.ServerVariable;
+import codecrafter47.bungeetablistplus.api.Variable;
 import codecrafter47.bungeetablistplus.variables.BalanceVariable;
+import codecrafter47.bungeetablistplus.variables.ColorVariable;
 import codecrafter47.bungeetablistplus.variables.CurrentServerPlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.DisplayPrefix;
 import codecrafter47.bungeetablistplus.variables.GroupVariable;
@@ -11,13 +15,10 @@ import codecrafter47.bungeetablistplus.variables.PingVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerNameVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerRawNameVariable;
-import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.variables.ServerNameVariable;
 import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
-import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.variables.TimeVariable;
 import codecrafter47.bungeetablistplus.variables.UUIDVariable;
-import codecrafter47.bungeetablistplus.api.Variable;
 import codecrafter47.bungeetablistplus.variables.WorldVariable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,8 @@ public final class VariablesManager {
 
     public VariablesManager() {
         super();
-        addVariable("server_player_count", new CurrentServerPlayerCountVariable());
+        addVariable("server_player_count",
+                new CurrentServerPlayerCountVariable());
         addVariable("player_count", new PlayerCountVariable());
         addVariable("gcount", new PlayerCountVariable());
         addVariable("players", new ServerPlayerCountVariable());
@@ -72,6 +74,7 @@ public final class VariablesManager {
         addVariable("UUID", new UUIDVariable());
         addVariable("world", new WorldVariable());
         addVariable("balance", new BalanceVariable());
+        addVariable("color", new ColorVariable());
     }
 
     public void addVariable(String name, Variable var) {

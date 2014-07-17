@@ -66,9 +66,9 @@ public class BungeeTabListPlus extends Plugin {
     private ScheduledTask refreshThread;
 
     private final static Collection<String> hiddenPlayers = new HashSet<>();
-    
+
     BukkitBridge bukkitBridge;
-    
+
     UpdateChecker updateChecker = null;
 
     // Changes:
@@ -89,9 +89,10 @@ public class BungeeTabListPlus extends Plugin {
     // more performant variable replacement
     // world playercount: {players:server#world}
     // /BTLP shows whether a update is available
+    // added {color} variable which randomly inserts a beautiful colorcode changing every few seconds, the variable inserts the same color in all slots
+    // {color:green,red} will insert green or red colorcodes. this changes every second
     // ---------------------------------------------
     // 1.7
-    // TODO color variable
     // TODO scrolling text
     // TODO multislot scrolling text
     // TODO tabComplete support
@@ -108,12 +109,12 @@ public class BungeeTabListPlus extends Plugin {
     // TODO uuid support for showTo
     // TODO rework commands (klickable links)
     // TODO improve automatic {fillplayers}: It would be nice to have a feature
-    // to combine several servers into 1 server, this would be very usefull for 
+    // to combine several servers into 1 server, this would be very usefull for
     // a minigames type of server setting, where you have different servers acting
-    // for different minigames. This would be helpful to categorize all players 
+    // for different minigames. This would be helpful to categorize all players
     // under 1 player count
     // EDIT:
-    // Also is there a way to sort the automatic {fillplayers} by player count? 
+    // Also is there a way to sort the automatic {fillplayers} by player count?
     // So that the server with the highest player count always gets displayed at
     // the top? Atm it just puts the servers randomly which makes everything look
     // butchered, since there are big gaps inbetween sometimes
@@ -145,9 +146,9 @@ public class BungeeTabListPlus extends Plugin {
             getLogger().info("Disabling Plugin");
             return;
         }
-        
+
         players = new PlayerManager(this);
-        
+
         tabLists = new TabListManager(this);
         if (!tabLists.loadTabLists()) {
             return;
@@ -162,25 +163,30 @@ public class BungeeTabListPlus extends Plugin {
         }
 
         if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
-            getLogger().warning("Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
+            getLogger().warning(
+                    "Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
             getLogger().warning("This option will be disabled");
             config.getMainConfig().useScoreboardToBypass16CharLimit = false;
         }
-        
+
         bukkitBridge = new BukkitBridge(this);
         bukkitBridge.enable();
 
         pm = new PermissionManager(this);
         variables = new VariablesManager();
 
-        ProxyServer.getInstance().getPluginManager().registerListener(this, listener);
+        ProxyServer.getInstance().getPluginManager().registerListener(this,
+                listener);
 
-        resendThread = new ResendThread(resendQueue, config.getMainConfig().tablistUpdateIntervall);
-        getProxy().getScheduler().schedule(this, resendThread, 1, TimeUnit.SECONDS);
+        resendThread = new ResendThread(resendQueue,
+                config.getMainConfig().tablistUpdateIntervall);
+        getProxy().getScheduler().schedule(this, resendThread, 1,
+                TimeUnit.SECONDS);
         startRefreshThread();
 
         // register Reload command
-        ProxyServer.getInstance().getPluginManager().registerCommand(INSTANCE, new SuperCommand(this));
+        ProxyServer.getInstance().getPluginManager().registerCommand(INSTANCE,
+                new SuperCommand(this));
 
         // Start metrics
         try {
@@ -190,23 +196,26 @@ public class BungeeTabListPlus extends Plugin {
             getLogger().warning("Failed to initialize Metrics");
             getLogger().warning(e.getLocalizedMessage());
         }
-        
+
         // Load updateCheck thread
-        if(config.getMainConfig().checkForUpdates){
+        if (config.getMainConfig().checkForUpdates) {
             updateChecker = new UpdateChecker(this);
         }
     }
 
     private void startRefreshThread() {
         if (config.getMainConfig().tablistUpdateIntervall > 0) {
-            refreshThread = ProxyServer.getInstance().getScheduler().schedule(INSTANCE, new Runnable() {
+            refreshThread = ProxyServer.getInstance().getScheduler().schedule(
+                    INSTANCE, new Runnable() {
 
-                @Override
-                public void run() {
-                    resendTabLists();
-                }
-            }, (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
-                    (long) (config.getMainConfig().tablistUpdateIntervall * 1000), TimeUnit.MILLISECONDS);
+                        @Override
+                        public void run() {
+                            resendTabLists();
+                        }
+                    },
+                    (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
+                    (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -231,8 +240,10 @@ public class BungeeTabListPlus extends Plugin {
     @Override
     public void onDisable() {
 
-        ProxyServer.getInstance().getPluginManager().unregisterCommands(INSTANCE);
-        ProxyServer.getInstance().getPluginManager().unregisterListeners(INSTANCE);
+        ProxyServer.getInstance().getPluginManager().
+                unregisterCommands(INSTANCE);
+        ProxyServer.getInstance().getPluginManager().unregisterListeners(
+                INSTANCE);
         ProxyServer.getInstance().getScheduler().cancel(INSTANCE);
 
         tabLists = null;
@@ -288,8 +299,9 @@ public class BungeeTabListPlus extends Plugin {
             String name = player.getName();
             hidden = hiddenPlayers.contains(name);
         }
-        String s = getInstance().bukkitBridge.getPlayerInformation(player, "isVanished");
-        if(s != null){
+        String s = getInstance().bukkitBridge.getPlayerInformation(player,
+                "isVanished");
+        if (s != null) {
             hidden |= Boolean.valueOf(s);
         }
         return hidden;
@@ -314,17 +326,17 @@ public class BungeeTabListPlus extends Plugin {
             hiddenPlayers.remove(name);
         }
     }
-    
-    public static boolean areHiddenPlayers(){
+
+    public static boolean areHiddenPlayers() {
         return !hiddenPlayers.isEmpty();
     }
-    
-    public BukkitBridge getBridge(){
+
+    public BukkitBridge getBridge() {
         return this.bukkitBridge;
     }
-    
-    public boolean isUpdateAvailable(){
-        if(updateChecker != null){
+
+    public boolean isUpdateAvailable() {
+        if (updateChecker != null) {
             return updateChecker.isUpdateAvailable();
         }
         return false;
