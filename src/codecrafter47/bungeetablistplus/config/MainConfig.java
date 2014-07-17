@@ -57,6 +57,13 @@ public class MainConfig extends Config {
     public boolean sendPing = true;
 
     @Comments({
+        "if enabled the plugin checks for new versions automatically.",
+        "Use /BTLP to see whether a new version is available",
+        "this does NOT automatically install an update"
+    })
+    public boolean checkForUpdates = true;
+
+    @Comments({
         "server Alias fo the {server} Variable"
     })
     public HashMap<String, String> serverAlias = new HashMap<>();

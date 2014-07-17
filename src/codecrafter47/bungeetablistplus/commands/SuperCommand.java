@@ -77,6 +77,9 @@ public class SuperCommand extends Command {
         } else {
             if (plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.help") || plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.admin")) {
                 sender.sendMessage(ChatColor.DARK_PURPLE + "BungeeTabListPlus " + BungeeTabListPlus.getInstance().getDescription().getVersion());
+                if(plugin.isUpdateAvailable()){
+                    sender.sendMessage(ChatColor.GREEN + "A new version of BungeeTabListPlus is available for download");
+                }
                 for(String s: plugin.getProxy().getServers().keySet()){
                     if(!plugin.getBridge().isUpToDate(s)){
                         sender.sendMessage(ChatColor.DARK_RED + "BukkitBridge on server '" + s +"' is outdated. Please update!");

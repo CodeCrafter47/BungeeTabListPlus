@@ -9,6 +9,7 @@ import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.managers.VariablesManager;
+import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -67,6 +68,8 @@ public class BungeeTabListPlus extends Plugin {
     private final static Collection<String> hiddenPlayers = new HashSet<>();
     
     BukkitBridge bukkitBridge;
+    
+    UpdateChecker updateChecker = null;
 
     // Changes:
     // validate config( check sortrules, check for server filter in groupLines, valid showTo(valid first parameter, valid server)
@@ -83,22 +86,19 @@ public class BungeeTabListPlus extends Plugin {
     // - support for bukkitside permission plugins
     // world fillplayers: {fillplayers:server#world}
     // allow {time:format}
+    // more performant variable replacement
+    // world playercount: {players:server#world}
+    // /BTLP shows whether a update is available
     // ---------------------------------------------
     // 1.7
-    // TODO /btpl command showing update status of plugin too
     // TODO color variable
-    // TODO updateChecker
     // TODO scrolling text
     // TODO multislot scrolling text
     // TODO tabComplete support
     // TODO use bridge version to check whether the plugin is uptodate (newer bridge version)
-    // TODO more performant variable replacement
-    // TODO regex based variable replacement
-    // TODO nested variables
+    // TODO nested variables - actually that is very difficult
     // TODO world player count, variable to show number of players on multiple servers like {players:lobby+survival}
     //      --> allow + / - operations in {players:*} variable
-    //      --> allow world in player varialbe
-    //      --> world playercount: {players:server#world}
     // TODO Developer api
     // TODO add isOnline
     // TODO better reload (restart resend-thread)
@@ -106,6 +106,7 @@ public class BungeeTabListPlus extends Plugin {
     // TODO improve performance in sortrules
     // TODO showTo more flexible
     // TODO uuid support for showTo
+    // TODO rework commands (klickable links)
     // TODO improve automatic {fillplayers}: It would be nice to have a feature
     // to combine several servers into 1 server, this would be very usefull for 
     // a minigames type of server setting, where you have different servers acting
@@ -188,6 +189,11 @@ public class BungeeTabListPlus extends Plugin {
         } catch (IOException e) {
             getLogger().warning("Failed to initialize Metrics");
             getLogger().warning(e.getLocalizedMessage());
+        }
+        
+        // Load updateCheck thread
+        if(config.getMainConfig().checkForUpdates){
+            updateChecker = new UpdateChecker(this);
         }
     }
 
@@ -315,5 +321,12 @@ public class BungeeTabListPlus extends Plugin {
     
     public BukkitBridge getBridge(){
         return this.bukkitBridge;
+    }
+    
+    public boolean isUpdateAvailable(){
+        if(updateChecker != null){
+            return updateChecker.isUpdateAvailable();
+        }
+        return false;
     }
 }
