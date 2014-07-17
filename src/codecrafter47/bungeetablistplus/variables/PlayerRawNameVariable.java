@@ -1,15 +1,12 @@
 package codecrafter47.bungeetablistplus.variables;
 
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class PlayerRawNameVariable extends PlayerVariable {
-
-	public PlayerRawNameVariable(String name) {
-		super(name);
-	}
+public class PlayerRawNameVariable implements PlayerVariable {
 
 	@Override
-	public String getReplacement(ProxiedPlayer player) {
+	public String getReplacement(String args, ProxiedPlayer player) {
 		return player.getName();
 	}
 

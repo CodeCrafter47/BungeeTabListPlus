@@ -82,6 +82,7 @@ public class BungeeTabListPlus extends Plugin {
     // - support for bukkitside tabcolor plugins
     // - support for bukkitside permission plugins
     // world fillplayers: {fillplayers:server#world}
+    // allow {time:format}
     // ---------------------------------------------
     // 1.7
     // TODO /btpl command showing update status of plugin too

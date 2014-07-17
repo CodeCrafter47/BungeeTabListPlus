@@ -6,6 +6,7 @@
 
 package codecrafter47.bungeetablistplus.variables;
 
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -13,14 +14,10 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  *
  * @author florian
  */
-public class WorldVariable extends PlayerVariable{
-
-    public WorldVariable() {
-        super("world");
-    }
+public class WorldVariable implements PlayerVariable{
 
     @Override
-    public String getReplacement(ProxiedPlayer player) {
+    public String getReplacement(String args, ProxiedPlayer player) {
         String world = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player, "world");
         if(world == null)return "";
         return world;

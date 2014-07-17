@@ -11,132 +11,157 @@ import codecrafter47.bungeetablistplus.variables.PingVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerNameVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerRawNameVariable;
-import codecrafter47.bungeetablistplus.variables.PlayerVariable;
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.variables.ServerNameVariable;
 import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
-import codecrafter47.bungeetablistplus.variables.ServerVariable;
+import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.variables.TimeVariable;
 import codecrafter47.bungeetablistplus.variables.UUIDVariable;
-import codecrafter47.bungeetablistplus.variables.Variable;
+import codecrafter47.bungeetablistplus.api.Variable;
 import codecrafter47.bungeetablistplus.variables.WorldVariable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public final class VariablesManager {
 
-    private final List<Variable> variables = new ArrayList<>();
-    private final List<PlayerVariable> playerVariables = new ArrayList<>();
-    private final List<ServerVariable> serverVariables = new ArrayList<>();
+    private final Map<String, Variable> variables = new HashMap<>();
+    private final Map<String, PlayerVariable> playerVariables = new HashMap<>();
+    private final Map<String, ServerVariable> serverVariables = new HashMap<>();
 
     public VariablesManager() {
         super();
-        // Adding default Variables
-        addVariable(new CurrentServerPlayerCountVariable(
-                "server_player_count"));
-        VariablesManager.this.addVariable(new PlayerCountVariable("player_count"));
-        VariablesManager.this.addVariable(new PlayerCountVariable("gcount"));
-        VariablesManager.this.addVariable(new PlayerCountVariable("players"));
-        VariablesManager.this.addVariable(new PlayerNameVariable("name"));
-        VariablesManager.this.addVariable(new PlayerNameVariable("player"));
-        VariablesManager.this.addVariable(new PlayerRawNameVariable("rawname"));
-        addVariable(new ServerNameVariable("server"));
-        VariablesManager.this.addVariable(new PermPrefix("permprefix"));
-        VariablesManager.this.addVariable(new PermPrefix("prefix"));
-        VariablesManager.this.addVariable(new PermSuffix("permsuffix"));
-        VariablesManager.this.addVariable(new PermSuffix("suffix"));
-        VariablesManager.this.addVariable(new DisplayPrefix("displayprefix"));
-        VariablesManager.this.addVariable(new PingVariable("ping"));
-
-        Map<String, ServerInfo> server_map = ProxyServer.getInstance().getServers();
-        for (String server_name : server_map.keySet()) {
-            VariablesManager.this.addVariable(new ServerPlayerCountVariable("players:"
-                    + server_name, server_name));
-            VariablesManager.this.addVariable(new ServerPlayerCountVariable("players:"
-                    + server_name.toLowerCase(), server_name));
-        }
-
-        VariablesManager.this.addVariable(new TimeVariable("time", "HH:mm:ss"));
-        VariablesManager.this.addVariable(new TimeVariable("date", "dd.MM.yyyy"));
-        VariablesManager.this.addVariable(new TimeVariable("second", "ss"));
-        VariablesManager.this.addVariable(new TimeVariable("seconds", "ss"));
-        VariablesManager.this.addVariable(new TimeVariable("sec", "ss"));
-        VariablesManager.this.addVariable(new TimeVariable("minute", "mm"));
-        VariablesManager.this.addVariable(new TimeVariable("minutes", "mm"));
-        VariablesManager.this.addVariable(new TimeVariable("min", "mm"));
-        VariablesManager.this.addVariable(new TimeVariable("hour", "HH"));
-        VariablesManager.this.addVariable(new TimeVariable("hours", "HH"));
-        VariablesManager.this.addVariable(new TimeVariable("day", "dd"));
-        VariablesManager.this.addVariable(new TimeVariable("days", "dd"));
-        VariablesManager.this.addVariable(new TimeVariable("month", "MM"));
-        VariablesManager.this.addVariable(new TimeVariable("months", "MM"));
-        VariablesManager.this.addVariable(new TimeVariable("year", "yyyy"));
-        VariablesManager.this.addVariable(new TimeVariable("years", "yyyy"));
-        VariablesManager.this.addVariable(new GroupVariable("group"));
-        addVariable(new UUIDVariable("uuid"));
-        addVariable(new UUIDVariable("UUID"));
-        addVariable(new WorldVariable());
-        addVariable(new BalanceVariable());
+        addVariable("server_player_count", new CurrentServerPlayerCountVariable());
+        addVariable("player_count", new PlayerCountVariable());
+        addVariable("gcount", new PlayerCountVariable());
+        addVariable("players", new ServerPlayerCountVariable());
+        addVariable("name", new PlayerNameVariable());
+        addVariable("player", new PlayerNameVariable());
+        addVariable("rawname", new PlayerRawNameVariable());
+        addVariable("server", new ServerNameVariable());
+        addVariable("permprefix", new PermPrefix());
+        addVariable("prefix", new PermPrefix());
+        addVariable("permsuffix", new PermSuffix());
+        addVariable("suffix", new PermSuffix());
+        addVariable("displayprefix", new DisplayPrefix());
+        addVariable("ping", new PingVariable());
+        addVariable("time", new TimeVariable("HH:mm:ss"));
+        addVariable("date", new TimeVariable("dd.MM.yyyy"));
+        addVariable("second", new TimeVariable("ss"));
+        addVariable("seconds", new TimeVariable("ss"));
+        addVariable("sec", new TimeVariable("ss"));
+        addVariable("minute", new TimeVariable("mm"));
+        addVariable("minutes", new TimeVariable("mm"));
+        addVariable("min", new TimeVariable("mm"));
+        addVariable("hour", new TimeVariable("HH"));
+        addVariable("hours", new TimeVariable("HH"));
+        addVariable("day", new TimeVariable("dd"));
+        addVariable("days", new TimeVariable("dd"));
+        addVariable("month", new TimeVariable("MM"));
+        addVariable("months", new TimeVariable("MM"));
+        addVariable("year", new TimeVariable("yyyy"));
+        addVariable("years", new TimeVariable("yyyy"));
+        addVariable("group", new GroupVariable());
+        addVariable("uuid", new UUIDVariable());
+        addVariable("UUID", new UUIDVariable());
+        addVariable("world", new WorldVariable());
+        addVariable("balance", new BalanceVariable());
     }
 
-    public void addVariable(Variable var) {
-        variables.add(var);
+    public void addVariable(String name, Variable var) {
+        variables.put(name, var);
     }
 
-    public void addVariable(PlayerVariable var) {
-        playerVariables.add(var);
+    public void addVariable(String name, PlayerVariable var) {
+        playerVariables.put(name, var);
     }
 
-    public void addVariable(ServerVariable var) {
-        serverVariables.add(var);
+    public void addVariable(String name, ServerVariable var) {
+        serverVariables.put(name, var);
     }
 
     public String replaceVariables(String s) {
-        for (Variable v : variables) {
-            if(s.contains("{" + v.getName() + "}"))s = s.replace("{" + v.getName() + "}", v.getReplacement());
-        }
-        return s;
+        StringBuffer sb = new StringBuffer();
+        Pattern pattern = Pattern.compile("\\{[^}]+\\}");
+        Matcher matcher = pattern.matcher(s);
 
+        while (matcher.find()) {
+            String var = s.substring(matcher.start(), matcher.end());
+            var = var.replaceAll("[\\{\\}]", "");
+            String arg = null;
+            if (var.contains(":")) {
+                arg = var.substring(var.indexOf(":"), var.length());
+            }
+
+            Variable variable = this.variables.get(var);
+            String replacement = "?";
+            if (variable != null) {
+                replacement = variable.getReplacement(arg);
+            }
+
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     public String replacePlayerVariables(String s, ProxiedPlayer player) {
         if (player.getServer() != null) {
             s = replaceServerVariables(s, player.getServer().getInfo());
         }
-        for (PlayerVariable v : playerVariables) {
-            if(s.contains("{" + v.getName() + "}"))s = s.replace("{" + v.getName() + "}", v.getReplacement(player));
-        }
-        return s;
 
+        StringBuffer sb = new StringBuffer();
+        Pattern pattern = Pattern.compile("\\{[^}]+\\}");
+        Matcher matcher = pattern.matcher(s);
+
+        while (matcher.find()) {
+            String var = s.substring(matcher.start(), matcher.end());
+            var = var.replaceAll("[\\{\\}]", "");
+            String arg = null;
+            if (var.contains(":")) {
+                arg = var.substring(var.indexOf(":"), var.length());
+            }
+
+            PlayerVariable variable = this.playerVariables.get(var);
+            String replacement = "?";
+            if (variable != null) {
+                replacement = variable.getReplacement(arg, player);
+            }
+
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     public String replaceServerVariables(String s, ServerInfo server) {
-        for (ServerVariable v : serverVariables) {
-            if(s.contains("{" + v.getName() + "}"))s = s.replace("{" + v.getName() + "}", v.getReplacement(server));
-        }
-        return s;
+        StringBuffer sb = new StringBuffer();
+        Pattern pattern = Pattern.compile("\\{[^}]+\\}");
+        Matcher matcher = pattern.matcher(s);
 
-    }
-
-    public boolean hasPlayerVariables(String s) {
-        for (PlayerVariable v : playerVariables) {
-            if (s.contains("{" + v.getName() + "}")) {
-                return true;
+        while (matcher.find()) {
+            String var = s.substring(matcher.start(), matcher.end());
+            var = var.replaceAll("[\\{\\}]", "");
+            String arg = null;
+            if (var.contains(":")) {
+                arg = var.substring(var.indexOf(":"), var.length());
             }
-        }
-        return false;
-    }
 
-    public boolean hasServerVariables(String s) {
-        for (ServerVariable v : serverVariables) {
-            if (s.contains("{" + v.getName() + "}")) {
-                return true;
+            ServerVariable variable = this.serverVariables.get(var);
+            String replacement = "?";
+            if (variable != null) {
+                replacement = variable.getReplacement(arg, server);
             }
-        }
-        return false;
-    }
 
+            matcher.appendReplacement(sb, replacement);
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
 }

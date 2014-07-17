@@ -6,6 +6,7 @@
 
 package codecrafter47.bungeetablistplus.variables;
 
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -13,14 +14,10 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  *
  * @author florian
  */
-public class DisplayPrefix extends PlayerVariable{
-
-    public DisplayPrefix(String name) {
-        super(name);
-    }
+public class DisplayPrefix implements PlayerVariable{
 
     @Override
-    public String getReplacement(ProxiedPlayer player) {
+    public String getReplacement(String args, ProxiedPlayer player) {
         return BungeeTabListPlus.getInstance().getPermissionManager().getDisplayPrefix(player);
     }
     

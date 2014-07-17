@@ -1,16 +1,13 @@
 package codecrafter47.bungeetablistplus.variables;
 
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class PlayerPingVariable extends PlayerVariable{
-
-	public PlayerPingVariable(String name) {
-		super(name);
-	}
+public class PlayerPingVariable implements PlayerVariable{
 
 	@Override
-	public String getReplacement(ProxiedPlayer player) {
-		return "" + player.getPing();
+	public String getReplacement(String args, ProxiedPlayer player) {
+		return Integer.toString(player.getPing());
 	}
 	
 }
