@@ -84,6 +84,7 @@ public class BungeeTabListPlus extends Plugin {
     // - worldplayercount
     // - support for bukkitside tabcolor plugins
     // - support for bukkitside permission plugins
+    // - faction support: {factionsWhere}, {factionName}, {factionMembersOnline}
     // world fillplayers: {fillplayers:server#world}
     // allow {time:format}
     // more performant variable replacement

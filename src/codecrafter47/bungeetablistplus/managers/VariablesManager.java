@@ -5,6 +5,7 @@ import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.api.Variable;
 import codecrafter47.bungeetablistplus.variables.BalanceVariable;
+import codecrafter47.bungeetablistplus.variables.BukkitBridgeVariable;
 import codecrafter47.bungeetablistplus.variables.ColorVariable;
 import codecrafter47.bungeetablistplus.variables.CurrentServerPlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.DisplayPrefix;
@@ -75,6 +76,10 @@ public final class VariablesManager {
         addVariable("world", new WorldVariable());
         addVariable("balance", new BalanceVariable());
         addVariable("color", new ColorVariable());
+        addVariable("factionName", new BukkitBridgeVariable("factionName"));
+        addVariable("onlineFactionMembers", new BukkitBridgeVariable(
+                "onlineFactionMembers"));
+        addVariable("factionsWhere", new BukkitBridgeVariable("factionsWhere"));
     }
 
     public void addVariable(String name, Variable var) {
