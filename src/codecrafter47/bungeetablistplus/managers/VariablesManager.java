@@ -80,6 +80,8 @@ public final class VariablesManager {
         addVariable("onlineFactionMembers", new BukkitBridgeVariable(
                 "onlineFactionMembers"));
         addVariable("factionsWhere", new BukkitBridgeVariable("factionsWhere"));
+        addVariable("health", new BukkitBridgeVariable("health"));
+        addVariable("level", new BukkitBridgeVariable("level"));
     }
 
     public void addVariable(String name, Variable var) {

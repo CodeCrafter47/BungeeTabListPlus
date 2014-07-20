@@ -27,10 +27,6 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.plugin.PluginDescription;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,8 +47,13 @@ import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginDescription;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class Metrics {
 
@@ -84,7 +85,8 @@ public class Metrics {
     /**
      * All of the custom graphs to submit to metrics
      */
-    private final Set<Graph> graphs = Collections.synchronizedSet(new HashSet<Graph>());
+    private final Set<Graph> graphs = Collections.synchronizedSet(
+            new HashSet<Graph>());
 
     /**
      * The plugin configuration file
@@ -114,7 +116,7 @@ public class Metrics {
     /**
      * The scheduled task
      */
-    private Thread thread = null;
+    private ScheduledTask thread = null;
 
     public Metrics(final Plugin plugin) throws IOException {
         if (plugin == null) {
@@ -127,7 +129,8 @@ public class Metrics {
         configurationFile = getConfigFile();
 
         if (!configurationFile.exists()) {
-            if (configurationFile.getPath().contains("/") || configurationFile.getPath().contains("\\")) {
+            if (configurationFile.getPath().contains("/") || configurationFile.
+                    getPath().contains("\\")) {
                 File parent = new File(configurationFile.getParent());
                 if (!parent.exists()) {
                     parent.mkdir();
@@ -138,7 +141,8 @@ public class Metrics {
             properties.put("opt-out", "false");
             properties.put("guid", UUID.randomUUID().toString());
             properties.put("debug", "false");
-            properties.store(new FileOutputStream(configurationFile), "http://mcstats.org");
+            properties.store(new FileOutputStream(configurationFile),
+                    "http://mcstats.org");
         } else {
             properties.load(new FileInputStream(configurationFile));
         }
@@ -149,11 +153,13 @@ public class Metrics {
     }
 
     /**
-     * Construct and create a Graph that can be used to separate specific plotters to their own graphs on the metrics
-     * website. Plotters can be added to the graph object returned.
+     * Construct and create a Graph that can be used to separate specific
+     * plotters to their own graphs on the metrics website. Plotters can be
+     * added to the graph object returned.
      *
      * @param name The name of the graph
-     * @return Graph object created. Will never return NULL under normal circumstances unless bad parameters are given
+     * @return Graph object created. Will never return NULL under normal
+     * circumstances unless bad parameters are given
      */
     public Graph createGraph(final String name) {
         if (name == null) {
@@ -171,7 +177,8 @@ public class Metrics {
     }
 
     /**
-     * Add a Graph object to BukkitMetrics that represents data for the plugin that should be sent to the backend
+     * Add a Graph object to BukkitMetrics that represents data for the plugin
+     * that should be sent to the backend
      *
      * @param graph The name of the graph
      */
@@ -184,9 +191,10 @@ public class Metrics {
     }
 
     /**
-     * Start measuring statistics. This will immediately create an async repeating task as the plugin and send the
-     * initial data to the metrics backend, and then after that it will post in increments of PING_INTERVAL * 1200
-     * ticks.
+     * Start measuring statistics. This will immediately create an async
+     * repeating task as the plugin and send the initial data to the metrics
+     * backend, and then after that it will post in increments of PING_INTERVAL
+     * * 1200 ticks.
      *
      * @return True if statistics measuring is running, otherwise false.
      */
@@ -203,55 +211,56 @@ public class Metrics {
             }
 
             // Begin hitting the server with glorious data
-            thread = new Thread(new Runnable() {
+            thread = plugin.getProxy().getScheduler().schedule(plugin,
+                    new Runnable() {
 
-                private boolean firstPost = true;
+                        private boolean firstPost = true;
 
-                private long nextPost = 0L;
+                        private long nextPost = 0L;
 
-                public void run() {
-                    while (thread != null) {
-                        if (nextPost == 0L || System.currentTimeMillis() > nextPost) {
-                            try {
-                                // This has to be synchronized or it can collide with the disable method.
-                                synchronized (optOutLock) {
-                                    // Disable Task, if it is running and the server owner decided to opt-out
-                                    if (isOptOut() && thread != null) {
-                                        Thread temp = thread;
-                                        thread = null;
-                                        // Tell all plotters to stop gathering information.
-                                        for (Graph graph : graphs) {
-                                            graph.onOptOut();
+                        public void run() {
+                            while (thread != null) {
+                                if (nextPost == 0L || System.currentTimeMillis() > nextPost) {
+                                    try {
+                                        // This has to be synchronized or it can collide with the disable method.
+                                        synchronized (optOutLock) {
+                                            // Disable Task, if it is running and the server owner decided to opt-out
+                                            if (isOptOut() && thread != null) {
+                                                ScheduledTask temp = thread;
+                                                thread = null;
+                                                // Tell all plotters to stop gathering information.
+                                                for (Graph graph : graphs) {
+                                                    graph.onOptOut();
+                                                }
+                                                temp.cancel();// interrupting ourselves
+                                                return;
+                                            }
                                         }
-                                        temp.interrupt(); // interrupting ourselves
-                                        return;
+
+                                        // We use the inverse of firstPost because if it is the first time we are posting,
+                                        // it is not a interval ping, so it evaluates to FALSE
+                                        // Each time thereafter it will evaluate to TRUE, i.e PING!
+                                        postPlugin(!firstPost);
+
+                                        // After the first post we set firstPost to false
+                                        // Each post thereafter will be a ping
+                                        firstPost = false;
+                                        nextPost = System.currentTimeMillis() + (PING_INTERVAL * 60 * 1000);
+                                    } catch (IOException e) {
+                                        if (debug) {
+                                            System.out.println("[Metrics] " + e.
+                                                    getMessage());
+                                        }
                                     }
                                 }
 
-                                // We use the inverse of firstPost because if it is the first time we are posting,
-                                // it is not a interval ping, so it evaluates to FALSE
-                                // Each time thereafter it will evaluate to TRUE, i.e PING!
-                                postPlugin(!firstPost);
-
-                                // After the first post we set firstPost to false
-                                // Each post thereafter will be a ping
-                                firstPost = false;
-                                nextPost = System.currentTimeMillis() + (PING_INTERVAL * 60 * 1000);
-                            } catch (IOException e) {
-                                if (debug) {
-                                    System.out.println("[Metrics] " + e.getMessage());
+                                try {
+                                    Thread.sleep(100L);
+                                } catch (InterruptedException e) {
                                 }
                             }
                         }
-
-                        try {
-                            Thread.sleep(100L);
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                }
-            }, "MCStats / Plugin Metrics");
-            thread.start();
+                    }, 0, PING_INTERVAL, TimeUnit.MINUTES);
 
             return true;
         }
@@ -269,7 +278,8 @@ public class Metrics {
                 properties.load(new FileInputStream(configurationFile));
             } catch (IOException ex) {
                 if (debug) {
-                    ProxyServer.getInstance().getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
+                    ProxyServer.getInstance().getLogger().log(Level.INFO,
+                            "[Metrics] " + ex.getMessage());
                 }
                 return true;
             }
@@ -279,7 +289,8 @@ public class Metrics {
     }
 
     /**
-     * Enables metrics for the server by setting "opt-out" to false in the config file and starting the metrics task.
+     * Enables metrics for the server by setting "opt-out" to false in the
+     * config file and starting the metrics task.
      *
      * @throws java.io.IOException
      */
@@ -289,7 +300,8 @@ public class Metrics {
             // Check if the server owner has already set opt-out, if not, set it.
             if (isOptOut()) {
                 properties.setProperty("opt-out", "false");
-                properties.store(new FileOutputStream(configurationFile), "http://mcstats.org");
+                properties.store(new FileOutputStream(configurationFile),
+                        "http://mcstats.org");
             }
 
             // Enable Task, if it is not running
@@ -300,7 +312,8 @@ public class Metrics {
     }
 
     /**
-     * Disables metrics for the server by setting "opt-out" to true in the config file and canceling the metrics task.
+     * Disables metrics for the server by setting "opt-out" to true in the
+     * config file and canceling the metrics task.
      *
      * @throws java.io.IOException
      */
@@ -310,25 +323,28 @@ public class Metrics {
             // Check if the server owner has already set opt-out, if not, set it.
             if (!isOptOut()) {
                 properties.setProperty("opt-out", "true");
-                properties.store(new FileOutputStream(configurationFile), "http://mcstats.org");
+                properties.store(new FileOutputStream(configurationFile),
+                        "http://mcstats.org");
             }
 
             // Disable Task, if it is running
             if (thread != null) {
-                thread.interrupt();
+                thread.cancel();
                 thread = null;
             }
         }
     }
 
     /**
-     * Gets the File object of the config file that should be used to store data such as the GUID and opt-out status
+     * Gets the File object of the config file that should be used to store data
+     * such as the GUID and opt-out status
      *
      * @return the File object for the config file
      */
     public File getConfigFile() {
         // return => base/plugins/PluginMetrics/config.yml
-        return new File(new File("plugins", "PluginMetrics"), "config.properties");
+        return new File(new File("plugins", "PluginMetrics"),
+                "config.properties");
     }
 
     /**
@@ -338,13 +354,13 @@ public class Metrics {
         // Server software specific section
         PluginDescription description = plugin.getDescription();
         String pluginName = description.getName();
-        boolean onlineMode = ProxyServer.getInstance().getConfigurationAdapter().getBoolean("online_mode", true); // TRUE if online mode is enabled
+        boolean onlineMode = ProxyServer.getInstance().getConfigurationAdapter().
+                getBoolean("online_mode", true); // TRUE if online mode is enabled
         String pluginVersion = description.getVersion();
         String serverVersion = ProxyServer.getInstance().getVersion();
         int playersOnline = ProxyServer.getInstance().getPlayers().size();
 
         // END server software specific section -- all code below does not use any code outside of this class / Java
-
         // Construct the post data
         StringBuilder json = new StringBuilder(1024);
         json.append('{');
@@ -399,7 +415,8 @@ public class Metrics {
                     graphJson.append('{');
 
                     for (Plotter plotter : graph.getPlotters()) {
-                        appendJSONPair(graphJson, plotter.getColumnName(), Integer.toString(plotter.getValue()));
+                        appendJSONPair(graphJson, plotter.getColumnName(),
+                                Integer.toString(plotter.getValue()));
                     }
 
                     graphJson.append('}');
@@ -423,7 +440,8 @@ public class Metrics {
         json.append('}');
 
         // Create the url
-        URL url = new URL(BASE_URL + String.format(REPORT_URL, urlEncode(pluginName)));
+        URL url = new URL(BASE_URL + String.format(REPORT_URL, urlEncode(
+                pluginName)));
 
         // Connect to the website
         URLConnection connection;
@@ -436,7 +454,6 @@ public class Metrics {
             connection = url.openConnection();
         }
 
-
         byte[] uncompressed = json.toString().getBytes();
         byte[] compressed = gzip(json.toString());
 
@@ -444,14 +461,16 @@ public class Metrics {
         connection.addRequestProperty("User-Agent", "MCStats/" + REVISION);
         connection.addRequestProperty("Content-Type", "application/json");
         connection.addRequestProperty("Content-Encoding", "gzip");
-        connection.addRequestProperty("Content-Length", Integer.toString(compressed.length));
+        connection.addRequestProperty("Content-Length", Integer.toString(
+                compressed.length));
         connection.addRequestProperty("Accept", "application/json");
         connection.addRequestProperty("Connection", "close");
 
         connection.setDoOutput(true);
 
         if (debug) {
-            System.out.println("[Metrics] Prepared request for " + pluginName + " uncompressed=" + uncompressed.length + " compressed=" + compressed.length);
+            System.out.println(
+                    "[Metrics] Prepared request for " + pluginName + " uncompressed=" + uncompressed.length + " compressed=" + compressed.length);
         }
 
         // Write the data
@@ -460,14 +479,16 @@ public class Metrics {
         os.flush();
 
         // Now read the response
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(
+                connection.getInputStream()));
         String response = reader.readLine();
 
         // close resources
         os.close();
         reader.close();
 
-        if (response == null || response.startsWith("ERR") || response.startsWith("7")) {
+        if (response == null || response.startsWith("ERR") || response.
+                startsWith("7")) {
             if (response == null) {
                 response = "null";
             } else if (response.startsWith("7")) {
@@ -477,7 +498,8 @@ public class Metrics {
             throw new IOException(response);
         } else {
             // Is this the first update this hour?
-            if (response.equals("1") || response.contains("This is your first update this hour")) {
+            if (response.equals("1") || response.contains(
+                    "This is your first update this hour")) {
                 synchronized (graphs) {
                     final Iterator<Graph> iter = graphs.iterator();
 
@@ -509,9 +531,11 @@ public class Metrics {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (gzos != null) try {
-                gzos.close();
-            } catch (IOException ignore) {
+            if (gzos != null) {
+                try {
+                    gzos.close();
+                } catch (IOException ignore) {
+                }
             }
         }
 
@@ -519,7 +543,8 @@ public class Metrics {
     }
 
     /**
-     * Check if mineshafter is present. If it is, we need to bypass it to send POST requests
+     * Check if mineshafter is present. If it is, we need to bypass it to send
+     * POST requests
      *
      * @return true if mineshafter is installed on the server
      */
@@ -540,7 +565,8 @@ public class Metrics {
      * @param value
      * @throws UnsupportedEncodingException
      */
-    private static void appendJSONPair(StringBuilder json, String key, String value) throws UnsupportedEncodingException {
+    private static void appendJSONPair(StringBuilder json, String key,
+            String value) throws UnsupportedEncodingException {
         boolean isValueNumeric = false;
 
         try {
@@ -618,7 +644,8 @@ public class Metrics {
      * @param text the text to encode
      * @return the encoded text, as UTF-8
      */
-    private static String urlEncode(final String text) throws UnsupportedEncodingException {
+    private static String urlEncode(final String text) throws
+            UnsupportedEncodingException {
         return URLEncoder.encode(text, "UTF-8");
     }
 
@@ -628,8 +655,8 @@ public class Metrics {
     public static class Graph {
 
         /**
-         * The graph's name, alphanumeric and spaces only :) If it does not comply to the above when submitted, it is
-         * rejected
+         * The graph's name, alphanumeric and spaces only :) If it does not
+         * comply to the above when submitted, it is rejected
          */
         private final String name;
 
@@ -694,7 +721,8 @@ public class Metrics {
         }
 
         /**
-         * Called when the server owner decides to opt-out of BukkitMetrics while the server is running.
+         * Called when the server owner decides to opt-out of BukkitMetrics
+         * while the server is running.
          */
         protected void onOptOut() {
         }
@@ -720,16 +748,19 @@ public class Metrics {
         /**
          * Construct a plotter with a specific plot name
          *
-         * @param name the name of the plotter to use, which will show up on the website
+         * @param name the name of the plotter to use, which will show up on the
+         * website
          */
         public Plotter(final String name) {
             this.name = name;
         }
 
         /**
-         * Get the current value for the plotted point. Since this function defers to an external function it may or may
-         * not return immediately thus cannot be guaranteed to be thread friendly or safe. This function can be called
-         * from any thread so care should be taken when accessing resources that need to be synchronized.
+         * Get the current value for the plotted point. Since this function
+         * defers to an external function it may or may not return immediately
+         * thus cannot be guaranteed to be thread friendly or safe. This
+         * function can be called from any thread so care should be taken when
+         * accessing resources that need to be synchronized.
          *
          * @return the current value for the point to be plotted.
          */

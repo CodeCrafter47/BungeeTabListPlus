@@ -33,7 +33,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 public class ConfigParser {
 
     //private static final Pattern formatThings = Pattern.compile("\\[ALIGN .*\\]");
-
     private final BungeeTabListPlus plugin;
 
     public TabListConfig config;
@@ -53,7 +52,7 @@ public class ConfigParser {
             int ping = 0;
             int startColumn = -1;
             int collumn = -1;
-            int maxplayers = Integer.MAX_VALUE;
+            int maxplayers = 1000;
             List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
@@ -70,16 +69,20 @@ public class ConfigParser {
                 } else if (tag.startsWith("COLUMN=")) {
                     collumn = Integer.parseInt(tag.substring(7, tag.length()));
                 } else if (tag.startsWith("SORT=")) {
-                    sortrules = Arrays.asList(tag.substring(5, tag.length()).split(","));
+                    sortrules = Arrays.asList(tag.substring(5, tag.length()).
+                            split(","));
                     validateSortrules(sortrules);
                 } else if (tag.startsWith("MAXPLAYERS=")) {
-                    maxplayers = Integer.parseInt(tag.substring(11, tag.length()));
+                    maxplayers = Integer.parseInt(tag.
+                            substring(11, tag.length()));
                 } else {
-                    plugin.getLogger().log(Level.WARNING, "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag, config.getFileName()});
+                    plugin.getLogger().log(Level.WARNING,
+                            "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
+                                config.getFileName()});
                 }
             }
-            
-            if(startColumn == -1 && collumn != -1){
+
+            if (startColumn == -1 && collumn != -1) {
                 startColumn = collumn;
             }
 
@@ -97,8 +100,11 @@ public class ConfigParser {
             // Parsing FillPlayers
             if (isFillPlayers(line)) {
                 String prefix = text.substring(0, text.indexOf("{fillplayers"));
-                String suffix = text.substring(text.indexOf('}', prefix.length()), text.length() - 1);
-                String args = text.charAt(prefix.length() + 12) == ':' ? text.substring(prefix.length() + 13, text.length() - suffix.length() - 1) : "";
+                String suffix = text.substring(text.
+                        indexOf('}', prefix.length()), text.length() - 1);
+                String args = text.charAt(prefix.length() + 12) == ':' ? text.
+                        substring(prefix.length() + 13, text.length() - suffix.
+                                length() - 1) : "";
                 List<String> filter;
                 if (args.length() > 0) {
                     filter = Arrays.asList(args.split(","));
@@ -106,29 +112,33 @@ public class ConfigParser {
                     filter = new ArrayList<>();
                 }
                 if (collumn == -1) {
-                    if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
-                        Map<String, ServerInfo> servers = ProxyServer.getInstance().getServers();
+                    if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.
+                            isEmpty()) {
+                        Map<String, ServerInfo> servers = ProxyServer.
+                                getInstance().getServers();
                         for (String server : servers.keySet()) {
-                            sections.addAll(parseServerSections(prefix, suffix, filter, server, sortrules, maxplayers));
+                            sections.addAll(parseServerSections(prefix, suffix,
+                                    filter, server, sortrules, maxplayers));
                         }
                     } else {
-                        sections.add(new FillPlayersSection(startColumn, filter, config, prefix, suffix, sortrules, maxplayers));
+                        sections.add(new FillPlayersSection(startColumn, filter,
+                                config, prefix, suffix, sortrules, maxplayers));
                     }
                 } else {
                     CollumnSplitSection cs;
                     if (sections.get(sections.size() - 1) instanceof CollumnSplitSection) {
-                        cs = (CollumnSplitSection) sections.get(sections.size() - 1);
+                        cs = (CollumnSplitSection) sections.get(
+                                sections.size() - 1);
                     } else {
                         cs = new CollumnSplitSection();
                         sections.add(cs);
                     }
-                    cs.addCollumn(collumn, new PlayerColumn(filter, config, prefix, suffix, sortrules, maxplayers));
+                    cs.addCollumn(collumn, new PlayerColumn(filter, config,
+                            prefix, suffix, sortrules, maxplayers));
                 }
-            }
-            else if(isFillBukkitPlayers(line)){
+            } else if (isFillBukkitPlayers(line)) {
                 sections.add(new FillBukkitPlayers(startColumn));
-            }
-            // Parsing Normal text
+            } // Parsing Normal text
             else {
                 StaticSection section;
                 if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof StaticSection && startColumn == -1) {
@@ -141,10 +151,13 @@ public class ConfigParser {
             }
         }
 
-        return new TabListProvider(topSections, botSections, config.showEmptyGroups, config);
+        return new TabListProvider(topSections, botSections,
+                config.showEmptyGroups, config);
     }
 
-    private List<Section> parseServerSections(String g_prefix, String g_suffix, List<String> g_filter, String g_server, List<String> g_sort, int maxplayers) throws ParseException {
+    private List<Section> parseServerSections(String g_prefix, String g_suffix,
+            List<String> g_filter, String g_server, List<String> g_sort,
+            int maxplayers) throws ParseException {
         List<Section> sections = new ArrayList<>();
         for (String line : config.groupLines) {
             // Its properties
@@ -162,14 +175,21 @@ public class ConfigParser {
                 } else if (tag.startsWith("PING=")) {
                     ping = Integer.parseInt(tag.substring(5, tag.length()));
                 } else if (tag.startsWith("SORT=")) {
-                    sortrules = new ArrayList<>(Arrays.asList(tag.substring(5, tag.length()).split(",")));
+                    sortrules = new ArrayList<>(Arrays.asList(tag.substring(5,
+                            tag.length()).split(",")));
                 } else if (tag.startsWith("COLUMN=")) {
-                    startColumn = Integer.parseInt(tag.substring(7, tag.length()));
+                    startColumn = Integer.parseInt(tag.
+                            substring(7, tag.length()));
+                } else if (tag.startsWith("MAXPLAYERS=")) {
+                    maxplayers = Integer.parseInt(tag.
+                            substring(11, tag.length()));
                 } else {
-                    plugin.getLogger().log(Level.WARNING, "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag, config.getFileName()});
+                    plugin.getLogger().log(Level.WARNING,
+                            "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
+                                config.getFileName()});
                 }
             }
-            
+
             sortrules.addAll(g_sort);
 
             // Strip Tags
@@ -177,14 +197,20 @@ public class ConfigParser {
             // Parsing FillPlayers
             if (isFillPlayers(line)) {
                 // TODO autogroup
-                String prefix = g_prefix + text.substring(0, text.indexOf("{fillplayers"));
-                String suffix = text.substring(text.indexOf('}', prefix.length()), text.length() - 1) + g_suffix;
-                String args = text.charAt(prefix.length() + 12) == ':' ? text.substring(prefix.length() + 13, text.length() - suffix.length() - 1) : "";
-                List<String> filter = new ArrayList<>(Arrays.asList(args.split(",")));
+                String prefix = g_prefix + text.substring(0, text.indexOf(
+                        "{fillplayers"));
+                String suffix = text.substring(text.
+                        indexOf('}', prefix.length()), text.length() - 1) + g_suffix;
+                String args = text.charAt(prefix.length() + 12) == ':' ? text.
+                        substring(prefix.length() + 13, text.length() - suffix.
+                                length() - 1) : "";
+                List<String> filter = new ArrayList<>(Arrays.asList(args.split(
+                        ",")));
                 checkServer(filter);
                 filter.addAll(g_filter);
                 filter.add(g_server);
-                sections.add(new FillPlayersSection(startColumn, filter, config, prefix, suffix, sortrules, maxplayers));
+                sections.add(new FillPlayersSection(startColumn, filter, config,
+                        prefix, suffix, sortrules, maxplayers));
             } // Parsing Normal text
             else {
                 ServerSection section;
@@ -241,17 +267,30 @@ public class ConfigParser {
     }
 
     private void validateSortrules(List<String> sortrules) {
-        for(String rule: sortrules){
-            if(!(rule.equalsIgnoreCase("you") || rule.equalsIgnoreCase("youfirst") || rule.equalsIgnoreCase("admin") || rule.equalsIgnoreCase("adminfirst") || rule.equalsIgnoreCase("alpha") || rule.equalsIgnoreCase("alphabet") || rule.equalsIgnoreCase("alphabetic") || rule.equalsIgnoreCase("alphabetical") || rule.equalsIgnoreCase("alphabetically"))){
-                plugin.getLogger().warning(ChatColor.RED + "Can't sort players using rule '" + rule + "': Unknown rule");
+        for (String rule : sortrules) {
+            if (!(rule.equalsIgnoreCase("you") || rule.equalsIgnoreCase(
+                    "youfirst") || rule.equalsIgnoreCase("admin") || rule.
+                    equalsIgnoreCase("adminfirst") || rule.equalsIgnoreCase(
+                            "alpha") || rule.equalsIgnoreCase("alphabet") || rule.
+                    equalsIgnoreCase("alphabetic") || rule.equalsIgnoreCase(
+                            "alphabetical") || rule.equalsIgnoreCase(
+                            "alphabetically"))) {
+                plugin.getLogger().warning(
+                        ChatColor.RED + "Can't sort players using rule '" + rule + "': Unknown rule");
             }
         }
     }
 
     private void checkServer(List<String> filter) {
-        for(String s: filter){
-            if(plugin.getPlayerManager().isServer(s))plugin.getLogger().warning(ChatColor.RED + "You shouldn't use {fillplayers:<server>} in groupLines");
-            if(s.equalsIgnoreCase("currentserver"))plugin.getLogger().warning(ChatColor.RED + "You shouldn't use {fillplayers:currentserver} in groupLines");
+        for (String s : filter) {
+            if (plugin.getPlayerManager().isServer(s)) {
+                plugin.getLogger().warning(
+                        ChatColor.RED + "You shouldn't use {fillplayers:<server>} in groupLines");
+            }
+            if (s.equalsIgnoreCase("currentserver")) {
+                plugin.getLogger().warning(
+                        ChatColor.RED + "You shouldn't use {fillplayers:currentserver} in groupLines");
+            }
         }
     }
 }

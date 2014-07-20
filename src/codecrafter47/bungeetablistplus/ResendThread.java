@@ -37,15 +37,16 @@ public class ResendThread implements Runnable {
                 if (player != null) {
                     TabListHandler tabList = player.getTabList();
                     if (tabList instanceof IMyTabListHandler) {
-                        if(player.getServer() != null){
-                        ((IMyTabListHandler) tabList).recreate();
-                        }else{
+                        if (player.getServer() != null) {
+                            ((IMyTabListHandler) tabList).recreate();
+                        } else {
                             BungeeTabListPlus.getInstance().sendLater(player);
                         }
                     }
                 }
 
-                int sleep = (int) (updateIntervall * 1000 / (ProxyServer.getInstance().getOnlineCount() + 1) / 2);
+                int sleep = (int) (updateIntervall * 1000 / (ProxyServer.
+                        getInstance().getOnlineCount() + 1) / 2);
                 if (sleep < 1) {
                     sleep = 1;
                 }
@@ -55,11 +56,12 @@ public class ResendThread implements Runnable {
                 try {
                     Thread.sleep(sleep);
                 } catch (InterruptedException ex) {
-                    BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, null, ex);
+                    // don't care
                 }
             } catch (Throwable th) {
-                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE,"An internal Error occured, please send the following Stacktrace to the developer to help resolving the problem",th);
-                //BungeeTabListPlus.getInstance().getLogger().warning(th.toString() + th.getLocalizedMessage());
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE,
+                        "An internal Error occured, please send the following Stacktrace to the developer to help resolving the problem",
+                        th);
             }
         }
     }

@@ -1,6 +1,7 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.bridge.Constants;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
@@ -84,16 +85,18 @@ public class BungeeTabListPlus extends Plugin {
     // - worldplayercount
     // - support for bukkitside tabcolor plugins
     // - support for bukkitside permission plugins
+    // - {health}, {level}
     // - faction support: {factionsWhere}, {factionName}, {factionMembersOnline}
     // world fillplayers: {fillplayers:server#world}
     // allow {time:format}
     // more performant variable replacement
-    // world playercount: {players:server#world}
     // /BTLP shows whether a update is available
     // added {color} variable which randomly inserts a beautiful colorcode changing every few seconds, the variable inserts the same color in all slots
     // {color:green,red} will insert green or red colorcodes. this changes every second
     // ---------------------------------------------
     // 1.7
+    // TODO fix many bugs
+    // TODO world playercount: {players:server#world}
     // TODO scrolling text
     // TODO multislot scrolling text
     // TODO tabComplete support
@@ -170,6 +173,7 @@ public class BungeeTabListPlus extends Plugin {
             config.getMainConfig().useScoreboardToBypass16CharLimit = false;
         }
 
+        getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
         bukkitBridge.enable();
 

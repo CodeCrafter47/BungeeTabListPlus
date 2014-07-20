@@ -29,26 +29,29 @@ import net.md_5.bungee.event.EventHandler;
  */
 public class BukkitBridge implements Listener {
 
-    private int correntVersion = 1;
+    private final int currentVersion = 1;
 
     BungeeTabListPlus plugin;
 
-    Map<String, Map<String, String>> serverInformations;
-    Map<String, Map<String, String>> playerInformations;
+    Map<String, Map<String, String>> serverInformation;
+    Map<String, Map<String, String>> playerInformation;
 
     public BukkitBridge(BungeeTabListPlus plugin) {
         this.plugin = plugin;
     }
 
     public void enable() {
-        serverInformations = new ConcurrentHashMap<>();
-        playerInformations = new ConcurrentHashMap<>();
+        serverInformation = new ConcurrentHashMap<>();
+        playerInformation = new ConcurrentHashMap<>();
         plugin.getProxy().getPluginManager().registerListener(plugin, this);
     }
 
     @EventHandler
     public void onPluginMessage(PluginMessageEvent event) {
+        // System.out.println("PluginMessage!");
+        // System.out.println("channel: " + event.getTag());
         if (event.getTag().equals(Constants.channel)) {
+            event.setCancelled(true);
             if (event.getReceiver() instanceof ProxiedPlayer && event.
                     getSender() instanceof Server) {
                 try {
@@ -69,28 +72,28 @@ public class BukkitBridge implements Listener {
                     }
 
                     if (subchannel.equals(Constants.subchannel_init)) {
-                        serverInformations.put(server.getInfo().getName(), data);
+                        serverInformation.put(server.getInfo().getName(), data);
                     } else if (subchannel.equals(Constants.subchannel_update)) {
-                        if (serverInformations.get(server.getInfo().getName()) == null) {
+                        if (serverInformation.get(server.getInfo().getName()) == null) {
                             server.sendData(Constants.channel, new byte[]{});
                         } else {
                             for (Entry<String, String> entry : data.entrySet()) {
-                                serverInformations.get(server.getInfo().
+                                serverInformation.get(server.getInfo().
                                         getName()).put(entry.getKey(), entry.
                                                 getValue());
                             }
                         }
                     } else if (subchannel.
                             equals(Constants.subchannel_initplayer)) {
-                        playerInformations.put(player.getName(), data);
+                        playerInformation.put(player.getName(), data);
                         data.put("server", server.getInfo().getName());
                     } else if (subchannel.equals(
                             Constants.subchannel_updateplayer)) {
-                        if (playerInformations.get(player.getName()) == null) {
+                        if (playerInformation.get(player.getName()) == null) {
                             server.sendData(Constants.channel, new byte[]{});
                         } else {
                             for (Entry<String, String> entry : data.entrySet()) {
-                                playerInformations.get(player.getName()).put(
+                                playerInformation.get(player.getName()).put(
                                         entry.getKey(), entry.getValue());
                             }
                         }
@@ -105,36 +108,36 @@ public class BukkitBridge implements Listener {
                             "Exception while parsing data from Bukkit", ex);
                 }
             }
-            event.setCancelled(true);
         }
+        //System.out.println(this.playerInformation.toString());
     }
 
     @EventHandler
     public void onServerChange(ServerConnectedEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        if (playerInformations.get(player.getName()) == null) {
+        if (playerInformation.get(player.getName()) == null) {
             return;
         }
-        if (!playerInformations.get(player.getName()).get("server").equals(
+        if (!playerInformation.get(player.getName()).get("server").equals(
                 player.getServer().getInfo().getName())) {
-            playerInformations.remove(player.getName());
+            playerInformation.remove(player.getName());
         }
     }
 
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        playerInformations.remove(player.getName());
+        playerInformation.remove(player.getName());
     }
 
     @EventHandler
     public void onPlayerKick(ServerKickEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        playerInformations.remove(player.getName());
+        playerInformation.remove(player.getName());
     }
 
     public String getServerInformation(ServerInfo server, String key) {
-        Map<String, String> map = serverInformations.get(server.getName());
+        Map<String, String> map = serverInformation.get(server.getName());
         if (map == null) {
             return null;
         }
@@ -142,7 +145,7 @@ public class BukkitBridge implements Listener {
     }
 
     public String getPlayerInformation(ProxiedPlayer player, String key) {
-        Map<String, String> map = playerInformations.get(player.getName());
+        Map<String, String> map = playerInformation.get(player.getName());
         if (map == null) {
             return null;
         }
@@ -150,19 +153,18 @@ public class BukkitBridge implements Listener {
     }
 
     public boolean isServerInformationAvailable(ServerInfo server) {
-        return serverInformations.get(server.getName()) != null;
+        return serverInformation.get(server.getName()) != null;
     }
 
     public boolean isPlayerInformationAvailable(ProxiedPlayer player) {
-        return playerInformations.get(player.getName()) != null;
+        return playerInformation.get(player.getName()) != null;
     }
 
     public boolean isUpToDate(String server) {
         try {
-            return Integer.valueOf(serverInformations.get(server).get(
-                    "bridgeVersion")) >= this.correntVersion;
+            return Integer.valueOf(serverInformation.get(server).get(
+                    "bridgeVersion")) >= this.currentVersion;
         } catch (Throwable ex) {
-            // passiert halt
         }
         return true;
     }
