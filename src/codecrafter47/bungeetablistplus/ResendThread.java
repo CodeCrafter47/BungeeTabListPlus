@@ -13,14 +13,21 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.tab.TabListHandler;
 
 /**
+ * Implementation of the ResendThread. Updates the tablist for all players after
+ * the given intervall
  *
- * @author florian
+ * @author Florian Stober
  */
 public class ResendThread implements Runnable {
 
     private final SendingQueue resendQueue;
     private double updateIntervall;
 
+    /**
+     *
+     * @param queue
+     * @param updateIntervall
+     */
     public ResendThread(SendingQueue queue, double updateIntervall) {
         this.resendQueue = queue;
         this.updateIntervall = updateIntervall;
@@ -29,6 +36,9 @@ public class ResendThread implements Runnable {
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void run() {
         while (true) {

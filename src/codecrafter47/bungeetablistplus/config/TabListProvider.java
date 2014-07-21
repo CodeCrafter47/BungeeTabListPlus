@@ -55,11 +55,7 @@ public class TabListProvider {
             topSections = new ArrayList<>();
             for (Section section : top) {
                 if (section instanceof ServerSection) {
-                    if ((!BungeeTabListPlus.areHiddenPlayers() && ProxyServer.
-                            getInstance().getServerInfo(
-                                    ((ServerSection) section).getServer()).
-                            getPlayers().size() > 0) || BungeeTabListPlus.
-                            getInstance().getPlayerManager().
+                    if (BungeeTabListPlus.getInstance().getPlayerManager().
                             getServerPlayerCount(((ServerSection) section).
                                     getServer()) > 0) {
                         topSections.add(section);
@@ -73,11 +69,7 @@ public class TabListProvider {
             botSections = new ArrayList<>();
             for (Section section : bot) {
                 if (section instanceof ServerSection) {
-                    if ((!BungeeTabListPlus.areHiddenPlayers() && ProxyServer.
-                            getInstance().getServerInfo(
-                                    ((ServerSection) section).getServer()).
-                            getPlayers().size() > 0) || BungeeTabListPlus.
-                            getInstance().getPlayerManager().
+                    if (BungeeTabListPlus.getInstance().getPlayerManager().
                             getServerPlayerCount(((ServerSection) section).
                                     getServer()) > 0) {
                         botSections.add(section);

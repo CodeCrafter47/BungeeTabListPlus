@@ -25,7 +25,7 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 /**
  * Main Class of BungeeTabListPlus
  *
- * @author florian
+ * @author Florian Stober
  */
 public class BungeeTabListPlus extends Plugin {
 
@@ -34,6 +34,12 @@ public class BungeeTabListPlus extends Plugin {
      */
     private static BungeeTabListPlus INSTANCE;
 
+    /**
+     * Static getter for the current instance of the plugin
+     *
+     * @return the current instance of the plugin, null if the plugin is
+     * disabled
+     */
     public static BungeeTabListPlus getInstance() {
         return INSTANCE;
 
@@ -137,7 +143,7 @@ public class BungeeTabListPlus extends Plugin {
     // TODO mc1.8
     // TODO tabsize per server
     /**
-     *
+     * Called when the plugin is enabled
      */
     @Override
     public void onEnable() {
@@ -224,6 +230,9 @@ public class BungeeTabListPlus extends Plugin {
         }
     }
 
+    /**
+     * Reloads most settings of the plugin
+     */
     public void reload() {
         //getProxy().getScheduler().cancel(refreshThread);
         try {
@@ -240,7 +249,7 @@ public class BungeeTabListPlus extends Plugin {
     }
 
     /**
-     *
+     * Disables the plugin
      */
     @Override
     public void onDisable() {
@@ -258,7 +267,7 @@ public class BungeeTabListPlus extends Plugin {
     }
 
     /**
-     * sends the tabLIst ot all clients
+     * updates the tabList on all connected clients
      */
     public void resendTabLists() {
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
@@ -266,40 +275,89 @@ public class BungeeTabListPlus extends Plugin {
         }
     }
 
+    /**
+     * updates the tablist for one player; the player is put at top of the
+     * resend-queue
+     *
+     * @param player the player whos tablist should be updated
+     */
     public void sendImmediate(ProxiedPlayer player) {
         resendQueue.addFrontPlayer(player);
     }
 
+    /**
+     * updates the tablist for one player; the player is put at the end of the
+     * resend-queue
+     *
+     * @param player the player whos tablist should be updated
+     */
     public void sendLater(ProxiedPlayer player) {
         resendQueue.addPlayer(player);
     }
 
+    /**
+     * Getter for an instance of the PlayerManager. For internal use only.
+     *
+     * @return an instance of the PlayerManager or null
+     */
     public PlayerManager getPlayerManager() {
         return this.players;
     }
 
+    /**
+     * Getter for the PermissionManager. For internal use only.
+     *
+     * @return an instance of the PermissionManager or null
+     */
     public PermissionManager getPermissionManager() {
         return pm;
     }
 
+    /**
+     * Getter for the ConfigManager. For internal use only.
+     *
+     * @return an instance of the ConfigManager or null
+     */
     public ConfigManager getConfigManager() {
         return config;
     }
 
+    /**
+     * Getter for the VariableManager. The VariableManager can be used to add
+     * custom Variables.
+     *
+     * @return an instance of the VariableManager or null
+     */
     public VariablesManager getVariablesManager() {
         return variables;
     }
 
+    /**
+     * Getter of the PacketManager. For internal use only
+     *
+     * @return an instance of the PacketManager or null
+     */
     public PacketManager getPacketManager() {
         return packets;
     }
 
+    /**
+     * Getter for the TabListManager. For internal use only
+     *
+     * @return an instance of the TabListManager
+     */
     public TabListManager getTabListManager() {
         return tabLists;
     }
 
+    /**
+     * checks whether a player is hidden from the tablist
+     *
+     * @param player the player object for which the check should be performed
+     * @return true if the player is hidden, false otherwise
+     */
     public static boolean isHidden(ProxiedPlayer player) {
-        boolean hidden = false;
+        boolean hidden;
         synchronized (hiddenPlayers) {
             String name = player.getName();
             hidden = hiddenPlayers.contains(name);
@@ -312,6 +370,11 @@ public class BungeeTabListPlus extends Plugin {
         return hidden;
     }
 
+    /**
+     * Hides a player from the tablist
+     *
+     * @param player The player which should be hidden.
+     */
     public static void hidePlayer(ProxiedPlayer player) {
         if (isHidden(player)) {
             return;
@@ -322,6 +385,13 @@ public class BungeeTabListPlus extends Plugin {
         }
     }
 
+    /**
+     * Unhides a previously hidden player from the tablist. Only works if the
+     * playe has been hidden via the hidePlayer method. Not works for players
+     * hidden by VanishNoPacket
+     *
+     * @param player the player on which the operation should be performed
+     */
     public static void unhidePlayer(ProxiedPlayer player) {
         if (!isHidden(player)) {
             return;
@@ -332,14 +402,22 @@ public class BungeeTabListPlus extends Plugin {
         }
     }
 
-    public static boolean areHiddenPlayers() {
-        return !hiddenPlayers.isEmpty();
-    }
-
+    /**
+     * Getter for BukkitBridge. For internal use only.
+     *
+     * @return an instance of BukkitBridge
+     */
     public BukkitBridge getBridge() {
         return this.bukkitBridge;
     }
 
+    /**
+     * Checks whether an update for BungeeTabListPlus is available. Acctually
+     * the check is performed in a background task and this only returns the
+     * result.
+     *
+     * @return true if an newer version of BungeeTabListPlus is available
+     */
     public boolean isUpdateAvailable() {
         if (updateChecker != null) {
             return updateChecker.isUpdateAvailable();
