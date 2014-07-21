@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
@@ -15,11 +14,12 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  *
  * @author florian
  */
-public class PermPrefix implements PlayerVariable{
+public class PermPrefix implements PlayerVariable {
 
     @Override
     public String getReplacement(String args, ProxiedPlayer player) {
-        return BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(player);
+        return BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(
+                player);
     }
-    
+
 }

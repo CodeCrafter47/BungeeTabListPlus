@@ -29,7 +29,8 @@ public class CustomTabListHandler extends TabListAdapter {
         // remove all those names from the clients tab, he's on another server now
         synchronized (usernames) {
             for (String username : usernames) {
-                BungeeTabListPlus.getInstance().getPacketManager().removePlayer(getPlayer().unsafe(), username);
+                BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
+                        getPlayer().unsafe(), username);
             }
             usernames.clear();
         }
@@ -41,7 +42,8 @@ public class CustomTabListHandler extends TabListAdapter {
 
     @Override
     public boolean onListUpdate(String name, boolean online, int ping) {
-        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoExcludeServers && !ChatColor.stripColor(name).equals(name)) {
+        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoExcludeServers && !ChatColor.
+                stripColor(name).equals(name)) {
             exclude();
         }
 
@@ -55,7 +57,8 @@ public class CustomTabListHandler extends TabListAdapter {
             }
         }
 
-        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.contains(getPlayer().getServer().getInfo().getName()) || isExcluded) {
+        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
+                contains(getPlayer().getServer().getInfo().getName()) || isExcluded) {
             // save which packets are send to the client
             synchronized (usernames) {
                 if (online) {
@@ -80,7 +83,8 @@ public class CustomTabListHandler extends TabListAdapter {
             synchronized (usernames) {
                 for (String s : bukkitplayers) {
                     if (!usernames.contains(s)) {
-                        BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(getPlayer().unsafe(), s, 0);
+                        BungeeTabListPlus.getInstance().getPacketManager().
+                                createOrUpdatePlayer(getPlayer().unsafe(), s, 0);
                         usernames.add(s);
                     }
                 }

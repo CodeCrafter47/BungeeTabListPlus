@@ -29,26 +29,34 @@ public class CollumnSplitSection extends Section {
             if (pc[i] != null) {
                 int m = pc[i].getMaxSize(player);
                 int span = 1;
-                while(i + span != pc.length && pc[i+span] != null && (i+span<pc.length && pc[i+span-1].filter.equals(pc[i+span].filter)))span++;
-                m=(m+span-1)/span;
+                while (i + span != pc.length && pc[i + span] != null && (i + span < pc.length && pc[i + span - 1].filter.
+                        equals(pc[i + span].filter))) {
+                    span++;
+                }
+                m = (m + span - 1) / span;
                 if (max < m) {
                     max = m;
                 }
-                i+=span-1;
+                i += span - 1;
             }
         }
         return max * ConfigManager.getCols();
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos, int size) {
+    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+            int size) {
         int sizePerCol = size / ConfigManager.getCols();
         for (int i = 0; i < pc.length; i++) {
             if (pc[i] != null) {
                 int span = 1;
-                while(i + span != pc.length && pc[i+span] != null && (i+span<pc.length && pc[i+span-1].filter.equals(pc[i+span].filter)))span++;
-                pc[i].calculate(player, tabList, i, pos / ConfigManager.getCols(), sizePerCol*span, span);
-                i+=span-1;
+                while (i + span != pc.length && pc[i + span] != null && (i + span < pc.length && pc[i + span - 1].filter.
+                        equals(pc[i + span].filter))) {
+                    span++;
+                }
+                pc[i].calculate(player, tabList, i, pos / ConfigManager.
+                        getCols(), sizePerCol * span, span);
+                i += span - 1;
             }
         }
         return pos + sizePerCol * ConfigManager.getCols();

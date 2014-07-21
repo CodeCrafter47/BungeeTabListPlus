@@ -1,13 +1,12 @@
 
 /*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package codecrafter47.bungeetablistplus.section;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  * @author florian
  */
 public class StaticSection extends Section {
+
     List<Slot> text;
     int vAlign;
 
@@ -47,8 +47,9 @@ public class StaticSection extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos, int size) {
-        for(Slot s : text){
+    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+            int size) {
+        for (Slot s : text) {
             tabList.setSlot(pos++, new Slot(s.text, s.ping));
         }
         return pos;

@@ -31,7 +31,7 @@ public class UpdateChecker implements Runnable {
     private final long intervall = 15;
 
     private int pid = -1;
-    
+
     private boolean error = false;
 
     public UpdateChecker(Plugin plugin) {
@@ -41,7 +41,8 @@ public class UpdateChecker implements Runnable {
 
     private void enable() {
         plugin.getLogger().info("Starting UpdateChecker Task");
-        pid = plugin.getProxy().getScheduler().schedule(plugin, this, intervall, intervall, TimeUnit.MINUTES).getId();
+        pid = plugin.getProxy().getScheduler().schedule(plugin, this, intervall,
+                intervall, TimeUnit.MINUTES).getId();
     }
 
     @Override
@@ -49,12 +50,14 @@ public class UpdateChecker implements Runnable {
         if (updateAvailable) {
             return;
         }
-        if(error){
+        if (error) {
             return;
         }
         try {
             InputStreamReader ir;
-            URL url = new URL("http://updates.codecrafter47.dyndns.eu/" + plugin.getDescription().getName() + "/version.txt");
+            URL url = new URL(
+                    "http://updates.codecrafter47.dyndns.eu/" + plugin.
+                    getDescription().getName() + "/version.txt");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.connect();
             int res = con.getResponseCode();
@@ -76,7 +79,8 @@ public class UpdateChecker implements Runnable {
                 }
             }
 
-            if (!newVersion.equalsIgnoreCase(plugin.getDescription().getVersion())) {
+            if (!newVersion.equalsIgnoreCase(plugin.getDescription().
+                    getVersion())) {
                 updateAvailable = true;
             }
         } catch (Throwable t) {

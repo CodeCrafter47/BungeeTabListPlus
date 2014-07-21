@@ -40,7 +40,8 @@ public class PlayerManager {
         return false;
     }
 
-    public List<ProxiedPlayer> getPlayers(Collection<String> filter, ProxiedPlayer who) {
+    public List<ProxiedPlayer> getPlayers(Collection<String> filter,
+            ProxiedPlayer who) {
         List<ProxiedPlayer> list = new ArrayList<>();
         for (ProxiedPlayer p : plugin.getProxy().getPlayers()) {
             boolean areGroupRules = false;
@@ -54,7 +55,8 @@ public class PlayerManager {
                 } else if (rule.equalsIgnoreCase("currentserver")) {
                     areServerRules = true;
                     if (p.getServer() != null && who.getServer() != null) {
-                        if (p.getServer().getInfo().getName().equalsIgnoreCase(who.getServer().getInfo().getName())) {
+                        if (p.getServer().getInfo().getName().equalsIgnoreCase(
+                                who.getServer().getInfo().getName())) {
                             fitServerRules = true;
                         }
                     }
@@ -67,8 +69,10 @@ public class PlayerManager {
                         }
                         String[] s = rule.split("#");
                         if (s.length == 2) {
-                            if (server.getInfo().getName().equalsIgnoreCase(s[0])) {
-                                String world = plugin.getBridge().getPlayerInformation(p, "world");
+                            if (server.getInfo().getName().
+                                    equalsIgnoreCase(s[0])) {
+                                String world = plugin.getBridge().
+                                        getPlayerInformation(p, "world");
                                 if (world != null) {
                                     if (world.equalsIgnoreCase(s[1])) {
                                         fitServerRules = true;
@@ -86,7 +90,8 @@ public class PlayerManager {
                     }
                 }
             }
-            if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.isHidden(p)) {
+            if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.
+                    isHidden(p)) {
                 list.add(p);
             }
         }
@@ -96,7 +101,7 @@ public class PlayerManager {
          list.add(new ProxiedPlayer() {
          final List<String> groups;
          {
-                    
+
          if(Math.random() < 0.2)groups = Arrays.asList(new String[]{"default", "admin"});
          else if(Math.random() < 0.4)groups = Arrays.asList(new String[]{"default", "vip"});
          else groups = Arrays.asList(new String[]{"default"});
@@ -267,7 +272,8 @@ public class PlayerManager {
         for (ProxiedPlayer p : plugin.getProxy().getPlayers()) {
             Server s = p.getServer();
             if (s != null) {
-                if (s.getInfo().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.isHidden(p)) {
+                if (s.getInfo().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
+                        isHidden(p)) {
                     num++;
                 }
             }

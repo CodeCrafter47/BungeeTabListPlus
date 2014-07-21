@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
@@ -13,11 +12,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  *
  * @author florian
  */
-public class PingVariable implements PlayerVariable{
+public class PingVariable implements PlayerVariable {
 
     @Override
     public String getReplacement(String args, ProxiedPlayer player) {
         return "" + player.getPing();
     }
-    
+
 }

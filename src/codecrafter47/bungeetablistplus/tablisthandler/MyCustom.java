@@ -45,7 +45,8 @@ public class MyCustom extends CustomTabListHandler {
     }
 
     public synchronized String setSlot(int n, Slot line, boolean update) {
-        Preconditions.checkArgument(n >= 0 && n < ConfigManager.getTabSize(), "row out of range");
+        Preconditions.checkArgument(n >= 0 && n < ConfigManager.getTabSize(),
+                "row out of range");
 
         String text = line.text;
 
@@ -111,7 +112,10 @@ public class MyCustom extends CustomTabListHandler {
 
     public synchronized void unload() {
         for (int i = 0; i < ConfigManager.getTabSize(); i++) {
-            if(sent[i] != null)BungeeTabListPlus.getInstance().getPacketManager().removePlayer(getPlayer().unsafe(), sent[i]);
+            if (sent[i] != null) {
+                BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
+                        getPlayer().unsafe(), sent[i]);
+            }
             sent[i] = null;
         }
         sentStuff.clear();
@@ -130,7 +134,8 @@ public class MyCustom extends CustomTabListHandler {
                     /*
                      getPlayer().unsafe().sendPacket(
                      new PlayerListItem(line, false, (short) 9999));*/
-                    BungeeTabListPlus.getInstance().getPacketManager().removePlayer(getPlayer().unsafe(), line);
+                    BungeeTabListPlus.getInstance().getPacketManager().
+                            removePlayer(getPlayer().unsafe(), line);
                     remove = true;
                 }
             }
@@ -146,7 +151,9 @@ public class MyCustom extends CustomTabListHandler {
             /*
              getPlayer().unsafe().sendPacket(
              new PlayerListItem(line, true, slots_ping[i]));*/
-            BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(getPlayer().unsafe(), line, slots_ping[i]);
+            BungeeTabListPlus.getInstance().getPacketManager().
+                    createOrUpdatePlayer(getPlayer().unsafe(), line,
+                            slots_ping[i]);
         }
     }
 }

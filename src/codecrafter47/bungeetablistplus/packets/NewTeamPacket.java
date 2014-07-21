@@ -29,7 +29,8 @@ public class NewTeamPacket implements ITeamPacket {
     }
 
     @Override
-    public void updateTeam(Connection.Unsafe connection, String player, String prefix, String displayname, String suffix) {
+    public void updateTeam(Connection.Unsafe connection, String player,
+            String prefix, String displayname, String suffix) {
         Team t = new Team();
         t.setName("TAB" + player);
         t.setMode((byte) 2);

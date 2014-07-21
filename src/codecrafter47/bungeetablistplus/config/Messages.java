@@ -16,7 +16,8 @@ public class Messages extends Config {
     public String successPlayerUnhide = "&aYou're not hidden any longer";
 
     public Messages(Plugin plugin) throws InvalidConfigurationException {
-        CONFIG_FILE = new File("plugins" + File.separator + plugin.getDescription().getName(), "messages.yml");
+        CONFIG_FILE = new File("plugins" + File.separator + plugin.
+                getDescription().getName(), "messages.yml");
         CONFIG_HEADER = new String[]{"You can change messages here"};
 
         this.init();

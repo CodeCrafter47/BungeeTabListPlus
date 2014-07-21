@@ -34,7 +34,8 @@ public class PlayerColumn {
     List<String> sort;
     int maxPlayers;
 
-    public PlayerColumn(List<String> filter, TabListConfig config, String prefix, String suffix, List<String> sortrules, int maxPlayers) {
+    public PlayerColumn(List<String> filter, TabListConfig config, String prefix,
+            String suffix, List<String> sortrules, int maxPlayers) {
         this.filter = filter;
         this.config = config;
         this.prefix = prefix;
@@ -44,15 +45,21 @@ public class PlayerColumn {
     }
 
     public void precalculate(ProxiedPlayer player) {
-        this.players = BungeeTabListPlus.getInstance().getPlayerManager().getPlayers(filter, player);
+        this.players = BungeeTabListPlus.getInstance().getPlayerManager().
+                getPlayers(filter, player);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {
-            if (rule.equalsIgnoreCase("you") || rule.equalsIgnoreCase("youfirst")) {
+            if (rule.equalsIgnoreCase("you") || rule.
+                    equalsIgnoreCase("youfirst")) {
                 srules.add(new YouFirst(player));
-            } else if (rule.equalsIgnoreCase("admin") || rule.equalsIgnoreCase("adminfirst")) {
+            } else if (rule.equalsIgnoreCase("admin") || rule.equalsIgnoreCase(
+                    "adminfirst")) {
                 srules.add(new AdminFirst());
-            } else if (rule.equalsIgnoreCase("alpha") || rule.equalsIgnoreCase("alphabet") || rule.equalsIgnoreCase("alphabetic") || rule.equalsIgnoreCase("alphabetical") || rule.equalsIgnoreCase("alphabetically")) {
+            } else if (rule.equalsIgnoreCase("alpha") || rule.equalsIgnoreCase(
+                    "alphabet") || rule.equalsIgnoreCase("alphabetic") || rule.
+                    equalsIgnoreCase("alphabetical") || rule.equalsIgnoreCase(
+                            "alphabetically")) {
                 srules.add(new Alphabet());
             }
         }
@@ -87,11 +94,15 @@ public class PlayerColumn {
         return m * config.playerLines.size();
     }
 
-    public void calculate(ProxiedPlayer player, TabList tabList, int collumn, int row, int size, int span) {
+    public void calculate(ProxiedPlayer player, TabList tabList, int collumn,
+            int row, int size, int span) {
         int playersToShow = players.size();
-        if(playersToShow > maxPlayers)playersToShow = maxPlayers;
+        if (playersToShow > maxPlayers) {
+            playersToShow = maxPlayers;
+        }
         if (playersToShow * config.playerLines.size() > size) {
-            playersToShow = (size - config.morePlayersLines.size()) / config.playerLines.size();
+            playersToShow = (size - config.morePlayersLines.size()) / config.playerLines.
+                    size();
             if (playersToShow < 0) {
                 playersToShow = 0;
             }
@@ -103,8 +114,11 @@ public class PlayerColumn {
         for (int i = 0; i < playersToShow; i++) {
             for (String line : config.playerLines) {
                 line = prefix + line + suffix;
-                line = BungeeTabListPlus.getInstance().getVariablesManager().replacePlayerVariables(line, players.get(i));
-                tabList.setSlot(p, collumn + c, new Slot(line, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().sendPing ? players.get(i).getPing() : 0));
+                line = BungeeTabListPlus.getInstance().getVariablesManager().
+                        replacePlayerVariables(line, players.get(i));
+                tabList.setSlot(p, collumn + c, new Slot(line,
+                        BungeeTabListPlus.getInstance().getConfigManager().
+                        getMainConfig().sendPing ? players.get(i).getPing() : 0));
                 c++;
                 if (c >= span) {
                     c = 0;

@@ -19,7 +19,8 @@ public class BalanceVariable implements PlayerVariable {
     @Override
     public String getReplacement(String args, ProxiedPlayer player) {
         if (args == null) {
-            String balance = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player, "balance");
+            String balance = BungeeTabListPlus.getInstance().getBridge().
+                    getPlayerInformation(player, "balance");
             if (balance == null) {
                 return "-";
             }
@@ -27,7 +28,8 @@ public class BalanceVariable implements PlayerVariable {
         } else {
             ProxiedPlayer player2 = ProxyServer.getInstance().getPlayer(args);
             if (player2 != null) {
-                String balance = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player2, "balance");
+                String balance = BungeeTabListPlus.getInstance().getBridge().
+                        getPlayerInformation(player2, "balance");
                 if (balance == null) {
                     return "-";
                 }

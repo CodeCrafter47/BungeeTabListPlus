@@ -16,10 +16,11 @@ import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.event.EventHandler;
 
 public class TabListListener implements Listener {
+
     private final BungeeTabListPlus plugin;
-    
-    public TabListListener(BungeeTabListPlus plugin){
-        this. plugin = plugin;
+
+    public TabListListener(BungeeTabListPlus plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler

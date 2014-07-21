@@ -19,11 +19,13 @@ public class ConfigManager {
     TabListConfig defaultTabList;
     List<TabListConfig> tabLists = new ArrayList<>();
 
-    public ConfigManager(BungeeTabListPlus bungeeTabListPlus) throws InvalidConfigurationException {
+    public ConfigManager(BungeeTabListPlus bungeeTabListPlus) throws
+            InvalidConfigurationException {
         loadConfig(bungeeTabListPlus);
     }
 
-    private void loadConfig(BungeeTabListPlus plugin) throws InvalidConfigurationException {
+    private void loadConfig(BungeeTabListPlus plugin) throws
+            InvalidConfigurationException {
         setMainConfig(new MainConfig(plugin));
         validateConfig();
         messages = new Messages(plugin);
@@ -37,7 +39,8 @@ public class ConfigManager {
                 try {
                     tabLists.add(new TabListConfig(plugin, s));
                 } catch (InvalidConfigurationException ex) {
-                    plugin.getLogger().log(Level.WARNING, "Unable to load {0}", s);
+                    plugin.getLogger().log(Level.WARNING, "Unable to load {0}",
+                            s);
                     plugin.getLogger().log(Level.WARNING, null, ex);
                 }
             }
@@ -68,7 +71,8 @@ public class ConfigManager {
     // TODO optimize
     public static int getTabSize() {
         //return ProxyServer.getInstance().getConfigurationAdapter().getInt("listeners.tab_size", 60);
-        return ProxyServer.getInstance().getConfigurationAdapter().getListeners().iterator().next().getTabListSize();
+        return ProxyServer.getInstance().getConfigurationAdapter().
+                getListeners().iterator().next().getTabListSize();
     }
 
     public static int getCols() {
@@ -80,10 +84,14 @@ public class ConfigManager {
     }
 
     private void validateConfig() {
-        if(config.permissionSource.equalsIgnoreCase("AUTO") || config.permissionSource.equalsIgnoreCase("BUKKIT") || config.permissionSource.equalsIgnoreCase("BUNGEE") || config.permissionSource.equalsIgnoreCase("BUNGEEPERMS")){
-            
-        }else{
-            BungeeTabListPlus.getInstance().getLogger().warning("CONFIG-ERROR: Unknown value for 'permissionSource'");
+        if (config.permissionSource.equalsIgnoreCase("AUTO") || config.permissionSource.
+                equalsIgnoreCase("BUKKIT") || config.permissionSource.
+                equalsIgnoreCase("BUNGEE") || config.permissionSource.
+                equalsIgnoreCase("BUNGEEPERMS")) {
+
+        } else {
+            BungeeTabListPlus.getInstance().getLogger().warning(
+                    "CONFIG-ERROR: Unknown value for 'permissionSource'");
         }
     }
 }

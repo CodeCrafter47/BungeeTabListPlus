@@ -8,7 +8,8 @@ public class PlayerNameVariable implements PlayerVariable {
 
     @Override
     public String getReplacement(String args, ProxiedPlayer player) {
-        String vname = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player, "tabName");
+        String vname = BungeeTabListPlus.getInstance().getBridge().
+                getPlayerInformation(player, "tabName");
         if (vname != null) {
             return vname;
         }

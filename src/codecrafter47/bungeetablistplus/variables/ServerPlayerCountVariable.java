@@ -10,9 +10,11 @@ public class ServerPlayerCountVariable implements Variable {
     @Override
     public String getReplacement(String args) {
         if (args == null) {
-            return Integer.toString(BungeeTabListPlus.getInstance().getPlayerManager().getGlobalPlayerCount());
+            return Integer.toString(BungeeTabListPlus.getInstance().
+                    getPlayerManager().getGlobalPlayerCount());
         }
-        return Integer.toString(BungeeTabListPlus.getInstance().getPlayerManager().getServerPlayerCount(args));
+        return Integer.toString(BungeeTabListPlus.getInstance().
+                getPlayerManager().getServerPlayerCount(args));
     }
 
 }

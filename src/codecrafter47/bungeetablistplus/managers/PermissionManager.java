@@ -17,10 +17,13 @@ public class PermissionManager {
     public String getMainGroup(ProxiedPlayer player) {
         String bpgroup = null;
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
+                getPlugin("BungeePerms");
         if (bp != null) {
             try {
-                bpgroup = bp.getPermissionsManager().getMainGroup(bp.getPermissionsManager().getUser(player.getName())).getName();
+                bpgroup = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(player.getName())).
+                        getName();
             } catch (Throwable th) {
                 // TODO do something here
             }
@@ -62,11 +65,14 @@ public class PermissionManager {
     public int comparePlayers(ProxiedPlayer p1, ProxiedPlayer p2) {
         // TODO Vault/Bukkit support
 
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
+                getPlugin("BungeePerms");
         if (bp != null) {
             try {
-                Group g1 = bp.getPermissionsManager().getMainGroup(bp.getPermissionsManager().getUser(p1.getName()));
-                Group g2 = bp.getPermissionsManager().getMainGroup(bp.getPermissionsManager().getUser(p2.getName()));
+                Group g1 = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(p1.getName()));
+                Group g2 = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(p2.getName()));
                 int r1 = g1.getRank();
                 int r2 = g2.getRank();
                 if (r1 > r2) {
@@ -105,19 +111,24 @@ public class PermissionManager {
 
     public String getPrefix(ProxiedPlayer player) {
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
+                getPlugin("BungeePerms");
         String bpprefix = null;
         if (bp != null) {
             try {
-                bpprefix = bp.getPermissionsManager().getMainGroup(bp.getPermissionsManager().getUser(player.getName())).getPrefix();
+                bpprefix = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(player.getName())).
+                        getPrefix();
             } catch (Throwable th) {
                 // TODO do something here
             }
         }
 
-        String bprefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
+        String bprefix = plugin.getConfigManager().getMainConfig().prefixes.get(
+                getMainGroup(player));
 
-        String vprefix = plugin.getBridge().getPlayerInformation(player, "prefix");
+        String vprefix = plugin.getBridge().getPlayerInformation(player,
+                "prefix");
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
@@ -139,11 +150,14 @@ public class PermissionManager {
 
     public String getDisplayPrefix(ProxiedPlayer player) {
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
+                getPlugin("BungeePerms");
         String display = null;
         if (bp != null) {
             try {
-                display = bp.getPermissionsManager().getMainGroup(bp.getPermissionsManager().getUser(player.getName())).getDisplay();
+                display = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(player.getName())).
+                        getDisplay();
             } catch (Throwable th) {
                 // TODO do something here
             }
@@ -158,11 +172,14 @@ public class PermissionManager {
 
     public String getSuffix(ProxiedPlayer player) {
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
+                getPlugin("BungeePerms");
         String suffix = null;
         if (bp != null) {
             try {
-                suffix = bp.getPermissionsManager().getMainGroup(bp.getPermissionsManager().getUser(player.getName())).getSuffix();
+                suffix = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(player.getName())).
+                        getSuffix();
             } catch (Throwable th) {
                 // TODO do something here
             }
@@ -172,7 +189,8 @@ public class PermissionManager {
             suffix = "";
         }
 
-        String vsuffix = plugin.getBridge().getPlayerInformation(player, "suffix");
+        String vsuffix = plugin.getBridge().getPlayerInformation(player,
+                "suffix");
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
@@ -187,17 +205,22 @@ public class PermissionManager {
 
         return suffix;
     }
-    
-    public boolean hasPermission(CommandSender sender, String permission){
-        if(sender.hasPermission(permission))return true;
-        
-        try{
-            Boolean b = Boolean.valueOf(plugin.getBridge().getPlayerInformation((ProxiedPlayer)sender, permission));
-            if(b != null)return b;
-        }catch(Throwable th){
+
+    public boolean hasPermission(CommandSender sender, String permission) {
+        if (sender.hasPermission(permission)) {
+            return true;
+        }
+
+        try {
+            Boolean b = Boolean.valueOf(plugin.getBridge().getPlayerInformation(
+                    (ProxiedPlayer) sender, permission));
+            if (b != null) {
+                return b;
+            }
+        } catch (Throwable th) {
             // TODO do something! This should never happen! But you cant know :-(
         }
-        
+
         return false;
     }
 }

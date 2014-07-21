@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.tablist.Slot;
@@ -16,10 +15,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  *
  * @author florian
  */
-public class FillBukkitPlayers extends Section{
+public class FillBukkitPlayers extends Section {
+
     int startColumn;
-    
-    public FillBukkitPlayers(int startColumn){
+
+    public FillBukkitPlayers(int startColumn) {
         this.startColumn = startColumn;
     }
 
@@ -30,15 +30,16 @@ public class FillBukkitPlayers extends Section{
 
     @Override
     public int getMaxSize(ProxiedPlayer player) {
-        return ((CustomTabListHandler)player.getTabList()).bukkitplayers.size();
+        return ((CustomTabListHandler) player.getTabList()).bukkitplayers.size();
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos, int size) {
-        List<String> players = ((CustomTabListHandler)player.getTabList()).bukkitplayers;
+    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+            int size) {
+        List<String> players = ((CustomTabListHandler) player.getTabList()).bukkitplayers;
         int p = pos;
-        for(; p< pos+size; p++){
-            if(players.size() > p - pos){
+        for (; p < pos + size; p++) {
+            if (players.size() > p - pos) {
                 tabList.setSlot(p, new Slot(players.get(p - pos)));
             }
         }
@@ -54,5 +55,5 @@ public class FillBukkitPlayers extends Section{
     public int getStartCollumn() {
         return this.startColumn;
     }
-    
+
 }

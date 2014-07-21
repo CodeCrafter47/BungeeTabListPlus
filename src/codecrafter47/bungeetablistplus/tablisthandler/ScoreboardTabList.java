@@ -22,7 +22,8 @@ import net.md_5.bungee.protocol.packet.Team;
  *
  * @author florian
  */
-public class ScoreboardTabList extends CustomTabListHandler implements IMyTabListHandler {
+public class ScoreboardTabList extends CustomTabListHandler implements
+        IMyTabListHandler {
 
     private static String getSlotID(int n) {
         String hex = Integer.toHexString(n + 1);
@@ -34,7 +35,8 @@ public class ScoreboardTabList extends CustomTabListHandler implements IMyTabLis
                 alloc[i] = hex.charAt(i / 2);
             }
         }
-        return new StringBuilder().append(ChatColor.MAGIC).append(alloc).append(ChatColor.RESET).toString();
+        return new StringBuilder().append(ChatColor.MAGIC).append(alloc).append(
+                ChatColor.RESET).toString();
     }
 
     private final int[] slots_ping = new int[ConfigManager.getTabSize()];
@@ -50,13 +52,16 @@ public class ScoreboardTabList extends CustomTabListHandler implements IMyTabLis
     @Override
     public void recreate() {
         if (getPlayer().getServer() != null) {
-            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.contains(getPlayer().getServer().getInfo().getName()) || isExcluded) {
+            if (BungeeTabListPlus.getInstance().getConfigManager().
+                    getMainConfig().excludeServers.contains(getPlayer().
+                            getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
             }
         }
 
-        TabListProvider tlp = BungeeTabListPlus.getInstance().getTabListManager().getTabListForPlayer(super.getPlayer());
+        TabListProvider tlp = BungeeTabListPlus.getInstance().
+                getTabListManager().getTabListForPlayer(super.getPlayer());
         if (tlp == null) {
             exclude();
             unload();
@@ -66,15 +71,18 @@ public class ScoreboardTabList extends CustomTabListHandler implements IMyTabLis
 
         resize(tabList.getUsedSlots());
 
-        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
+                getMainConfig().charLimit;
 
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
             Slot line = tabList.getSlot(i);
             if (line == null) {
                 line = new Slot("");
             }
-            String text = BungeeTabListPlus.getInstance().getVariablesManager().replacePlayerVariables(line.text, super.getPlayer());
-            text = BungeeTabListPlus.getInstance().getVariablesManager().replaceVariables(text);
+            String text = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replacePlayerVariables(line.text, super.getPlayer());
+            text = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replaceVariables(text);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
@@ -110,27 +118,34 @@ public class ScoreboardTabList extends CustomTabListHandler implements IMyTabLis
         if (i >= ConfigManager.getTabSize()) {
             return;
         }
-        BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(i), slots_ping[i]);
+        BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(
+                getPlayer().unsafe(), getSlotID(i), slots_ping[i]);
         send[i] = "";
     }
 
     private void removeSlot(int i) {
-        BungeeTabListPlus.getInstance().getPacketManager().removePlayer(getPlayer().unsafe(), getSlotID(i));
-        BungeeTabListPlus.getInstance().getPacketManager().removeTeam(getPlayer().unsafe(), getSlotID(i));
+        BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
+                getPlayer().unsafe(), getSlotID(i));
+        BungeeTabListPlus.getInstance().getPacketManager().removeTeam(
+                getPlayer().unsafe(), getSlotID(i));
     }
 
     private void updateSlot(int row, String text, int ping) {
         if (ping != slots_ping[row]) {
-            BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(row), ping);
+            BungeeTabListPlus.getInstance().getPacketManager().
+                    createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(row),
+                            ping);
         }
         send[row] = text;
         slots_ping[row] = ping;
         String split[] = splitText(text);
-        BungeeTabListPlus.getInstance().getPacketManager().updateTeam(getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
+        BungeeTabListPlus.getInstance().getPacketManager().updateTeam(
+                getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
     }
 
     private void createSlot(int row) {
-        BungeeTabListPlus.getInstance().getPacketManager().createTeam(getPlayer().unsafe(), getSlotID(row));
+        BungeeTabListPlus.getInstance().getPacketManager().createTeam(
+                getPlayer().unsafe(), getSlotID(row));
     }
 
     private String[] splitText(String s) {

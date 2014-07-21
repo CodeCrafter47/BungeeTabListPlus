@@ -24,19 +24,19 @@ public class TabListConfig extends Config {
         "'all' for all players"
     })
     public String showTo = "all";
-    
+
     @Comments({
         "how Players should be grouped",
         "You can use 'SERVER' or 'NONE'"
     })
     public String groupPlayers = "SERVER";
-    
+
     @Comments({
         "Whether to Show Groups with no Players",
         "not effective if groupPlayers=NONE"
     })
     public boolean showEmptyGroups = false;
-    
+
     @Comments({
         "This is how a group looks in the tabList",
         "Use {fillplayers} at the point where you",
@@ -45,19 +45,19 @@ public class TabListConfig extends Config {
         "You can also use {fillplayers:<group>}"
     })
     public List<String> groupLines = new ArrayList<>();
-    
+
     @Comments({
         "This allows you to change the way players are listet",
         "You can also use multiple slots to displaye additional information"
     })
     public List<String> playerLines = new ArrayList<>();
-    
+
     @Comments({
         "These lines are shown if there's not enough space",
         "for all players upon the tabList"
     })
     public List<String> morePlayersLines = new ArrayList<>();
-    
+
     @Comments({
         "And here finally is the tabList",
         "Use {fillplayers} at the point where",
@@ -105,13 +105,19 @@ public class TabListConfig extends Config {
         tabList.add("&3here");
     }
 
-    public TabListConfig(Plugin plugin, String filename) throws InvalidConfigurationException {
-        CONFIG_FILE = new File(plugin.getDataFolder() + File.separator + "tabLists", filename);
+    public TabListConfig(Plugin plugin, String filename) throws
+            InvalidConfigurationException {
+        CONFIG_FILE = new File(
+                plugin.getDataFolder() + File.separator + "tabLists", filename);
         CONFIG_HEADER = new String[]{
-            "", "This the default TabList", "It is shown to all users which haven't got another TabList", "",
-            "Create a copy of this File, name it like you wish", "and change the showTo and some other options",
-            "to create another TabList only shown to some users.", "By doing this you can for example create",
-            "a special TabList for VIPs / Admins or", "create a tabList only shown o one server", ""
+            "", "This the default TabList",
+            "It is shown to all users which haven't got another TabList", "",
+            "Create a copy of this File, name it like you wish",
+            "and change the showTo and some other options",
+            "to create another TabList only shown to some users.",
+            "By doing this you can for example create",
+            "a special TabList for VIPs / Admins or",
+            "create a tabList only shown o one server", ""
         };
 
         this.init();
@@ -160,7 +166,8 @@ public class TabListConfig extends Config {
             }
         }
 
-        String group = BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(player);
+        String group = BungeeTabListPlus.getInstance().getPermissionManager().
+                getMainGroup(player);
 
         if (group != null) {
             if (s[0].equalsIgnoreCase("group")) {
@@ -180,7 +187,7 @@ public class TabListConfig extends Config {
 
         return false;
     }
-    
+
     public String getFileName() {
         return this.CONFIG_FILE.getName();
     }

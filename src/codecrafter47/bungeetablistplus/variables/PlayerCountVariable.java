@@ -11,7 +11,8 @@ public class PlayerCountVariable implements Variable {
         if (false && !BungeeTabListPlus.areHiddenPlayers()) {
             return "" + ProxyServer.getInstance().getOnlineCount();
         } else {
-            return "" + BungeeTabListPlus.getInstance().getPlayerManager().getGlobalPlayerCount();
+            return "" + BungeeTabListPlus.getInstance().getPlayerManager().
+                    getGlobalPlayerCount();
         }
     }
 

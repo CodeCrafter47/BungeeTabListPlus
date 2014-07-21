@@ -19,14 +19,16 @@ public class SuperCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] arg1) {
         if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
-            if (plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.admin")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.admin")) {
                 BungeeTabListPlus.getInstance().reload();
                 sendReloadComplete(sender);
             } else {
                 sendNoPermission(sender);
             }
         } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
-            if (plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.hide")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
                     if (BungeeTabListPlus.isHidden(player)) {
@@ -42,8 +44,10 @@ public class SuperCommand extends Command {
             } else {
                 sendNoPermission(sender);
             }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].equalsIgnoreCase("on")) {
-            if (plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.hide")) {
+        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                equalsIgnoreCase("on")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
                     if (BungeeTabListPlus.isHidden(player)) {
@@ -58,8 +62,10 @@ public class SuperCommand extends Command {
             } else {
                 sendNoPermission(sender);
             }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].equalsIgnoreCase("off")) {
-            if (plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.hide")) {
+        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                equalsIgnoreCase("off")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
                     if (BungeeTabListPlus.isHidden(player)) {
@@ -75,69 +81,91 @@ public class SuperCommand extends Command {
                 sendNoPermission(sender);
             }
         } else {
-            if (plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.help") || plugin.getPermissionManager().hasPermission(sender, "bungeetablistplus.admin")) {
-                sender.sendMessage(ChatColor.DARK_PURPLE + "BungeeTabListPlus " + BungeeTabListPlus.getInstance().getDescription().getVersion());
-                if(plugin.isUpdateAvailable()){
-                    sender.sendMessage(ChatColor.GREEN + "A new version of BungeeTabListPlus is available for download");
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.help") || plugin.getPermissionManager().
+                    hasPermission(sender, "bungeetablistplus.admin")) {
+                sender.sendMessage(
+                        ChatColor.DARK_PURPLE + "BungeeTabListPlus " + BungeeTabListPlus.
+                        getInstance().getDescription().getVersion());
+                if (plugin.isUpdateAvailable()) {
+                    sender.sendMessage(
+                            ChatColor.GREEN + "A new version of BungeeTabListPlus is available for download");
                 }
-                for(String s: plugin.getProxy().getServers().keySet()){
-                    if(!plugin.getBridge().isUpToDate(s)){
-                        sender.sendMessage(ChatColor.DARK_RED + "BukkitBridge on server '" + s +"' is outdated. Please update!");
+                for (String s : plugin.getProxy().getServers().keySet()) {
+                    if (!plugin.getBridge().isUpToDate(s)) {
+                        sender.sendMessage(
+                                ChatColor.DARK_RED + "BukkitBridge on server '" + s + "' is outdated. Please update!");
                     }
                 }
-                sender.sendMessage(ChatColor.DARK_PURPLE + "/BungeeTabListPlus reload");
-                sender.sendMessage(ChatColor.DARK_PURPLE + "/BungeeTabListPlus hide [on/off]");
-            }else{
+                sender.sendMessage(
+                        ChatColor.DARK_PURPLE + "/BungeeTabListPlus reload");
+                sender.sendMessage(
+                        ChatColor.DARK_PURPLE + "/BungeeTabListPlus hide [on/off]");
+            } else {
                 sendNoPermission(sender);
             }
         }
     }
-    
-    private void sendNoPermission(CommandSender target){
+
+    private void sendNoPermission(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().errorNoPermission;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }
-    
-    private void sendNeedsPlayer(CommandSender target){
+
+    private void sendNeedsPlayer(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().errorNeedsPlayer;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }
-    
-    private void sendReloadComplete(CommandSender target){
+
+    private void sendReloadComplete(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().successReloadComplete;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }
-    
-    private void sendPlayerHide(CommandSender target){
+
+    private void sendPlayerHide(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().successPlayerHide;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }
-    
-    private void sendPlayerUnhide(CommandSender target){
+
+    private void sendPlayerUnhide(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().successPlayerUnhide;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }
-    
-    private void sendAlreadyHidden(CommandSender target){
+
+    private void sendAlreadyHidden(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().errorAlreadyHidden;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }
-    
-    private void sendErrorNotHidden(CommandSender target){
+
+    private void sendErrorNotHidden(CommandSender target) {
         String message = plugin.getConfigManager().getMessages().errorNotHidden;
-        if(message == null || message.isEmpty())return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         target.sendMessage(message);
     }

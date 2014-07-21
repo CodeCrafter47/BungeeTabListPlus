@@ -46,7 +46,8 @@ public class PacketManager {
                     }
                 }
             } catch (ClassNotFoundException ex) {
-                clazz = Class.forName("net.md_5.bungee.protocol.packet.PacketD1Team");
+                clazz = Class.forName(
+                        "net.md_5.bungee.protocol.packet.PacketD1Team");
                 teamPacket = new TeamPacket16();
             }
         } catch (Throwable th) {
@@ -55,7 +56,8 @@ public class PacketManager {
 
         try {
             try {
-                clazz = Class.forName("net.md_5.bungee.protocol.packet.PlayerListItem");
+                clazz = Class.forName(
+                        "net.md_5.bungee.protocol.packet.PlayerListItem");
                 if (clazz != null) {
                     clazz.getMethod("setUsername", String.class);
                     clazz.getMethod("setOnline", boolean.class);
@@ -67,7 +69,8 @@ public class PacketManager {
                     }
                 }
             } catch (ClassNotFoundException ex) {
-                clazz = Class.forName("net.md_5.bungee.protocol.packet.PacketC9PlayerListItem");
+                clazz = Class.forName(
+                        "net.md_5.bungee.protocol.packet.PacketC9PlayerListItem");
                 playerListPacket = new PlayerListPacket16();
             }
         } catch (Throwable th) {
@@ -79,7 +82,8 @@ public class PacketManager {
         teamPacket.createTeam(connection, player);
     }
 
-    public void updateTeam(Connection.Unsafe connection, String player, String prefix, String displayname, String suffix) {
+    public void updateTeam(Connection.Unsafe connection, String player,
+            String prefix, String displayname, String suffix) {
         teamPacket.updateTeam(connection, player, prefix, displayname, suffix);
     }
 
@@ -87,19 +91,20 @@ public class PacketManager {
         teamPacket.removeTeam(connection, player);
     }
 
-    public void createOrUpdatePlayer(Connection.Unsafe connection, String player, int ping) {
+    public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
+            int ping) {
         playerListPacket.createOrUpdatePlayer(connection, player, ping);
     }
 
     public void removePlayer(Connection.Unsafe connection, String player) {
         playerListPacket.removePlayer(connection, player);
     }
-    
-    public boolean isScoreboardSupported(){
+
+    public boolean isScoreboardSupported() {
         return teamPacket != null;
     }
-    
-    public boolean isTabModificationSupported(){
+
+    public boolean isTabModificationSupported() {
         return playerListPacket != null;
     }
 }

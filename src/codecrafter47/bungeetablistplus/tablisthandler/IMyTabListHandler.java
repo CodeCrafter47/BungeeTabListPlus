@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 /**
@@ -11,5 +10,6 @@ package codecrafter47.bungeetablistplus.tablisthandler;
  * @author florian
  */
 public interface IMyTabListHandler {
+
     void recreate();
 }

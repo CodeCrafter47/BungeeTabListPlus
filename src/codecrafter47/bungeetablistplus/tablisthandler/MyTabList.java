@@ -20,13 +20,16 @@ public class MyTabList extends MyCustom implements IMyTabListHandler {
     @Override
     public void recreate() {
         if (getPlayer().getServer() != null) {
-            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.contains(getPlayer().getServer().getInfo().getName()) || isExcluded) {
+            if (BungeeTabListPlus.getInstance().getConfigManager().
+                    getMainConfig().excludeServers.contains(getPlayer().
+                            getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
             }
         }
 
-        TabListProvider tlp = BungeeTabListPlus.getInstance().getTabListManager().getTabListForPlayer(super.getPlayer());
+        TabListProvider tlp = BungeeTabListPlus.getInstance().
+                getTabListManager().getTabListForPlayer(super.getPlayer());
         if (tlp == null) {
             exclude();
             unload();
@@ -35,18 +38,22 @@ public class MyTabList extends MyCustom implements IMyTabListHandler {
         super.clear();
         TabList tabList = tlp.getTabList(super.getPlayer());
 
-        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
+                getMainConfig().charLimit;
 
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
             Slot line = tabList.getSlot(i);
             if (line == null) {
                 line = new Slot("");
             }
-            line.text = BungeeTabListPlus.getInstance().getVariablesManager().replacePlayerVariables(line.text, super.getPlayer());
-            line.text = BungeeTabListPlus.getInstance().getVariablesManager().replaceVariables(line.text);  
+            line.text = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replacePlayerVariables(line.text, super.getPlayer());
+            line.text = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replaceVariables(line.text);
             line.text = ChatColor.translateAlternateColorCodes('&', line.text);
             if (charLimit > 0) {
-                line.text = ColorParser.substringIgnoreColors(line.text, charLimit);
+                line.text = ColorParser.substringIgnoreColors(line.text,
+                        charLimit);
             }
             super.setSlot(i, line, false);
         }

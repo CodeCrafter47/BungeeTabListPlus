@@ -67,6 +67,7 @@ public class MainConfig extends Config {
         "server Alias fo the {server} Variable"
     })
     public HashMap<String, String> serverAlias = new HashMap<>();
+
     {
         serverAlias.put("server1", "Spawn");
         serverAlias.put("server2", "Creative");
@@ -78,6 +79,7 @@ public class MainConfig extends Config {
         "this will only be used if bungeeperms is not installed"
     })
     public HashMap<String, String> prefixes = new HashMap<>();
+
     {
         prefixes.put("default", "");
         prefixes.put("admin", "&c[A] ");
@@ -92,8 +94,7 @@ public class MainConfig extends Config {
         excludeServers.add("server2");
         excludeServers.add("server7");
     }
-    
-    
+
     @Comments({
         "Detects which servers are using a bukkit-side tabList-plugin",
         "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
@@ -103,8 +104,10 @@ public class MainConfig extends Config {
     public boolean autoExcludeServers = false;
 
     public MainConfig(Plugin plugin) throws InvalidConfigurationException {
-        CONFIG_FILE = new File("plugins" + File.separator + plugin.getDescription().getName(), "config.yml");
-        CONFIG_HEADER = new String[]{"This is the Config File of BungeeTabListPlus"};
+        CONFIG_FILE = new File("plugins" + File.separator + plugin.
+                getDescription().getName(), "config.yml");
+        CONFIG_HEADER = new String[]{
+            "This is the Config File of BungeeTabListPlus"};
 
         this.init();
     }

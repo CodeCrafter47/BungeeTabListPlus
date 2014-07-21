@@ -6,9 +6,10 @@ import net.md_5.bungee.api.config.ServerInfo;
 
 public class ServerNameVariable implements ServerVariable {
 
-	@Override
-	public String getReplacement(String args, ServerInfo server) {
-		return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getServerAlias(server.getName());
-	}
+    @Override
+    public String getReplacement(String args, ServerInfo server) {
+        return BungeeTabListPlus.getInstance().getConfigManager().
+                getMainConfig().getServerAlias(server.getName());
+    }
 
 }

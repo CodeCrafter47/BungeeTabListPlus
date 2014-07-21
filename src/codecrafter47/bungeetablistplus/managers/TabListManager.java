@@ -24,14 +24,19 @@ public class TabListManager {
     // returns true on succes
     public boolean loadTabLists() {
         try {
-            if (!plugin.getConfigManager().defaultTabList.showTo.equalsIgnoreCase("all")) {
-                plugin.getLogger().warning("The default tabList is configured not to be shown by default");
-                plugin.getLogger().warning("This is not recommended and you should not do this if you're not knowing exaclty what you are doing");
+            if (!plugin.getConfigManager().defaultTabList.showTo.
+                    equalsIgnoreCase("all")) {
+                plugin.getLogger().warning(
+                        "The default tabList is configured not to be shown by default");
+                plugin.getLogger().warning(
+                        "This is not recommended and you should not do this if you're not knowing exaclty what you are doing");
             }
             validateShowTo(plugin.getConfigManager().defaultTabList);
-            defaultTab = new ConfigParser(plugin.getConfigManager().defaultTabList, plugin).parse();
+            defaultTab = new ConfigParser(
+                    plugin.getConfigManager().defaultTabList, plugin).parse();
         } catch (Throwable ex) {
-            plugin.getLogger().log(Level.WARNING, "Could not load default tabList");
+            plugin.getLogger().log(Level.WARNING,
+                    "Could not load default tabList");
             plugin.getLogger().log(Level.WARNING, null, ex);
             plugin.getLogger().log(Level.WARNING, "Disabling plugin");
             return false;
@@ -41,7 +46,8 @@ public class TabListManager {
                 validateShowTo(c);
                 tabLists.add(new ConfigParser(c, plugin).parse());
             } catch (Throwable ex) {
-                plugin.getLogger().log(Level.WARNING, "Could not load {0}", c.getFileName());
+                plugin.getLogger().log(Level.WARNING, "Could not load {0}", c.
+                        getFileName());
                 plugin.getLogger().log(Level.WARNING, null, ex);
             }
         }
@@ -121,6 +127,7 @@ public class TabListManager {
     }
 
     private void invalidShowTo(TabListConfig config) {
-        plugin.getLogger().warning(ChatColor.RED + config.getFileName() + ": showTo is partly or completly invalid");
+        plugin.getLogger().warning(
+                ChatColor.RED + config.getFileName() + ": showTo is partly or completly invalid");
     }
 }

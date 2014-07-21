@@ -15,7 +15,8 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 public class NewPlayerListPacket implements IPlayerListPacket {
 
     @Override
-    public void createOrUpdatePlayer(Connection.Unsafe connection, String player, int ping) {
+    public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
+            int ping) {
         connection.sendPacket(new PlayerListItem(player, true, ping));
     }
 
