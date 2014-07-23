@@ -103,21 +103,21 @@ public class BungeeTabListPlus extends Plugin {
     // world playercount: {players:server#world}
     // world player count, variable to show number of players on multiple servers like {players:lobby+survival}
     //      --> allow + / - operations in {players:*} variable
+    // rework commands (klickable links)
     // ---------------------------------------------
     // 1.7
     // TODO scrolling text
     // TODO multislot scrolling text
     // TODO tabComplete support
     // TODO use bridge version to check whether the plugin is uptodate (newer bridge version)
-    // TODO nested variables - actually that is very difficult
+    // TODO nested variables - actually that is very difficult - and I don't need that
     // TODO Developer api
     // TODO add isOnline
-    // TODO better reload (restart resend-thread)
+    // TODO better reload (restart resend-thread) - no solution available that fits all bungee versions using this plugin
     // TODO howto use BungeeTablistplus without bungeeperms
     // TODO improve performance in sortrules
     // TODO showTo more flexible
     // TODO uuid support for showTo
-    // TODO rework commands (klickable links)
     // TODO improve automatic {fillplayers}: It would be nice to have a feature
     // to combine several servers into 1 server, this would be very usefull for
     // a minigames type of server setting, where you have different servers acting
