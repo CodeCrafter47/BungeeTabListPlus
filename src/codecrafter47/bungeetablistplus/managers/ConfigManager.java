@@ -28,7 +28,10 @@ public class ConfigManager {
             InvalidConfigurationException {
         setMainConfig(new MainConfig(plugin));
         validateConfig();
-        messages = new Messages(plugin);
+        File messageFile = new File(plugin.getDataFolder(), "messages.yml");
+        if (messageFile.exists()) {
+            messages = new Messages(plugin);
+        }
         // Load default TabList
         defaultTabList = new TabListConfig(plugin, "default.yml");
         // Load other TabLists
