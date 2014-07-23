@@ -105,13 +105,13 @@ public final class VariablesManager {
             String var = s.substring(matcher.start(), matcher.end());
             var = var.replaceAll("[\\{\\}]", "");
             String arg = null;
+            String replacement = "{" + var + "}";
             if (var.contains(":")) {
-                arg = var.substring(var.indexOf(":"), var.length());
+                arg = var.substring(var.indexOf(":") + 1);
                 var = var.substring(0, var.indexOf(":"));
             }
 
             Variable variable = this.variables.get(var);
-            String replacement = "{" + var + "}";
             if (variable != null) {
                 replacement = variable.getReplacement(arg);
             }
@@ -135,13 +135,13 @@ public final class VariablesManager {
             String var = s.substring(matcher.start(), matcher.end());
             var = var.replaceAll("[\\{\\}]", "");
             String arg = null;
+            String replacement = "{" + var + "}";
             if (var.contains(":")) {
-                arg = var.substring(var.indexOf(":"), var.length());
+                arg = var.substring(var.indexOf(":") + 1);
                 var = var.substring(0, var.indexOf(":"));
             }
 
             PlayerVariable variable = this.playerVariables.get(var);
-            String replacement = "{" + var + "}";
             if (variable != null) {
                 replacement = variable.getReplacement(arg, player);
             }
@@ -161,13 +161,13 @@ public final class VariablesManager {
             String var = s.substring(matcher.start(), matcher.end());
             var = var.replaceAll("[\\{\\}]", "");
             String arg = null;
+            String replacement = "{" + var + "}";
             if (var.contains(":")) {
-                arg = var.substring(var.indexOf(":"), var.length());
+                arg = var.substring(var.indexOf(":") + 1);
                 var = var.substring(0, var.indexOf(":"));
             }
 
             ServerVariable variable = this.serverVariables.get(var);
-            String replacement = "{" + var + "}";
             if (variable != null) {
                 replacement = variable.getReplacement(arg, server);
             }

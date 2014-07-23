@@ -23,8 +23,6 @@ public class NewTeamPacket implements ITeamPacket {
         t.setDisplayName(" ");
         t.setSuffix(" ");
         t.setPlayers(new String[]{player});
-        // TODO FIXME
-        //t.setNameTagVisibility("never");
         connection.sendPacket(t);
     }
 

@@ -127,7 +127,9 @@ public class TabListManager {
     }
 
     private void invalidShowTo(TabListConfig config) {
-        plugin.getLogger().warning(
-                ChatColor.RED + config.getFileName() + ": showTo is partly or completly invalid");
+        plugin.getLogger().log(
+                Level.WARNING, "{0}{1}: showTo is partly or completly invalid",
+                new Object[]{ChatColor.RED,
+                    config.getFileName()});
     }
 }

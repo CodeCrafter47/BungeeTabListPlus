@@ -36,7 +36,7 @@ public class ColorVariable implements Variable {
         ChatColor all[];
         if (args != null) {
             // parse color args
-            String array[] = args.split("[,;:.]");
+            String array[] = args.split(",");
             all = new ChatColor[array.length];
             for (int i = 0; i < array.length; i++) {
                 String color = array[i];

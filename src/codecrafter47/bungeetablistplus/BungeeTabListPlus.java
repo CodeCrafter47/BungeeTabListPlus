@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -101,7 +102,6 @@ public class BungeeTabListPlus extends Plugin {
     // {color:green,red} will insert green or red colorcodes. this changes every second
     // ---------------------------------------------
     // 1.7
-    // TODO fix many bugs
     // TODO world playercount: {players:server#world}
     // TODO scrolling text
     // TODO multislot scrolling text
@@ -423,5 +423,13 @@ public class BungeeTabListPlus extends Plugin {
             return updateChecker.isUpdateAvailable();
         }
         return false;
+    }
+
+    public void reportError(Throwable th) {
+        getLogger().log(Level.WARNING,
+                ChatColor.RED + "An internal error occured! Please send the "
+                + "following stacktrace to the developer in order to help"
+                + " resolving the problem",
+                th);
     }
 }

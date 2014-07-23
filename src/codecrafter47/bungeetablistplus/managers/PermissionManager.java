@@ -25,7 +25,7 @@ public class PermissionManager {
                         getPermissionsManager().getUser(player.getName())).
                         getName();
             } catch (Throwable th) {
-                // TODO do something here
+                BungeeTabListPlus.getInstance().reportError(th);
             }
         }
 
@@ -53,11 +53,11 @@ public class PermissionManager {
             return bgroup;
         }
 
-        if (vgroup != null) {
-            return vgroup;
-        }
         if (bpgroup != null) {
             return bpgroup;
+        }
+        if (vgroup != null) {
+            return vgroup;
         }
         return bgroup;
     }
@@ -83,7 +83,7 @@ public class PermissionManager {
                 }
                 return 0;
             } catch (Throwable th) {
-                // TODO do something here
+                BungeeTabListPlus.getInstance().reportError(th);
             }
         }
 
@@ -120,7 +120,7 @@ public class PermissionManager {
                         getPermissionsManager().getUser(player.getName())).
                         getPrefix();
             } catch (Throwable th) {
-                // TODO do something here
+                BungeeTabListPlus.getInstance().reportError(th);
             }
         }
 
@@ -139,11 +139,11 @@ public class PermissionManager {
             return bprefix;
         }
 
-        if (vprefix != null) {
-            return vprefix;
-        }
         if (bpprefix != null) {
             return bpprefix;
+        }
+        if (vprefix != null) {
+            return vprefix;
         }
         return bprefix;
     }
@@ -159,7 +159,7 @@ public class PermissionManager {
                         getPermissionsManager().getUser(player.getName())).
                         getDisplay();
             } catch (Throwable th) {
-                // TODO do something here
+                BungeeTabListPlus.getInstance().reportError(th);
             }
         }
 
@@ -181,12 +181,8 @@ public class PermissionManager {
                         getPermissionsManager().getUser(player.getName())).
                         getSuffix();
             } catch (Throwable th) {
-                // TODO do something here
+                BungeeTabListPlus.getInstance().reportError(th);
             }
-        }
-
-        if (suffix == null) {
-            suffix = "";
         }
 
         String vsuffix = plugin.getBridge().getPlayerInformation(player,
@@ -199,11 +195,15 @@ public class PermissionManager {
             return vsuffix != null ? vsuffix : "";
         }
 
+        if (suffix != null) {
+            return suffix;
+        }
+
         if (vsuffix != null) {
             return vsuffix;
         }
 
-        return suffix;
+        return "";
     }
 
     public boolean hasPermission(CommandSender sender, String permission) {
@@ -218,7 +218,7 @@ public class PermissionManager {
                 return b;
             }
         } catch (Throwable th) {
-            // TODO do something! This should never happen! But you cant know :-(
+            BungeeTabListPlus.getInstance().reportError(th);
         }
 
         return false;
