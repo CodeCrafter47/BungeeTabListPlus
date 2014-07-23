@@ -100,16 +100,16 @@ public class BungeeTabListPlus extends Plugin {
     // /BTLP shows whether a update is available
     // added {color} variable which randomly inserts a beautiful colorcode changing every few seconds, the variable inserts the same color in all slots
     // {color:green,red} will insert green or red colorcodes. this changes every second
+    // world playercount: {players:server#world}
+    // world player count, variable to show number of players on multiple servers like {players:lobby+survival}
+    //      --> allow + / - operations in {players:*} variable
     // ---------------------------------------------
     // 1.7
-    // TODO world playercount: {players:server#world}
     // TODO scrolling text
     // TODO multislot scrolling text
     // TODO tabComplete support
     // TODO use bridge version to check whether the plugin is uptodate (newer bridge version)
     // TODO nested variables - actually that is very difficult
-    // TODO world player count, variable to show number of players on multiple servers like {players:lobby+survival}
-    //      --> allow + / - operations in {players:*} variable
     // TODO Developer api
     // TODO add isOnline
     // TODO better reload (restart resend-thread)
