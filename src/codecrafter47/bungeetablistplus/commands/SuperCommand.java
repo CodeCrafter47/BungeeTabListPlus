@@ -96,7 +96,7 @@ public class SuperCommand extends Command {
 
     private void sendHelp(CommandSender target) {
         target.sendMessage(getPrefix().append(
-                "================================================================================").
+                "==================================").
                 color(ChatColor.DARK_BLUE).create());
         target.sendMessage(getPrefix().append("version " + plugin.
                 getDescription().getVersion()).color(ChatColor.AQUA).create());
@@ -128,9 +128,12 @@ public class SuperCommand extends Command {
                         new ClickEvent(Action.SUGGEST_COMMAND,
                                 "/BungeeTabListPlus hide ")).create());
         target.sendMessage(getPrefix().append("    ").append(
-                "/BungeeTabListPlus help").color(ChatColor.AQUA).event(
+                "/BungeeTabListPlus reload").color(ChatColor.AQUA).event(
                         new ClickEvent(Action.SUGGEST_COMMAND,
-                                "/BungeeTabListPlus help")).create());
+                                "/BungeeTabListPlus reload")).create());
+        target.sendMessage(getPrefix().append(
+                "==================================").
+                color(ChatColor.DARK_BLUE).create());
     }
 
     private void sendNoPermission(CommandSender target) {
@@ -242,6 +245,6 @@ public class SuperCommand extends Command {
                 "BungeeTabListPlus").color(ChatColor.YELLOW).event(
                         new ClickEvent(Action.OPEN_URL,
                                 "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
-                append("] ").color(ChatColor.BLUE);
+                append("] ").color(ChatColor.BLUE).event((ClickEvent) null);
     }
 }
