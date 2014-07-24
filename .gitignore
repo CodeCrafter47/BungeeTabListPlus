@@ -1,2 +1,7 @@
 /build/
 /dist/
+/nbproject/private/
+/packets/
+.gitignore
+manifest.mf
+build.xml
