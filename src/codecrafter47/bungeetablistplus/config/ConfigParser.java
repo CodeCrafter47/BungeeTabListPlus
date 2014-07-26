@@ -7,6 +7,7 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.CollumnSplitSection;
 import codecrafter47.bungeetablistplus.section.FillBukkitPlayers;
 import codecrafter47.bungeetablistplus.section.FillPlayersSection;
@@ -114,12 +115,8 @@ public class ConfigParser {
                 if (collumn == -1) {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.
                             isEmpty()) {
-                        Map<String, ServerInfo> servers = ProxyServer.
-                                getInstance().getServers();
-                        for (String server : servers.keySet()) {
-                            sections.addAll(parseServerSections(prefix, suffix,
-                                    filter, server, sortrules, maxplayers));
-                        }
+                        sections.add(new AutoFillPlayers(startColumn, prefix,
+                                suffix, sortrules, maxplayers));
                     } else {
                         sections.add(new FillPlayersSection(startColumn, filter,
                                 config, prefix, suffix, sortrules, maxplayers));
@@ -152,10 +149,10 @@ public class ConfigParser {
         }
 
         return new TabListProvider(topSections, botSections,
-                config.showEmptyGroups, config);
+                config.showEmptyGroups, config, this);
     }
 
-    private List<Section> parseServerSections(String g_prefix, String g_suffix,
+    public List<Section> parseServerSections(String g_prefix, String g_suffix,
             List<String> g_filter, String g_server, List<String> g_sort,
             int maxplayers) throws ParseException {
         List<Section> sections = new ArrayList<>();

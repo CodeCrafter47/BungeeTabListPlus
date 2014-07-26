@@ -7,14 +7,23 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.section.ServerSection;
 import codecrafter47.bungeetablistplus.tablist.TabList;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
@@ -27,59 +36,86 @@ public class TabListProvider {
     List<Section> bot;
     boolean showEmptyGroups;
     TabListConfig config;
+    ConfigParser parser;
 
     public TabListProvider(List<Section> top, List<Section> bot,
-            boolean showEmpty, TabListConfig config) {
+            boolean showEmpty, TabListConfig config, ConfigParser parser) {
         this.top = top;
         this.bot = bot;
         showEmptyGroups = showEmpty;
         this.config = config;
+        this.parser = parser;
     }
 
     public TabList getTabList(final ProxiedPlayer player) {
 
-        // precalculate all sections
-        for (Section section : top) {
-            section.precalculate(player);
-        }
-        for (Section section : bot) {
-            section.precalculate(player);
+        List<Section> topSections = top;
+        List<Section> botSections = bot;
+
+        for (int n = 0; n < 2; n++) {
+            List<Section> sectionList;
+            if (n == 0) {
+                sectionList = topSections;
+            } else {
+                sectionList = botSections;
+            }
+
+            for (int i = 0; i < sectionList.size(); i++) {
+                Section section = sectionList.get(i);
+                if (section instanceof AutoFillPlayers) {
+                    sectionList.remove(i);
+                    String prefix = ((AutoFillPlayers) section).prefix;
+                    String suffix = ((AutoFillPlayers) section).suffix;
+                    int startColumn = ((AutoFillPlayers) section).startColumn;
+                    int maxPlayers = ((AutoFillPlayers) section).maxPlayers;
+                    List<String> sortRules = ((AutoFillPlayers) section).sortRules;
+
+                    Map<String, ServerInfo> servers = ProxyServer.getInstance().
+                            getServers();
+
+                    List<String> list = new LinkedList(servers.keySet());
+                    Collections.sort(list, new Comparator<String>() {
+                        @Override
+                        public int compare(String s1, String s2) {
+                            int p1 = BungeeTabListPlus.getInstance().
+                                    getPlayerManager().getServerPlayerCount(s1);
+                            int p2 = BungeeTabListPlus.getInstance().
+                                    getPlayerManager().getServerPlayerCount(s2);
+                            if (p1 > p2) {
+                                return 1;
+                            }
+                            if (p1 < p2) {
+                                return -1;
+                            }
+                            return s1.compareTo(s2);
+                        }
+                    });
+
+                    int j = i;
+                    for (String server : list) {
+                        try {
+                            List<Section> sections = parser.parseServerSections(
+                                    prefix, suffix, new ArrayList(0),
+                                    server,
+                                    sortRules, maxPlayers);
+                            for (Section s : sections) {
+                                sectionList.add(j++, s);
+                            }
+                        } catch (ParseException ex) {
+                            Logger.getLogger(TabListProvider.class.getName()).
+                                    log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
         }
 
-        List<Section> topSections;
-        List<Section> botSections;
-        if (showEmptyGroups) {
-            topSections = top;
-            botSections = bot;
-        } else {
-            topSections = new ArrayList<>();
-            for (Section section : top) {
-                if (section instanceof ServerSection) {
-                    if (BungeeTabListPlus.getInstance().getPlayerManager().
-                            getServerPlayerCount(((ServerSection) section).
-                                    getServer()) > 0) {
-                        topSections.add(section);
-                    }
-                } else {
-                    if (section.getMaxSize(player) > 0) {
-                        topSections.add(section);
-                    }
-                }
-            }
-            botSections = new ArrayList<>();
-            for (Section section : bot) {
-                if (section instanceof ServerSection) {
-                    if (BungeeTabListPlus.getInstance().getPlayerManager().
-                            getServerPlayerCount(((ServerSection) section).
-                                    getServer()) > 0) {
-                        botSections.add(section);
-                    }
-                } else {
-                    if (section.getMaxSize(player) > 0) {
-                        botSections.add(section);
-                    }
-                }
-            }
+        // precalculate all sections
+        for (Section section : topSections) {
+            section.precalculate(player);
+        }
+        for (Section section : botSections) {
+            section.precalculate(player);
         }
 
         // Calculation maximum space the top sections need

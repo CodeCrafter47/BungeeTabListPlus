@@ -104,6 +104,11 @@ public class BungeeTabListPlus extends Plugin {
     // world player count, variable to show number of players on multiple servers like {players:lobby+survival}
     //      --> allow + / - operations in {players:*} variable
     // rework commands (klickable links)
+    // EDIT:
+    // Also is there a way to sort the automatic {fillplayers} by player count?
+    // So that the server with the highest player count always gets displayed at
+    // the top? Atm it just puts the servers randomly which makes everything look
+    // butchered, since there are big gaps inbetween sometimes
     // ---------------------------------------------
     // 1.7
     // TODO scrolling text
@@ -123,11 +128,6 @@ public class BungeeTabListPlus extends Plugin {
     // a minigames type of server setting, where you have different servers acting
     // for different minigames. This would be helpful to categorize all players
     // under 1 player count
-    // EDIT:
-    // Also is there a way to sort the automatic {fillplayers} by player count?
-    // So that the server with the highest player count always gets displayed at
-    // the top? Atm it just puts the servers randomly which makes everything look
-    // butchered, since there are big gaps inbetween sometimes
     // TODO two servers share one column.
     // TODO group rank from vault - vault doesn't offer this - maybe from pex?
     // TODO if we have a max for {fillplayers} we might want to have a minimun too! - we don't want this yet; It would be too confusing
