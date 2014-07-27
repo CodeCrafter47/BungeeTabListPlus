@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -41,7 +42,7 @@ public class UpdateChecker implements Runnable {
 
     private void enable() {
         plugin.getLogger().info("Starting UpdateChecker Task");
-        pid = plugin.getProxy().getScheduler().schedule(plugin, this, intervall,
+        pid = plugin.getProxy().getScheduler().schedule(plugin, this, 0,
                 intervall, TimeUnit.MINUTES).getId();
     }
 
@@ -58,7 +59,7 @@ public class UpdateChecker implements Runnable {
             URL url = new URL(
                     "http://updates.codecrafter47.dyndns.eu/" + plugin.
                     getDescription().getName() + "/version.txt");
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.connect();
             int res = con.getResponseCode();
             if (res != 200) {
@@ -82,6 +83,7 @@ public class UpdateChecker implements Runnable {
             if (!newVersion.equalsIgnoreCase(plugin.getDescription().
                     getVersion())) {
                 updateAvailable = true;
+
             }
         } catch (Throwable t) {
             error = true;
