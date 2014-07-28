@@ -93,17 +93,24 @@ public class TabListProvider {
 
                     int j = i;
                     for (String server : list) {
-                        try {
-                            List<Section> sections = parser.parseServerSections(
-                                    prefix, suffix, new ArrayList(0),
-                                    server,
-                                    sortRules, maxPlayers);
-                            for (Section s : sections) {
-                                sectionList.add(j++, s);
+                        if (config.showEmptyGroups || BungeeTabListPlus.
+                                getInstance().getPlayerManager().
+                                getServerPlayerCount(server) > 0) {
+                            try {
+                                List<Section> sections = parser.
+                                        parseServerSections(
+                                                prefix, suffix, new ArrayList(0),
+                                                server,
+                                                sortRules, maxPlayers);
+                                for (Section s : sections) {
+                                    sectionList.add(j++, s);
+                                }
+                            } catch (ParseException ex) {
+                                Logger.
+                                        getLogger(TabListProvider.class.
+                                                getName()).
+                                        log(Level.SEVERE, null, ex);
                             }
-                        } catch (ParseException ex) {
-                            Logger.getLogger(TabListProvider.class.getName()).
-                                    log(Level.SEVERE, null, ex);
                         }
                     }
                 }

@@ -2,6 +2,7 @@ package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.Constants;
+import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
@@ -195,9 +196,18 @@ public class BungeeTabListPlus extends Plugin {
                 TimeUnit.SECONDS);
         startRefreshThread();
 
-        // register Reload command
-        ProxyServer.getInstance().getPluginManager().registerCommand(INSTANCE,
-                new SuperCommand(this));
+        // register commands
+        try {
+            Thread.currentThread().getContextClassLoader().loadClass(
+                    "net.md_5.bungee.api.chat.ComponentBuilder");
+            ProxyServer.getInstance().getPluginManager().registerCommand(
+                    INSTANCE,
+                    new SuperCommand(this));
+        } catch (Exception ex) {
+            ProxyServer.getInstance().getPluginManager().registerCommand(
+                    INSTANCE,
+                    new OldSuperCommand(this));
+        }
 
         // Start metrics
         try {

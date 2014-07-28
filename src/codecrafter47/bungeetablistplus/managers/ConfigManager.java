@@ -32,6 +32,15 @@ public class ConfigManager {
         if (messageFile.exists()) {
             messages = new Messages(plugin);
         }
+
+        try {
+            Thread.currentThread().getContextClassLoader().loadClass(
+                    "net.md_5.bungee.api.chat.ComponentBuilder");
+        } catch (Exception ex) {
+            if (messages == null) {
+                messages = new Messages(plugin);
+            }
+        }
         // Load default TabList
         defaultTabList = new TabListConfig(plugin, "default.yml");
         // Load other TabLists
