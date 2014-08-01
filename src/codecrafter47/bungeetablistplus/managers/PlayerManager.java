@@ -293,7 +293,7 @@ public class PlayerManager {
 
     public int getPlayerCount(String args, ProxiedPlayer player) {
         String tmp = args.replaceAll(",", "+");
-        String[] all = tmp.split("+");
+        String[] all = tmp.split("\\+");
         return this.getPlayers(Arrays.asList(all), player).size();
     }
 }
