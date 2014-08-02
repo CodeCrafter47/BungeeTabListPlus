@@ -14,8 +14,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -136,15 +139,54 @@ public class BukkitBridge implements Listener {
 
     @EventHandler
     public void onServerChange(ServerConnectedEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        player.getServer().sendData(Constants.channel, Cinit_player);
-        if (playerInformation.get(player.getName()) == null) {
-            return;
+        final ProxiedPlayer player = event.getPlayer();
+
+        if (playerInformation.get(player.getName()) != null) {
+            if (!playerInformation.get(player.getName()).get("server").equals(
+                    player.getServer().getInfo().getName())) {
+                playerInformation.remove(player.getName());
+
+                final AtomicInteger tid = new AtomicInteger(-1);
+                tid.set(ProxyServer.getInstance().getScheduler().
+                        schedule(plugin,
+                                new Runnable() {
+
+                                    int cnt = 0;
+
+                                    @Override
+                                    public void run() {
+                                        if (playerInformation.get(player.
+                                                getName()) == null) {
+                                            player.getServer().sendData(
+                                                    Constants.channel,
+                                                    Cinit_player);
+                                            cnt++;
+                                            if (cnt > 50) {
+                                                // 10 seconds --> we give up
+                                                try {
+                                                    ProxyServer.getInstance().
+                                                    getScheduler().cancel(tid.
+                                                            get());
+                                                } catch (Throwable th) {
+                                                    // we simply ignore this
+                                                    // I really don't care
+                                                }
+                                            }
+                                        } else {
+                                            try {
+                                                ProxyServer.getInstance().
+                                                getScheduler().cancel(tid.get());
+                                            } catch (Throwable th) {
+                                                // we simply ignore this
+                                                // I really don't care
+                                            }
+                                        }
+                                    }
+                                },
+                                200, 200, TimeUnit.MILLISECONDS).getId());
+            }
         }
-        if (!playerInformation.get(player.getName()).get("server").equals(
-                player.getServer().getInfo().getName())) {
-            playerInformation.remove(player.getName());
-        }
+
     }
 
     @EventHandler

@@ -113,7 +113,7 @@ public class BungeeTabListPlus extends Plugin {
     // 1.7#2
     // fixed NPE while replacing variables
     // improved bukkitbridge to make information transfer more reliable
-    // fix: automatic fillplayers now shows the server with the most players at first
+    // fixed automatic fillplayers
     // ---------------------------------------------
     // 1.8
     // TODO scrolling text

@@ -49,8 +49,8 @@ public class TabListProvider {
 
     public TabList getTabList(final ProxiedPlayer player) {
 
-        List<Section> topSections = top;
-        List<Section> botSections = bot;
+        List<Section> topSections = new ArrayList<>(top);
+        List<Section> botSections = new ArrayList<>(bot);
 
         for (int n = 0; n < 2; n++) {
             List<Section> sectionList;
