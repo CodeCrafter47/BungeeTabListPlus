@@ -43,6 +43,9 @@ public class PermissionManager {
                 break;
             }
         }
+        if (bgroup == null) {
+            bgroup = "default";
+        }
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
@@ -145,7 +148,10 @@ public class PermissionManager {
         if (vprefix != null) {
             return vprefix;
         }
-        return bprefix;
+        if (bprefix != null) {
+            return bprefix;
+        }
+        return "";
     }
 
     public String getDisplayPrefix(ProxiedPlayer player) {

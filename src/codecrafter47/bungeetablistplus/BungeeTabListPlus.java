@@ -88,14 +88,14 @@ public class BungeeTabListPlus extends Plugin {
     // max for fillplayers use [MAXPLAYERS=11]
     // fixed bug with [ALIGN LEFT][COLUMN=0]{fillplayers}
     // added config entry to select where from to take informations like permissions/prefix/suffix/group
-    // new variables {world} and {balance}
     // bukkit bridge
     // - worldplayercount
     // - support for bukkitside tabcolor plugins
     // - support for bukkitside permission plugins
     // - {health}, {level}
+    // - new variables {world} and {balance}
     // - faction support: {factionsWhere}, {factionName}, {factionMembersOnline}
-    // world fillplayers: {fillplayers:server#world}
+    // - world fillplayers: {fillplayers:server#world}
     // allow {time:format}
     // more performant variable replacement
     // /BTLP shows whether a update is available

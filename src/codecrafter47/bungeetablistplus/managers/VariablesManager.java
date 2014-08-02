@@ -113,7 +113,10 @@ public final class VariablesManager {
 
             Variable variable = this.variables.get(var);
             if (variable != null) {
-                replacement = variable.getReplacement(arg);
+                String str = variable.getReplacement(arg);
+                if (str != null) {
+                    replacement = str;
+                }
             }
 
             matcher.appendReplacement(sb, replacement);
@@ -143,7 +146,10 @@ public final class VariablesManager {
 
             PlayerVariable variable = this.playerVariables.get(var);
             if (variable != null) {
-                replacement = variable.getReplacement(arg, player);
+                String str = variable.getReplacement(arg, player);
+                if (str != null) {
+                    replacement = str;
+                }
             }
 
             matcher.appendReplacement(sb, replacement);
@@ -169,7 +175,10 @@ public final class VariablesManager {
 
             ServerVariable variable = this.serverVariables.get(var);
             if (variable != null) {
-                replacement = variable.getReplacement(arg, server);
+                String str = variable.getReplacement(arg, server);
+                if (str != null) {
+                    replacement = str;
+                }
             }
 
             matcher.appendReplacement(sb, replacement);
