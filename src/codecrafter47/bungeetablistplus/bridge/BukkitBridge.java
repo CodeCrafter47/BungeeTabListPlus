@@ -142,51 +142,47 @@ public class BukkitBridge implements Listener {
         final ProxiedPlayer player = event.getPlayer();
 
         if (playerInformation.get(player.getName()) != null) {
-            if (!playerInformation.get(player.getName()).get("server").equals(
-                    player.getServer().getInfo().getName())) {
-                playerInformation.remove(player.getName());
-
-                final AtomicInteger tid = new AtomicInteger(-1);
-                tid.set(ProxyServer.getInstance().getScheduler().
-                        schedule(plugin,
-                                new Runnable() {
-
-                                    int cnt = 0;
-
-                                    @Override
-                                    public void run() {
-                                        if (playerInformation.get(player.
-                                                getName()) == null) {
-                                            player.getServer().sendData(
-                                                    Constants.channel,
-                                                    Cinit_player);
-                                            cnt++;
-                                            if (cnt > 50) {
-                                                // 10 seconds --> we give up
-                                                try {
-                                                    ProxyServer.getInstance().
-                                                    getScheduler().cancel(tid.
-                                                            get());
-                                                } catch (Throwable th) {
-                                                    // we simply ignore this
-                                                    // I really don't care
-                                                }
-                                            }
-                                        } else {
-                                            try {
-                                                ProxyServer.getInstance().
-                                                getScheduler().cancel(tid.get());
-                                            } catch (Throwable th) {
-                                                // we simply ignore this
-                                                // I really don't care
-                                            }
-                                        }
-                                    }
-                                },
-                                200, 200, TimeUnit.MILLISECONDS).getId());
-            }
+            playerInformation.remove(player.getName());
         }
 
+        final AtomicInteger tid = new AtomicInteger(-1);
+        tid.set(ProxyServer.getInstance().getScheduler().
+                schedule(plugin,
+                        new Runnable() {
+
+                            int cnt = 0;
+
+                            @Override
+                            public void run() {
+                                if (playerInformation.get(player.
+                                        getName()) == null) {
+                                    player.getServer().sendData(
+                                            Constants.channel,
+                                            Cinit_player);
+                                    cnt++;
+                                    if (cnt > 50) {
+                                        // 10 seconds --> we give up
+                                        try {
+                                            ProxyServer.getInstance().
+                                            getScheduler().cancel(tid.
+                                                    get());
+                                        } catch (Throwable th) {
+                                            // we simply ignore this
+                                            // I really don't care
+                                        }
+                                    }
+                                } else {
+                                    try {
+                                        ProxyServer.getInstance().
+                                        getScheduler().cancel(tid.get());
+                                    } catch (Throwable th) {
+                                        // we simply ignore this
+                                        // I really don't care
+                                    }
+                                }
+                            }
+                        },
+                        200, 200, TimeUnit.MILLISECONDS).getId());
     }
 
     @EventHandler
