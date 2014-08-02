@@ -145,44 +145,37 @@ public class BukkitBridge implements Listener {
             playerInformation.remove(player.getName());
         }
 
-        final AtomicInteger tid = new AtomicInteger(-1);
-        tid.set(ProxyServer.getInstance().getScheduler().
+        ProxyServer.getInstance().getScheduler().
                 schedule(plugin,
                         new Runnable() {
-
-                            int cnt = 0;
-
                             @Override
                             public void run() {
-                                if (playerInformation.get(player.
-                                        getName()) == null) {
-                                    player.getServer().sendData(
-                                            Constants.channel,
-                                            Cinit_player);
-                                    cnt++;
-                                    if (cnt > 50) {
-                                        // 10 seconds --> we give up
-                                        try {
-                                            ProxyServer.getInstance().
-                                            getScheduler().cancel(tid.
-                                                    get());
-                                        } catch (Throwable th) {
-                                            // we simply ignore this
-                                            // I really don't care
-                                        }
-                                    }
-                                } else {
-                                    try {
-                                        ProxyServer.getInstance().
-                                        getScheduler().cancel(tid.get());
-                                    } catch (Throwable th) {
-                                        // we simply ignore this
-                                        // I really don't care
-                                    }
-                                }
+                                requestInformationIn200Millis(player, 1);
                             }
-                        },
-                        200, 200, TimeUnit.MILLISECONDS).getId());
+                        }, 5, TimeUnit.MILLISECONDS);
+    }
+
+    private void requestInformationIn200Millis(final ProxiedPlayer player,
+            final int tries) {
+        if (tries > 50) {
+            return;
+        }
+        if (playerInformation.get(player.
+                getName()) != null) {
+            return;
+        }
+        player.getServer().sendData(
+                Constants.channel,
+                Cinit_player);
+
+        ProxyServer.getInstance().getScheduler().
+                schedule(plugin,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                requestInformationIn200Millis(player, tries + 1);
+                            }
+                        }, 200, TimeUnit.MILLISECONDS);
     }
 
     @EventHandler
