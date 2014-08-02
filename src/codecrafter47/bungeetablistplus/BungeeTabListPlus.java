@@ -80,7 +80,7 @@ public class BungeeTabListPlus extends Plugin {
 
     UpdateChecker updateChecker = null;
 
-    // Changes:
+    // Changes: 1.7
     // validate config( check sortrules, check for server filter in groupLines, valid showTo(valid first parameter, valid server)
     // improve tablistprovider using timsort
     // vanish no packets support
@@ -110,8 +110,12 @@ public class BungeeTabListPlus extends Plugin {
     // So that the server with the highest player count always gets displayed at
     // the top? Atm it just puts the servers randomly which makes everything look
     // butchered, since there are big gaps inbetween sometimes
+    // 1.7#2
+    // fixed NPE while replacing variables
+    // improved bukkitbridge to make information transfer more reliable
+    // fix: automatic fillplayers now shows the server with the most players at first
     // ---------------------------------------------
-    // 1.7
+    // 1.8
     // TODO scrolling text
     // TODO multislot scrolling text
     // TODO tabComplete support
@@ -132,7 +136,7 @@ public class BungeeTabListPlus extends Plugin {
     // TODO two servers share one column.
     // TODO group rank from vault - vault doesn't offer this - maybe from pex?
     // TODO if we have a max for {fillplayers} we might want to have a minimun too! - we don't want this yet; It would be too confusing
-    // 1.8
+    // 1.9
     // TODO connect economy databases
     // TODO add spaces and canIhazmoreSpaces
     // TODO groupplayers:permgroup

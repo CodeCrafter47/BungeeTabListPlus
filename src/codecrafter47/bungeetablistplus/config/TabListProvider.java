@@ -81,10 +81,10 @@ public class TabListProvider {
                                     getPlayerManager().getServerPlayerCount(s1);
                             int p2 = BungeeTabListPlus.getInstance().
                                     getPlayerManager().getServerPlayerCount(s2);
-                            if (p1 > p2) {
+                            if (p1 < p2) {
                                 return 1;
                             }
-                            if (p1 < p2) {
+                            if (p1 > p2) {
                                 return -1;
                             }
                             return s1.compareTo(s2);

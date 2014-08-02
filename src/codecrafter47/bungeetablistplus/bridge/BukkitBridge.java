@@ -7,12 +7,15 @@ package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -29,7 +32,9 @@ import net.md_5.bungee.event.EventHandler;
  */
 public class BukkitBridge implements Listener {
 
-    private final int currentVersion = 1;
+    private final int currentVersion = 2;
+
+    byte[] Cinit, Cinit_player;
 
     BungeeTabListPlus plugin;
 
@@ -38,6 +43,25 @@ public class BukkitBridge implements Listener {
 
     public BukkitBridge(BungeeTabListPlus plugin) {
         this.plugin = plugin;
+
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(os);
+            out.writeUTF(Constants.subchannel_init);
+            Cinit = os.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(BukkitBridge.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(os);
+            out.writeUTF(Constants.subchannel_initplayer);
+            Cinit_player = os.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(BukkitBridge.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
     }
 
     public void enable() {
@@ -48,8 +72,6 @@ public class BukkitBridge implements Listener {
 
     @EventHandler
     public void onPluginMessage(PluginMessageEvent event) {
-        // System.out.println("PluginMessage!");
-        // System.out.println("channel: " + event.getTag());
         if (event.getTag().equals(Constants.channel)) {
             event.setCancelled(true);
             if (event.getReceiver() instanceof ProxiedPlayer && event.
@@ -75,7 +97,7 @@ public class BukkitBridge implements Listener {
                         serverInformation.put(server.getInfo().getName(), data);
                     } else if (subchannel.equals(Constants.subchannel_update)) {
                         if (serverInformation.get(server.getInfo().getName()) == null) {
-                            server.sendData(Constants.channel, new byte[]{});
+                            server.sendData(Constants.channel, Cinit);
                         } else {
                             for (Entry<String, String> entry : data.entrySet()) {
                                 serverInformation.get(server.getInfo().
@@ -90,7 +112,8 @@ public class BukkitBridge implements Listener {
                     } else if (subchannel.equals(
                             Constants.subchannel_updateplayer)) {
                         if (playerInformation.get(player.getName()) == null) {
-                            server.sendData(Constants.channel, new byte[]{});
+                            player.getServer().sendData(Constants.channel,
+                                    Cinit_player);
                         } else {
                             for (Entry<String, String> entry : data.entrySet()) {
                                 playerInformation.get(player.getName()).put(
@@ -109,12 +132,12 @@ public class BukkitBridge implements Listener {
                 }
             }
         }
-        //System.out.println(this.playerInformation.toString());
     }
 
     @EventHandler
     public void onServerChange(ServerConnectedEvent event) {
         ProxiedPlayer player = event.getPlayer();
+        player.getServer().sendData(Constants.channel, Cinit_player);
         if (playerInformation.get(player.getName()) == null) {
             return;
         }
