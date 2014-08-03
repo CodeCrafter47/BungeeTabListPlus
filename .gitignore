@@ -2,8 +2,9 @@
 /dist/
 /nbproject/private/
 /nbproject/
+/nbproject/*
 /packets/
-.gitignore
+.gitignore~
 manifest.mf
 build.xml
 todo.lst

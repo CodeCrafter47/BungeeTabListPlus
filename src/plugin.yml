@@ -1,5 +1,0 @@
-name: BungeeTabListPlus
-main : codecrafter47.bungeetablistplus.BungeeTabListPlus
-version: 1.7#2
-author: CodeCrafter47
-depends: ['Yamler']
