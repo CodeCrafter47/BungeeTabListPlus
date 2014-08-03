@@ -87,7 +87,7 @@ public class BungeeTabListPlus extends Plugin {
     private final SendingQueue resendQueue = new SendingQueue();
     private ResendThread resendThread;
 
-    private ScheduledTask refreshThread;
+    private ScheduledTask refreshThread = null;
 
     private final static Collection<String> hiddenPlayers = new HashSet<>();
 
@@ -184,11 +184,13 @@ public class BungeeTabListPlus extends Plugin {
                         @Override
                         public void run() {
                             resendTabLists();
+                            startRefreshThread();
                         }
                     },
                     (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
-                    (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
                     TimeUnit.MILLISECONDS);
+        } else {
+            refreshThread = null;
         }
     }
 
@@ -196,7 +198,6 @@ public class BungeeTabListPlus extends Plugin {
      * Reloads most settings of the plugin
      */
     public void reload() {
-        //getProxy().getScheduler().cancel(refreshThread);
         try {
             config = new ConfigManager(this);
             tabLists = new TabListManager(this);
@@ -207,11 +208,13 @@ public class BungeeTabListPlus extends Plugin {
             getLogger().warning("Unable to reload Config");
             getLogger().log(Level.WARNING, null, ex);
         }
-        //startRefreshThread();
+        if (refreshThread == null) {
+            startRefreshThread();
+        }
     }
 
     /**
-     * Disables the plugin
+     * called when the plugin is disabled
      */
     @Override
     public void onDisable() {
