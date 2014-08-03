@@ -33,6 +33,7 @@ import codecrafter47.bungeetablistplus.variables.PingVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerNameVariable;
 import codecrafter47.bungeetablistplus.variables.PlayerRawNameVariable;
+import codecrafter47.bungeetablistplus.variables.PrefixColor;
 import codecrafter47.bungeetablistplus.variables.ServerNameVariable;
 import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.TimeVariable;
@@ -64,6 +65,7 @@ public final class VariablesManager {
         addVariable("server", new ServerNameVariable());
         addVariable("permprefix", new PermPrefix());
         addVariable("prefix", new PermPrefix());
+        addVariable("prefixColor", new PrefixColor());
         addVariable("permsuffix", new PermSuffix());
         addVariable("suffix", new PermSuffix());
         addVariable("displayprefix", new DisplayPrefix());
