@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2014 florian
+ * BungeeTabListPlus - a bungeecord plugin to customize the tablist
+ *
+ * Copyright (C) 2014 Florian Stober
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +24,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
  *
- * @author florian
+ * @author Florian Stober
  */
 public class BukkitBridgeVariable implements PlayerVariable {
 

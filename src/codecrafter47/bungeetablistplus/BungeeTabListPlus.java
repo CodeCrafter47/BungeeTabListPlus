@@ -1,3 +1,21 @@
+/*
+ * BungeeTabListPlus - a bungeecord plugin to customize the tablist
+ *
+ * Copyright (C) 2014 Florian Stober
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
@@ -50,12 +68,12 @@ public class BungeeTabListPlus extends Plugin {
     private PlayerManager players;
 
     /**
-     * provides acces to the configuration
+     * provides access to the configuration
      */
     private ConfigManager config;
 
     /**
-     * provides acces to the Variable Manager use this to add Variables
+     * provides access to the Variable Manager use this to add Variables
      */
     private VariablesManager variables;
 
@@ -80,73 +98,6 @@ public class BungeeTabListPlus extends Plugin {
 
     UpdateChecker updateChecker = null;
 
-    // Changes: 1.7
-    // validate config( check sortrules, check for server filter in groupLines, valid showTo(valid first parameter, valid server)
-    // improve tablistprovider using timsort
-    // vanish no packets support
-    // fixed bug: if you put 7 or more characters in bold, the 7th or so character will lose its boldness
-    // max for fillplayers use [MAXPLAYERS=11]
-    // fixed bug with [ALIGN LEFT][COLUMN=0]{fillplayers}
-    // added config entry to select where from to take informations like permissions/prefix/suffix/group
-    // bukkit bridge
-    // - worldplayercount
-    // - support for bukkitside tabcolor plugins
-    // - support for bukkitside permission plugins
-    // - {health}, {level}
-    // - new variables {world} and {balance}
-    // - faction support: {factionsWhere}, {factionName}, {factionMembersOnline}
-    // - world fillplayers: {fillplayers:server#world}
-    // allow {time:format}
-    // more performant variable replacement
-    // /BTLP shows whether a update is available
-    // added {color} variable which randomly inserts a beautiful colorcode changing every few seconds, the variable inserts the same color in all slots
-    // {color:green,red} will insert green or red colorcodes. this changes every second
-    // world playercount: {players:server#world}
-    // world player count, variable to show number of players on multiple servers like {players:lobby+survival}
-    //      --> allow + / - operations in {players:*} variable
-    // rework commands (klickable links)
-    // EDIT:
-    // Also is there a way to sort the automatic {fillplayers} by player count?
-    // So that the server with the highest player count always gets displayed at
-    // the top? Atm it just puts the servers randomly which makes everything look
-    // butchered, since there are big gaps inbetween sometimes
-    // 1.7#2
-    // fixed NPE while replacing variables
-    // improved bukkitbridge to make information transfer more reliable
-    // fixed automatic fillplayers
-    // ---------------------------------------------
-    // 1.8
-    // TODO scrolling text
-    // TODO multislot scrolling text
-    // TODO tabComplete support
-    // TODO use bridge version to check whether the plugin is uptodate (newer bridge version)
-    // TODO nested variables - actually that is very difficult - and I don't need that
-    // TODO Developer api
-    // TODO add isOnline
-    // TODO better reload (restart resend-thread) - no solution available that fits all bungee versions using this plugin
-    // TODO howto use BungeeTablistplus without bungeeperms
-    // TODO improve performance in sortrules
-    // TODO showTo more flexible
-    // TODO uuid support for showTo
-    // TODO improve automatic {fillplayers}: It would be nice to have a feature
-    // to combine several servers into 1 server, this would be very usefull for
-    // a minigames type of server setting, where you have different servers acting
-    // for different minigames. This would be helpful to categorize all players
-    // under 1 player count
-    // TODO two servers share one column.
-    // TODO group rank from vault - vault doesn't offer this - maybe from pex?
-    // TODO if we have a max for {fillplayers} we might want to have a minimun too! - we don't want this yet; It would be too confusing
-    // 1.9
-    // TODO connect economy databases
-    // TODO add spaces and canIhazmoreSpaces
-    // TODO groupplayers:permgroup
-    // TODO symbols
-    // TODO easter eggs
-    // TODO custom config library for more flexibitity
-    // TODO [IF ...]
-    // TODO lowtraffic mode (no i dont like this)
-    // TODO mc1.8
-    // TODO tabsize per server
     /**
      * Called when the plugin is enabled
      */
