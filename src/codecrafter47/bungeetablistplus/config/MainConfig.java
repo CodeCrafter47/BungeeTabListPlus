@@ -82,6 +82,11 @@ public class MainConfig extends Config {
     public boolean checkForUpdates = true;
 
     @Comments({
+        "this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available"
+    })
+    public boolean notifyAdminsIfUpdateAvailable = true;
+
+    @Comments({
         "server Alias fo the {server} Variable"
     })
     public HashMap<String, String> serverAlias = new HashMap<>();

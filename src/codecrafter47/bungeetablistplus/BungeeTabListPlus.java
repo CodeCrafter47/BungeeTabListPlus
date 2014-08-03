@@ -30,6 +30,7 @@ import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.managers.VariablesManager;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
+import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -148,13 +149,15 @@ public class BungeeTabListPlus extends Plugin {
                 TimeUnit.SECONDS);
         startRefreshThread();
 
-        // register commands
+        // register commands and update Notifier
         try {
             Thread.currentThread().getContextClassLoader().loadClass(
                     "net.md_5.bungee.api.chat.ComponentBuilder");
             ProxyServer.getInstance().getPluginManager().registerCommand(
                     INSTANCE,
                     new SuperCommand(this));
+            ProxyServer.getInstance().getScheduler().schedule(this,
+                    new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
         } catch (Exception ex) {
             ProxyServer.getInstance().getPluginManager().registerCommand(
                     INSTANCE,
