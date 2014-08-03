@@ -157,17 +157,17 @@ public class PermissionManager {
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return vprefix != null ? vprefix : "";
         } else if (mode.equalsIgnoreCase("Bungee")) {
-            return bprefix;
+            return bprefix != null ? bprefix : "";
         }
 
+        if (bprefix != null) {
+            return bprefix;
+        }
         if (bpprefix != null) {
             return bpprefix;
         }
         if (vprefix != null) {
             return vprefix;
-        }
-        if (bprefix != null) {
-            return bprefix;
         }
         return "";
     }
