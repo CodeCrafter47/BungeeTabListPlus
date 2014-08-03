@@ -18,7 +18,6 @@
  */
 package codecrafter47.bungeetablistplus.managers;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.api.Variable;
@@ -39,13 +38,10 @@ import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
 import codecrafter47.bungeetablistplus.variables.TimeVariable;
 import codecrafter47.bungeetablistplus.variables.UUIDVariable;
 import codecrafter47.bungeetablistplus.variables.WorldVariable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -100,6 +96,7 @@ public final class VariablesManager {
         addVariable("factionsWhere", new BukkitBridgeVariable("factionsWhere"));
         addVariable("health", new BukkitBridgeVariable("health"));
         addVariable("level", new BukkitBridgeVariable("level"));
+        addVariable("tabName", new BukkitBridgeVariable("tabName"));
     }
 
     public void addVariable(String name, Variable var) {
