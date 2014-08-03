@@ -48,7 +48,7 @@ import net.md_5.bungee.event.EventHandler;
  */
 public class BukkitBridge implements Listener {
 
-    private final int currentVersion = 2;
+    private final int currentVersion = 3;
 
     byte[] Cinit, Cinit_player;
 
