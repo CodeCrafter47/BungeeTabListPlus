@@ -81,9 +81,6 @@ public class BungeeTabListPlus extends Plugin {
 
     private PacketManager packets;
 
-    /**
-     * LOL
-     */
     private TabListManager tabLists;
     private final TabListListener listener = new TabListListener(this);
 

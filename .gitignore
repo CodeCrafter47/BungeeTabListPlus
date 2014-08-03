@@ -1,6 +1,7 @@
 /build/
 /dist/
 /nbproject/private/
+/nbproject/
 /packets/
 .gitignore
 manifest.mf
