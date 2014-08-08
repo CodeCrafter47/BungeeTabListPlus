@@ -90,7 +90,7 @@ public class TabListConfig extends Config {
     public List<String> tabList = new ArrayList<>();
 
     {
-        groupLines.add("[ALIGN LEFT]&1&l>&1 {server}({server_player_count}):");
+        groupLines.add("[ALIGN LEFT]&9&l>&9 {server}({server_player_count}):");
         groupLines.add("{fillplayers}");
     }
 
@@ -103,22 +103,22 @@ public class TabListConfig extends Config {
     }
 
     {
-        tabList.add("&8>>>>>>>>>>>>");
-        tabList.add("&8Welcome");
-        tabList.add("&8<<<<<<<<<<<<");
-        tabList.add("&8>>>>>>>>>>>>");
-        tabList.add("&8{player}");
-        tabList.add("&8<<<<<<<<<<<<");
+        tabList.add("&2>>>>>>>>>>>>");
+        tabList.add("&aWelcome");
+        tabList.add("&2<<<<<<<<<<<<");
+        tabList.add("&2>>>>>>>>>>>>");
+        tabList.add("&a{player}");
+        tabList.add("&2<<<<<<<<<<<<");
         tabList.add(" ");
         tabList.add(" ");
         tabList.add(" ");
         tabList.add("{fillplayers}");
-        tabList.add("[ALIGN BOTTOM]&8============");
-        tabList.add("&8============");
-        tabList.add("&8============");
-        tabList.add("&8Time: &7{time}");
-        tabList.add("&8Players: &7{players}");
-        tabList.add("&8Balance: &7{balance}");
+        tabList.add("[ALIGN BOTTOM]&2============");
+        tabList.add("&2============");
+        tabList.add("&2============");
+        tabList.add("&2Time: &a{time}");
+        tabList.add("&2Players: &a{players}");
+        tabList.add("&2Balance: &a{balance}");
     }
 
     public TabListConfig(Plugin plugin, String filename) throws
