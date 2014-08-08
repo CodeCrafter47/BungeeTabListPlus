@@ -36,6 +36,7 @@ import codecrafter47.bungeetablistplus.variables.PlayerRawNameVariable;
 import codecrafter47.bungeetablistplus.variables.PrefixColor;
 import codecrafter47.bungeetablistplus.variables.ServerNameVariable;
 import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
+import codecrafter47.bungeetablistplus.variables.TabNameVariable;
 import codecrafter47.bungeetablistplus.variables.TimeVariable;
 import codecrafter47.bungeetablistplus.variables.UUIDVariable;
 import codecrafter47.bungeetablistplus.variables.WorldVariable;
@@ -98,7 +99,7 @@ public final class VariablesManager {
         addVariable("factionsWhere", new BukkitBridgeVariable("factionsWhere"));
         addVariable("health", new BukkitBridgeVariable("health"));
         addVariable("level", new BukkitBridgeVariable("level"));
-        addVariable("tabName", new BukkitBridgeVariable("tabName"));
+        addVariable("tabName", new TabNameVariable());
     }
 
     public void addVariable(String name, Variable var) {
