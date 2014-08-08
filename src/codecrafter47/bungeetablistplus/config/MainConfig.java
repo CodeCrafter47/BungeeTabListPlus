@@ -98,8 +98,8 @@ public class MainConfig extends Config {
     }
 
     @Comments({
-        "the prefixes used for the {prefix} variable, based upon bungeecord permission groups",
-        "this will only be used if bungeeperms is not installed"
+        "the prefixes used for the {prefix} variable, based upon permission groups",
+        "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
     })
     public HashMap<String, String> prefixes = new HashMap<>();
 
