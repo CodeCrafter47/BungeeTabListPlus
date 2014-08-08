@@ -38,7 +38,7 @@ public class TabListConfig extends Config {
         "'Server:<Server>' for all Players on that Server",
         "'Servers:<server1>,<server2>' for all Players which are on These Servers",
         "'group:<group>' for all players within that permission group",
-        "groups:<group1>,<group2> same with multiple groups",
+        "'groups:<group1>,<group2>' same with multiple groups",
         "'all' for all players"
     })
     public String showTo = "all";
@@ -85,19 +85,17 @@ public class TabListConfig extends Config {
         "lines should be shown at the bottom of the tabList",
         "You can also use [ALIGN LEFT]",
         "You can use Variables to display dynamic content",
-        "more information at http://www.spigotmc.org/resources/bungeetablistplus.313/"
+        "more information at https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"
     })
     public List<String> tabList = new ArrayList<>();
 
     {
-        groupLines.add("[ALIGN LEFT]&c>>> {server}({server_player_count}):");
-        groupLines.add(" ");
-        groupLines.add(" ");
+        groupLines.add("[ALIGN LEFT]&1&l>&1 {server}({server_player_count}):");
         groupLines.add("{fillplayers}");
     }
 
     {
-        playerLines.add("{permprefix}{player}{permsuffix}");
+        playerLines.add("{player}");
     }
 
     {
@@ -105,22 +103,22 @@ public class TabListConfig extends Config {
     }
 
     {
-        tabList.add("&a>>>>>>>>>>>>");
-        tabList.add("&aWelcome");
-        tabList.add("&a<<<<<<<<<<<<");
-        tabList.add("&a>>>>>>>>>>>>");
-        tabList.add("&a{player}");
-        tabList.add("&a<<<<<<<<<<<<");
+        tabList.add("&8>>>>>>>>>>>>");
+        tabList.add("&8Welcome");
+        tabList.add("&8<<<<<<<<<<<<");
+        tabList.add("&8>>>>>>>>>>>>");
+        tabList.add("&8{player}");
+        tabList.add("&8<<<<<<<<<<<<");
         tabList.add(" ");
         tabList.add(" ");
         tabList.add(" ");
         tabList.add("{fillplayers}");
-        tabList.add("[ALIGN BOTTOM]&3------------");
-        tabList.add("&3------------");
-        tabList.add("&3------------");
-        tabList.add("&3and some");
-        tabList.add("&3other text");
-        tabList.add("&3here");
+        tabList.add("[ALIGN BOTTOM]&8============");
+        tabList.add("&8============");
+        tabList.add("&8============");
+        tabList.add("&8Time: &7{time}");
+        tabList.add("&8Players: &7{players}");
+        tabList.add("&8Balance: &7{balance}");
     }
 
     public TabListConfig(Plugin plugin, String filename) throws
@@ -135,7 +133,9 @@ public class TabListConfig extends Config {
             "to create another TabList only shown to some users.",
             "By doing this you can for example create",
             "a special TabList for VIPs / Admins or",
-            "create a tabList only shown o one server", ""
+            "create a tabList only shown o one server",
+            "You can find more information on the wiki https://github.com/CodeCrafter47/BungeeTabListPlus/wiki",
+            ""
         };
 
         this.init();

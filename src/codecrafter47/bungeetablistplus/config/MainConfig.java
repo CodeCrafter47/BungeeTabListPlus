@@ -98,8 +98,8 @@ public class MainConfig extends Config {
     }
 
     @Comments({
-        "the prefixes used for the {prefix} variable, based upon bungeecord permission groups",
-        "this will only be used if bungeeperms is not installed"
+        "the prefixes used for the {prefix} variable, based upon permission groups",
+        "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
     })
     public HashMap<String, String> prefixes = new HashMap<>();
 
@@ -130,7 +130,8 @@ public class MainConfig extends Config {
         CONFIG_FILE = new File("plugins" + File.separator + plugin.
                 getDescription().getName(), "config.yml");
         CONFIG_HEADER = new String[]{
-            "This is the Config File of BungeeTabListPlus"};
+            "This is the Config File of BungeeTabListPlus",
+            "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"};
 
         this.init();
     }
