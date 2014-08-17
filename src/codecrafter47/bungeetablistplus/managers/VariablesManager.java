@@ -99,6 +99,8 @@ public final class VariablesManager {
         addVariable("factionsWhere", new BukkitBridgeVariable("factionsWhere"));
         addVariable("health", new BukkitBridgeVariable("health"));
         addVariable("level", new BukkitBridgeVariable("level"));
+        addVariable("currency", new BukkitBridgeVariable("currency"));
+        addVariable("currencyPl", new BukkitBridgeVariable("currencyPl"));
         addVariable("tabName", new TabNameVariable());
     }
 
