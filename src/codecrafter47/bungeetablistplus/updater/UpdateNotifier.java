@@ -39,6 +39,9 @@ public class UpdateNotifier implements Runnable {
         if (!plugin.getConfigManager().getMainConfig().notifyAdminsIfUpdateAvailable) {
             return;
         }
+        if (!plugin.isUpdateAvailable()) {
+            return;
+        }
         for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
             if (plugin.getPermissionManager().hasPermission(player,
                     "bungeetablistplus.admin")) {
