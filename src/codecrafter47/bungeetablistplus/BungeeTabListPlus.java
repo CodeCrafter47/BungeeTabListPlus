@@ -221,17 +221,7 @@ public class BungeeTabListPlus extends Plugin {
      */
     @Override
     public void onDisable() {
-
-        ProxyServer.getInstance().getPluginManager().
-                unregisterCommands(INSTANCE);
-        ProxyServer.getInstance().getPluginManager().unregisterListeners(
-                INSTANCE);
-        ProxyServer.getInstance().getScheduler().cancel(INSTANCE);
-
-        tabLists = null;
-        variables = null;
-        config = null;
-        INSTANCE = null;
+        // let the proxy do this
     }
 
     /**
