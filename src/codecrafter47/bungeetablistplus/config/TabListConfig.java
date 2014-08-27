@@ -95,7 +95,7 @@ public class TabListConfig extends Config {
     }
 
     {
-        playerLines.add("{player}");
+        playerLines.add("{tabName}");
     }
 
     {

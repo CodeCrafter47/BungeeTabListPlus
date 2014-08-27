@@ -33,7 +33,7 @@ public class MainConfig extends Config {
         "time in seconds after which the tabList will be resend to all players",
         "set this to -1 to disable scheduled update of the tabList"
     })
-    public double tablistUpdateIntervall = 5;
+    public double tablistUpdateIntervall = 1;
 
     @Comments({
         "whether tabList should be resend if a player joins or leaves the server"
