@@ -176,9 +176,11 @@ public class BukkitBridge implements Listener {
                 getName()) != null) {
             return;
         }
-        player.getServer().sendData(
-                Constants.channel,
-                Cinit_player);
+        if (player.getServer() != null) {
+            player.getServer().sendData(
+                    Constants.channel,
+                    Cinit_player);
+        }
 
         ProxyServer.getInstance().getScheduler().
                 schedule(plugin,
