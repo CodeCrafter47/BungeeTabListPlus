@@ -34,6 +34,7 @@ import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
@@ -181,17 +182,22 @@ public class BungeeTabListPlus extends Plugin {
 
     private void startRefreshThread() {
         if (config.getMainConfig().tablistUpdateIntervall > 0) {
-            refreshThread = ProxyServer.getInstance().getScheduler().schedule(
-                    INSTANCE, new Runnable() {
+            try {
+                refreshThread = ProxyServer.getInstance().getScheduler().
+                        schedule(
+                                INSTANCE, new Runnable() {
 
-                        @Override
-                        public void run() {
-                            resendTabLists();
-                            startRefreshThread();
-                        }
-                    },
-                    (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
-                    TimeUnit.MILLISECONDS);
+                                    @Override
+                                    public void run() {
+                                        resendTabLists();
+                                        startRefreshThread();
+                                    }
+                                },
+                                (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
+                                TimeUnit.MILLISECONDS);
+            } catch (RejectedExecutionException ex) {
+                // this occurs on proxy shutdown -> we can safely ignore it
+            }
         } else {
             refreshThread = null;
         }
