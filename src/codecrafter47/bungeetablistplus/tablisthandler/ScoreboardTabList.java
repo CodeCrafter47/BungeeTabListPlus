@@ -27,7 +27,6 @@ import codecrafter47.bungeetablistplus.util.ColorParser;
 import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.tab.TabListAdapter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
@@ -37,6 +36,8 @@ import net.md_5.bungee.protocol.packet.Team;
  */
 public class ScoreboardTabList extends CustomTabListHandler implements
         IMyTabListHandler {
+
+    ProxiedPlayer player;
 
     private static String getSlotID(int n) {
         String hex = Integer.toHexString(n + 1);
@@ -59,14 +60,14 @@ public class ScoreboardTabList extends CustomTabListHandler implements
     private final String send[] = new String[ConfigManager.getTabSize()];
 
     public ScoreboardTabList(ProxiedPlayer player) {
-        this.init(player);
+        this.player = player;
     }
 
     @Override
     public void recreate() {
-        if (getPlayer().getServer() != null) {
+        if (player.getServer() != null) {
             if (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(getPlayer().
+                    getMainConfig().excludeServers.contains(player.
                             getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
@@ -74,13 +75,13 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         }
 
         TabListProvider tlp = BungeeTabListPlus.getInstance().
-                getTabListManager().getTabListForPlayer(super.getPlayer());
+                getTabListManager().getTabListForPlayer(player);
         if (tlp == null) {
             exclude();
             unload();
             return;
         }
-        TabList tabList = tlp.getTabList(super.getPlayer());
+        TabList tabList = tlp.getTabList(player);
 
         resize(tabList.getUsedSlots());
 
@@ -93,7 +94,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
                 line = new Slot("");
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, super.getPlayer());
+                    replacePlayerVariables(line.text, player);
             text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replaceVariables(text);
             text = ChatColor.translateAlternateColorCodes('&', text);
@@ -132,33 +133,33 @@ public class ScoreboardTabList extends CustomTabListHandler implements
             return;
         }
         BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(
-                getPlayer().unsafe(), getSlotID(i), slots_ping[i]);
+                player.unsafe(), getSlotID(i), slots_ping[i]);
         send[i] = "";
     }
 
     private void removeSlot(int i) {
         BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
-                getPlayer().unsafe(), getSlotID(i));
+                player.unsafe(), getSlotID(i));
         BungeeTabListPlus.getInstance().getPacketManager().removeTeam(
-                getPlayer().unsafe(), getSlotID(i));
+                player.unsafe(), getSlotID(i));
     }
 
     private void updateSlot(int row, String text, int ping) {
         if (ping != slots_ping[row]) {
             BungeeTabListPlus.getInstance().getPacketManager().
-                    createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(row),
+                    createOrUpdatePlayer(player.unsafe(), getSlotID(row),
                             ping);
         }
         send[row] = text;
         slots_ping[row] = ping;
         String split[] = splitText(text);
         BungeeTabListPlus.getInstance().getPacketManager().updateTeam(
-                getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
+                player.unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
     }
 
     private void createSlot(int row) {
         BungeeTabListPlus.getInstance().getPacketManager().createTeam(
-                getPlayer().unsafe(), getSlotID(row));
+                player.unsafe(), getSlotID(row));
     }
 
     private String[] splitText(String s) {

@@ -29,6 +29,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class MyCustom extends CustomTabListHandler {
 
+    ProxiedPlayer player;
+
     private static final char[] FILLER = new char[]{'0', '1', '2', '2', '4',
         '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final int MAX_LEN = 16;
@@ -55,7 +57,7 @@ public class MyCustom extends CustomTabListHandler {
     private int rowLim;
 
     public MyCustom(ProxiedPlayer player) {
-        this.init(player);
+        this.player = player;
     }
 
     public synchronized String setSlot(int n, Slot line) {
@@ -132,7 +134,7 @@ public class MyCustom extends CustomTabListHandler {
         for (int i = 0; i < ConfigManager.getTabSize(); i++) {
             if (sent[i] != null) {
                 BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
-                        getPlayer().unsafe(), sent[i]);
+                        player.unsafe(), sent[i]);
             }
             sent[i] = null;
         }
@@ -153,7 +155,7 @@ public class MyCustom extends CustomTabListHandler {
                      getPlayer().unsafe().sendPacket(
                      new PlayerListItem(line, false, (short) 9999));*/
                     BungeeTabListPlus.getInstance().getPacketManager().
-                            removePlayer(getPlayer().unsafe(), line);
+                            removePlayer(player.unsafe(), line);
                     remove = true;
                 }
             }
@@ -170,7 +172,7 @@ public class MyCustom extends CustomTabListHandler {
              getPlayer().unsafe().sendPacket(
              new PlayerListItem(line, true, slots_ping[i]));*/
             BungeeTabListPlus.getInstance().getPacketManager().
-                    createOrUpdatePlayer(getPlayer().unsafe(), line,
+                    createOrUpdatePlayer(player.unsafe(), line,
                             slots_ping[i]);
         }
     }

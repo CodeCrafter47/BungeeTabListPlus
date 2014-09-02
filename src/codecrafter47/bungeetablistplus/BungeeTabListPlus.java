@@ -29,11 +29,14 @@ import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.managers.VariablesManager;
+import codecrafter47.bungeetablistplus.tablisthandler.IMyTabListHandler;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -96,6 +99,9 @@ public class BungeeTabListPlus extends Plugin {
     BukkitBridge bukkitBridge;
 
     UpdateChecker updateChecker = null;
+
+    // TODO remove tablist of disconnaced plalyers
+    private static Map<String, IMyTabListHandler> tabListHandlers = new HashMap<>();
 
     /**
      * Called when the plugin is enabled
@@ -395,5 +401,13 @@ public class BungeeTabListPlus extends Plugin {
                 + "following stacktrace to the developer in order to help"
                 + " resolving the problem",
                 th);
+    }
+
+    public static IMyTabListHandler getTabList(ProxiedPlayer player) {
+        return tabListHandlers.get(player.getName());
+    }
+
+    public static void setTabList(ProxiedPlayer player, IMyTabListHandler tab) {
+        tabListHandlers.put(player.getName(), tab);
     }
 }

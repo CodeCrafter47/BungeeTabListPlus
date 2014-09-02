@@ -28,5 +28,8 @@ public interface IPlayerListPacket {
 
     public void createOrUpdatePlayer(Unsafe connection, String player, int ping);
 
+    public void updatePlayer(Unsafe connection, String player, String name,
+            int ping);
+
     public void removePlayer(Unsafe connection, String player);
 }

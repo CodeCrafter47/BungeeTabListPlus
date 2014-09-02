@@ -19,13 +19,13 @@
 package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.tablisthandler.IMyTabListHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.tab.TabListHandler;
 import net.md_5.bungee.event.EventHandler;
 
 public class TabListListener implements Listener {
@@ -38,7 +38,7 @@ public class TabListListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PostLoginEvent e) {
-        TabListHandler tab;
+        IMyTabListHandler tab;
         if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
             tab = new MyTabList(e.getPlayer());
             if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
@@ -48,7 +48,7 @@ public class TabListListener implements Listener {
         } else {
             tab = new ScoreboardTabList(e.getPlayer());
         }
-        e.getPlayer().setTabList(tab);
+        BungeeTabListPlus.setTabList(e.getPlayer(), tab);
     }
 
     @EventHandler

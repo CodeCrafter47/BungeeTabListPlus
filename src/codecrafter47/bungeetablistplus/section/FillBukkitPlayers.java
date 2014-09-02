@@ -43,20 +43,21 @@ public class FillBukkitPlayers extends Section {
 
     @Override
     public int getMaxSize(ProxiedPlayer player) {
-        return ((CustomTabListHandler) player.getTabList()).bukkitplayers.size();
+        return 0;//((CustomTabListHandler) player.getTabList()).bukkitplayers.size();
     }
 
     @Override
     public int calculate(ProxiedPlayer player, TabList tabList, int pos,
             int size) {
-        List<String> players = ((CustomTabListHandler) player.getTabList()).bukkitplayers;
-        int p = pos;
-        for (; p < pos + size; p++) {
-            if (players.size() > p - pos) {
-                tabList.setSlot(p, new Slot(players.get(p - pos)));
-            }
-        }
-        return p;
+        /*
+         List<String> players = ((CustomTabListHandler) player.getTabList()).bukkitplayers;
+         int p = pos;
+         for (; p < pos + size; p++) {
+         if (players.size() > p - pos) {
+         tabList.setSlot(p, new Slot(players.get(p - pos)));
+         }
+         }
+         return p;*/ return pos;
     }
 
     @Override
