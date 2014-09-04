@@ -132,6 +132,10 @@ public class PlayerColumn {
                 tabList.setSlot(p, collumn + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
                         getMainConfig().sendPing ? players.get(i).getPing() : 0));
+
+                tabList.getSlot(p, collumn + c).textures = BungeeTabListPlus.
+                        getPlayerTexture(
+                                players.get(i));
                 c++;
                 if (c >= span) {
                     c = 0;

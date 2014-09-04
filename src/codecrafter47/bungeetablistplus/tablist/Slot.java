@@ -22,6 +22,7 @@ public class Slot {
 
     public String text;
     public int ping;
+    public String[] textures = null;
 
     public Slot(String text, int ping) {
         super();

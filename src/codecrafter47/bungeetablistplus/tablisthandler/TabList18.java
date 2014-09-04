@@ -47,6 +47,8 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
 
     private final String send[] = new String[ConfigManager.getTabSize()];
 
+    private final String[] sendTextures = new String[ConfigManager.getTabSize()];
+
     public TabList18(ProxiedPlayer player) {
         super(player);
     }
@@ -93,7 +95,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
 
             String old = send[i];
             if (old == null || !old.equals(text) || line.ping != slots_ping[i]) {
-                updateSlot(i, text, line.ping);
+                updateSlot(i, text, line.ping, line.textures);
             }
         }
 
@@ -145,7 +147,37 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         getPlayer().unsafe().sendPacket(pli);
     }
 
-    private void updateSlot(int row, String text, int ping) {
+    private void updateSlot(int row, String text, int ping, String[] textures) {
+        if (textures != null) {
+            if (sendTextures[row] != null || !textures[0].equals(
+                    sendTextures[row])) {
+                // update texture
+                PlayerListItem pli = new PlayerListItem();
+                pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+                Item item = new Item();
+                UUID offlineId = java.util.UUID.nameUUIDFromBytes(
+                        ("OfflinePlayer:" + getSlotID(row)).getBytes(
+                                Charsets.UTF_8));
+                item.setUuid(offlineId);
+                item.setPing(ping);
+                item.setDisplayName(ComponentSerializer.toString(
+                        TextComponent.
+                        fromLegacyText(text)));
+
+                item.setUsername(getSlotID(row));
+                item.setGamemode(0);
+                item.setProperties(new String[][]{{"textures", textures[0],
+                    //  "o14FenB0emn6eLFBGY2rHUwT9J2BPfdeSBCCie7JM/pE9RSQgJyOHAuNnwnolYVd59N+5BbLQGS8FY5mTnSY2jPqYByP71gHMOqKY6MGR95Hcf+xkTyCs5cOITI1S2dd1asncMtqyRd71VPyCelYlnoBPYYCppltJRfO3lledtFnvXB7qa9dIxbgcxesfttU0YT5HyodLoGrr5NpC+oYVpxrYAPspXTm+kmjkxEJABQ72eDw2cQSt+SVh5zV3kLcOsLI/Hljzi/MUvyldGNM94joK7JvCrqt5hcjwaWudnIE/iUkeXtZOBwfVGh4JKBlmxmwJDOIhPeoibH7awnmvhj7JEVXJs905SLRFDdDtKJu7M3TDgvW4tWXzryV5WJKu8XsisuOMrNfcGUV6rsb9jAZDTQb1PE9oS5kuk5APLlp9s2LHHrAlGBFFKHJzGMBhzf+mmgYb0wP1v4ovan1tlMfC4kUS7jC3KgqpIHoB2bJ1WiiUMg3fucpfAjpx/DiPO/5IUZx56F8YbNLhYl8SJrs36SnqijgHFRG75HWzs7WTLR8I6dct7SMWyE4A2cIut1yX9vwX9Mfyx6qfoHA+8NeZvwpkq2UJqavCCwgNOhBxroY371GmeZ7gQdOsGw2Gqo412NlU94uF1UE5BhxMdbTPjasHZTE41zhrCypo10="/*,
+                    textures[1]
+
+                }});
+                pli.setItems(new Item[]{item});
+                getPlayer().unsafe().sendPacket(pli);
+                sendTextures[row] = textures[0];
+            }
+        }
+
+        // update ping
         if (ping != slots_ping[row]) {
             PlayerListItem pli = new PlayerListItem();
             pli.setAction(PlayerListItem.Action.UPDATE_LATENCY);
@@ -159,6 +191,8 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
             pli.setItems(new Item[]{item});
             getPlayer().unsafe().sendPacket(pli);
         }
+
+        // update name
         send[row] = text;
         slots_ping[row] = ping;
         PlayerListItem pli = new PlayerListItem();
@@ -167,9 +201,12 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         UUID offlineId = java.util.UUID.nameUUIDFromBytes(
                 ("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
         item.setUuid(offlineId);
+        item.setPing(ping);
         item.setDisplayName(ComponentSerializer.toString(TextComponent.
                 fromLegacyText(text)));
+
         item.setUsername(getSlotID(row));
+        item.setGamemode(0);
         item.setProperties(new String[0][0]);
         pli.setItems(new Item[]{item});
         getPlayer().unsafe().sendPacket(pli);

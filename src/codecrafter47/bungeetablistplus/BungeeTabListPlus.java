@@ -48,6 +48,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.connection.LoginResult;
+import net.md_5.bungee.connection.LoginResult.Property;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.Protocol;
 
@@ -456,5 +458,19 @@ public class BungeeTabListPlus extends Plugin {
                 isVersion18() ? "tabListHandler" : "tabList");
         tabListHandler.setAccessible(true);
         tabListHandler.set(player, tabList);
+    }
+
+    public static String[] getPlayerTexture(ProxiedPlayer player) {
+        LoginResult loginResult = ((UserConnection) player).
+                getPendingConnection().getLoginProfile();
+        if (loginResult == null) {
+            return null;
+        }
+        for (Property s : loginResult.getProperties()) {
+            if (s.getName().equals("textures")) {
+                return new String[]{s.getValue(), s.getSignature()};
+            }
+        }
+        return null;
     }
 }

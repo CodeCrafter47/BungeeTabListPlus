@@ -166,6 +166,8 @@ public class CustomTabList18 extends TabList {
                             usernames.remove(item.getUsername());
                         }
                     }
+                    item.setDisplayName(null);
+                    item.setUsername(null);
                 }
             }
             // Pass the Packet to the client
