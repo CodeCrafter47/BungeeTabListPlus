@@ -109,25 +109,26 @@ public class CustomTabList18 extends TabList {
 
     public void exclude() {
         isExcluded = true;
-        // TODO
-        /*
-         synchronized (bukkitplayers) {
-         synchronized (usernames) {
-         for (String s : bukkitplayers) {
-         if (!usernames.contains(s)) {
-         PlayerListItem pli = new PlayerListItem();
-         pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-         Item item = new Item();
-         item.setPing(0);
-         item.setUsername(s);
-         item.setProperties(new String[0][0]);
-         pli.setItems(new Item[]{item});
-         getPlayer().unsafe().sendPacket(pli);
-         usernames.add(s);
-         }
-         }
-         }
-         }*/
+        // only 1.7 clients
+        if (player.getPendingConnection().getVersion() < ProtocolConstants.MINECRAFT_SNAPSHOT) {
+            synchronized (bukkitplayers) {
+                synchronized (usernames) {
+                    for (String s : bukkitplayers) {
+                        if (!usernames.contains(s)) {
+                            PlayerListItem pli = new PlayerListItem();
+                            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+                            Item item = new Item();
+                            item.setPing(0);
+                            item.setUsername(s);
+                            item.setProperties(new String[0][0]);
+                            pli.setItems(new Item[]{item});
+                            getPlayer().unsafe().sendPacket(pli);
+                            usernames.add(s);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -166,8 +167,6 @@ public class CustomTabList18 extends TabList {
                             usernames.remove(item.getUsername());
                         }
                     }
-                    item.setDisplayName(null);
-                    item.setUsername(null);
                 }
             }
             // Pass the Packet to the client
