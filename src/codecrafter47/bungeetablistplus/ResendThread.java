@@ -19,8 +19,8 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.tablisthandler.IMyTabListHandler;
-import io.netty.handler.logging.LogLevel;
 import java.util.logging.Level;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -57,8 +57,7 @@ public class ResendThread implements Runnable {
             try {
                 ProxiedPlayer player = resendQueue.getNext();
                 if (player != null) {
-                    IMyTabListHandler tabList = BungeeTabListPlus.getTabList(
-                            player);
+                    Object tabList = BungeeTabListPlus.getTabList(player);
                     if (tabList instanceof IMyTabListHandler) {
                         if (player.getServer() != null) {
                             ((IMyTabListHandler) tabList).recreate();

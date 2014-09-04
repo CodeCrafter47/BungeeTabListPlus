@@ -40,9 +40,55 @@ public class PacketManager {
     public PacketManager() {
         Class clazz;
 
-        teamPacket = new NewTeamPacket();
+        try {
+            try {
+                clazz = Class.forName("net.md_5.bungee.protocol.packet.Team");
+                if (clazz != null) {
+                    clazz.getMethod("setName", String.class);
+                    clazz.getMethod("setMode", byte.class);
+                    clazz.getMethod("setPrefix", String.class);
+                    clazz.getMethod("setSuffix", String.class);
+                    clazz.getMethod("setDisplayName", String.class);
+                    clazz.getMethod("setDisplayName", String.class);
+                    clazz.getMethod("setPlayers", String[].class);
+                    try {
+                        clazz.getMethod("setPlayerCount", short.class);
+                        teamPacket = new OldTeamPacket();
+                    } catch (NoSuchMethodException ex) {
+                        teamPacket = new NewTeamPacket();
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
+                clazz = Class.forName(
+                        "net.md_5.bungee.protocol.packet.PacketD1Team");
+                teamPacket = new TeamPacket16();
+            }
+        } catch (Throwable th) {
+            teamPacket = null;
+        }
 
-        playerListPacket = new NewPlayerListPacket();
+        try {
+            try {
+                clazz = Class.forName(
+                        "net.md_5.bungee.protocol.packet.PlayerListItem");
+                if (clazz != null) {
+                    clazz.getMethod("setUsername", String.class);
+                    clazz.getMethod("setOnline", boolean.class);
+                    try {
+                        clazz.getMethod("setPing", short.class);
+                        playerListPacket = new OldPlayerListPacket();
+                    } catch (NoSuchMethodException ex) {
+                        playerListPacket = new NewPlayerListPacket();
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
+                clazz = Class.forName(
+                        "net.md_5.bungee.protocol.packet.PacketC9PlayerListItem");
+                playerListPacket = new PlayerListPacket16();
+            }
+        } catch (Throwable th) {
+            playerListPacket = null;
+        }
     }
 
     public void createTeam(Connection.Unsafe connection, String player) {
@@ -61,12 +107,6 @@ public class PacketManager {
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
             int ping) {
         playerListPacket.createOrUpdatePlayer(connection, player, ping);
-    }
-
-    public void updatePlayer(Connection.Unsafe connection, String player,
-            String name,
-            int ping) {
-        playerListPacket.updatePlayer(connection, player, name, ping);
     }
 
     public void removePlayer(Connection.Unsafe connection, String player) {

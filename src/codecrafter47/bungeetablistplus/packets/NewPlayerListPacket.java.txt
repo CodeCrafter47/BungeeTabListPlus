@@ -20,7 +20,6 @@ package codecrafter47.bungeetablistplus.packets;
 
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 
 /**
  *
@@ -31,32 +30,11 @@ public class NewPlayerListPacket implements IPlayerListPacket {
     @Override
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
             int ping) {
-        PlayerListItem t = new PlayerListItem();
-        t.setAction(PlayerListItem.Action.ADD_PLAYER);
-        Item i = new Item();
-        i.setDisplayName(" ");
-        i.setGamemode(1);
-        i.setPing(ping);
-        i.setUsername(player);
-        connection.sendPacket(t);
+        connection.sendPacket(new PlayerListItem(player, true, ping));
     }
 
     @Override
     public void removePlayer(Connection.Unsafe connection, String player) {
-        //connection.sendPacket(new PlayerListItem(player, false, 9999));
-    }
-
-    @Override
-    public void updatePlayer(Connection.Unsafe connection, String player,
-            String name,
-            int ping) {
-        PlayerListItem t = new PlayerListItem();
-        t.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
-        Item i = new Item();
-        i.setDisplayName(name);
-        i.setGamemode(0);
-        i.setPing(ping);
-        i.setUsername(player);
-        connection.sendPacket(t);
+        connection.sendPacket(new PlayerListItem(player, false, 9999));
     }
 }

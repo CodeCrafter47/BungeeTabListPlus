@@ -37,9 +37,9 @@ public class MyTabList extends MyCustom implements IMyTabListHandler {
 
     @Override
     public void recreate() {
-        if (player.getServer() != null) {
+        if (getPlayer().getServer() != null) {
             if (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(player.
+                    getMainConfig().excludeServers.contains(getPlayer().
                             getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
@@ -47,14 +47,14 @@ public class MyTabList extends MyCustom implements IMyTabListHandler {
         }
 
         TabListProvider tlp = BungeeTabListPlus.getInstance().
-                getTabListManager().getTabListForPlayer(player);
+                getTabListManager().getTabListForPlayer(super.getPlayer());
         if (tlp == null) {
             exclude();
             unload();
             return;
         }
         super.clear();
-        TabList tabList = tlp.getTabList(player);
+        TabList tabList = tlp.getTabList(super.getPlayer());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
                 getMainConfig().charLimit;
@@ -65,7 +65,7 @@ public class MyTabList extends MyCustom implements IMyTabListHandler {
                 line = new Slot("");
             }
             line.text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, player);
+                    replacePlayerVariables(line.text, super.getPlayer());
             line.text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replaceVariables(line.text);
             line.text = ChatColor.translateAlternateColorCodes('&', line.text);

@@ -29,18 +29,17 @@ import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.managers.VariablesManager;
-import codecrafter47.bungeetablistplus.tablisthandler.IMyTabListHandler;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -84,8 +83,6 @@ public class BungeeTabListPlus extends Plugin {
 
     private PermissionManager pm;
 
-    private PacketManager packets;
-
     private TabListManager tabLists;
     private final TabListListener listener = new TabListListener(this);
 
@@ -100,8 +97,9 @@ public class BungeeTabListPlus extends Plugin {
 
     UpdateChecker updateChecker = null;
 
-    // TODO remove tablist of disconnaced plalyers
-    private static Map<String, IMyTabListHandler> tabListHandlers = new HashMap<>();
+    static private boolean is18 = true;
+
+    private PacketManager packets;
 
     /**
      * Called when the plugin is enabled
@@ -118,26 +116,38 @@ public class BungeeTabListPlus extends Plugin {
             return;
         }
 
+        try {
+            Class.forName("net.md_5.bungee.tab.TabList");
+        } catch (ClassNotFoundException ex) {
+            is18 = false;
+        }
+
+        if (!isVersion18()) {
+
+            packets = new PacketManager();
+
+            if (!packets.isTabModificationSupported()) {
+                getLogger().warning(
+                        "Your BungeeCord Version isn't supported yet");
+                getLogger().info("Disabling Plugin");
+                return;
+            }
+
+            if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
+                getLogger().warning(
+                        "Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
+                getLogger().warning("This option will be disabled");
+                config.getMainConfig().useScoreboardToBypass16CharLimit = false;
+            }
+        } else {
+            packets = null;
+        }
+
         players = new PlayerManager(this);
 
         tabLists = new TabListManager(this);
         if (!tabLists.loadTabLists()) {
             return;
-        }
-
-        packets = new PacketManager();
-
-        if (!packets.isTabModificationSupported()) {
-            getLogger().warning("Your BungeeCord Version isn't supported yet");
-            getLogger().info("Disabling Plugin");
-            return;
-        }
-
-        if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
-            getLogger().warning(
-                    "Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
-            getLogger().warning("This option will be disabled");
-            config.getMainConfig().useScoreboardToBypass16CharLimit = false;
         }
 
         getProxy().registerChannel(Constants.channel);
@@ -181,9 +191,10 @@ public class BungeeTabListPlus extends Plugin {
         }
 
         // Load updateCheck thread
-        if (config.getMainConfig().checkForUpdates) {
-            updateChecker = new UpdateChecker(this);
-        }
+        /*
+         if (config.getMainConfig().checkForUpdates) {
+         updateChecker = new UpdateChecker(this);
+         }*/
     }
 
     private void startRefreshThread() {
@@ -275,6 +286,15 @@ public class BungeeTabListPlus extends Plugin {
     }
 
     /**
+     * Getter of the PacketManager. For internal use only
+     *
+     * @return an instance of the PacketManager or null
+     */
+    public PacketManager getPacketManager() {
+        return packets;
+    }
+
+    /**
      * Getter for the PermissionManager. For internal use only.
      *
      * @return an instance of the PermissionManager or null
@@ -300,15 +320,6 @@ public class BungeeTabListPlus extends Plugin {
      */
     public VariablesManager getVariablesManager() {
         return variables;
-    }
-
-    /**
-     * Getter of the PacketManager. For internal use only
-     *
-     * @return an instance of the PacketManager or null
-     */
-    public PacketManager getPacketManager() {
-        return packets;
     }
 
     /**
@@ -403,11 +414,27 @@ public class BungeeTabListPlus extends Plugin {
                 th);
     }
 
-    public static IMyTabListHandler getTabList(ProxiedPlayer player) {
-        return tabListHandlers.get(player.getName());
+    public static boolean isVersion18() {
+        return is18;
     }
 
-    public static void setTabList(ProxiedPlayer player, IMyTabListHandler tab) {
-        tabListHandlers.put(player.getName(), tab);
+    public static Object getTabList(ProxiedPlayer player) throws
+            IllegalArgumentException, IllegalAccessException,
+            NoSuchFieldException {
+        Class cplayer = UserConnection.class;
+        Field tabListHandler = cplayer.getDeclaredField(
+                isVersion18() ? "tabListHandler" : "tabList");
+        tabListHandler.setAccessible(true);
+        return tabListHandler.get(player);
+    }
+
+    public static void setTabList(ProxiedPlayer player, Object tabList) throws
+            IllegalArgumentException, IllegalAccessException,
+            NoSuchFieldException {
+        Class cplayer = UserConnection.class;
+        Field tabListHandler = cplayer.getDeclaredField(
+                isVersion18() ? "tabListHandler" : "tabList");
+        tabListHandler.setAccessible(true);
+        tabListHandler.set(player, tabList);
     }
 }

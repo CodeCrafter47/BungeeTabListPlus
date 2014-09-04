@@ -24,8 +24,8 @@ import codecrafter47.bungeetablistplus.config.TabListProvider;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import codecrafter47.bungeetablistplus.util.ColorParser;
-import java.util.List;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
@@ -34,10 +34,8 @@ import net.md_5.bungee.protocol.packet.Team;
  *
  * @author Florian Stober
  */
-public class ScoreboardTabList extends CustomTabListHandler implements
+public class TabList17 extends CustomTabList18 implements
         IMyTabListHandler {
-
-    ProxiedPlayer player;
 
     private static String getSlotID(int n) {
         String hex = Integer.toHexString(n + 1);
@@ -59,15 +57,15 @@ public class ScoreboardTabList extends CustomTabListHandler implements
 
     private final String send[] = new String[ConfigManager.getTabSize()];
 
-    public ScoreboardTabList(ProxiedPlayer player) {
-        this.player = player;
+    public TabList17(ProxiedPlayer player) {
+        super(player);
     }
 
     @Override
     public void recreate() {
-        if (player.getServer() != null) {
+        if (getPlayer().getServer() != null) {
             if (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(player.
+                    getMainConfig().excludeServers.contains(getPlayer().
                             getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
@@ -75,13 +73,13 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         }
 
         TabListProvider tlp = BungeeTabListPlus.getInstance().
-                getTabListManager().getTabListForPlayer(player);
+                getTabListManager().getTabListForPlayer(super.getPlayer());
         if (tlp == null) {
             exclude();
             unload();
             return;
         }
-        TabList tabList = tlp.getTabList(player);
+        TabList tabList = tlp.getTabList(super.getPlayer());
 
         resize(tabList.getUsedSlots());
 
@@ -94,7 +92,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
                 line = new Slot("");
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, player);
+                    replacePlayerVariables(line.text, super.getPlayer());
             text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replaceVariables(text);
             text = ChatColor.translateAlternateColorCodes('&', text);
@@ -128,38 +126,77 @@ public class ScoreboardTabList extends CustomTabListHandler implements
     }
 
     private void sendSlot(int i) {
-
         if (i >= ConfigManager.getTabSize()) {
             return;
         }
-        BungeeTabListPlus.getInstance().getPacketManager().createOrUpdatePlayer(
-                player.unsafe(), getSlotID(i), slots_ping[i]);
-        send[i] = "";
+        PlayerListItem pli = new PlayerListItem();
+        pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setDisplayName(getSlotID(i));
+        item.setPing(0);
+        pli.setItems(new PlayerListItem.Item[]{item});
+        getPlayer().unsafe().sendPacket(pli);
+
     }
 
     private void removeSlot(int i) {
-        BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
-                player.unsafe(), getSlotID(i));
-        BungeeTabListPlus.getInstance().getPacketManager().removeTeam(
-                player.unsafe(), getSlotID(i));
+        PlayerListItem pli = new PlayerListItem();
+        pli.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setDisplayName(getSlotID(i));
+        item.setPing(0);
+        getPlayer().unsafe().sendPacket(pli);
+        Team t = new Team();
+        t.setName("TAB" + player);
+        t.setMode((byte) 1);
+        getPlayer().unsafe().sendPacket(t);
+
     }
 
     private void updateSlot(int row, String text, int ping) {
         if (ping != slots_ping[row]) {
-            BungeeTabListPlus.getInstance().getPacketManager().
-                    createOrUpdatePlayer(player.unsafe(), getSlotID(row),
-                            ping);
+            PlayerListItem pli = new PlayerListItem();
+            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+            PlayerListItem.Item item = new PlayerListItem.Item();
+            item.setDisplayName(getSlotID(row));
+            item.setPing(ping);
+            pli.setItems(new PlayerListItem.Item[]{item});
+            getPlayer().unsafe().sendPacket(pli);
         }
         send[row] = text;
         slots_ping[row] = ping;
         String split[] = splitText(text);
-        BungeeTabListPlus.getInstance().getPacketManager().updateTeam(
-                player.unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
+        updateTeam(getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
+
+    }
+
+    public void updateTeam(Connection.Unsafe connection, String player,
+            String prefix, String displayname, String suffix) {
+        Team t = new Team();
+        t.setName("TAB" + player);
+        t.setMode((byte) 2);
+        t.setPrefix(prefix);
+        t.setDisplayName(displayname);
+        t.setSuffix(suffix);
+        connection.sendPacket(t);
     }
 
     private void createSlot(int row) {
-        BungeeTabListPlus.getInstance().getPacketManager().createTeam(
-                player.unsafe(), getSlotID(row));
+        createTeam(getPlayer().unsafe(), getSlotID(row));
+
+    }
+
+    public void createTeam(Connection.Unsafe connection, String player) {
+        Team t = new Team();
+        t.setName("TAB" + player);
+        t.setMode((byte) 0);
+        t.setPrefix(" ");
+        t.setDisplayName(" ");
+        t.setSuffix(" ");
+        t.setPlayers(new String[]{player});
+        // TODO FIXME
+        //t.setNameTagVisibility("never");
+        connection.sendPacket(t);
     }
 
     private String[] splitText(String s) {

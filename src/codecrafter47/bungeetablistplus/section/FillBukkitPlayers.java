@@ -18,10 +18,16 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import static codecrafter47.bungeetablistplus.BungeeTabListPlus.isVersion18;
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.TabList;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
@@ -43,21 +49,41 @@ public class FillBukkitPlayers extends Section {
 
     @Override
     public int getMaxSize(ProxiedPlayer player) {
-        return 0;//((CustomTabListHandler) player.getTabList()).bukkitplayers.size();
+        try {
+            Object tabList = BungeeTabListPlus.getTabList(player);
+            Class clasz = tabList.getClass();
+            Field bukkitplayers = clasz.getDeclaredField("bukkitplayers");
+            bukkitplayers.setAccessible(true);
+            List<String> bplayers = (List<String>) bukkitplayers.get(tabList);
+            return bplayers.size();
+        } catch (NoSuchFieldException | SecurityException |
+                IllegalArgumentException | IllegalAccessException ex) {
+            BungeeTabListPlus.getInstance().reportError(ex);
+        }
+        return 0;
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+    public int calculate(ProxiedPlayer player, TabList ttabList, int pos,
             int size) {
-        /*
-         List<String> players = ((CustomTabListHandler) player.getTabList()).bukkitplayers;
-         int p = pos;
-         for (; p < pos + size; p++) {
-         if (players.size() > p - pos) {
-         tabList.setSlot(p, new Slot(players.get(p - pos)));
-         }
-         }
-         return p;*/ return pos;
+        try {
+            Object tabList = BungeeTabListPlus.getTabList(player);
+            Class clasz = tabList.getClass();
+            Field bukkitplayers = clasz.getDeclaredField("bukkitplayers");
+            bukkitplayers.setAccessible(true);
+            List<String> players = (List<String>) bukkitplayers.get(tabList);
+            int p = pos;
+            for (; p < pos + size; p++) {
+                if (players.size() > p - pos) {
+                    ttabList.setSlot(p, new Slot(players.get(p - pos)));
+                }
+            }
+            return p;
+        } catch (IllegalArgumentException | IllegalAccessException |
+                NoSuchFieldException ex) {
+            BungeeTabListPlus.getInstance().reportError(ex);
+        }
+        return pos;
     }
 
     @Override

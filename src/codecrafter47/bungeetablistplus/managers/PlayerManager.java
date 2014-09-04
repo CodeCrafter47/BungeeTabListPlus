@@ -19,18 +19,12 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
-import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
@@ -112,175 +106,6 @@ public class PlayerManager {
                 list.add(p);
             }
         }
-        /*
-         for (int i = 0; i < 5 + Math.random() * 10; i++) {
-         final String name = "player" + (int) (Math.random() * 100);
-         list.add(new ProxiedPlayer() {
-         final List<String> groups;
-         {
-
-         if(Math.random() < 0.2)groups = Arrays.asList(new String[]{"default", "admin"});
-         else if(Math.random() < 0.4)groups = Arrays.asList(new String[]{"default", "vip"});
-         else groups = Arrays.asList(new String[]{"default"});
-         }
-
-         @Override
-         public String getDisplayName() {
-         return name;
-         }
-
-         @Override
-         public void setDisplayName(String string) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void connect(ServerInfo si) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void connect(ServerInfo si, Callback<Boolean> clbck) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public Server getServer() {
-         return null;
-         }
-
-         @Override
-         public int getPing() {
-         return (int) (Math.random() * 1000);
-         }
-
-         @Override
-         public void sendData(String string, byte[] bytes) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public PendingConnection getPendingConnection() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void chat(String string) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void setTabList(TabListHandler tlh) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public TabListHandler getTabList() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public ServerInfo getReconnectServer() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void setReconnectServer(ServerInfo si) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public String getUUID() {
-         return name;
-         }
-
-         @Override
-         public UUID getUniqueId() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public InetSocketAddress getAddress() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void disconnect(String string) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void disconnect(BaseComponent... bcs) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void disconnect(BaseComponent bc) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public Connection.Unsafe unsafe() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public String getName() {
-         return name;
-         }
-
-         @Override
-         public void sendMessage(String string) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void sendMessages(String... strings) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void sendMessage(BaseComponent... bcs) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void sendMessage(BaseComponent bc) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public Collection<String> getGroups() {
-         return groups;
-         }
-
-         @Override
-         public void addGroups(String... strings) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void removeGroups(String... strings) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public boolean hasPermission(String string) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public void setPermission(String string, boolean bln) {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         @Override
-         public Collection<String> getPermissions() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-         }
-
-         });
-         }*/
         return list;
     }
 
