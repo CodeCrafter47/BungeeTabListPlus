@@ -21,13 +21,11 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.config.TabListProvider;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -97,6 +95,20 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
             if (old == null || !old.equals(text) || line.ping != slots_ping[i]) {
                 updateSlot(i, text, line.ping);
             }
+        }
+
+        // update header/footer
+        if (tabList.getHeader() != null && tabList.getFooter() != null) {
+            TabHeaderPacket packet = new TabHeaderPacket();
+            if (tabList.getHeader() != null) {
+                packet.setHeader(ComponentSerializer.toString(TextComponent.
+                        fromLegacyText(tabList.getHeader())));
+            }
+            if (tabList.getFooter() != null) {
+                packet.setFooter(ComponentSerializer.toString(TextComponent.
+                        fromLegacyText(tabList.getFooter())));
+            }
+            player.unsafe().sendPacket(packet);
         }
     }
 

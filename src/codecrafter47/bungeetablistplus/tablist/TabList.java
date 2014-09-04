@@ -28,12 +28,32 @@ public class TabList {
     private int collums;
     private int usedSlots;
     private Slot[] slots;
+    private String header;
+    private String footer;
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getFooter() {
+        return footer;
+    }
+
+    public void setFooter(String footer) {
+        this.footer = footer;
+    }
 
     public TabList(int rows, int collums) {
         this.rows = rows;
         this.collums = collums;
         this.usedSlots = 0;
         this.slots = new Slot[rows * collums];
+        header = null;
+        footer = null;
     }
 
     public int getRows() {

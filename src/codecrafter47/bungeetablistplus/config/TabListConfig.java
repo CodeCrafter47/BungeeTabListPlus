@@ -44,6 +44,21 @@ public class TabListConfig extends Config {
     public String showTo = "all";
 
     @Comments({
+        "This text will be shown above the tablist"
+    })
+    public String header = "&bWelcome &6{player}";
+
+    @Comments({
+        "This text will be shown below the tablist"
+    })
+    public String footer = "&4play.minecraft.example.com";
+
+    @Comments({
+        "whether to shown header/footer or not. You should set this to false if you are using a bukkit/spigot side plugin for that."
+    })
+    public boolean shownFooterHeader = true;
+
+    @Comments({
         "how Players should be grouped",
         "You can use 'SERVER' or 'NONE'"
     })

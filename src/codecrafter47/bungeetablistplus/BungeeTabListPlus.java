@@ -29,8 +29,10 @@ import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.managers.VariablesManager;
+import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
+import gnu.trove.map.TObjectIntMap;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -38,6 +40,7 @@ import java.util.HashSet;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -45,6 +48,8 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.Protocol;
 
 /**
  * Main Class of BungeeTabListPlus
@@ -195,6 +200,21 @@ public class BungeeTabListPlus extends Plugin {
          if (config.getMainConfig().checkForUpdates) {
          updateChecker = new UpdateChecker(this);
          }*/
+        if (isVersion18()) {
+            try {
+                // register tabheaderpacket
+                Class clazz = Protocol.DirectionData.class;
+                Field tabListHandler = clazz.getDeclaredField("packetMap");
+                tabListHandler.setAccessible(true);
+                TObjectIntMap<Class<? extends DefinedPacket>> packetMap = (TObjectIntMap<Class<? extends DefinedPacket>>) tabListHandler.
+                        get(Protocol.GAME.TO_CLIENT);
+                packetMap.put(TabHeaderPacket.class, 0x47);
+            } catch (IllegalArgumentException | IllegalAccessException |
+                    NoSuchFieldException | SecurityException ex) {
+                Logger.getLogger(BungeeTabListPlus.class.getName()).
+                        log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     private void startRefreshThread() {

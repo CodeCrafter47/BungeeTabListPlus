@@ -22,19 +22,17 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.section.ServerSection;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -475,6 +473,24 @@ public class TabListProvider {
                         getCols())) % ConfigManager.getCols();
             }
             pos = s.calculate(player, tabList, pos, len[i++]);
+        }
+
+        // header + footer
+        if (this.config.shownFooterHeader) {
+            String header = config.header;
+            header = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replacePlayerVariables(header, player);
+            header = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replaceVariables(header);
+            header = ChatColor.translateAlternateColorCodes('&', header);
+            tabList.setHeader(header);
+            String footer = config.footer;
+            footer = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replacePlayerVariables(footer, player);
+            footer = BungeeTabListPlus.getInstance().getVariablesManager().
+                    replaceVariables(footer);
+            footer = ChatColor.translateAlternateColorCodes('&', footer);
+            tabList.setFooter(footer);
         }
 
         return tabList;
