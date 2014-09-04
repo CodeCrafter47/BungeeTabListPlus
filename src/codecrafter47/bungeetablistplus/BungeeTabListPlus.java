@@ -196,10 +196,10 @@ public class BungeeTabListPlus extends Plugin {
         }
 
         // Load updateCheck thread
-        /*
-         if (config.getMainConfig().checkForUpdates) {
-         updateChecker = new UpdateChecker(this);
-         }*/
+        if (config.getMainConfig().checkForUpdates) {
+            updateChecker = new UpdateChecker(this);
+        }
+
         if (isVersion18()) {
             try {
                 // register tabheaderpacket
