@@ -147,7 +147,7 @@ public class TabList17 extends CustomTabList18 implements
         item.setPing(0);
         getPlayer().unsafe().sendPacket(pli);
         Team t = new Team();
-        t.setName("TAB" + player);
+        t.setName("TAB" + getSlotID(i));
         t.setMode((byte) 1);
         getPlayer().unsafe().sendPacket(t);
 
