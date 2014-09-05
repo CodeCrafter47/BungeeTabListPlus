@@ -461,6 +461,9 @@ public class BungeeTabListPlus extends Plugin {
     }
 
     public static String[] getPlayerTexture(ProxiedPlayer player) {
+        if (!isVersion18()) {
+            return null;
+        }
         LoginResult loginResult = ((UserConnection) player).
                 getPendingConnection().getLoginProfile();
         if (loginResult == null) {
