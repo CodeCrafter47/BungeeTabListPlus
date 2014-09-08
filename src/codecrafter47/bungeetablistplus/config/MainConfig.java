@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import net.cubespace.Yamler.Config.Comment;
 import net.cubespace.Yamler.Config.Comments;
 import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
@@ -107,6 +108,21 @@ public class MainConfig extends Config {
         prefixes.put("default", "");
         prefixes.put("admin", "&c[A] ");
     }
+
+    @Comments({
+        "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
+        "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
+        "setting this to -1 disables this feature"
+    })
+    public int pingDelay = 10;
+
+    @Comment(
+            "replacement for the {onlineState} variable if the server is online")
+    public String online_text = "&2 ON";
+
+    @Comment(
+            "replacement for the {onlineState} variable if the server is offline")
+    public String offline_text = "&c OFF";
 
     @Comments({
         "servers which you wish to show their own tabList (The one provided by bukkit)"

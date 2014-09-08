@@ -36,6 +36,7 @@ import codecrafter47.bungeetablistplus.variables.PlayerRawNameVariable;
 import codecrafter47.bungeetablistplus.variables.PrefixColor;
 import codecrafter47.bungeetablistplus.variables.ServerNameVariable;
 import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
+import codecrafter47.bungeetablistplus.variables.ServerState;
 import codecrafter47.bungeetablistplus.variables.TabNameVariable;
 import codecrafter47.bungeetablistplus.variables.TimeVariable;
 import codecrafter47.bungeetablistplus.variables.UUIDVariable;
@@ -102,6 +103,7 @@ public final class VariablesManager {
         addVariable("currency", new BukkitBridgeVariable("currency"));
         addVariable("currencyPl", new BukkitBridgeVariable("currencyPl"));
         addVariable("tabName", new TabNameVariable());
+        addVariable("onlineState", new ServerState());
     }
 
     public void addVariable(String name, Variable var) {

@@ -36,7 +36,9 @@ import gnu.trove.map.TObjectIntMap;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -45,6 +47,7 @@ import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
@@ -108,6 +111,12 @@ public class BungeeTabListPlus extends Plugin {
 
     private PacketManager packets;
 
+    Map<String, PingTask> serverState = new HashMap<>();
+
+    public PingTask getServerState(String o) {
+        return serverState.get(o);
+    }
+
     /**
      * Called when the plugin is enabled
      */
@@ -148,6 +157,17 @@ public class BungeeTabListPlus extends Plugin {
             }
         } else {
             packets = null;
+        }
+
+        // start server ping tasks
+        if (config.getMainConfig().pingDelay > 0) {
+            for (ServerInfo server : getProxy().getServers().values()) {
+                PingTask task = new PingTask(this, server);
+                serverState.put(server.getName(), task);
+                getProxy().getScheduler().schedule(this, task, config.
+                        getMainConfig().pingDelay,
+                        config.getMainConfig().pingDelay, TimeUnit.SECONDS);
+            }
         }
 
         players = new PlayerManager(this);
