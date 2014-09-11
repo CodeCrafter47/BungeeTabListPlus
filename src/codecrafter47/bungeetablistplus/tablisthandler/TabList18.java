@@ -100,17 +100,23 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         }
 
         // update header/footer
-        if (tabList.getHeader() != null && tabList.getFooter() != null) {
-            TabHeaderPacket packet = new TabHeaderPacket();
-            if (tabList.getHeader() != null) {
-                packet.setHeader(ComponentSerializer.toString(TextComponent.
-                        fromLegacyText(tabList.getHeader())));
+        if (tabList.getHeader() != null || tabList.getFooter() != null) {
+            if (BungeeTabListPlus.isAbove995()) {
+                player.setTabHeader(TextComponent.fromLegacyText(tabList.
+                        getHeader()), TextComponent.fromLegacyText(tabList.
+                                getFooter()));
+            } else {
+                TabHeaderPacket packet = new TabHeaderPacket();
+                if (tabList.getHeader() != null) {
+                    packet.setHeader(ComponentSerializer.toString(TextComponent.
+                            fromLegacyText(tabList.getHeader())));
+                }
+                if (tabList.getFooter() != null) {
+                    packet.setFooter(ComponentSerializer.toString(TextComponent.
+                            fromLegacyText(tabList.getFooter())));
+                }
+                player.unsafe().sendPacket(packet);
             }
-            if (tabList.getFooter() != null) {
-                packet.setFooter(ComponentSerializer.toString(TextComponent.
-                        fromLegacyText(tabList.getFooter())));
-            }
-            player.unsafe().sendPacket(packet);
         }
     }
 

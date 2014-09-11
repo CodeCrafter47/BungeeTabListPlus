@@ -109,6 +109,8 @@ public class BungeeTabListPlus extends Plugin {
 
     static private boolean is18 = true;
 
+    static private boolean isAbove995 = false;
+
     private PacketManager packets;
 
     Map<String, PingTask> serverState = new HashMap<>();
@@ -136,6 +138,13 @@ public class BungeeTabListPlus extends Plugin {
             Class.forName("net.md_5.bungee.tab.TabList");
         } catch (ClassNotFoundException ex) {
             is18 = false;
+        }
+
+        try {
+            Class.forName("net.md_5.bungee.api.Title");
+            isAbove995 = true;
+        } catch (ClassNotFoundException ex) {
+            isAbove995 = false;
         }
 
         if (!isVersion18()) {
@@ -222,7 +231,7 @@ public class BungeeTabListPlus extends Plugin {
             updateChecker = new UpdateChecker(this);
         }
 
-        if (isVersion18()) {
+        if (isVersion18() && !isAbove995) {
             try {
                 // register tabheaderpacket
                 Class clazz = Protocol.DirectionData.class;
@@ -495,5 +504,9 @@ public class BungeeTabListPlus extends Plugin {
             }
         }
         return null;
+    }
+
+    public static boolean isAbove995() {
+        return isAbove995;
     }
 }
