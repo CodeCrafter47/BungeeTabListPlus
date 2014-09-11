@@ -23,8 +23,7 @@ import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList17;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
-import java.lang.reflect.Field;
-import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -78,6 +77,16 @@ public class TabListListener implements Listener {
     public void onPlayerLeave(PlayerDisconnectEvent e) {
         if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
             plugin.resendTabLists();
+        }
+    }
+
+    @EventHandler
+    public void onDevJoin(PostLoginEvent e) {
+        if (plugin.getDescription().getAuthor().equalsIgnoreCase(e.getPlayer().
+                getName())) {
+            e.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "Hello " + e.
+                    getPlayer().getName() + ", this server uses " + plugin.
+                    getDescription().getName() + ", one of you incredible good plugins");
         }
     }
 }
