@@ -483,6 +483,7 @@ public class TabListProvider {
             header = BungeeTabListPlus.getInstance().getVariablesManager().
                     replaceVariables(header);
             header = ChatColor.translateAlternateColorCodes('&', header);
+            header = header.replaceAll("\\{newline\\}", "\n");
             tabList.setHeader(header);
             String footer = config.footer;
             footer = BungeeTabListPlus.getInstance().getVariablesManager().
@@ -490,6 +491,7 @@ public class TabListProvider {
             footer = BungeeTabListPlus.getInstance().getVariablesManager().
                     replaceVariables(footer);
             footer = ChatColor.translateAlternateColorCodes('&', footer);
+            footer = footer.replaceAll("\\{newline\\}", "\n");
             tabList.setFooter(footer);
         }
 
