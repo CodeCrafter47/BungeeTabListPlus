@@ -154,33 +154,40 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
     }
 
     private void updateSlot(int row, String text, int ping, String[] textures) {
-        if (textures != null) {
-            if (sendTextures[row] != null || !textures[0].equals(
-                    sendTextures[row])) {
-                // update texture
-                PlayerListItem pli = new PlayerListItem();
-                pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-                Item item = new Item();
-                UUID offlineId = java.util.UUID.nameUUIDFromBytes(
-                        ("OfflinePlayer:" + getSlotID(row)).getBytes(
-                                Charsets.UTF_8));
-                item.setUuid(offlineId);
-                item.setPing(ping);
-                item.setDisplayName(ComponentSerializer.toString(
-                        TextComponent.
-                        fromLegacyText(text)));
+        if (sendTextures[row] == null || (textures != null && !textures[0].
+                equals(
+                        sendTextures[row]))) {
+            // update texture
+            PlayerListItem pli = new PlayerListItem();
+            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+            Item item = new Item();
+            UUID offlineId = java.util.UUID.nameUUIDFromBytes(
+                    ("OfflinePlayer:" + getSlotID(row)).getBytes(
+                            Charsets.UTF_8));
+            item.setUuid(offlineId);
+            item.setPing(ping);
+            item.setDisplayName(ComponentSerializer.toString(
+                    TextComponent.
+                    fromLegacyText(text)));
 
-                item.setUsername(getSlotID(row));
-                item.setGamemode(0);
+            item.setUsername(getSlotID(row));
+            item.setGamemode(0);
+            if (textures != null) {
                 item.setProperties(new String[][]{{"textures", textures[0],
                     //  "o14FenB0emn6eLFBGY2rHUwT9J2BPfdeSBCCie7JM/pE9RSQgJyOHAuNnwnolYVd59N+5BbLQGS8FY5mTnSY2jPqYByP71gHMOqKY6MGR95Hcf+xkTyCs5cOITI1S2dd1asncMtqyRd71VPyCelYlnoBPYYCppltJRfO3lledtFnvXB7qa9dIxbgcxesfttU0YT5HyodLoGrr5NpC+oYVpxrYAPspXTm+kmjkxEJABQ72eDw2cQSt+SVh5zV3kLcOsLI/Hljzi/MUvyldGNM94joK7JvCrqt5hcjwaWudnIE/iUkeXtZOBwfVGh4JKBlmxmwJDOIhPeoibH7awnmvhj7JEVXJs905SLRFDdDtKJu7M3TDgvW4tWXzryV5WJKu8XsisuOMrNfcGUV6rsb9jAZDTQb1PE9oS5kuk5APLlp9s2LHHrAlGBFFKHJzGMBhzf+mmgYb0wP1v4ovan1tlMfC4kUS7jC3KgqpIHoB2bJ1WiiUMg3fucpfAjpx/DiPO/5IUZx56F8YbNLhYl8SJrs36SnqijgHFRG75HWzs7WTLR8I6dct7SMWyE4A2cIut1yX9vwX9Mfyx6qfoHA+8NeZvwpkq2UJqavCCwgNOhBxroY371GmeZ7gQdOsGw2Gqo412NlU94uF1UE5BhxMdbTPjasHZTE41zhrCypo10="/*,
                     textures[1]
 
                 }});
-                pli.setItems(new Item[]{item});
-                getPlayer().unsafe().sendPacket(pli);
-                sendTextures[row] = textures[0];
+            } else {
+                item.setProperties(new String[][]{{"textures",
+                    "eyJ0aW1lc3RhbXAiOjE0MTA0NzA2NjMxMDIsInByb2ZpbGVJZCI6ImY4NGM2YTc5MGE0ZTQ1ZTA4NzliY2Q0OWViZDRjNGUyIiwicHJvZmlsZU5hbWUiOiJIZXJvYnJpbmUiLCJpc1B1YmxpYyI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzk4YjdjYTNjN2QzMTRhNjFhYmVkOGZjMThkNzk3ZmMzMGI2ZWZjODQ0NTQyNWM0ZTI1MDk5N2U1MmU2Y2IifX19",
+                    "fttLQKGbHG8n6mFUr3LaCG03GNzGk5dEmirzJ9l7DFFbaKm4vWW8ETeLEUBZynwejRUVFuC7Cr7WRvQvvni2fluH9zUw4sY/rceoFYXqJn3zyTSseOGkSgsdIiNIw21l4qpgAkvW8NvV+wWIC4gBv9qfQoNbDbHttOa+QVDpaPOWLcYUZG9yNdkjxmVbviPOytzwBk+hzF6U9Lx+gOjFYnNUgIO9efQ27itdONKlEbZBTM0PWuHJXTIwYACkSGNdRmyrTzgnJI1fH4v7DLi0kwd/dC1Kc8P+/GFdzzpGDhrUqWDPdBl2HguwaC1z+ks2U827+dsiq5fgTUvVpALLCCEIjcncpPH6QrkgHHfn0BHNqdWQ6PL+ugegT3561iKAX9CDRQbdCmu0rZ6K6dnb0u1cS4dcfGGMCYrOolhHzXSHxHPaFxpvNTO8uzTL0r9qu3FDsw7aBGTR1lrMOrdI53PItSNao/41CSOK5KRoFCDjgRrscppNf3sQtGNPh4L2vFkvfnPeOdGXeWjBYQpC/W2o6upuDgJEyV2vPEsqMA6LKZBOKadKcpXkCt0V9+cdkeZViCMtjFh8uI+qg34q3zd1/H1TmaSILZoVX6pSm+vOUk/C+gs+sTVdQGyeXObf558EYwGubT23Ri9aJyKOahib/OX/meGbsivh46xbNRU="
+                }});
+
             }
+            pli.setItems(new Item[]{item});
+            getPlayer().unsafe().sendPacket(pli);
+            sendTextures[row] = item.getProperties()[0][1];
         }
 
         // update ping
