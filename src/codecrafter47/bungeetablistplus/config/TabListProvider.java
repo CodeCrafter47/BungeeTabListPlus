@@ -495,6 +495,11 @@ public class TabListProvider {
             tabList.setFooter(footer);
         }
 
+        if (BungeeTabListPlus.isVersion18()) {
+            tabList.setDefaultSkin(BungeeTabListPlus.getInstance().
+                    getSkinManager().getSkin(config.defaultSkin));
+        }
+
         return tabList;
     }
 

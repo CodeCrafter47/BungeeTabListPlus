@@ -59,6 +59,12 @@ public class TabListConfig extends Config {
     public boolean shownFooterHeader = true;
 
     @Comments({
+        "The skin shown for non-players",
+        "leave empty for random skins"
+    })
+    public String defaultSkin = "Herobrine";
+
+    @Comments({
         "how Players should be grouped",
         "You can use 'SERVER' or 'NONE'"
     })

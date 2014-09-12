@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.PacketManager;
 import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.managers.VariablesManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
@@ -115,6 +116,8 @@ public class BungeeTabListPlus extends Plugin {
 
     Map<String, PingTask> serverState = new HashMap<>();
 
+    private SkinManager skins;
+
     public PingTask getServerState(String o) {
         return serverState.get(o);
     }
@@ -166,6 +169,7 @@ public class BungeeTabListPlus extends Plugin {
             }
         } else {
             packets = null;
+            skins = new SkinManager(this);
         }
 
         // start server ping tasks
@@ -334,6 +338,10 @@ public class BungeeTabListPlus extends Plugin {
      */
     public PlayerManager getPlayerManager() {
         return this.players;
+    }
+
+    public SkinManager getSkinManager() {
+        return skins;
     }
 
     /**

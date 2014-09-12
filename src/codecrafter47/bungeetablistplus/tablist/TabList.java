@@ -30,6 +30,15 @@ public class TabList {
     private Slot[] slots;
     private String header;
     private String footer;
+    private String[] defaultSkin;
+
+    public String[] getDefaultSkin() {
+        return defaultSkin;
+    }
+
+    public void setDefaultSkin(String[] defaultSkin) {
+        this.defaultSkin = defaultSkin;
+    }
 
     public String getHeader() {
         return header;
