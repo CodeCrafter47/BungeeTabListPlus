@@ -17,6 +17,7 @@
 package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.PingTask;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -27,13 +28,22 @@ import net.md_5.bungee.api.config.ServerInfo;
  */
 public class ServerState implements ServerVariable {
 
+    String errorText = "&cPlease set pingDelay in config.yml > 0";
+
     @Override
     public String getReplacement(String args, ServerInfo server) {
         if (args != null) {
             server = ProxyServer.getInstance().getServerInfo(args);
         }
-        boolean isOnline = BungeeTabListPlus.getInstance().getServerState(
-                server.getName()).isOnline();
+        PingTask ping = BungeeTabListPlus.getInstance().getServerState(
+                server.getName());
+        if (ping == null) {
+            BungeeTabListPlus.getInstance().getLogger().warning(
+                    errorText);
+            return errorText;
+        }
+
+        boolean isOnline = ping.isOnline();
         String replacement = isOnline ? BungeeTabListPlus.getInstance().
                 getConfigManager().getMainConfig().online_text : BungeeTabListPlus.
                 getInstance().getConfigManager().getMainConfig().offline_text;
