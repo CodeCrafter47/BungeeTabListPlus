@@ -47,9 +47,11 @@ public class PingTask
             @Override
             public void done(ServerPing v, Throwable thrwbl) {
                 if (thrwbl != null) {
-                    if ((!(thrwbl instanceof ConnectException)) && (!(thrwbl instanceof SocketTimeoutException))) {
-                        plugin.getLogger().log(Level.WARNING, null, thrwbl);
-                    }
+                    /* Never give confusing warnings
+                     if ((!(thrwbl instanceof ConnectException)) && (!(thrwbl instanceof SocketTimeoutException))) {
+                     plugin.getLogger().log(Level.WARNING, null, thrwbl);
+                     }
+                     */
                     online = false;
                     return;
                 }
