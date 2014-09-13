@@ -93,8 +93,8 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
 
             @Override
             public int compare(UUID t, UUID t1) {
-                String name1 = ProxyServer.getInstance().getPlayer(t).getName();
-                String name2 = ProxyServer.getInstance().getPlayer(t1).getName();
+                String name1 = uuids.get(t).getUsername();
+                String name2 = uuids.get(t1).getUsername();
                 return Collator.getInstance().compare(name1, name2);
             }
         });

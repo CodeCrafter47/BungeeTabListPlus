@@ -151,6 +151,16 @@ public class CustomTabList18 extends TabList {
         if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
                 contains(getPlayer().getServer().getInfo().getName()) || isExcluded || getPlayer().
                 getPendingConnection().getVersion() >= 47) {
+            // Pass the Packet to the client
+            if ((!(this instanceof TabList18v2)) || !(pli.getAction() == PlayerListItem.Action.ADD_PLAYER && uuids.
+                    containsKey(pli.getItems()[0].getUuid()))) {
+                player.unsafe().sendPacket(pli);
+                if (this instanceof TabList18v2 && (pli.getAction() == PlayerListItem.Action.ADD_PLAYER || pli.
+                        getAction() == Action.REMOVE_PLAYER)) {
+                    // update list on the client
+                    BungeeTabListPlus.getInstance().sendImmediate(player);
+                }
+            }
             // save which packets are send to the client
             synchronized (usernames) {
                 for (Item item : pli.getItems()) {
@@ -169,8 +179,6 @@ public class CustomTabList18 extends TabList {
                     }
                 }
             }
-            // Pass the Packet to the client
-            player.unsafe().sendPacket(pli);
         }
     }
 
