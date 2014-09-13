@@ -18,11 +18,14 @@
  */
 package codecrafter47.bungeetablistplus.tablist;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+
 public class Slot {
 
     public String text;
     public int ping;
-    public String[] textures = null;
+    private String[] textures = null;
+    private String skin = null;
 
     public Slot(String text, int ping) {
         super();
@@ -47,5 +50,31 @@ public class Slot {
         super();
         this.text = text;
         this.ping = 0;
+    }
+
+    public Slot(Slot s) {
+        this.ping = s.ping;
+        this.skin = s.skin;
+        this.text = s.text;
+        this.textures = s.textures;
+    }
+
+    public String[] getTextures() {
+        if (textures != null) {
+            return textures;
+        }
+        if (skin != null) {
+            return BungeeTabListPlus.getInstance().getSkinManager().
+                    getSkin(skin);
+        }
+        return null;
+    }
+
+    public void setTextures(String[] textures) {
+        this.textures = textures;
+    }
+
+    public void setSkin(String name) {
+        this.skin = name;
     }
 }

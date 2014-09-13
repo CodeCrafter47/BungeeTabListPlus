@@ -148,9 +148,9 @@ public class FillPlayersSection extends Section {
                     replacePlayerVariables(line, player);
             tabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
                     getConfigManager().getMainConfig().sendPing ? player.
-                    getPing() : 0));
-            tabList.getSlot(i).textures = BungeeTabListPlus.getPlayerTexture(
-                    player);
+                            getPing() : 0));
+            tabList.getSlot(i).setTextures(BungeeTabListPlus.getPlayerTexture(
+                    player));
         }
         return i;
     }

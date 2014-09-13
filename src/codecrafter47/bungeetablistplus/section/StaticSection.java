@@ -18,7 +18,6 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-//~--- non-JDK imports --------------------------------------------------------
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class StaticSection extends Section {
     public int calculate(ProxiedPlayer player, TabList tabList, int pos,
             int size) {
         for (Slot s : text) {
-            tabList.setSlot(pos++, new Slot(s.text, s.ping));
+            tabList.setSlot(pos++, new Slot(s));
         }
         return pos;
     }
@@ -76,6 +75,3 @@ public class StaticSection extends Section {
         return vAlign;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

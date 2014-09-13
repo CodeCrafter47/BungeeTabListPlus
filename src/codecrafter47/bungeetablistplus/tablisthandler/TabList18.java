@@ -93,10 +93,10 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
             }
 
-            if (line.textures == null) {
-                line.textures = tabList.getDefaultSkin();
+            if (line.getTextures() == null) {
+                line.setTextures(tabList.getDefaultSkin());
             }
-            updateSlot(i, text, line.ping, line.textures);
+            updateSlot(i, text, line.ping, line.getTextures());
         }
 
         // update header/footer

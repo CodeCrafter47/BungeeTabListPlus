@@ -67,6 +67,7 @@ public class ConfigParser {
             int startColumn = -1;
             int collumn = -1;
             int maxplayers = 1000;
+            String skin = null;
             List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
@@ -89,6 +90,9 @@ public class ConfigParser {
                 } else if (tag.startsWith("MAXPLAYERS=")) {
                     maxplayers = Integer.parseInt(tag.
                             substring(11, tag.length()));
+                } else if (tag.startsWith("SKIN=") && BungeeTabListPlus.
+                        isVersion18()) {
+                    skin = tag.substring(5, tag.length());
                 } else {
                     plugin.getLogger().log(Level.WARNING,
                             "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
@@ -157,7 +161,9 @@ public class ConfigParser {
                     section = new StaticSection(startColumn);
                     sections.add(section);
                 }
-                section.add(new Slot(text, ping));
+                Slot slot = new Slot(text, ping);
+                slot.setSkin(skin);
+                section.add(slot);
             }
         }
 
@@ -173,6 +179,7 @@ public class ConfigParser {
             // Its properties
             int ping = 0;
             int startColumn = -1;
+            String skin = null;
             List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
@@ -193,6 +200,9 @@ public class ConfigParser {
                 } else if (tag.startsWith("MAXPLAYERS=")) {
                     maxplayers = Integer.parseInt(tag.
                             substring(11, tag.length()));
+                } else if (tag.startsWith("SKIN=") && BungeeTabListPlus.
+                        isVersion18()) {
+                    skin = tag.substring(5, tag.length());
                 } else {
                     plugin.getLogger().log(Level.WARNING,
                             "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
@@ -230,7 +240,9 @@ public class ConfigParser {
                     section = new ServerSection(startColumn, g_server);
                     sections.add(section);
                 }
-                section.add(new Slot(g_prefix + text + g_suffix, ping));
+                Slot slot = new Slot(g_prefix + text + g_suffix, ping);
+                slot.setSkin(skin);
+                section.add(slot);
             }
         }
         return sections;
