@@ -82,7 +82,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
         }
         TabList tabList = tlp.getTabList(super.getPlayer());
 
-        resize(tabList.getCollums() * tabList.getRows() - super.size());
+        resize(tabList.getCollums() * tabList.getRows() - super.uuids.size());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
                 getMainConfig().charLimit;
@@ -95,7 +95,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             public int compare(UUID t, UUID t1) {
                 String name1 = ProxyServer.getInstance().getPlayer(t).getName();
                 String name2 = ProxyServer.getInstance().getPlayer(t1).getName();
-                return -Collator.getInstance().compare(name1, name2);
+                return Collator.getInstance().compare(name1, name2);
             }
         });
 
@@ -120,11 +120,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
             }
-
-            if (line.getTextures() == null) {
-                line.setTextures(tabList.getDefaultSkin());
-            }
-            updateSlot(i, text, line.ping, line.getTextures());
+            updateSlot(i, text, line.ping);
         }
 
         // update header/footer
@@ -182,7 +178,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
         uuidList[i] = null;
     }
 
-    private void updateSlot(int row, String text, int ping, String[] textures) {
+    private void updateSlot(int row, String text, int ping) {
         UUID offlineId = uuidList[row];
 
         // update ping
