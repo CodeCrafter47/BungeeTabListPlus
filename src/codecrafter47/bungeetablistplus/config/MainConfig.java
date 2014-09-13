@@ -114,7 +114,7 @@ public class MainConfig extends Config {
         "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
         "setting this to -1 disables this feature"
     })
-    public int pingDelay = 10;
+    public int pingDelay = -1;
 
     @Comment(
             "replacement for the {onlineState} variable if the server is online")
