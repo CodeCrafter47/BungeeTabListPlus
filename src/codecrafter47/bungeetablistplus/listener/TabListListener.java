@@ -19,10 +19,12 @@
 package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList17;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
+import codecrafter47.bungeetablistplus.tablisthandler.TabList18v2;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -57,7 +59,11 @@ public class TabListListener implements Listener {
             if (e.getPlayer().getPendingConnection().getVersion() < 47) {
                 tab = new TabList17(e.getPlayer());
             } else {
-                tab = new TabList18(e.getPlayer());
+                if (ConfigManager.getTabSize() >= 80) {
+                    tab = new TabList18(e.getPlayer());
+                } else {
+                    tab = new TabList18v2(e.getPlayer());
+                }
             }
         }
         // e.getPlayer().setTabList(tab);

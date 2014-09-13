@@ -43,7 +43,7 @@ public class CustomTabList18 extends TabList {
     boolean isExcluded = false;
 
     private final Collection<String> usernames = new HashSet<>();
-    private final Map<UUID, Item> uuids = new HashMap<>();
+    protected final Map<UUID, Item> uuids = new HashMap<>();
     public final List<String> bukkitplayers = new ArrayList<>(100);
 
     public CustomTabList18(ProxiedPlayer player) {
@@ -187,5 +187,9 @@ public class CustomTabList18 extends TabList {
     @Override
     public void onDisconnect() {
         // nothing to do
+    }
+
+    public int size() {
+        return uuids.size();
     }
 }
