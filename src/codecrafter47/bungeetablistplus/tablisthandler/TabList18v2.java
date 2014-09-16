@@ -58,6 +58,8 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
 
     private final UUID[] uuidList = new UUID[ConfigManager.getTabSize()];
 
+    private final String[] sendTextures = new String[ConfigManager.getTabSize()];
+
     public TabList18v2(ProxiedPlayer player) {
         super(player);
     }
@@ -120,7 +122,11 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
             }
-            updateSlot(i, text, line.ping);
+
+            if (line.getTextures() == null) {
+                line.setTextures(tabList.getDefaultSkin());
+            }
+            updateSlot(i, text, line.ping, line.getTextures());
         }
 
         // update header/footer
@@ -177,10 +183,41 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
         getPlayer().unsafe().sendPacket(pli);
         uuidList[i] = null;
         send.remove(offlineId);
+        sendTextures[i] = null;
     }
 
-    private void updateSlot(int row, String text, int ping) {
+    private void updateSlot(int row, String text, int ping, String[] textures) {
         UUID offlineId = uuidList[row];
+        boolean textureUpdate = false;
+        if (row < sendSlots && ((sendTextures[row] == null && textures != null) || (sendTextures[row] != null && textures == null) || (textures != null && sendTextures[row] != null && !textures[0].
+                equals(
+                        sendTextures[row])))) {
+            // update texture
+            PlayerListItem pli = new PlayerListItem();
+            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+            Item item = new Item();
+            item.setUuid(offlineId);
+            item.setPing(ping);
+            item.setDisplayName(ComponentSerializer.toString(
+                    TextComponent.
+                    fromLegacyText(text)));
+
+            item.setUsername(getSlotID(row));
+            item.setGamemode(0);
+            if (textures != null) {
+                item.setProperties(new String[][]{{"textures", textures[0],
+                    textures[1]
+                }});
+                sendTextures[row] = item.getProperties()[0][1];
+            } else {
+                item.setProperties(new String[0][0]);
+                sendTextures[row] = null;
+
+            }
+            pli.setItems(new Item[]{item});
+            getPlayer().unsafe().sendPacket(pli);
+            textureUpdate = true;
+        }
 
         // update ping
         if (ping != slots_ping[row]) {
@@ -188,9 +225,6 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             PlayerListItem pli = new PlayerListItem();
             pli.setAction(PlayerListItem.Action.UPDATE_LATENCY);
             Item item = new Item();
-            /*
-             UUID offlineId = java.util.UUID.nameUUIDFromBytes(
-             ("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));*/
             item.setUuid(offlineId);
             item.setPing(ping);
             item.setUsername(getSlotID(row));
@@ -201,13 +235,11 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
 
         // update name
         String old = send.get(offlineId);
-        if (old == null || !old.equals(text) || row >= sendSlots) {
+        if (textureUpdate || old == null || !old.equals(text) || row >= sendSlots) {
             send.put(offlineId, text);
             PlayerListItem pli = new PlayerListItem();
             pli.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
             Item item = new Item();
-            /*UUID offlineId = java.util.UUID.nameUUIDFromBytes(
-             ("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));*/
             item.setUuid(offlineId);
             item.setPing(ping);
             item.setDisplayName(ComponentSerializer.toString(TextComponent.
