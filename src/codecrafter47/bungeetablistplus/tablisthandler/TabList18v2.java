@@ -176,6 +176,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
         pli.setItems(new Item[]{item});
         getPlayer().unsafe().sendPacket(pli);
         uuidList[i] = null;
+        send.remove(offlineId);
     }
 
     private void updateSlot(int row, String text, int ping) {
@@ -200,7 +201,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
 
         // update name
         String old = send.get(offlineId);
-        if (old == null || !old.equals(text)) {
+        if (old == null || !old.equals(text) || row >= sendSlots) {
             send.put(offlineId, text);
             PlayerListItem pli = new PlayerListItem();
             pli.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
