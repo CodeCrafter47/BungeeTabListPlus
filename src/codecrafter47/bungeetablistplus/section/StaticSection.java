@@ -18,8 +18,8 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.api.TabList;
 import java.util.ArrayList;
 import java.util.List;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

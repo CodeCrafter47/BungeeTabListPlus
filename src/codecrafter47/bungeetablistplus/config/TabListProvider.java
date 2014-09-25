@@ -19,10 +19,11 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.TabList;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +42,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  *
  * @author Florian Stober
  */
-public class TabListProvider {
+public class TabListProvider implements ITabListProvider {
 
     List<Section> top;
     List<Section> bot;
@@ -58,6 +59,7 @@ public class TabListProvider {
         this.parser = parser;
     }
 
+    @Override
     public TabList getTabList(final ProxiedPlayer player) {
 
         List<Section> topSections = new ArrayList<>(top);
@@ -256,8 +258,7 @@ public class TabListProvider {
         }
 
         // calculating bot and top sections
-        TabList tabList = new TabList(ConfigManager.getRows(), ConfigManager.
-                getCols());
+        TabList tabList = new TabList();
         // TOP
         // grob vorberechnen
         int len[] = new int[topSections.size()];

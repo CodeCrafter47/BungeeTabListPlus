@@ -19,7 +19,7 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.TabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**

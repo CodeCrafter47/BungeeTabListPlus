@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.tablist;
+package codecrafter47.bungeetablistplus.api;
+
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
 
 /**
  *
@@ -56,9 +58,9 @@ public class TabList {
         this.footer = footer;
     }
 
-    public TabList(int rows, int collums) {
-        this.rows = rows;
-        this.collums = collums;
+    public TabList() {
+        this.rows = ConfigManager.getRows();
+        this.collums = ConfigManager.getCols();
         this.usedSlots = 0;
         this.slots = new Slot[rows * collums];
         header = null;

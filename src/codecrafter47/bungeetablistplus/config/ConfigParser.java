@@ -28,7 +28,7 @@ import codecrafter47.bungeetablistplus.section.PlayerColumn;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.section.ServerSection;
 import codecrafter47.bungeetablistplus.section.StaticSection;
-import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.Slot;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;

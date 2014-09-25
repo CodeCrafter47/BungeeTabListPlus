@@ -20,8 +20,8 @@ package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import static codecrafter47.bungeetablistplus.BungeeTabListPlus.isVersion18;
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
 import java.lang.reflect.Field;
 import java.util.List;

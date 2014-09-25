@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.tablist;
+package codecrafter47.bungeetablistplus.api;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 
@@ -44,6 +44,22 @@ public class Slot {
         } else {
             this.ping = 1000;
         }
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public int getPing() {
+        return ping;
+    }
+
+    public void setPing(int ping) {
+        this.ping = ping;
     }
 
     public Slot(String text) {

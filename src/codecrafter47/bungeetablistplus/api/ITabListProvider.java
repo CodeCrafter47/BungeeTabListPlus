@@ -1,3 +1,5 @@
+package codecrafter47.bungeetablistplus.api;
+
 /*
  * BungeeTabListPlus - a bungeecord plugin to customize the tablist
  *
@@ -16,32 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.section;
-
-//~--- non-JDK imports --------------------------------------------------------
 import codecrafter47.bungeetablistplus.api.TabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-/**
- *
- * @author Florian Stober
- */
-public abstract class Section {
 
-    public double id = Math.random();
 
-    public abstract int getMinSize(ProxiedPlayer player);
 
-    public abstract int getMaxSize(ProxiedPlayer player);
+public interface ITabListProvider {
 
-    public abstract int calculate(ProxiedPlayer player, TabList tabList, int pos,
-            int size);
-
-    public abstract void precalculate(ProxiedPlayer player);
-
-    // can be -1 for N/A
-    public abstract int getStartCollumn();
+    TabList getTabList(final ProxiedPlayer player);
+    
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -19,11 +19,12 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.config.TabListProvider;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import java.util.UUID;
@@ -64,7 +65,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
             }
         }
 
-        TabListProvider tlp = BungeeTabListPlus.getInstance().
+        ITabListProvider tlp = BungeeTabListPlus.getInstance().
                 getTabListManager().getTabListForPlayer(super.getPlayer());
         if (tlp == null) {
             exclude();

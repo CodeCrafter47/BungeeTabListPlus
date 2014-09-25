@@ -18,8 +18,8 @@
  */
 package codecrafter47.bungeetablistplus.tablisthandler;
 
-import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import com.google.common.base.Preconditions;
 import java.util.Collection;
