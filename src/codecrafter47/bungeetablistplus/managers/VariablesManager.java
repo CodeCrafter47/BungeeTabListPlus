@@ -173,7 +173,7 @@ public final class VariablesManager {
                     replacement = str;
                 }
             }
-
+            replacement = Matcher.quoteReplacement(replacement);
             matcher.appendReplacement(sb, replacement);
         }
         matcher.appendTail(sb);
