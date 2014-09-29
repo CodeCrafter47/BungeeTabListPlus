@@ -146,6 +146,7 @@ public class TabList17 extends CustomTabList18 implements
         PlayerListItem.Item item = new PlayerListItem.Item();
         item.setDisplayName(getSlotID(i));
         item.setPing(0);
+        pli.setItems(new PlayerListItem.Item[]{item});
         getPlayer().unsafe().sendPacket(pli);
         Team t = new Team();
         t.setName("TAB" + getSlotID(i));
