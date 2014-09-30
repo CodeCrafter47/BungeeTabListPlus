@@ -42,7 +42,7 @@ public class UpdateChecker implements Runnable {
 
     private boolean updateAvailable = false;
 
-    private final long intervall = 15;
+    private final long intervall = 120;
 
     private int pid = -1;
 
