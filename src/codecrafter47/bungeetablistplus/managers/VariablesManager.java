@@ -21,32 +21,14 @@ package codecrafter47.bungeetablistplus.managers;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.api.Variable;
-import codecrafter47.bungeetablistplus.variables.BalanceVariable;
-import codecrafter47.bungeetablistplus.variables.BukkitBridgeVariable;
-import codecrafter47.bungeetablistplus.variables.ColorVariable;
-import codecrafter47.bungeetablistplus.variables.CurrentServerPlayerCountVariable;
-import codecrafter47.bungeetablistplus.variables.DisplayPrefix;
-import codecrafter47.bungeetablistplus.variables.GroupVariable;
-import codecrafter47.bungeetablistplus.variables.PermPrefix;
-import codecrafter47.bungeetablistplus.variables.PermSuffix;
-import codecrafter47.bungeetablistplus.variables.PingVariable;
-import codecrafter47.bungeetablistplus.variables.PlayerCountVariable;
-import codecrafter47.bungeetablistplus.variables.PlayerNameVariable;
-import codecrafter47.bungeetablistplus.variables.PlayerRawNameVariable;
-import codecrafter47.bungeetablistplus.variables.PrefixColor;
-import codecrafter47.bungeetablistplus.variables.ServerNameVariable;
-import codecrafter47.bungeetablistplus.variables.ServerPlayerCountVariable;
-import codecrafter47.bungeetablistplus.variables.ServerState;
-import codecrafter47.bungeetablistplus.variables.TabNameVariable;
-import codecrafter47.bungeetablistplus.variables.TimeVariable;
-import codecrafter47.bungeetablistplus.variables.UUIDVariable;
-import codecrafter47.bungeetablistplus.variables.WorldVariable;
+import codecrafter47.bungeetablistplus.variables.*;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public final class VariablesManager {
 
@@ -104,6 +86,7 @@ public final class VariablesManager {
         addVariable("currencyPl", new BukkitBridgeVariable("currencyPl"));
         addVariable("tabName", new TabNameVariable());
         addVariable("onlineState", new ServerState());
+        addVariable("rplayers", new RedisPlayers());
     }
 
     public void addVariable(String name, Variable var) {

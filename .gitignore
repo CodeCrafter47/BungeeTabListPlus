@@ -4,6 +4,7 @@
 /nbproject/
 /nbproject/*
 /packets/
+/lib/
 .gitignore~
 manifest.mf
 build.xml
