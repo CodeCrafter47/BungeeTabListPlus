@@ -8,3 +8,7 @@
 manifest.mf
 build.xml
 todo.lst
+
+# idea
+/.idea/
+BungeeTabListPlus.iml
