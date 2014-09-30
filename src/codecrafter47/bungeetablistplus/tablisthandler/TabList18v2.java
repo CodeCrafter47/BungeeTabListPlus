@@ -20,29 +20,22 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.config.TabListProvider;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
+
+import java.text.Collator;
+import java.util.*;
+import java.util.logging.Level;
 
 public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
 
@@ -70,7 +63,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
         if (getPlayer().getServer() != null) {
             if (BungeeTabListPlus.getInstance().getConfigManager().
                     getMainConfig().excludeServers.contains(getPlayer().
-                            getServer().getInfo().getName()) || isExcluded) {
+                    getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
             }
@@ -83,6 +76,16 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             unload();
             return;
         }
+
+        // check number of players on that server
+        if (super.uuids.size() > ConfigManager.getTabSize()) {
+            // Spam server logs telling users to set tab_size to 80
+            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING,
+                    String.format("Couldn't update tablist for user %s on server %s because the number of players on that server is higher than the tab_size you configured. This is not allowed. To solve the problem you should set tab_size=80 in bungee's config.yml", player.getDisplayName(), player.getServer().getInfo().getName()));
+            return;
+        }
+
+
         TabList tabList = tlp.getTabList(super.getPlayer());
 
         resize(tabList.getCollums() * tabList.getRows() - super.uuids.size());
@@ -104,8 +107,8 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
 
         Iterator<UUID> it = list.iterator();
         for (int i = sendSlots;
-                i < tabList.getCollums() * tabList.getRows() && it.hasNext();
-                i++) {
+             i < tabList.getCollums() * tabList.getRows() && it.hasNext();
+             i++) {
             uuidList[i] = it.next();
         }
 
@@ -135,7 +138,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             if (BungeeTabListPlus.isAbove995()) {
                 player.setTabHeader(TextComponent.fromLegacyText(tabList.
                         getHeader()), TextComponent.fromLegacyText(tabList.
-                                getFooter()));
+                        getFooter()));
             } else {
                 TabHeaderPacket packet = new TabHeaderPacket();
                 if (tabList.getHeader() != null) {
@@ -201,13 +204,13 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             item.setPing(ping);
             item.setDisplayName(ComponentSerializer.toString(
                     TextComponent.
-                    fromLegacyText(text)));
+                            fromLegacyText(text)));
 
             item.setUsername(getSlotID(row));
             item.setGamemode(0);
             if (textures != null) {
                 item.setProperties(new String[][]{{"textures", textures[0],
-                    textures[1]
+                        textures[1]
                 }});
                 sendTextures[row] = item.getProperties()[0][1];
             } else {
