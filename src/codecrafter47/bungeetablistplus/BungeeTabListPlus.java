@@ -23,27 +23,11 @@ import codecrafter47.bungeetablistplus.bridge.Constants;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.managers.PacketManager;
-import codecrafter47.bungeetablistplus.managers.PermissionManager;
-import codecrafter47.bungeetablistplus.managers.PlayerManager;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.managers.TabListManager;
-import codecrafter47.bungeetablistplus.managers.VariablesManager;
+import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import gnu.trove.map.TObjectIntMap;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -56,6 +40,17 @@ import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.connection.LoginResult.Property;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.Protocol;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Main Class of BungeeTabListPlus
@@ -467,8 +462,8 @@ public class BungeeTabListPlus extends Plugin {
 
     public void reportError(Throwable th) {
         getLogger().log(Level.WARNING,
-                ChatColor.RED + "An internal error occured! Please send the "
-                + "following stacktrace to the developer in order to help"
+                ChatColor.RED + "An internal error occurred! Please send the "
+                + "following StackTrace to the developer in order to help"
                 + " resolving the problem",
                 th);
     }
