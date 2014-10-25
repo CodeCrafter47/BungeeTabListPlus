@@ -35,7 +35,10 @@ public class WorldVariable implements PlayerVariable {
         if (world == null) {
             return "";
         }
+        if(player.getServer() == null)return "";
+        String key = player.getServer().getInfo().getName() + ":" + world;
+        String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().worldAlias.get(key);
+        if(alias != null)return alias;
         return world;
     }
-
 }

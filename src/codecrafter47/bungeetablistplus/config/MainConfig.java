@@ -18,15 +18,16 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import net.cubespace.Yamler.Config.Comment;
 import net.cubespace.Yamler.Config.Comments;
 import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainConfig extends Config {
 
@@ -96,6 +97,17 @@ public class MainConfig extends Config {
         serverAlias.put("server1", "Spawn");
         serverAlias.put("server2", "Creative");
         serverAlias.put("server3", "PvP");
+    }
+
+    @Comments({
+            "Alias fo the {world} Variable. Match 'server:world' to an alias"
+    })
+    public HashMap<String, String> worldAlias = new HashMap<>();
+
+    {
+        serverAlias.put("server1:world1", "Spawn");
+        serverAlias.put("server2:world", "Creative");
+        serverAlias.put("server3:world", "PvP");
     }
 
     @Comments({
