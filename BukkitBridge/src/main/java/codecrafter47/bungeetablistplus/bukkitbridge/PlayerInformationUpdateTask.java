@@ -20,7 +20,9 @@ import codecrafter47.bungeetablistplus.bukkitbridge.api.PlayerInformationProvide
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,20 +64,26 @@ public class PlayerInformationUpdateTask extends BukkitRunnable {
 
     private void init() {
         this.buffer.clear();
+        List<PlayerInformationProvider> remove = new ArrayList<>();
         for (PlayerInformationProvider ip : plugin.
                 getPlayerInformationProviders()) {
             try {
                 buffer.putAll(ip.getInformation(player));
             } catch (Throwable th) {
                 plugin.reportError(th);
+                remove.add(ip);
             }
         }
         plugin.sendInformation(Constants.subchannel_initplayer, buffer, player);
         initialized = true;
+        for(PlayerInformationProvider ip: remove){
+            plugin.playerInformationProviders.remove(ip);
+        }
     }
 
     private void update() {
         Map<String, Object> updates = new HashMap<>();
+        List<PlayerInformationProvider> remove = new ArrayList<>();
         for (PlayerInformationProvider ip : plugin.
                 getPlayerInformationProviders()) {
             try {
@@ -91,11 +99,15 @@ public class PlayerInformationUpdateTask extends BukkitRunnable {
                 }
             } catch (Throwable th) {
                 plugin.reportError(th);
+                remove.add(ip);
             }
         }
         if (!updates.isEmpty()) {
             plugin.sendInformation(Constants.subchannel_updateplayer, updates,
                     player);
+        }
+        for(PlayerInformationProvider ip: remove){
+            plugin.playerInformationProviders.remove(ip);
         }
     }
 }

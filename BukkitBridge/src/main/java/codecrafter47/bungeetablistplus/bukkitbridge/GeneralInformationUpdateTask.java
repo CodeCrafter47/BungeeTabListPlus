@@ -21,9 +21,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -69,20 +67,26 @@ public class GeneralInformationUpdateTask extends BukkitRunnable {
 
     private void init(Player player) {
         this.buffer.clear();
+        List<GeneralInformationProvider> remove = new ArrayList<>();
         for (GeneralInformationProvider ip : plugin.
                 getGeneralInformationProviders()) {
             try {
                 buffer.putAll(ip.getInformation());
             } catch (Throwable th) {
                 plugin.reportError(th);
+                remove.add(ip);
             }
         }
         plugin.sendInformation(Constants.subchannel_init, buffer, player);
         initialized = true;
+        for(GeneralInformationProvider ip: remove){
+            plugin.generalInformationProviders.remove(ip);
+        }
     }
 
     private void update(Player player) {
         Map<String, Object> updates = new HashMap<>();
+        List<GeneralInformationProvider> remove = new ArrayList<>();
         for (GeneralInformationProvider ip : plugin.
                 getGeneralInformationProviders()) {
             try {
@@ -97,10 +101,14 @@ public class GeneralInformationUpdateTask extends BukkitRunnable {
                 }
             } catch (Throwable th) {
                 plugin.reportError(th);
+                remove.add(ip);
             }
         }
         if (!updates.isEmpty()) {
             plugin.sendInformation(Constants.subchannel_update, updates, player);
+        }
+        for(GeneralInformationProvider ip: remove){
+            plugin.generalInformationProviders.remove(ip);
         }
     }
 
