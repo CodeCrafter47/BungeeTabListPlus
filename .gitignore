@@ -1,15 +1,48 @@
-/build/
-/dist/
-/nbproject/private/
-/nbproject/
-/nbproject/*
-/packets/
-/lib/
-.gitignore~
-manifest.mf
-build.xml
-todo.lst
+# Created by .gitignore support plugin (hsz.mobi)
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
 
-# idea
-/.idea/
-BungeeTabListPlus.iml
+# Eclipse stuff
+.classpath
+.project
+.settings/
+
+# netbeans
+nbproject/
+nbactions.xml
+
+# we use maven!
+build.xml
+
+# vim
+.*.sw[a-p]
+
+# various other potential build files
+build/
+bin/
+dist/
+manifest.mf
+
+# Mac filesystem dust
+.DS_Store/
+
+# intellij
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# other files
+*.log*
+
+# delombok
+*/src/main/lombok
+
+# magic
+src/todo.lst
