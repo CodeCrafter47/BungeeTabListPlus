@@ -257,7 +257,7 @@ public class ConfigParser {
         // TODO this can be optimized
         int i = 0;
         int end = -1;
-        while (line.charAt(i) == '[') {
+        while (i < line.length() && line.charAt(i) == '[') {
             end = line.indexOf(']', i);
             if (end == -1) {
                 throw new ParseException("Missing ']'", i);
