@@ -19,14 +19,15 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import net.cubespace.Yamler.Config.Comments;
 import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TabListConfig extends Config {
 
@@ -63,6 +64,11 @@ public class TabListConfig extends Config {
         "leave empty for random skins"
     })
     public String defaultSkin = "Herobrine";
+
+    @Comments({
+            "if true player skin is shown beneath name, otherwise default skin"
+    })
+    public boolean showCorrectPlayerSkins = true;
 
     @Comments({
         "how Players should be grouped",

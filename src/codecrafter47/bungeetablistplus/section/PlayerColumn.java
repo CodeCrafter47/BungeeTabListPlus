@@ -132,7 +132,7 @@ public class PlayerColumn {
                                 getMainConfig().sendPing ? players.get(i).getPing() : 0));
                 if (skin != null && !skin.isEmpty())
                     tabList.getSlot(p, collumn + c).setSkin(skin);
-                else
+                else if(config.showCorrectPlayerSkins)
                     tabList.getSlot(p, collumn + c).setTextures(BungeeTabListPlus.
                             getPlayerTexture(players.get(i)));
                 c++;

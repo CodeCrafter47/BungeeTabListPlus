@@ -150,7 +150,7 @@ public class FillPlayersSection extends Section {
                             getPing() : 0));
             if(skin != null && !skin.isEmpty())
                 tabList.getSlot(i).setSkin(skin);
-            else
+            else if(config.showCorrectPlayerSkins)
                 tabList.getSlot(i).setTextures(BungeeTabListPlus.getPlayerTexture(
                         player));
         }
