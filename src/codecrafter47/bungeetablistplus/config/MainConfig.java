@@ -105,9 +105,9 @@ public class MainConfig extends Config {
     public HashMap<String, String> worldAlias = new HashMap<>();
 
     {
-        serverAlias.put("server1:world1", "Spawn");
-        serverAlias.put("server2:world", "Creative");
-        serverAlias.put("server3:world", "PvP");
+        worldAlias.put("server1:world1", "Spawn");
+        worldAlias.put("server2:world", "Creative");
+        worldAlias.put("server3:world", "PvP");
     }
 
     @Comments({

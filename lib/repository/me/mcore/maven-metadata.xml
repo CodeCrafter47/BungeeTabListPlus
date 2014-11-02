@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>me</groupId>
+  <artifactId>mcore</artifactId>
+  <version>7.2</version>
+  <versioning>
+    <versions>
+      <version>7.2</version>
+      <version>7.3</version>
+    </versions>
+    <lastUpdated>20141026182221</lastUpdated>
+  </versioning>
+</metadata>
