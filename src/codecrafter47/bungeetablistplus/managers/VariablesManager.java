@@ -87,6 +87,7 @@ public final class VariablesManager {
         addVariable("tabName", new TabNameVariable());
         addVariable("onlineState", new ServerState());
         addVariable("rplayers", new RedisPlayers());
+        addVariable("internalServerName", new InternalServerNameVariable());
     }
 
     public void addVariable(String name, Variable var) {
