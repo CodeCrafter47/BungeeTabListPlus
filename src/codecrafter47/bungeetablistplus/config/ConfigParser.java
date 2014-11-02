@@ -19,26 +19,16 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
-import codecrafter47.bungeetablistplus.section.CollumnSplitSection;
-import codecrafter47.bungeetablistplus.section.FillBukkitPlayers;
-import codecrafter47.bungeetablistplus.section.FillPlayersSection;
-import codecrafter47.bungeetablistplus.section.PlayerColumn;
-import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.section.ServerSection;
-import codecrafter47.bungeetablistplus.section.StaticSection;
 import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.section.*;
+import net.md_5.bungee.api.ChatColor;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 
 /**
  *
@@ -136,7 +126,7 @@ public class ConfigParser {
                                 suffix, sortrules, maxplayers));
                     } else {
                         sections.add(new FillPlayersSection(startColumn, filter,
-                                config, prefix, suffix, sortrules, maxplayers));
+                                config, prefix, suffix, skin, sortrules, maxplayers));
                     }
                 } else {
                     CollumnSplitSection cs;
@@ -148,7 +138,7 @@ public class ConfigParser {
                         sections.add(cs);
                     }
                     cs.addCollumn(collumn, new PlayerColumn(filter, config,
-                            prefix, suffix, sortrules, maxplayers));
+                            prefix, suffix, skin, sortrules, maxplayers));
                 }
             } else if (isFillBukkitPlayers(line)) {
                 sections.add(new FillBukkitPlayers(startColumn));
@@ -230,7 +220,7 @@ public class ConfigParser {
                 filter.addAll(g_filter);
                 filter.add(g_server);
                 sections.add(new FillPlayersSection(startColumn, filter, config,
-                        prefix, suffix, sortrules, maxplayers));
+                        prefix, suffix, skin, sortrules, maxplayers));
             } // Parsing Normal text
             else {
                 ServerSection section;

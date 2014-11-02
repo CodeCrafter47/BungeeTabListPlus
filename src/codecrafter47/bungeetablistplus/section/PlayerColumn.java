@@ -19,22 +19,18 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.sorting.AdminFirst;
 import codecrafter47.bungeetablistplus.sorting.Alphabet;
 import codecrafter47.bungeetablistplus.sorting.ISortingRule;
 import codecrafter47.bungeetablistplus.sorting.YouFirst;
-import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.*;
+
 /**
- *
  * @author Florian Stober
  */
 public class PlayerColumn {
@@ -43,17 +39,19 @@ public class PlayerColumn {
     TabListConfig config;
     String prefix;
     String suffix;
+    String skin;
     List<ProxiedPlayer> players;
     List<String> sort;
     int maxPlayers;
 
     public PlayerColumn(List<String> filter, TabListConfig config, String prefix,
-            String suffix, List<String> sortrules, int maxPlayers) {
+                        String suffix, String skin, List<String> sortrules, int maxPlayers) {
         this.filter = filter;
         this.config = config;
         this.prefix = prefix;
         this.suffix = suffix;
         this.sort = sortrules;
+        this.skin = skin;
         this.maxPlayers = maxPlayers;
     }
 
@@ -72,7 +70,7 @@ public class PlayerColumn {
             } else if (rule.equalsIgnoreCase("alpha") || rule.equalsIgnoreCase(
                     "alphabet") || rule.equalsIgnoreCase("alphabetic") || rule.
                     equalsIgnoreCase("alphabetical") || rule.equalsIgnoreCase(
-                            "alphabetically")) {
+                    "alphabetically")) {
                 srules.add(new Alphabet());
             }
         }
@@ -108,7 +106,7 @@ public class PlayerColumn {
     }
 
     public void calculate(ProxiedPlayer player, TabList tabList, int collumn,
-            int row, int size, int span) {
+                          int row, int size, int span) {
         int playersToShow = players.size();
         if (playersToShow > maxPlayers) {
             playersToShow = maxPlayers;
@@ -131,10 +129,12 @@ public class PlayerColumn {
                         replacePlayerVariables(line, players.get(i));
                 tabList.setSlot(p, collumn + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
-                        getMainConfig().sendPing ? players.get(i).getPing() : 0));
-
-                tabList.getSlot(p, collumn + c).setTextures(BungeeTabListPlus.
-                        getPlayerTexture(players.get(i)));
+                                getMainConfig().sendPing ? players.get(i).getPing() : 0));
+                if (skin != null && !skin.isEmpty())
+                    tabList.getSlot(p, collumn + c).setSkin(skin);
+                else
+                    tabList.getSlot(p, collumn + c).setTextures(BungeeTabListPlus.
+                            getPlayerTexture(players.get(i)));
                 c++;
                 if (c >= span) {
                     c = 0;
@@ -148,6 +148,8 @@ public class PlayerColumn {
                 line = prefix + line + suffix;
                 line = line.replace("{other_count}", "" + other_count);
                 tabList.setSlot(p, collumn + c, new Slot(line));
+                if (skin != null && !skin.isEmpty())
+                    tabList.getSlot(p, collumn + c).setSkin(skin);
                 c++;
                 if (c >= span) {
                     c = 0;
