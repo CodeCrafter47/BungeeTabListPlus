@@ -29,13 +29,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SkinManager {
 
@@ -84,14 +81,6 @@ public class SkinManager {
             }
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
-            /*
-             String line;
-             StringBuffer result = new StringBuffer();
-             while ((line = reader.readLine()) != null) {
-             result.append(line);
-             result.append('\r');
-             }
-             reader.close();*/
             Profile[] profiles = gson.fromJson(reader, Profile[].class);
             if (profiles != null && profiles.length >= 1) {
                 return profiles[0].id;
@@ -104,7 +93,7 @@ public class SkinManager {
 
     }
 
-    private String[] fetchSkin(String uuid) {
+    private String[] fetchSkin(final String uuid) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(
                     "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").
@@ -115,6 +104,20 @@ public class SkinManager {
             return new String[]{skin.properties.get(0).value, skin.properties.
                 get(0).signature};
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
+            if(e.getMessage().contains("429")){
+                // mojang rate limit
+                // try again in 1 min
+                plugin.getProxy().getScheduler().schedule(plugin, new Runnable(){
+
+                    @Override
+                    public void run() {
+                        badNames.remove(uuid);
+                        skinsToFetch.add(uuid);
+                    }
+                    
+                }, 1, TimeUnit.MINUTES);
+                return null;
+            }
             plugin.reportError(e);
         }
         return null;
