@@ -30,12 +30,13 @@ import java.util.Map;
  * @author Florian Stober
  */
 public class BukkitHook implements GeneralInformationProvider,
-        PlayerInformationProvider {
+        PlayerInformationProvider, Runnable {
 
     BukkitBridge plugin;
 
     public BukkitHook(BukkitBridge plugin) {
         this.plugin = plugin;
+        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, monitorInterval, monitorInterval);
     }
 
     @Override
@@ -64,7 +65,34 @@ public class BukkitHook implements GeneralInformationProvider,
         map.put("world", player.getWorld().getName());
         map.put("health", player.getHealth());
         map.put("level", player.getLevel());
+        map.put("tps", getTPS());
         return map;
     }
 
+    public int monitorInterval = 40;
+    public long prevtime;
+
+    public String getTPS() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(round(tps, 1));
+        return builder.toString();
+    }
+
+    public double elapsedtimesec;
+    public long elapsedtime;
+    public double tps = 0;
+
+    @Override
+    public void run() {
+        long time = System.currentTimeMillis();
+        elapsedtime = time - prevtime;
+        elapsedtimesec = (double) elapsedtime / 1000;
+        tps = monitorInterval / elapsedtimesec;
+        prevtime = time;
+    }
+
+    double round(double value, int decimals) {
+        double p = Math.pow(10, decimals);
+        return Math.round(value * p) / p;
+    }
 }
