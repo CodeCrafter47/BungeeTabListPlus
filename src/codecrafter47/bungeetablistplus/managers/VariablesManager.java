@@ -85,6 +85,7 @@ public final class VariablesManager {
         addVariable("currency", new BukkitBridgeVariable("currency"));
         addVariable("currencyPl", new BukkitBridgeVariable("currencyPl"));
         addVariable("tabName", new TabNameVariable());
+        addVariable("tps", new BukkitBridgeVariable("tps"));
         addVariable("onlineState", new ServerState());
         addVariable("rplayers", new RedisPlayers());
         addVariable("internalServerName", new InternalServerNameVariable());
