@@ -83,7 +83,7 @@ public class VaultHook implements PlayerInformationProvider {
     public Map<String, Object> getInformation(Player player) {
         Map<String, Object> map = new HashMap<>();
         try {
-            if (permission != null && permission.hasGroupSupport()) {
+            if (permission != null && permission.hasGroupSupport() && permission.getPrimaryGroup(player) != null) {
                 map.put("group", permission.getPrimaryGroup(player));
             }
         } catch (Throwable th) {
