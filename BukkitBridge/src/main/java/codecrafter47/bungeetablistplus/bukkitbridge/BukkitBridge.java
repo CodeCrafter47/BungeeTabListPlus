@@ -114,16 +114,9 @@ public class BukkitBridge extends JavaPlugin implements Listener,
         Plugin factions = getServer().getPluginManager().getPlugin("Factions");
         if (factions != null) {
             getLogger().info("hooked Factions");
-            try {
-                Class.forName("com.massivecraft.mcore.ps.PS");
-                // no exception --> old factions
-                this.registerPlayerInformationProvider(factions,
-                        new FactionHook_7_2_X());
-            } catch (Exception ex) {
-                // new factions
-                this.registerPlayerInformationProvider(factions,
-                        new FactionHook_7_3_0());
-            }
+            // new factions
+            this.registerPlayerInformationProvider(factions,
+                    new FactionHook_7_3_0());
         }
 
         BukkitHook bukkitHook = new BukkitHook(this);
