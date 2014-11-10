@@ -185,7 +185,8 @@ public class TabList17 extends CustomTabList18 implements
 
     private void createSlot(int row) {
         createTeam(getPlayer().unsafe(), getSlotID(row));
-
+        send[row] = null;
+        slots_ping[row] = 0;
     }
 
     public void createTeam(Connection.Unsafe connection, String player) {
