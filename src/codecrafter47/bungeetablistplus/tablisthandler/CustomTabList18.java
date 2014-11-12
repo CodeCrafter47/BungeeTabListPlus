@@ -168,12 +168,14 @@ public class CustomTabList18 extends TabList {
                     if (pli.getAction() == PlayerListItem.Action.ADD_PLAYER) {
                         if (item.getUuid() != null) {
                             uuids.put(item.getUuid(), item);
+                            if(this instanceof TabList18v3)((TabList18v3)this).sendUsernames.remove(item.getUuid());
                         } else {
                             usernames.add(item.getUsername());
                         }
                     } else if (pli.getAction() == Action.REMOVE_PLAYER) {
                         if (item.getUuid() != null) {
                             uuids.remove(item.getUuid());
+                            if(this instanceof TabList18v3)((TabList18v3)this).sendUsernames.remove(item.getUuid());
                         } else {
                             usernames.remove(item.getUsername());
                         }

@@ -55,7 +55,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
 
     private final Map<UUID, String> sendTextures = new HashMap<>();
     
-    private final Map<UUID, String> sendUsernames = new HashMap<>();
+    final Map<UUID, String> sendUsernames = new HashMap<>();
     
     public TabList18v3(ProxiedPlayer player) {
         super(player);
