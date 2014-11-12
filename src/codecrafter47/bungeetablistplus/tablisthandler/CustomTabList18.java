@@ -152,11 +152,12 @@ public class CustomTabList18 extends TabList {
                 contains(getPlayer().getServer().getInfo().getName()) || isExcluded || getPlayer().
                 getPendingConnection().getVersion() >= 47) {
             // Pass the Packet to the client
-            if ((!(this instanceof TabList18v2)) || !(pli.getAction() == PlayerListItem.Action.ADD_PLAYER && uuids.
+            if ((!(this instanceof TabList18v3)) || (!(this instanceof TabList18v2)) || !(pli.getAction() == PlayerListItem.Action.ADD_PLAYER && uuids.
                     containsKey(pli.getItems()[0].getUuid()))) {
                 player.unsafe().sendPacket(pli);
-                if (this instanceof TabList18v2 && (pli.getAction() == PlayerListItem.Action.ADD_PLAYER || pli.
-                        getAction() == Action.REMOVE_PLAYER)) {
+                if ((this instanceof TabList18v2 && (pli.getAction() == PlayerListItem.Action.ADD_PLAYER || pli.
+                        getAction() == Action.REMOVE_PLAYER)) || (this instanceof TabList18v3 && (pli.getAction() == PlayerListItem.Action.ADD_PLAYER || pli.
+                        getAction() == Action.REMOVE_PLAYER))) {
                     // update list on the client
                     BungeeTabListPlus.getInstance().sendImmediate(player);
                 }

@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.api;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import java.util.UUID;
 
 public class Slot {
 
@@ -26,6 +27,7 @@ public class Slot {
     public int ping;
     private String[] textures = null;
     private String skin = null;
+    public UUID uuid = null;
 
     public Slot(String text, int ping) {
         super();
@@ -92,5 +94,9 @@ public class Slot {
 
     public void setSkin(String name) {
         this.skin = name;
+    }
+
+    public UUID getUUID() {
+        return uuid;
     }
 }

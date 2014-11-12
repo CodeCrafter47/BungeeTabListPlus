@@ -135,6 +135,7 @@ public class PlayerColumn {
                 else if(config.showCorrectPlayerSkins)
                     tabList.getSlot(p, collumn + c).setTextures(BungeeTabListPlus.
                             getPlayerTexture(players.get(i)));
+                tabList.getSlot(p, collumn + c).uuid = player.getUniqueId();
                 c++;
                 if (c >= span) {
                     c = 0;
