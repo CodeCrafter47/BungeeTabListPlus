@@ -137,6 +137,11 @@ public class MainConfig extends Config {
     public String offline_text = "&c OFF";
 
     @Comments({
+            "those fakeplayers will randomly appear on the tablist. If you don't put any names there then no fakeplayers will appear"
+    })
+    public List<String> fakePlayers = new ArrayList<>();
+
+    @Comments({
         "servers which you wish to show their own tabList (The one provided by bukkit)"
     })
     public List<String> excludeServers = new ArrayList<>();

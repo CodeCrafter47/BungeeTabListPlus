@@ -19,14 +19,15 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class PlayerManager {
 
@@ -54,7 +55,9 @@ public class PlayerManager {
     public List<ProxiedPlayer> getPlayers(Collection<String> filter,
             ProxiedPlayer who) {
         List<ProxiedPlayer> list = new ArrayList<>();
-        for (ProxiedPlayer p : plugin.getProxy().getPlayers()) {
+        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
+        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
+        for (ProxiedPlayer p : players) {
             boolean areGroupRules = false;
             boolean areServerRules = false;
             boolean fitGroupRules = false;
@@ -111,7 +114,9 @@ public class PlayerManager {
 
     public int getServerPlayerCount(String server) {
         int num = 0;
-        for (ProxiedPlayer p : plugin.getProxy().getPlayers()) {
+        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
+        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
+        for (ProxiedPlayer p : players) {
             Server s = p.getServer();
             if (s != null) {
                 if (s.getInfo().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
@@ -125,7 +130,9 @@ public class PlayerManager {
 
     public int getGlobalPlayerCount() {
         int num = 0;
-        for (ProxiedPlayer p : plugin.getProxy().getPlayers()) {
+        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
+        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
+        for (ProxiedPlayer p : players) {
             if (!BungeeTabListPlus.isHidden(p)) {
                 num++;
             }

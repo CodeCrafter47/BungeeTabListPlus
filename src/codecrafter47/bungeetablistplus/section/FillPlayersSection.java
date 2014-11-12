@@ -153,7 +153,8 @@ public class FillPlayersSection extends Section {
             else if(config.showCorrectPlayerSkins)
                 tabList.getSlot(i).setTextures(BungeeTabListPlus.getPlayerTexture(
                         player));
-            tabList.getSlot(i).uuid = player.getUniqueId();
+            if(BungeeTabListPlus.isVersion18())
+                tabList.getSlot(i).uuid = player.getUniqueId();
         }
         return i;
     }

@@ -82,6 +82,12 @@ public class BungeeTabListPlus extends Plugin {
      */
     private ConfigManager config;
 
+    public FakePlayerManager getFakePlayerManager() {
+        return fakePlayerManager;
+    }
+
+    private FakePlayerManager fakePlayerManager;
+
     /**
      * provides access to the Variable Manager use this to add Variables
      */
@@ -245,6 +251,8 @@ public class BungeeTabListPlus extends Plugin {
                         log(Level.SEVERE, null, ex);
             }
         }
+
+        fakePlayerManager = new FakePlayerManager(this);
     }
 
     private void startRefreshThread() {
@@ -280,6 +288,7 @@ public class BungeeTabListPlus extends Plugin {
             if (!tabLists.loadTabLists()) {
                 return;
             }
+            fakePlayerManager.reload();
         } catch (InvalidConfigurationException ex) {
             getLogger().warning("Unable to reload Config");
             getLogger().log(Level.WARNING, null, ex);
@@ -495,6 +504,9 @@ public class BungeeTabListPlus extends Plugin {
     public static String[] getPlayerTexture(ProxiedPlayer player) {
         if (!isVersion18()) {
             return null;
+        }
+        if(player instanceof FakePlayerManager.FakePlayer){
+            return getInstance().getSkinManager().getSkin(player.getName());
         }
         LoginResult loginResult = ((UserConnection) player).
                 getPendingConnection().getLoginProfile();
