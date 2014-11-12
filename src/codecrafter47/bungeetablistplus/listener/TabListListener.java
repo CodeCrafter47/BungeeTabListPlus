@@ -61,7 +61,7 @@ public class TabListListener implements Listener {
                 tab = new TabList17(e.getPlayer());
             } else {
                 if (ConfigManager.getTabSize() >= 80) {
-                    tab = new TabList18v3(e.getPlayer());
+                    tab = new TabList18(e.getPlayer());
                 } else {
                     tab = new TabList18v3(e.getPlayer());
                 }

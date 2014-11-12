@@ -218,6 +218,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
         send.remove(offlineId);
         sendTextures.remove(offlineId);
         sendPing.remove(offlineId);
+        sendUsernames.remove(offlineId);
     }
 
     private void updateSlot(UUID offlineId, int row, String text, int ping, String[] textures, boolean reorder) {
