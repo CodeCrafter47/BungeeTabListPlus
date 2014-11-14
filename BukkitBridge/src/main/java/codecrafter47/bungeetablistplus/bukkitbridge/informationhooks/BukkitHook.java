@@ -62,6 +62,8 @@ public class BukkitHook implements GeneralInformationProvider,
                 "bungeetablistplus.help"));
         map.put("bungeetablistplus.vanish", player.hasPermission(
                 "bungeetablistplus.vanish"));
+        map.put("bungeetablistplus.seevanished", player.
+                hasPermission("bungeetablistplus.seevanished"));
         map.put("world", player.getWorld().getName());
         map.put("health", player.getHealth());
         map.put("level", player.getLevel());
