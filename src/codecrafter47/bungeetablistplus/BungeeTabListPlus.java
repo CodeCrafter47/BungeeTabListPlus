@@ -400,6 +400,27 @@ public class BungeeTabListPlus extends Plugin {
      * @param player the player object for which the check should be performed
      * @return true if the player is hidden, false otherwise
      */
+    public static boolean isHidden(ProxiedPlayer player, ProxiedPlayer viewer) {
+        if(getInstance().getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished"))return false;
+        boolean hidden;
+        synchronized (hiddenPlayers) {
+            String name = player.getName();
+            hidden = hiddenPlayers.contains(name);
+        }
+        String s = getInstance().bukkitBridge.getPlayerInformation(player,
+                "isVanished");
+        if (s != null) {
+            hidden |= Boolean.valueOf(s);
+        }
+        return hidden;
+    }
+
+    /**
+     * checks whether a player is hidden from the tablist
+     *
+     * @param player the player object for which the check should be performed
+     * @return true if the player is hidden, false otherwise
+     */
     public static boolean isHidden(ProxiedPlayer player) {
         boolean hidden;
         synchronized (hiddenPlayers) {
@@ -420,12 +441,10 @@ public class BungeeTabListPlus extends Plugin {
      * @param player The player which should be hidden.
      */
     public static void hidePlayer(ProxiedPlayer player) {
-        if (isHidden(player)) {
-            return;
-        }
         synchronized (hiddenPlayers) {
             String name = player.getName();
-            hiddenPlayers.add(name);
+            if(!hiddenPlayers.contains(name))
+                hiddenPlayers.add(name);
         }
     }
 
@@ -437,9 +456,6 @@ public class BungeeTabListPlus extends Plugin {
      * @param player the player on which the operation should be performed
      */
     public static void unhidePlayer(ProxiedPlayer player) {
-        if (!isHidden(player)) {
-            return;
-        }
         synchronized (hiddenPlayers) {
             String name = player.getName();
             hiddenPlayers.remove(name);

@@ -20,23 +20,19 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.api.TabList;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.text.ParseException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -91,9 +87,9 @@ public class TabListProvider implements ITabListProvider {
                         @Override
                         public int compare(String s1, String s2) {
                             int p1 = BungeeTabListPlus.getInstance().
-                                    getPlayerManager().getServerPlayerCount(s1);
+                                    getPlayerManager().getServerPlayerCount(s1, player);
                             int p2 = BungeeTabListPlus.getInstance().
-                                    getPlayerManager().getServerPlayerCount(s2);
+                                    getPlayerManager().getServerPlayerCount(s2, player);
                             if (p1 < p2) {
                                 return 1;
                             }
@@ -108,7 +104,7 @@ public class TabListProvider implements ITabListProvider {
                     for (String server : list) {
                         if (config.showEmptyGroups || BungeeTabListPlus.
                                 getInstance().getPlayerManager().
-                                getServerPlayerCount(server) > 0) {
+                                getServerPlayerCount(server, player) > 0) {
                             try {
                                 List<Section> sections = parser.
                                         parseServerSections(

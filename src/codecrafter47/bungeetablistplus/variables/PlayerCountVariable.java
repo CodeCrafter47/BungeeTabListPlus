@@ -18,16 +18,15 @@
  */
 package codecrafter47.bungeetablistplus.variables;
 
-import codecrafter47.bungeetablistplus.api.Variable;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import net.md_5.bungee.api.ProxyServer;
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class PlayerCountVariable implements Variable {
+public class PlayerCountVariable implements PlayerVariable {
 
     @Override
-    public String getReplacement(String args) {
+    public String getReplacement(String args, ProxiedPlayer player) {
         return "" + BungeeTabListPlus.getInstance().getPlayerManager().
-                getGlobalPlayerCount();
+                getGlobalPlayerCount(player);
     }
-
 }

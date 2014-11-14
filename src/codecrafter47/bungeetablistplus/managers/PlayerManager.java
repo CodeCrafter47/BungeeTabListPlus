@@ -105,7 +105,7 @@ public class PlayerManager {
                 }
             }
             if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.
-                    isHidden(p)) {
+                    isHidden(p, who)) {
                 list.add(p);
             }
         }
@@ -128,12 +128,28 @@ public class PlayerManager {
         return num;
     }
 
-    public int getGlobalPlayerCount() {
+    public int getServerPlayerCount(String server, ProxiedPlayer viewer) {
         int num = 0;
         Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
         players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
         for (ProxiedPlayer p : players) {
-            if (!BungeeTabListPlus.isHidden(p)) {
+            Server s = p.getServer();
+            if (s != null) {
+                if (s.getInfo().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
+                        isHidden(p, viewer)) {
+                    num++;
+                }
+            }
+        }
+        return num;
+    }
+
+    public int getGlobalPlayerCount(ProxiedPlayer viewer) {
+        int num = 0;
+        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
+        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
+        for (ProxiedPlayer p : players) {
+            if (!BungeeTabListPlus.isHidden(p, viewer)) {
                 num++;
             }
         }
