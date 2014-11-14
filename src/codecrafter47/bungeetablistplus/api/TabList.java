@@ -33,6 +33,7 @@ public class TabList {
     private String header;
     private String footer;
     private String[] defaultSkin;
+    private int defaultPing;
 
     public String[] getDefaultSkin() {
         return defaultSkin;
@@ -99,5 +100,13 @@ public class TabList {
 
     public void setSlot(int row, int collum, Slot s) {
         setSlot(row * collums + collum, s);
+    }
+
+    public int getDefaultPing() {
+        return defaultPing;
+    }
+
+    public void setDefaultPing(int defaultPing) {
+        this.defaultPing = defaultPing;
     }
 }

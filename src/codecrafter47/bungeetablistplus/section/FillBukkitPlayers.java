@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import static codecrafter47.bungeetablistplus.BungeeTabListPlus.isVersion18;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -37,9 +38,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class FillBukkitPlayers extends Section {
 
     int startColumn;
+    TabListConfig config;
 
-    public FillBukkitPlayers(int startColumn) {
+    public FillBukkitPlayers(int startColumn, TabListConfig config) {
         this.startColumn = startColumn;
+        this.config = config;
     }
 
     @Override
@@ -75,7 +78,7 @@ public class FillBukkitPlayers extends Section {
             int p = pos;
             for (; p < pos + size; p++) {
                 if (players.size() > p - pos) {
-                    ttabList.setSlot(p, new Slot(players.get(p - pos)));
+                    ttabList.setSlot(p, new Slot(players.get(p - pos), config.defaultPing));
                 }
             }
             return p;

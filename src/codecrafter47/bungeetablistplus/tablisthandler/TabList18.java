@@ -20,7 +20,6 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.config.TabListProvider;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.api.Slot;
@@ -83,7 +82,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
             Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
                     getCollums() + (i / tabList.getRows()));
             if (line == null) {
-                line = new Slot(" ");
+                line = new Slot(" ", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replacePlayerVariables(line.text, super.getPlayer());

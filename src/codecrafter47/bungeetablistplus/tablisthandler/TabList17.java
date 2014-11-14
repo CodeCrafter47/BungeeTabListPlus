@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.config.TabListProvider;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.util.ColorParser;
@@ -90,7 +89,7 @@ public class TabList17 extends CustomTabList18 implements
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
             Slot line = tabList.getSlot(i);
             if (line == null) {
-                line = new Slot("");
+                line = new Slot("", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replacePlayerVariables(line.text, super.getPlayer());

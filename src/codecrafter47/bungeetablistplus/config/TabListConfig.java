@@ -66,6 +66,12 @@ public class TabListConfig extends Config {
     public String defaultSkin = "Herobrine";
 
     @Comments({
+        "ping value for nonplayer slots, ",
+        "used if no other value is specified using [PING=?]"
+    })
+    public int defaultPing = 0;
+
+    @Comments({
             "if true player skin is shown beneath name, otherwise default skin"
     })
     public boolean showCorrectPlayerSkins = true;

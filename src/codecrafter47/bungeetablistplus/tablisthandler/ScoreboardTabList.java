@@ -86,7 +86,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
             Slot line = tabList.getSlot(i);
             if (line == null) {
-                line = new Slot("");
+                line = new Slot("", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replacePlayerVariables(line.text, super.getPlayer());

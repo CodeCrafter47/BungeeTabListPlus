@@ -496,6 +496,8 @@ public class TabListProvider implements ITabListProvider {
             tabList.setDefaultSkin(BungeeTabListPlus.getInstance().
                     getSkinManager().getSkin(config.defaultSkin));
         }
+        
+        tabList.setDefaultPing(config.defaultPing);
 
         return tabList;
     }

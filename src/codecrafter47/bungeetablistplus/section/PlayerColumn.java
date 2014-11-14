@@ -149,7 +149,7 @@ public class PlayerColumn {
             for (String line : config.morePlayersLines) {
                 line = prefix + line + suffix;
                 line = line.replace("{other_count}", "" + other_count);
-                tabList.setSlot(p, collumn + c, new Slot(line));
+                tabList.setSlot(p, collumn + c, new Slot(line, config.defaultPing));
                 if (skin != null && !skin.isEmpty())
                     tabList.getSlot(p, collumn + c).setSkin(skin);
                 c++;

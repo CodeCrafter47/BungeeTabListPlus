@@ -22,10 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
-import codecrafter47.bungeetablistplus.config.TabListProvider;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.util.ColorParser;
-import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -63,7 +60,7 @@ public class MyTabList extends MyCustom implements IMyTabListHandler {
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
             Slot line = tabList.getSlot(i);
             if (line == null) {
-                line = new Slot("");
+                line = new Slot("", tabList.getDefaultPing());
             }
             line.text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replacePlayerVariables(line.text, super.getPlayer());

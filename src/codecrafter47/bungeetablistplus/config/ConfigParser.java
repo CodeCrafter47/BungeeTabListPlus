@@ -141,7 +141,7 @@ public class ConfigParser {
                             prefix, suffix, skin, sortrules, maxplayers));
                 }
             } else if (isFillBukkitPlayers(line)) {
-                sections.add(new FillBukkitPlayers(startColumn));
+                sections.add(new FillBukkitPlayers(startColumn, config));
             } // Parsing Normal text
             else {
                 StaticSection section;

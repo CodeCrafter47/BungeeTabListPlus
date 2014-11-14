@@ -116,7 +116,7 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
             Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
                     getCollums() + (i / tabList.getRows()));
             if (line == null) {
-                line = new Slot(" ");
+                line = new Slot(" ", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
                     replacePlayerVariables(line.text, super.getPlayer());
