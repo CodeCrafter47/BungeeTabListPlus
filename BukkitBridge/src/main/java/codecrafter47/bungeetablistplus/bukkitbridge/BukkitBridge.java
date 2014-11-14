@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 /**
  *
@@ -235,6 +236,30 @@ public class BukkitBridge extends JavaPlugin implements Listener,
                     new HashSet<PlayerInformationProvider>());
         }
         this.pluginsPlayerInformationProviders.get(pl).add(ip);
+    }
+
+    // run addPlayer even if the bungee forgets about it
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        getServer().getScheduler().runTaskLater(this, new Runnable() {
+
+            @Override
+            public void run() {
+                if(player.isOnline()){
+                    addPlayer(player);
+                }
+            }
+        }, 20);
+        getServer().getScheduler().runTaskLater(this, new Runnable() {
+
+            @Override
+            public void run() {
+                if(player.isOnline()){
+                    addPlayer(player);
+                }
+            }
+        }, 200);
     }
 
     protected void sendInformation(String subchannel,
