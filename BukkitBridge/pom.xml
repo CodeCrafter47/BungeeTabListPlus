@@ -6,7 +6,7 @@
 
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>BungeeTabListPlus_BukkitBridge</artifactId>
-    <version>6</version>
+    <version>7</version>
 
     <repositories>
         <repository>
