@@ -42,17 +42,17 @@ public class GeneralInformationUpdateTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        Player[] players = Bukkit.getOnlinePlayers();
 
         // a player is required to be online
         if (players == null) {
             return;
         }
-        if (players.size() == 0) {
+        if (players.length== 0) {
             return;
         }
 
-        Player p = players.iterator().next();
+        Player p = players[0];
 
         if (!initialized) {
             init(p);
