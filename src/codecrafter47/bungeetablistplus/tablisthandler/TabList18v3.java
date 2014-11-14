@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
@@ -239,16 +238,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
 
                     item.setUsername(newName);
                     item.setGamemode(0);
-                    if (textures != null) {
-                        item.setProperties(new String[][]{{"textures", textures[0],
-                                textures[1]
-                        }});
-                        sendTextures.put(offlineId, item.getProperties()[0][1]);
-                    } else {
-                        item.setProperties(new String[0][0]);
-                        sendTextures.remove(offlineId);
-
-                    }
+                    item.setProperties(super.uuids.get(offlineId).getProperties());
                     pli.setItems(new Item[]{item});
                     getPlayer().unsafe().sendPacket(pli);
                     textureUpdate = true;
@@ -298,16 +288,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
 
                     item.setUsername(newName);
                     item.setGamemode(0);
-                    if (textures != null) {
-                        item.setProperties(new String[][]{{"textures", textures[0],
-                                textures[1]
-                        }});
-                        sendTextures.put(offlineId, item.getProperties()[0][1]);
-                    } else {
-                        item.setProperties(new String[0][0]);
-                        sendTextures.remove(offlineId);
-
-                    }
+                    item.setProperties(super.uuids.get(offlineId).getProperties());
                     pli.setItems(new Item[]{item});
                     getPlayer().unsafe().sendPacket(pli);
                     textureUpdate = true;
