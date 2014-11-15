@@ -63,7 +63,7 @@ public class TabListConfig extends Config {
         "The skin shown for non-players",
         "leave empty for random skins"
     })
-    public String defaultSkin = "Herobrine";
+    public String defaultSkin = "MHF_Question";
 
     @Comments({
         "ping value for nonplayer slots, ",
@@ -123,7 +123,7 @@ public class TabListConfig extends Config {
     public List<String> tabList = new ArrayList<>();
 
     {
-        groupLines.add("[ALIGN LEFT]&9&l>&9 {server}({server_player_count}):");
+        groupLines.add("[ALIGN LEFT][SKIN=MHF_ArrowRight]&9&l>&9 {server}({server_player_count}):");
         groupLines.add("{fillplayers}");
     }
 
