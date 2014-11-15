@@ -241,7 +241,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         item.setProperties(new String[0][0]);
         pli.setItems(new Item[]{item});
         getPlayer().unsafe().sendPacket(pli);
-        send[row] = " ";
+        send[row] = null;
         slots_ping[row] = 0;
         sendTextures[row] = null;
     }
