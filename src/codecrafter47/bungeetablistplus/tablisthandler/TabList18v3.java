@@ -62,123 +62,125 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
 
     @Override
     public void recreate() {
-        if (getPlayer().getServer() != null) {
-            if (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(getPlayer().
-                    getServer().getInfo().getName()) || isExcluded) {
+        synchronized (super.usernames) {
+            if (getPlayer().getServer() != null) {
+                if (BungeeTabListPlus.getInstance().getConfigManager().
+                        getMainConfig().excludeServers.contains(getPlayer().
+                        getServer().getInfo().getName()) || isExcluded) {
+                    unload();
+                    return;
+                }
+            }
+
+            ITabListProvider tlp = BungeeTabListPlus.getInstance().
+                    getTabListManager().getTabListForPlayer(super.getPlayer());
+            if (tlp == null) {
+                exclude();
                 unload();
                 return;
             }
-        }
 
-        ITabListProvider tlp = BungeeTabListPlus.getInstance().
-                getTabListManager().getTabListForPlayer(super.getPlayer());
-        if (tlp == null) {
-            exclude();
-            unload();
-            return;
-        }
-        
-        int numFakePlayers = 80;
+            int numFakePlayers = 80;
 
-        TabList tabList = tlp.getTabList(super.getPlayer());
-        
-        if(tabList.getRows() * tabList.getCollums() < 80){
-            numFakePlayers = tabList.getCollums() * tabList.getRows() - super.uuids.size();
-            if(numFakePlayers < 0){
-                BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", getPlayer().getName());
-            }
-        }
+            TabList tabList = tlp.getTabList(super.getPlayer());
 
-        resize(numFakePlayers);
-
-        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
-                getMainConfig().charLimit;
-
-        // create uuidList
-        List<UUID> list = new ArrayList<>(super.uuids.keySet());
-        Collections.sort(list, new Comparator<UUID>() {
-
-            @Override
-            public int compare(UUID t, UUID t1) {
-                String name1 = uuids.get(t).getUsername();
-                String name2 = uuids.get(t1).getUsername();
-                return Collator.getInstance().compare(name1, name2);
-            }
-        });
-        
-        List<UUID> fakeUUIDs = new ArrayList<>();
-        for(int i = 0; i < numFakePlayers; i++){
-            fakeUUIDs.add(java.util.UUID.nameUUIDFromBytes(
-                ("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8)));
-        }
-
-        for (int i = 0; i < tabList.getCollums() * tabList.getRows(); i++) {
-            Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
-                    getCollums() + (i / tabList.getRows()));
-            if (line == null) {
-                line = new Slot(" ", tabList.getDefaultPing());
-            }
-            String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, super.getPlayer());
-            text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(text);
-            text = ChatColor.translateAlternateColorCodes('&', text);
-            if (charLimit > 0) {
-                text = ColorParser.substringIgnoreColors(text, charLimit);
+            if (tabList.getRows() * tabList.getCollums() < 80) {
+                numFakePlayers = tabList.getCollums() * tabList.getRows() - super.uuids.size();
+                if (numFakePlayers < 0) {
+                    BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", getPlayer().getName());
+                }
             }
 
-            if (line.getTextures() == null) {
-                line.setTextures(tabList.getDefaultSkin());
+            resize(numFakePlayers);
+
+            int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
+                    getMainConfig().charLimit;
+
+            // create uuidList
+            List<UUID> list = new ArrayList<>(super.uuids.keySet());
+            Collections.sort(list, new Comparator<UUID>() {
+
+                @Override
+                public int compare(UUID t, UUID t1) {
+                    String name1 = uuids.get(t).getUsername();
+                    String name2 = uuids.get(t1).getUsername();
+                    return Collator.getInstance().compare(name1, name2);
+                }
+            });
+
+            List<UUID> fakeUUIDs = new ArrayList<>();
+            for (int i = 0; i < numFakePlayers; i++) {
+                fakeUUIDs.add(java.util.UUID.nameUUIDFromBytes(
+                        ("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8)));
             }
-            
-            UUID uuid = null;
-            boolean reorder = true;
-            if(line.getUUID() != null && list.contains(line.getUUID()) && super.uuids.get(line.getUUID()).getUsername().length() <= 13){
-                uuid = line.getUUID();
-                list.remove(uuid);
+
+            for (int i = 0; i < tabList.getCollums() * tabList.getRows(); i++) {
+                Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
+                        getCollums() + (i / tabList.getRows()));
+                if (line == null) {
+                    line = new Slot(" ", tabList.getDefaultPing());
+                }
+                String text = BungeeTabListPlus.getInstance().getVariablesManager().
+                        replacePlayerVariables(line.text, super.getPlayer());
+                text = BungeeTabListPlus.getInstance().getVariablesManager().
+                        replaceVariables(text);
+                text = ChatColor.translateAlternateColorCodes('&', text);
+                if (charLimit > 0) {
+                    text = ColorParser.substringIgnoreColors(text, charLimit);
+                }
+
+                if (line.getTextures() == null) {
+                    line.setTextures(tabList.getDefaultSkin());
+                }
+
+                UUID uuid = null;
+                boolean reorder = true;
+                if (line.getUUID() != null && list.contains(line.getUUID()) && super.uuids.get(line.getUUID()).getUsername().length() <= 13) {
+                    uuid = line.getUUID();
+                    list.remove(uuid);
+                }
+                if (uuid == null && !fakeUUIDs.isEmpty()) {
+                    uuid = fakeUUIDs.get(0);
+                    fakeUUIDs.remove(uuid);
+                }
+                if (uuid == null) {
+                    uuid = list.get(0);
+                    list.remove(uuid);
+                    reorder = false;
+                }
+
+                updateSlot(uuid, i, text, line.ping, line.getTextures(), reorder);
             }
-            if(uuid == null && !fakeUUIDs.isEmpty()){
-                uuid = fakeUUIDs.get(0);
-                fakeUUIDs.remove(uuid);
-            }
-            if(uuid == null){
-                uuid = list.get(0);
-                list.remove(uuid);
-                reorder = false;
-            }
-            
-            updateSlot(uuid, i, text, line.ping, line.getTextures(), reorder);
-        }
-        
-        for(UUID offlineId: list){
-            String newName = super.uuids.get(offlineId).getUsername();
-                if(sendUsernames.containsKey(offlineId) && !sendUsernames.get(offlineId).equals(newName)){
+
+            for (UUID offlineId : list) {
+                String newName = super.uuids.get(offlineId).getUsername();
+                if (sendUsernames.containsKey(offlineId) && !sendUsernames.get(offlineId).equals(newName)) {
                     PlayerListItem pli = new PlayerListItem();
                     pli.setAction(PlayerListItem.Action.ADD_PLAYER);
                     pli.setItems(new Item[]{super.uuids.get(offlineId)});
                     getPlayer().unsafe().sendPacket(pli);
                     sendUsernames.put(offlineId, newName);
                 }
-        }
+            }
 
-        // update header/footer
-        if (tabList.getHeader() != null || tabList.getFooter() != null) {
-            if (BungeeTabListPlus.isAbove995()) {
-                player.setTabHeader(TextComponent.fromLegacyText(tabList.
-                        getHeader()), TextComponent.fromLegacyText(tabList.
-                        getFooter()));
-            } else {
-                TabHeaderPacket packet = new TabHeaderPacket();
-                if (tabList.getHeader() != null) {
-                    packet.setHeader(ComponentSerializer.toString(TextComponent.
-                            fromLegacyText(tabList.getHeader())));
+            // update header/footer
+            if (tabList.getHeader() != null || tabList.getFooter() != null) {
+                if (BungeeTabListPlus.isAbove995()) {
+                    player.setTabHeader(TextComponent.fromLegacyText(tabList.
+                            getHeader()), TextComponent.fromLegacyText(tabList.
+                            getFooter()));
+                } else {
+                    TabHeaderPacket packet = new TabHeaderPacket();
+                    if (tabList.getHeader() != null) {
+                        packet.setHeader(ComponentSerializer.toString(TextComponent.
+                                fromLegacyText(tabList.getHeader())));
+                    }
+                    if (tabList.getFooter() != null) {
+                        packet.setFooter(ComponentSerializer.toString(TextComponent.
+                                fromLegacyText(tabList.getFooter())));
+                    }
+                    player.unsafe().sendPacket(packet);
                 }
-                if (tabList.getFooter() != null) {
-                    packet.setFooter(ComponentSerializer.toString(TextComponent.
-                            fromLegacyText(tabList.getFooter())));
-                }
-                player.unsafe().sendPacket(packet);
             }
         }
     }

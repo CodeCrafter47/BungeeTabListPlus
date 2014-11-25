@@ -19,20 +19,15 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Action;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 import net.md_5.bungee.tab.TabList;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  *
@@ -42,7 +37,7 @@ public class CustomTabList18 extends TabList {
 
     boolean isExcluded = false;
 
-    private final Collection<String> usernames = new HashSet<>();
+    protected final Collection<String> usernames = new HashSet<>();
     protected final Map<UUID, Item> uuids = new HashMap<>();
     public final List<String> bukkitplayers = new ArrayList<>(100);
 
