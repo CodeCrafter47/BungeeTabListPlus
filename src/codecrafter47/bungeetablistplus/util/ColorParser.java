@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.util;
 import net.md_5.bungee.api.ChatColor;
 
 /**
- *
  * @author Florian Stober
  */
 public class ColorParser {
@@ -40,7 +39,9 @@ public class ColorParser {
             char ch = s.charAt(i);
             if (escaped) {
                 ChatColor code = ChatColor.getByChar(ch);
-                if (code.equals(ChatColor.BOLD)) {
+                if (code == null) {
+                    // ignore
+                } else if (code.equals(ChatColor.BOLD)) {
                     bold = true;
                 } else if (code.equals(ChatColor.ITALIC)) {
                     italic = true;
