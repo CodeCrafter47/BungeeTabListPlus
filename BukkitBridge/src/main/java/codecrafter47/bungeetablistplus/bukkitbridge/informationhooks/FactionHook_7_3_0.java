@@ -17,14 +17,14 @@
 package codecrafter47.bungeetablistplus.bukkitbridge.informationhooks;
 
 import codecrafter47.bungeetablistplus.bukkitbridge.api.PlayerInformationProvider;
-import com.massivecraft.factions.entity.BoardColls;
-import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.UPlayer;
 import com.massivecraft.massivecore.ps.PS;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.massivecraft.factions.entity.MPlayer;
+import com.massivecraft.factions.entity.Faction;
+import com.massivecraft.factions.entity.BoardColl;
 
 /**
  *
@@ -35,11 +35,11 @@ public class FactionHook_7_3_0 implements PlayerInformationProvider {
     @Override
     public Map<String, Object> getInformation(Player player) {
         Map<String, Object> map = new HashMap<>();
-        UPlayer uplayer = UPlayer.get(player);
+        MPlayer uplayer = MPlayer.get(player);
         map.put("factionName", uplayer.getFactionName());
         Faction faction = uplayer.getFaction();
         map.put("onlineFactionMembers", faction.getOnlinePlayers());
-        faction = BoardColls.get().
+        faction = BoardColl.get().
                 getFactionAt(PS.valueOf(player.getLocation()));
         map.put("factionsWhere", faction.getName());
         return map;
