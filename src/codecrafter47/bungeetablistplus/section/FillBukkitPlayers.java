@@ -55,7 +55,7 @@ public class FillBukkitPlayers extends Section {
         try {
             Object tabList = BungeeTabListPlus.getTabList(player);
             Class clasz = tabList.getClass();
-            Field bukkitplayers = clasz.getDeclaredField("bukkitplayers");
+            Field bukkitplayers = clasz.getField("bukkitplayers");
             bukkitplayers.setAccessible(true);
             List<String> bplayers = (List<String>) bukkitplayers.get(tabList);
             return bplayers.size();
