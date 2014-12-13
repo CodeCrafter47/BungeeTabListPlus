@@ -10,12 +10,16 @@
 
     <repositories>
         <repository>
-            <id>md5-repo</id>
-            <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
             <id>vault-repo</id>
             <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>md5-repo</id>
+            <url>http://repo.md-5.net/content/repositories/snapshots/</url>
         </repository>
         <repository>
             <id>kittehReleases</id>
@@ -49,7 +53,7 @@
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
