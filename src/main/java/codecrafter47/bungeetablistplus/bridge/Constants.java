@@ -19,7 +19,6 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 /**
- *
  * @author Florian Stober
  */
 public class Constants {

@@ -19,11 +19,11 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.api.TabList;
-import java.util.List;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.List;
+
 /**
- *
  * @author Florian Stober
  */
 public class AutoFillPlayers extends Section {
@@ -33,7 +33,7 @@ public class AutoFillPlayers extends Section {
     public List<String> sortRules;
 
     public AutoFillPlayers(int startColumn, String prefix, String suffix,
-            List<String> sortRules, int maxPlayers) {
+                           List<String> sortRules, int maxPlayers) {
         this.prefix = prefix;
         this.suffix = suffix;
         this.startColumn = startColumn;
@@ -53,7 +53,7 @@ public class AutoFillPlayers extends Section {
 
     @Override
     public int calculate(ProxiedPlayer player, TabList tabList, int pos,
-            int size) {
+                         int size) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

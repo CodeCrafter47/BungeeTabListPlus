@@ -19,10 +19,14 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.Collection;
 
 public class PermissionManager {
 
@@ -32,7 +36,7 @@ public class PermissionManager {
         this.plugin = plugin;
     }
 
-    public String getMainGroup(ProxiedPlayer player) {
+    public String getMainGroup(IPlayer player) {
         String bpgroup = null;
         // BungeePerms
         BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
@@ -52,10 +56,11 @@ public class PermissionManager {
 
         // BungeeCord
         String bgroup = null;
-        if (player.getGroups().size() == 1) {
-            bgroup = player.getGroups().iterator().next();
+        Collection<String> groups = plugin.getProxy().getConfigurationAdapter().getGroups(player.getName());
+        if (groups.size() == 1) {
+            bgroup = groups.iterator().next();
         }
-        for (String group : player.getGroups()) {
+        for (String group : groups) {
             if (!group.equals("default")) {
                 bgroup = group;
                 break;
@@ -83,7 +88,7 @@ public class PermissionManager {
         return bgroup;
     }
 
-    public int comparePlayers(ProxiedPlayer p1, ProxiedPlayer p2) {
+    public int comparePlayers(IPlayer p1, IPlayer p2) {
         // TODO Vault/Bukkit support
 
         BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
@@ -109,28 +114,30 @@ public class PermissionManager {
         }
 
         // BungeeCord
-        int i = 0;
-        for (String group : p1.getGroups()) {
-            if (!group.equals("default")) {
-                i = 1;
+        if(p1 instanceof BungeePlayer && p2 instanceof BungeePlayer) {
+            int i = 0;
+            for (String group : ((BungeePlayer) p1).getPlayer().getGroups()) {
+                if (!group.equals("default")) {
+                    i = 1;
+                }
             }
-        }
-        int j = 0;
-        for (String group : p2.getGroups()) {
-            if (!group.equals("default")) {
-                j = 1;
+            int j = 0;
+            for (String group : ((BungeePlayer) p2).getPlayer().getGroups()) {
+                if (!group.equals("default")) {
+                    j = 1;
+                }
             }
-        }
-        if (i > j) {
-            return 1;
-        }
-        if (j > i) {
-            return -1;
+            if (i > j) {
+                return 1;
+            }
+            if (j > i) {
+                return -1;
+            }
         }
         return 0;
     }
 
-    public String getPrefix(ProxiedPlayer player) {
+    public String getPrefix(IPlayer player) {
         // BungeePerms
         BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
                 getPlugin("BungeePerms");
@@ -172,7 +179,7 @@ public class PermissionManager {
         return "";
     }
 
-    public String getDisplayPrefix(ProxiedPlayer player) {
+    public String getDisplayPrefix(IPlayer player) {
         // BungeePerms
         BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
                 getPlugin("BungeePerms");
@@ -194,7 +201,7 @@ public class PermissionManager {
         return display;
     }
 
-    public String getSuffix(ProxiedPlayer player) {
+    public String getSuffix(IPlayer player) {
         // BungeePerms
         BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
                 getPlugin("BungeePerms");
@@ -237,7 +244,7 @@ public class PermissionManager {
 
         try {
             Boolean b = Boolean.valueOf(plugin.getBridge().getPlayerInformation(
-                    (ProxiedPlayer) sender, permission));
+                    plugin.getBungeePlayerProvider().wrapPlayer((ProxiedPlayer) sender), permission));
             if (b != null) {
                 return b;
             }

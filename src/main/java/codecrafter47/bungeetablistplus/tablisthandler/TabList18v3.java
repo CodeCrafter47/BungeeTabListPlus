@@ -43,7 +43,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
     }
 
     private static String getSlotPrefix(int n) {
-        return " §" + (char)(970 + n);
+        return " §" + (char) (970 + n);
     }
 
     private final Map<UUID, Integer> sendPing = new HashMap<>();
@@ -53,9 +53,9 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
     private final Map<UUID, String> send = new HashMap<>();
 
     private final Map<UUID, String> sendTextures = new HashMap<>();
-    
+
     final Map<UUID, String> sendUsernames = new HashMap<>();
-    
+
     public TabList18v3(ProxiedPlayer player) {
         super(player);
     }
@@ -121,9 +121,9 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                     line = new Slot(" ", tabList.getDefaultPing());
                 }
                 String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(line.text, super.getPlayer());
+                        replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
                 text = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replaceVariables(text);
+                        replaceVariables(getPlayer(), text);
                 text = ChatColor.translateAlternateColorCodes('&', text);
                 if (charLimit > 0) {
                     text = ColorParser.substringIgnoreColors(text, charLimit);
@@ -225,10 +225,10 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
     private void updateSlot(UUID offlineId, int row, String text, int ping, String[] textures, boolean reorder) {
         boolean textureUpdate = false;
         // order
-        if(reorder){
-            if(super.uuids.containsKey(offlineId)){
+        if (reorder) {
+            if (super.uuids.containsKey(offlineId)) {
                 String newName = getSlotPrefix(row) + super.uuids.get(offlineId).getUsername();
-                if(!sendUsernames.containsKey(offlineId) || !sendUsernames.get(offlineId).equals(newName)){
+                if (!sendUsernames.containsKey(offlineId) || !sendUsernames.get(offlineId).equals(newName)) {
                     PlayerListItem pli = new PlayerListItem();
                     pli.setAction(PlayerListItem.Action.ADD_PLAYER);
                     Item item = new Item();
@@ -248,7 +248,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                 }
             } else {
                 String newName = getSlotID(row);
-                if(!sendUsernames.containsKey(offlineId) || !sendUsernames.get(offlineId).equals(newName)){
+                if (!sendUsernames.containsKey(offlineId) || !sendUsernames.get(offlineId).equals(newName)) {
                     PlayerListItem pli = new PlayerListItem();
                     pli.setAction(PlayerListItem.Action.ADD_PLAYER);
                     Item item = new Item();
@@ -278,26 +278,26 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
             }
         } else {
             String newName = super.uuids.get(offlineId).getUsername();
-                if(sendUsernames.containsKey(offlineId) && !sendUsernames.get(offlineId).equals(newName)){
-                    PlayerListItem pli = new PlayerListItem();
-                    pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-                    Item item = new Item();
-                    item.setUuid(offlineId);
-                    item.setPing(ping);
-                    item.setDisplayName(ComponentSerializer.toString(
-                            TextComponent.
-                                    fromLegacyText(text)));
+            if (sendUsernames.containsKey(offlineId) && !sendUsernames.get(offlineId).equals(newName)) {
+                PlayerListItem pli = new PlayerListItem();
+                pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+                Item item = new Item();
+                item.setUuid(offlineId);
+                item.setPing(ping);
+                item.setDisplayName(ComponentSerializer.toString(
+                        TextComponent.
+                                fromLegacyText(text)));
 
-                    item.setUsername(newName);
-                    item.setGamemode(0);
-                    item.setProperties(super.uuids.get(offlineId).getProperties());
-                    pli.setItems(new Item[]{item});
-                    getPlayer().unsafe().sendPacket(pli);
-                    textureUpdate = true;
-                    sendUsernames.put(offlineId, newName);
-                }
+                item.setUsername(newName);
+                item.setGamemode(0);
+                item.setProperties(super.uuids.get(offlineId).getProperties());
+                pli.setItems(new Item[]{item});
+                getPlayer().unsafe().sendPacket(pli);
+                textureUpdate = true;
+                sendUsernames.put(offlineId, newName);
+            }
         }
-        if(!sendUsernames.containsKey(offlineId) && super.uuids.containsKey(offlineId)){
+        if (!sendUsernames.containsKey(offlineId) && super.uuids.containsKey(offlineId)) {
             sendUsernames.put(offlineId, super.uuids.get(offlineId).getUsername());
         }
         // textures
@@ -332,7 +332,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
         }
 
         // update ping
-        if(sendPing.get(offlineId) == null){
+        if (sendPing.get(offlineId) == null) {
             sendPing.put(offlineId, 0);
         }
         if (ping != sendPing.get(offlineId)) {

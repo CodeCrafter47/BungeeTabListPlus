@@ -22,10 +22,12 @@
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>ignore</checksumPolicy>
+                <updatePolicy>always</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
                 <checksumPolicy>ignore</checksumPolicy>
+                <updatePolicy>always</updatePolicy>
             </snapshots>
             <url>file://${project.basedir}/lib/repository/</url>
         </repository>

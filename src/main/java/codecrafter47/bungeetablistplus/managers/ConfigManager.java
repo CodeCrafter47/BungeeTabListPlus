@@ -22,13 +22,14 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.config.Messages;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ConfigManager {
 
@@ -114,14 +115,12 @@ public class ConfigManager {
     }
 
     private void validateConfig() {
-        if (config.permissionSource.equalsIgnoreCase("AUTO") || config.permissionSource.
-                equalsIgnoreCase("BUKKIT") || config.permissionSource.
-                equalsIgnoreCase("BUNGEE") || config.permissionSource.
+        if (!config.permissionSource.equalsIgnoreCase("AUTO") && !config.permissionSource.
+                equalsIgnoreCase("BUKKIT") && !config.permissionSource.
+                equalsIgnoreCase("BUNGEE") && !config.permissionSource.
                 equalsIgnoreCase("BUNGEEPERMS")) {
-
-        } else {
-            BungeeTabListPlus.getInstance().getLogger().warning(
-                    "CONFIG-ERROR: Unknown value for 'permissionSource'");
-        }
+                    BungeeTabListPlus.getInstance().getLogger().warning(
+                            "CONFIG-ERROR: Unknown value for 'permissionSource'");
+                }
     }
 }

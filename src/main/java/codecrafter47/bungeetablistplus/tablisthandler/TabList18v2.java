@@ -119,9 +119,9 @@ public class TabList18v2 extends CustomTabList18 implements IMyTabListHandler {
                 line = new Slot(" ", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, super.getPlayer());
+                    replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
             text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(text);
+                    replaceVariables(getPlayer(), text);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);

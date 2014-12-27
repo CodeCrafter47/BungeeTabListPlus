@@ -18,6 +18,7 @@
  */
 package codecrafter47.bungeetablistplus.managers;
 
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.api.Variable;
@@ -104,7 +105,7 @@ public final class VariablesManager {
         serverVariables.put(name, var);
     }
 
-    public String replaceVariables(String s) {
+    public String replaceVariables(ProxiedPlayer viewer, String s) {
         StringBuffer sb = new StringBuffer();
         Pattern pattern = Pattern.compile("\\{[^}]+\\}");
         Matcher matcher = pattern.matcher(s);
@@ -121,7 +122,7 @@ public final class VariablesManager {
 
             Variable variable = this.variables.get(var);
             if (variable != null) {
-                String str = variable.getReplacement(arg);
+                String str = variable.getReplacement(viewer, arg);
                 if (str != null) {
                     replacement = str;
                 }
@@ -133,9 +134,9 @@ public final class VariablesManager {
         return sb.toString();
     }
 
-    public String replacePlayerVariables(String s, ProxiedPlayer player) {
-        if (player.getServer() != null) {
-            s = replaceServerVariables(s, player.getServer().getInfo());
+    public String replacePlayerVariables(ProxiedPlayer viewer, String s, IPlayer player) {
+        if (player.getServer().isPresent()) {
+            s = replaceServerVariables(viewer, s, player.getServer().get());
         }
 
         StringBuffer sb = new StringBuffer();
@@ -154,7 +155,7 @@ public final class VariablesManager {
 
             PlayerVariable variable = this.playerVariables.get(var);
             if (variable != null) {
-                String str = variable.getReplacement(arg, player);
+                String str = variable.getReplacement(viewer, player, arg);
                 if (str != null) {
                     replacement = str;
                 }
@@ -166,7 +167,7 @@ public final class VariablesManager {
         return sb.toString();
     }
 
-    public String replaceServerVariables(String s, ServerInfo server) {
+    public String replaceServerVariables(ProxiedPlayer viewer, String s, ServerInfo server) {
         StringBuffer sb = new StringBuffer();
         Pattern pattern = Pattern.compile("\\{[^}]+\\}");
         Matcher matcher = pattern.matcher(s);
@@ -183,7 +184,7 @@ public final class VariablesManager {
 
             ServerVariable variable = this.serverVariables.get(var);
             if (variable != null) {
-                String str = variable.getReplacement(arg, server);
+                String str = variable.getReplacement(viewer, server, arg);
                 if (str != null) {
                     replacement = str;
                 }

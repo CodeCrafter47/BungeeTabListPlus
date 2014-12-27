@@ -16,9 +16,6 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.util.logging.Level;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;

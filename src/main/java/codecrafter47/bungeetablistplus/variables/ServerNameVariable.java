@@ -18,14 +18,15 @@
  */
 package codecrafter47.bungeetablistplus.variables;
 
-import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ServerVariable;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ServerNameVariable implements ServerVariable {
 
     @Override
-    public String getReplacement(String args, ServerInfo server) {
+    public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
         return BungeeTabListPlus.getInstance().getConfigManager().
                 getMainConfig().getServerAlias(server.getName());
     }

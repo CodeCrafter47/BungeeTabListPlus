@@ -32,42 +32,42 @@ import java.util.List;
 public class TabListConfig extends Config {
 
     @Comments({
-        "Defines to which players this tabList applies",
-        "No effect in the default tabList", "possible values:",
-        "'Player:<Name>' for spezific Player",
-        "'Players:<player1>,<player2>' for multiple Players",
-        "'Server:<Server>' for all Players on that Server",
-        "'Servers:<server1>,<server2>' for all Players which are on These Servers",
-        "'group:<group>' for all players within that permission group",
-        "'groups:<group1>,<group2>' same with multiple groups",
-        "'all' for all players"
+            "Defines to which players this tabList applies",
+            "No effect in the default tabList", "possible values:",
+            "'Player:<Name>' for spezific Player",
+            "'Players:<player1>,<player2>' for multiple Players",
+            "'Server:<Server>' for all Players on that Server",
+            "'Servers:<server1>,<server2>' for all Players which are on These Servers",
+            "'group:<group>' for all players within that permission group",
+            "'groups:<group1>,<group2>' same with multiple groups",
+            "'all' for all players"
     })
     public String showTo = "all";
 
     @Comments({
-        "This text will be shown above the tablist"
+            "This text will be shown above the tablist"
     })
     public String header = "&bWelcome &6{player}";
 
     @Comments({
-        "This text will be shown below the tablist"
+            "This text will be shown below the tablist"
     })
     public String footer = "&4play.minecraft.example.com";
 
     @Comments({
-        "whether to shown header/footer or not. You should set this to false if you are using a bukkit/spigot side plugin for that."
+            "whether to shown header/footer or not. You should set this to false if you are using a bukkit/spigot side plugin for that."
     })
     public boolean shownFooterHeader = true;
 
     @Comments({
-        "The skin shown for non-players",
-        "leave empty for random skins"
+            "The skin shown for non-players",
+            "leave empty for random skins"
     })
     public String defaultSkin = "MHF_Question";
 
     @Comments({
-        "ping value for nonplayer slots, ",
-        "used if no other value is specified using [PING=?]"
+            "ping value for nonplayer slots, ",
+            "used if no other value is specified using [PING=?]"
     })
     public int defaultPing = 0;
 
@@ -77,48 +77,48 @@ public class TabListConfig extends Config {
     public boolean showCorrectPlayerSkins = true;
 
     @Comments({
-        "how Players should be grouped",
-        "You can use 'SERVER' or 'NONE'"
+            "how Players should be grouped",
+            "You can use 'SERVER' or 'NONE'"
     })
     public String groupPlayers = "SERVER";
 
     @Comments({
-        "Whether to Show Groups with no Players",
-        "not effective if groupPlayers=NONE"
+            "Whether to Show Groups with no Players",
+            "not effective if groupPlayers=NONE"
     })
     public boolean showEmptyGroups = false;
 
     @Comments({
-        "This is how a group looks in the tabList",
-        "Use {fillplayers} at the point where you",
-        "wish the players to be listet",
-        "not effective if groupPlayers=NONE",
-        "You can also use {fillplayers:<group>}"
+            "This is how a group looks in the tabList",
+            "Use {fillplayers} at the point where you",
+            "wish the players to be listet",
+            "not effective if groupPlayers=NONE",
+            "You can also use {fillplayers:<group>}"
     })
     public List<String> groupLines = new ArrayList<>();
 
     @Comments({
-        "This allows you to change the way players are listet",
-        "You can also use multiple slots to displaye additional information"
+            "This allows you to change the way players are listet",
+            "You can also use multiple slots to displaye additional information"
     })
     public List<String> playerLines = new ArrayList<>();
 
     @Comments({
-        "These lines are shown if there's not enough space",
-        "for all players upon the tabList"
+            "These lines are shown if there's not enough space",
+            "for all players upon the tabList"
     })
     public List<String> morePlayersLines = new ArrayList<>();
 
     @Comments({
-        "And here finally is the tabList",
-        "Use {fillplayers} at the point where",
-        "you want the players to be shown.",
-        "You can also use {fillplayers:<group>} or {fillplayers:<server>}",
-        "Use [ALIGN BOTTOM] to state that the folowing",
-        "lines should be shown at the bottom of the tabList",
-        "You can also use [ALIGN LEFT]",
-        "You can use Variables to display dynamic content",
-        "more information at https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"
+            "And here finally is the tabList",
+            "Use {fillplayers} at the point where",
+            "you want the players to be shown.",
+            "You can also use {fillplayers:<group>} or {fillplayers:<server>}",
+            "Use [ALIGN BOTTOM] to state that the folowing",
+            "lines should be shown at the bottom of the tabList",
+            "You can also use [ALIGN LEFT]",
+            "You can use Variables to display dynamic content",
+            "more information at https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"
     })
     public List<String> tabList = new ArrayList<>();
 
@@ -159,16 +159,16 @@ public class TabListConfig extends Config {
         CONFIG_FILE = new File(
                 plugin.getDataFolder() + File.separator + "tabLists", filename);
         CONFIG_HEADER = new String[]{
-            "", "This the default TabList",
-            "It is shown to all users which haven't got another TabList", "",
-            "Create a copy of this File, name it like you wish",
-            "and change the showTo and some other options",
-            "to create another TabList only shown to some users.",
-            "By doing this you can for example create",
-            "a special TabList for VIPs / Admins or",
-            "create a tabList only shown o one server",
-            "You can find more information on the wiki https://github.com/CodeCrafter47/BungeeTabListPlus/wiki",
-            ""
+                "", "This the default TabList",
+                "It is shown to all users which haven't got another TabList", "",
+                "Create a copy of this File, name it like you wish",
+                "and change the showTo and some other options",
+                "to create another TabList only shown to some users.",
+                "By doing this you can for example create",
+                "a special TabList for VIPs / Admins or",
+                "create a tabList only shown o one server",
+                "You can find more information on the wiki https://github.com/CodeCrafter47/BungeeTabListPlus/wiki",
+                ""
         };
 
         this.init();
@@ -218,7 +218,7 @@ public class TabListConfig extends Config {
         }
 
         String group = BungeeTabListPlus.getInstance().getPermissionManager().
-                getMainGroup(player);
+                getMainGroup(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(player));
 
         if (group != null) {
             if (s[0].equalsIgnoreCase("group")) {

@@ -18,10 +18,12 @@
  */
 package codecrafter47.bungeetablistplus.sorting;
 
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Objects;
+
 /**
- *
  * @author Florian Stober
  */
 public class YouFirst implements ISortingRule {
@@ -33,11 +35,11 @@ public class YouFirst implements ISortingRule {
     }
 
     @Override
-    public int compare(ProxiedPlayer player1, ProxiedPlayer player2) {
-        if (player1 == player) {
+    public int compare(IPlayer player1, IPlayer player2) {
+        if (Objects.equals(player1.getName(), player.getName())) {
             return 1;
         }
-        if (player2 == player) {
+        if (Objects.equals(player1.getName(), player.getName())) {
             return -1;
         }
         return 0;

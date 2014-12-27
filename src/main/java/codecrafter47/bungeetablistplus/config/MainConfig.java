@@ -32,64 +32,64 @@ import java.util.List;
 public class MainConfig extends Config {
 
     @Comments({
-        "time in seconds after which the tabList will be resend to all players",
-        "set this to -1 to disable scheduled update of the tabList"
+            "time in seconds after which the tabList will be resend to all players",
+            "set this to -1 to disable scheduled update of the tabList"
     })
     public double tablistUpdateIntervall = 1;
 
     @Comments({
-        "whether tabList should be resend if a player joins or leaves the server"
+            "whether tabList should be resend if a player joins or leaves the server"
     })
     public boolean updateOnPlayerJoinLeave = true;
 
     @Comments({
-        "whether tablist should be resend if a player switches the server"
+            "whether tablist should be resend if a player switches the server"
     })
     public boolean updateOnServerChange = true;
 
     @Comments({
-        "whether to use scoreboard functions to bypass the 16 character limit",
-        "does NOT conflict if other scoreboard plugins"
+            "whether to use scoreboard functions to bypass the 16 character limit",
+            "does NOT conflict if other scoreboard plugins"
     })
     public boolean useScoreboardToBypass16CharLimit = true;
 
     @Comments({
-        "You can limit the number of characters per slot here",
-        "Color codes do not count as a character; -1 means unlimited"
+            "You can limit the number of characters per slot here",
+            "Color codes do not count as a character; -1 means unlimited"
     })
     public int charLimit = -1;
 
     @Comments({
-        "Decide from where BungeeTabListPlus takes informations like permissions,",
-        "prefix, suffix and group.",
-        "Possible values:",
-        "AUTO        - take best source",
-        "BUKKIT      - take informations from bukkit/vault",
-        "BUNGEEPERMS - take informations from bungeeperms",
-        "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
+            "Decide from where BungeeTabListPlus takes informations like permissions,",
+            "prefix, suffix and group.",
+            "Possible values:",
+            "AUTO        - take best source",
+            "BUKKIT      - take informations from bukkit/vault",
+            "BUNGEEPERMS - take informations from bungeeperms",
+            "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
     })
     public String permissionSource = "AUTO";
 
     @Comments({
-        "whether ping is sent to clients",
-        "setting this to false can help you reducing network traffic"
+            "whether ping is sent to clients",
+            "setting this to false can help you reducing network traffic"
     })
     public boolean sendPing = true;
 
     @Comments({
-        "if enabled the plugin checks for new versions automatically.",
-        "Use /BTLP to see whether a new version is available",
-        "this does NOT automatically install an update"
+            "if enabled the plugin checks for new versions automatically.",
+            "Use /BTLP to see whether a new version is available",
+            "this does NOT automatically install an update"
     })
     public boolean checkForUpdates = true;
 
     @Comments({
-        "this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available"
+            "this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available"
     })
     public boolean notifyAdminsIfUpdateAvailable = true;
 
     @Comments({
-        "server Alias fo the {server} Variable"
+            "server Alias fo the {server} Variable"
     })
     public HashMap<String, String> serverAlias = new HashMap<>();
 
@@ -111,8 +111,8 @@ public class MainConfig extends Config {
     }
 
     @Comments({
-        "the prefixes used for the {prefix} variable, based upon permission groups",
-        "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
+            "the prefixes used for the {prefix} variable, based upon permission groups",
+            "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
     })
     public HashMap<String, String> prefixes = new HashMap<>();
 
@@ -122,9 +122,9 @@ public class MainConfig extends Config {
     }
 
     @Comments({
-        "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
-        "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
-        "setting this to -1 disables this feature"
+            "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
+            "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
+            "setting this to -1 disables this feature"
     })
     public int pingDelay = -1;
 
@@ -142,7 +142,7 @@ public class MainConfig extends Config {
     public List<String> fakePlayers = new ArrayList<>();
 
     @Comments({
-        "servers which you wish to show their own tabList (The one provided by bukkit)"
+            "servers which you wish to show their own tabList (The one provided by bukkit)"
     })
     public List<String> excludeServers = new ArrayList<>();
 
@@ -152,10 +152,10 @@ public class MainConfig extends Config {
     }
 
     @Comments({
-        "Detects which servers are using a bukkit-side tabList-plugin",
-        "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
-        "This is disabled by default because it could be accidentially triggered by other plugins (Essentials nicknames etc.)",
-        "Warning: This is an experimental feature, it may cause unintended behaviour"
+            "Detects which servers are using a bukkit-side tabList-plugin",
+            "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
+            "This is disabled by default because it could be accidentially triggered by other plugins (Essentials nicknames etc.)",
+            "Warning: This is an experimental feature, it may cause unintended behaviour"
     })
     public boolean autoExcludeServers = false;
 
@@ -163,8 +163,8 @@ public class MainConfig extends Config {
         CONFIG_FILE = new File("plugins" + File.separator + plugin.
                 getDescription().getName(), "config.yml");
         CONFIG_HEADER = new String[]{
-            "This is the Config File of BungeeTabListPlus",
-            "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"};
+                "This is the Config File of BungeeTabListPlus",
+                "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"};
 
         this.init();
     }

@@ -19,17 +19,7 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -41,8 +31,15 @@ import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.io.*;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- *
  * @author Florian Stober
  */
 public class BukkitBridge implements Listener {
@@ -117,7 +114,7 @@ public class BukkitBridge implements Listener {
                             for (Entry<String, String> entry : data.entrySet()) {
                                 serverInformation.get(server.getInfo().
                                         getName()).put(entry.getKey(), entry.
-                                                getValue());
+                                        getValue());
                             }
                         }
                     } else if (subchannel.
@@ -138,7 +135,7 @@ public class BukkitBridge implements Listener {
                     } else {
                         plugin.getLogger().log(Level.SEVERE,
                                 "BukkitBridge on server " + server.getInfo().
-                                getName() + " send an unknown packet! Is everything up-to-date?");
+                                        getName() + " send an unknown packet! Is everything up-to-date?");
                     }
 
                 } catch (IOException ex) {
@@ -168,7 +165,7 @@ public class BukkitBridge implements Listener {
     }
 
     private void requestInformationIn200Millis(final ProxiedPlayer player,
-            final int tries) {
+                                               final int tries) {
         if (tries > 50) {
             return;
         }
@@ -212,7 +209,7 @@ public class BukkitBridge implements Listener {
         return map.get(key);
     }
 
-    public String getPlayerInformation(ProxiedPlayer player, String key) {
+    public String getPlayerInformation(IPlayer player, String key) {
         Map<String, String> map = playerInformation.get(player.getName());
         if (map == null) {
             return null;

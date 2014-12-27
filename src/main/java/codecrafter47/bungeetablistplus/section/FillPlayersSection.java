@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
@@ -31,7 +32,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.*;
 
 /**
- *
  * @author Florian Stober
  */
 public class FillPlayersSection extends Section {
@@ -42,13 +42,13 @@ public class FillPlayersSection extends Section {
     String prefix;
     String suffix;
     String skin;
-    List<ProxiedPlayer> players;
+    List<IPlayer> players;
     List<String> sort;
     int maxPlayers;
 
     public FillPlayersSection(int vAlign, Collection<String> filter,
-            TabListConfig config, String prefix, String suffix, String skin,
-            List<String> sortrules, int maxPlayers) {
+                              TabListConfig config, String prefix, String suffix, String skin,
+                              List<String> sortrules, int maxPlayers) {
         this.vAlign = vAlign;
         this.filter = filter;
         this.config = config;
@@ -75,15 +75,15 @@ public class FillPlayersSection extends Section {
             } else if (rule.equalsIgnoreCase("alpha") || rule.equalsIgnoreCase(
                     "alphabet") || rule.equalsIgnoreCase("alphabetic") || rule.
                     equalsIgnoreCase("alphabetical") || rule.equalsIgnoreCase(
-                            "alphabetically")) {
+                    "alphabetically")) {
                 srules.add(new Alphabet());
             }
         }
 
-        Collections.sort(players, new Comparator<ProxiedPlayer>() {
+        Collections.sort(players, new Comparator<IPlayer>() {
 
             @Override
-            public int compare(ProxiedPlayer p1, ProxiedPlayer p2) {
+            public int compare(IPlayer p1, IPlayer p2) {
                 for (ISortingRule rule : srules) {
                     int i = rule.compare(p1, p2);
                     if (i != 0) {
@@ -114,7 +114,7 @@ public class FillPlayersSection extends Section {
 
     @Override
     public int calculate(ProxiedPlayer player, TabList tabList, int pos,
-            int size) {
+                         int size) {
         //System.out.println(size + " / " + getMaxSize(player));
         int playersToShow = players.size();
         if (playersToShow > this.maxPlayers) {
@@ -130,7 +130,7 @@ public class FillPlayersSection extends Section {
         int other_count = players.size() - playersToShow;
 
         for (int i = 0; i < playersToShow; i++) {
-            pos = drawPlayerLines(players.get(i), tabList, pos);
+            pos = drawPlayerLines(player, players.get(i), tabList, pos);
         }
 
         if (other_count > 0) {
@@ -139,22 +139,22 @@ public class FillPlayersSection extends Section {
         return pos;
     }
 
-    private int drawPlayerLines(ProxiedPlayer player, TabList tabList, int pos) {
+    private int drawPlayerLines(ProxiedPlayer viewer, IPlayer player, TabList tabList, int pos) {
         int i = pos;
         for (; i < pos + config.playerLines.size(); i++) {
             String line = prefix + config.playerLines.get(i - pos) + suffix;
             line = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line, player);
+                    replacePlayerVariables(viewer, line, player);
             tabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
                     getConfigManager().getMainConfig().sendPing ? player.
-                            getPing() : 0));
-            if(skin != null && !skin.isEmpty())
+                    getPing() : 0));
+            if (skin != null && !skin.isEmpty())
                 tabList.getSlot(i).setSkin(skin);
-            else if(config.showCorrectPlayerSkins)
+            else if (config.showCorrectPlayerSkins)
                 tabList.getSlot(i).setTextures(BungeeTabListPlus.getPlayerTexture(
                         player));
-            if(BungeeTabListPlus.isVersion18())
-                tabList.getSlot(i).uuid = player.getUniqueId();
+            if (BungeeTabListPlus.isVersion18())
+                tabList.getSlot(i).uuid = player.getUniqueID();
         }
         return i;
     }
@@ -165,7 +165,7 @@ public class FillPlayersSection extends Section {
             String line = prefix + config.morePlayersLines.get(i - pos) + suffix;
             line = line.replace("{other_count}", "" + other_count);
             tabList.setSlot(i, new Slot(line, 0));
-            if(skin != null && !skin.isEmpty())
+            if (skin != null && !skin.isEmpty())
                 tabList.getSlot(i).setSkin(skin);
         }
         return i;

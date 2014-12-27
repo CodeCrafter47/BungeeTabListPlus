@@ -47,7 +47,7 @@ public class OldSuperCommand extends Command {
             if (sender.hasPermission("bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(player)) {
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
                         BungeeTabListPlus.unhidePlayer(player);
                         sendPlayerUnhide(player);
                     } else {
@@ -65,7 +65,7 @@ public class OldSuperCommand extends Command {
             if (sender.hasPermission("bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(player)) {
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
                         sendAlreadyHidden(player);
                     } else {
                         BungeeTabListPlus.hidePlayer(player);
@@ -82,7 +82,7 @@ public class OldSuperCommand extends Command {
             if (sender.hasPermission("bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(player)) {
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
                         BungeeTabListPlus.unhidePlayer(player);
                         sendPlayerUnhide(player);
                     } else {
@@ -99,7 +99,7 @@ public class OldSuperCommand extends Command {
                     hasPermission("bungeetablistplus.admin")) {
                 sender.sendMessage(
                         ChatColor.DARK_PURPLE + "BungeeTabListPlus " + BungeeTabListPlus.
-                        getInstance().getDescription().getVersion());
+                                getInstance().getDescription().getVersion());
                 sender.sendMessage(
                         ChatColor.DARK_PURPLE + "/BungeeTabListPlus reload");
                 sender.sendMessage(

@@ -24,7 +24,6 @@ import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 /**
- *
  * @author florian
  */
 public class TabHeaderPacket extends DefinedPacket {
@@ -67,7 +66,7 @@ public class TabHeaderPacket extends DefinedPacket {
     public boolean equals(Object o) {
         return o instanceof TabHeaderPacket && ((TabHeaderPacket) o).footer.
                 equals(this.footer) && ((TabHeaderPacket) o).header.equals(
-                        this.header);
+                this.header);
     }
 
     @Override
@@ -82,13 +81,13 @@ public class TabHeaderPacket extends DefinedPacket {
 
     @Override
     public void read(ByteBuf buf, ProtocolConstants.Direction direction,
-            int protocolVersion) {
+                     int protocolVersion) {
         // I don't think we receive that packet
     }
 
     @Override
     public void write(ByteBuf buf, ProtocolConstants.Direction direction,
-            int protocolVersion) {
+                      int protocolVersion) {
         writeString(header, buf);
         writeString(footer, buf);
     }

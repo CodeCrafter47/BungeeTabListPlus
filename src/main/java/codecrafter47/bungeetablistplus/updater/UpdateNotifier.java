@@ -23,7 +23,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author florian
  */
 public class UpdateNotifier implements Runnable {
@@ -47,11 +46,11 @@ public class UpdateNotifier implements Runnable {
                     "bungeetablistplus.admin")) {
                 player.sendMessage(getPrefix().append(
                         "A new version is available. Download ").color(
-                                ChatColor.GOLD).append("here").color(
-                                ChatColor.LIGHT_PURPLE).
+                        ChatColor.GOLD).append("here").color(
+                        ChatColor.LIGHT_PURPLE).
                         underlined(true).event(
-                                new ClickEvent(ClickEvent.Action.OPEN_URL,
-                                        "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
+                        new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
                         create());
             }
         }
@@ -60,8 +59,8 @@ public class UpdateNotifier implements Runnable {
     private ComponentBuilder getPrefix() {
         return new ComponentBuilder("[").color(ChatColor.BLUE).append(
                 "BungeeTabListPlus").color(ChatColor.YELLOW).event(
-                        new ClickEvent(ClickEvent.Action.OPEN_URL,
-                                "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
+                new ClickEvent(ClickEvent.Action.OPEN_URL,
+                        "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
                 append("] ").color(ChatColor.BLUE).event((ClickEvent) null);
     }
 

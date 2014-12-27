@@ -19,9 +19,11 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -76,11 +78,11 @@ public class SkinManager {
             connection.setDoOutput(true);
             try (DataOutputStream out = new DataOutputStream(connection.
                     getOutputStream())) {
-                out.write(("[\"" + player + "\"]").getBytes());
+                out.write(("[\"" + player + "\"]").getBytes(Charsets.UTF_8));
                 out.flush();
             }
             BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
+                    connection.getInputStream(), Charsets.UTF_8));
             Profile[] profiles = gson.fromJson(reader, Profile[].class);
             if (profiles != null && profiles.length >= 1) {
                 return profiles[0].id;
@@ -99,22 +101,22 @@ public class SkinManager {
                     "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").
                     openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
+                    connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
             return new String[]{skin.properties.get(0).value, skin.properties.
-                get(0).signature};
+                    get(0).signature};
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
-            if(e.getMessage().contains("429")){
+            if (e.getMessage().contains("429")) {
                 // mojang rate limit
                 // try again in 1 min
-                plugin.getProxy().getScheduler().schedule(plugin, new Runnable(){
+                plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
 
                     @Override
                     public void run() {
                         badNames.remove(uuid);
                         skinsToFetch.add(uuid);
                     }
-                    
+
                 }, 1, TimeUnit.MINUTES);
                 return null;
             }

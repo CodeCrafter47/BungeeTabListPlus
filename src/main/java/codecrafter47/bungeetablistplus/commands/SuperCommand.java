@@ -52,7 +52,7 @@ public class SuperCommand extends Command {
                     "bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(player)) {
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
                         BungeeTabListPlus.unhidePlayer(player);
                         sendPlayerUnhide(player);
                     } else {
@@ -71,7 +71,7 @@ public class SuperCommand extends Command {
                     "bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(player)) {
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
                         sendAlreadyHidden(player);
                     } else {
                         BungeeTabListPlus.hidePlayer(player);
@@ -89,7 +89,7 @@ public class SuperCommand extends Command {
                     "bungeetablistplus.hide")) {
                 if (sender instanceof ProxiedPlayer) {
                     ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(player)) {
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
                         BungeeTabListPlus.unhidePlayer(player);
                         sendPlayerUnhide(player);
                     } else {
@@ -121,10 +121,10 @@ public class SuperCommand extends Command {
         if (plugin.isUpdateAvailable()) {
             target.sendMessage(getPrefix().append(
                     "A new version is available. Download ").color(
-                            ChatColor.GOLD).append("here").color(
-                            ChatColor.LIGHT_PURPLE).
+                    ChatColor.GOLD).append("here").color(
+                    ChatColor.LIGHT_PURPLE).
                     underlined(true).event(new ClickEvent(Action.OPEN_URL,
-                                    "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
+                    "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
                     create());
         }
         for (String s : plugin.getProxy().getServers().keySet()) {
@@ -136,19 +136,19 @@ public class SuperCommand extends Command {
         }
         target.sendMessage(
                 getPrefix().append("Commands:").color(ChatColor.AQUA).bold(true).
-                create());
+                        create());
         target.sendMessage(getPrefix().append("    ").append(
                 "/BungeeTabListPlus help").color(ChatColor.AQUA).event(
-                        new ClickEvent(Action.SUGGEST_COMMAND,
-                                "/BungeeTabListPlus help")).create());
+                new ClickEvent(Action.SUGGEST_COMMAND,
+                        "/BungeeTabListPlus help")).create());
         target.sendMessage(getPrefix().append("    ").append(
                 "/BungeeTabListPlus hide [on|off]").color(ChatColor.AQUA).event(
-                        new ClickEvent(Action.SUGGEST_COMMAND,
-                                "/BungeeTabListPlus hide ")).create());
+                new ClickEvent(Action.SUGGEST_COMMAND,
+                        "/BungeeTabListPlus hide ")).create());
         target.sendMessage(getPrefix().append("    ").append(
                 "/BungeeTabListPlus reload").color(ChatColor.AQUA).event(
-                        new ClickEvent(Action.SUGGEST_COMMAND,
-                                "/BungeeTabListPlus reload")).create());
+                new ClickEvent(Action.SUGGEST_COMMAND,
+                        "/BungeeTabListPlus reload")).create());
         target.sendMessage(getPrefix().append(
                 "==================================").
                 color(ChatColor.DARK_BLUE).create());
@@ -180,7 +180,7 @@ public class SuperCommand extends Command {
         } else {
             target.sendMessage(getPrefix().append(
                     "This command can only be executed by a player").color(
-                            ChatColor.RED).create());
+                    ChatColor.RED).create());
         }
     }
 
@@ -261,8 +261,8 @@ public class SuperCommand extends Command {
     private ComponentBuilder getPrefix() {
         return new ComponentBuilder("[").color(ChatColor.BLUE).append(
                 "BungeeTabListPlus").color(ChatColor.YELLOW).event(
-                        new ClickEvent(Action.OPEN_URL,
-                                "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
+                new ClickEvent(Action.OPEN_URL,
+                        "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
                 append("] ").color(ChatColor.BLUE).event((ClickEvent) null);
     }
 }

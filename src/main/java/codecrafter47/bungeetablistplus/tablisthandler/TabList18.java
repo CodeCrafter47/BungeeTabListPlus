@@ -20,19 +20,20 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
+
+import java.util.UUID;
 
 public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
 
@@ -58,7 +59,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         if (getPlayer().getServer() != null) {
             if (BungeeTabListPlus.getInstance().getConfigManager().
                     getMainConfig().excludeServers.contains(getPlayer().
-                            getServer().getInfo().getName()) || isExcluded) {
+                    getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
             }
@@ -85,9 +86,9 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
                 line = new Slot(" ", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, super.getPlayer());
+                    replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
             text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(text);
+                    replaceVariables(getPlayer(), text);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
@@ -104,7 +105,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
             if (BungeeTabListPlus.isAbove995()) {
                 player.setTabHeader(TextComponent.fromLegacyText(tabList.
                         getHeader()), TextComponent.fromLegacyText(tabList.
-                                getFooter()));
+                        getFooter()));
             } else {
                 TabHeaderPacket packet = new TabHeaderPacket();
                 if (tabList.getHeader() != null) {
@@ -169,13 +170,13 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
             item.setPing(ping);
             item.setDisplayName(ComponentSerializer.toString(
                     TextComponent.
-                    fromLegacyText(text)));
+                            fromLegacyText(text)));
 
             item.setUsername(getSlotID(row));
             item.setGamemode(0);
             if (textures != null) {
                 item.setProperties(new String[][]{{"textures", textures[0],
-                    textures[1]
+                        textures[1]
                 }});
                 sendTextures[row] = item.getProperties()[0][1];
             } else {

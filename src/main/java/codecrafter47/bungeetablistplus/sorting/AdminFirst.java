@@ -19,16 +19,15 @@
 package codecrafter47.bungeetablistplus.sorting;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class AdminFirst implements ISortingRule {
 
     @Override
-    public int compare(ProxiedPlayer player1, ProxiedPlayer player2) {
+    public int compare(IPlayer player1, IPlayer player2) {
         return BungeeTabListPlus.getInstance().getPermissionManager().
                 comparePlayers(player1, player2);
     }

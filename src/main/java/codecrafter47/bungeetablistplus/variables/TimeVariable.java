@@ -19,6 +19,8 @@
 package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.api.Variable;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -31,7 +33,7 @@ public class TimeVariable implements Variable {
     }
 
     @Override
-    public String getReplacement(String args) {
+    public String getReplacement(ProxiedPlayer viewer, String args) {
         if (args == null) {
             return format.format(Calendar.getInstance().getTime());
         } else {

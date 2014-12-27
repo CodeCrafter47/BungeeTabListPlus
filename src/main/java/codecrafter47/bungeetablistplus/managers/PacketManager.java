@@ -18,18 +18,10 @@
  */
 package codecrafter47.bungeetablistplus.managers;
 
-import codecrafter47.bungeetablistplus.packets.IPlayerListPacket;
-import codecrafter47.bungeetablistplus.packets.ITeamPacket;
-import codecrafter47.bungeetablistplus.packets.NewPlayerListPacket;
-import codecrafter47.bungeetablistplus.packets.NewTeamPacket;
-import codecrafter47.bungeetablistplus.packets.OldPlayerListPacket;
-import codecrafter47.bungeetablistplus.packets.OldTeamPacket;
-import codecrafter47.bungeetablistplus.packets.PlayerListPacket16;
-import codecrafter47.bungeetablistplus.packets.TeamPacket16;
+import codecrafter47.bungeetablistplus.packets.*;
 import net.md_5.bungee.api.connection.Connection;
 
 /**
- *
  * @author Florian Stober
  */
 public class PacketManager {
@@ -96,7 +88,7 @@ public class PacketManager {
     }
 
     public void updateTeam(Connection.Unsafe connection, String player,
-            String prefix, String displayname, String suffix) {
+                           String prefix, String displayname, String suffix) {
         teamPacket.updateTeam(connection, player, prefix, displayname, suffix);
     }
 
@@ -105,7 +97,7 @@ public class PacketManager {
     }
 
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
-            int ping) {
+                                     int ping) {
         playerListPacket.createOrUpdatePlayer(connection, player, ping);
     }
 

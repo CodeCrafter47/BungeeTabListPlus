@@ -19,20 +19,15 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import static codecrafter47.bungeetablistplus.BungeeTabListPlus.isVersion18;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 /**
- *
  * @author Florian Stober
  */
 public class FillBukkitPlayers extends Section {
@@ -68,7 +63,7 @@ public class FillBukkitPlayers extends Section {
 
     @Override
     public int calculate(ProxiedPlayer player, TabList ttabList, int pos,
-            int size) {
+                         int size) {
         try {
             Object tabList = BungeeTabListPlus.getTabList(player);
             Class clasz = tabList.getClass();

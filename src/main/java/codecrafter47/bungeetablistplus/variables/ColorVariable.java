@@ -21,19 +21,19 @@ package codecrafter47.bungeetablistplus.variables;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.Variable;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class ColorVariable implements Variable {
 
     private final ChatColor colors[] = new ChatColor[]{ChatColor.BLUE,
-        ChatColor.AQUA, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.GOLD,
-        ChatColor.RED, ChatColor.LIGHT_PURPLE, ChatColor.DARK_PURPLE};
+            ChatColor.AQUA, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.GOLD,
+            ChatColor.RED, ChatColor.LIGHT_PURPLE, ChatColor.DARK_PURPLE};
 
     @Override
-    public String getReplacement(String args) {
+    public String getReplacement(ProxiedPlayer viewer, String args) {
         long time = System.currentTimeMillis() / 1000;
         ChatColor all[];
         if (args != null) {

@@ -18,10 +18,9 @@
  */
 package codecrafter47.bungeetablistplus.sorting;
 
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public interface ISortingRule {
@@ -30,6 +29,8 @@ public interface ISortingRule {
      * return 1: player1 before player2 return 0: invoke next sorting rule
      * return -1: player2 before player1
      *
+     * @param player1
+     * @param player2
      */
-    public int compare(ProxiedPlayer player1, ProxiedPlayer player2);
+    public int compare(IPlayer player1, IPlayer player2);
 }

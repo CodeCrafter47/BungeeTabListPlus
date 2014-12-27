@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
@@ -40,7 +41,7 @@ public class PlayerColumn {
     String prefix;
     String suffix;
     String skin;
-    List<ProxiedPlayer> players;
+    List<IPlayer> players;
     List<String> sort;
     int maxPlayers;
 
@@ -75,10 +76,10 @@ public class PlayerColumn {
             }
         }
 
-        Collections.sort(players, new Comparator<ProxiedPlayer>() {
+        Collections.sort(players, new Comparator<IPlayer>() {
 
             @Override
-            public int compare(ProxiedPlayer p1, ProxiedPlayer p2) {
+            public int compare(IPlayer p1, IPlayer p2) {
                 for (ISortingRule rule : srules) {
                     int i = rule.compare(p1, p2);
                     if (i != 0) {
@@ -126,17 +127,17 @@ public class PlayerColumn {
             for (String line : config.playerLines) {
                 line = prefix + line + suffix;
                 line = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(line, players.get(i));
+                        replacePlayerVariables(player, line, players.get(i));
                 tabList.setSlot(p, collumn + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
                                 getMainConfig().sendPing ? players.get(i).getPing() : 0));
                 if (skin != null && !skin.isEmpty())
                     tabList.getSlot(p, collumn + c).setSkin(skin);
-                else if(config.showCorrectPlayerSkins)
+                else if (config.showCorrectPlayerSkins)
                     tabList.getSlot(p, collumn + c).setTextures(BungeeTabListPlus.
                             getPlayerTexture(players.get(i)));
-                if(BungeeTabListPlus.isVersion18())
-                    tabList.getSlot(p, collumn + c).uuid = players.get(i).getUniqueId();
+                if (BungeeTabListPlus.isVersion18())
+                    tabList.getSlot(p, collumn + c).uuid = players.get(i).getUniqueID();
                 c++;
                 if (c >= span) {
                     c = 0;

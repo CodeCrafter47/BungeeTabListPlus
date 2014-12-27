@@ -18,19 +18,19 @@
  */
 package codecrafter47.bungeetablistplus.variables;
 
-import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class BalanceVariable implements PlayerVariable {
 
     @Override
-    public String getReplacement(String args, ProxiedPlayer player) {
+    public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
         if (args == null) {
             String balance = BungeeTabListPlus.getInstance().getBridge().
                     getPlayerInformation(player, "balance");
@@ -42,7 +42,7 @@ public class BalanceVariable implements PlayerVariable {
             ProxiedPlayer player2 = ProxyServer.getInstance().getPlayer(args);
             if (player2 != null) {
                 String balance = BungeeTabListPlus.getInstance().getBridge().
-                        getPlayerInformation(player2, "balance");
+                        getPlayerInformation(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(player2), "balance");
                 if (balance == null) {
                     return "-";
                 }

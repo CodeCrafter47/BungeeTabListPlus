@@ -21,9 +21,9 @@ import codecrafter47.bungeetablistplus.PingTask;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author florian
  */
 public class ServerState implements ServerVariable {
@@ -31,7 +31,7 @@ public class ServerState implements ServerVariable {
     String errorText = "&cPlease set pingDelay in config.yml > 0";
 
     @Override
-    public String getReplacement(String args, ServerInfo server) {
+    public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
         if (args != null) {
             server = ProxyServer.getInstance().getServerInfo(args);
         }

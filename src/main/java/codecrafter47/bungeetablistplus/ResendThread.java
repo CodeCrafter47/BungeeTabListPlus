@@ -19,10 +19,10 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.tablisthandler.IMyTabListHandler;
-import java.util.logging.Level;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.logging.Level;
 
 /**
  * Implementation of the ResendThread. Updates the tablist for all players after
@@ -36,7 +36,6 @@ public class ResendThread implements Runnable {
     private double updateIntervall;
 
     /**
-     *
      * @param queue
      * @param updateIntervall
      */

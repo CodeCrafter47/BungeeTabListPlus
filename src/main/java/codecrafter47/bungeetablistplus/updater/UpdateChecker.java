@@ -18,22 +18,17 @@
  */
 package codecrafter47.bungeetablistplus.updater;
 
+import com.google.common.base.Charsets;
+import net.md_5.bungee.api.plugin.Plugin;
+
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import javax.net.ssl.HttpsURLConnection;
-import net.md_5.bungee.api.plugin.Plugin;
 
 /**
- *
  * @author Florian Stober
  */
 public class UpdateChecker implements Runnable {
@@ -71,14 +66,16 @@ public class UpdateChecker implements Runnable {
             InputStreamReader ir;
             URL url = new URL(
                     "http://updates.codecrafter47.dyndns.eu/" + plugin.
-                    getDescription().getName() + "/version.txt");
+                            getDescription().getName() + "/version.txt");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.connect();
             int res = con.getResponseCode();
             if (res != 200) {
+                con.disconnect();
                 return;
             }
-            ir = new InputStreamReader(con.getInputStream());
+            InputStream inputStream = con.getInputStream();
+            ir = new InputStreamReader(inputStream, Charsets.UTF_8);
 
             BufferedReader input = new BufferedReader(ir);
 
@@ -98,6 +95,11 @@ public class UpdateChecker implements Runnable {
                 updateAvailable = true;
 
             }
+
+            input.close();
+            ir.close();
+            inputStream.close();
+            con.disconnect();
         } catch (Throwable t) {
             error = true;
         }

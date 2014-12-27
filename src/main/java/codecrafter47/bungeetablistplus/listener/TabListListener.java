@@ -20,12 +20,7 @@ package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
-import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList17;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18v2;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;
+import codecrafter47.bungeetablistplus.tablisthandler.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;

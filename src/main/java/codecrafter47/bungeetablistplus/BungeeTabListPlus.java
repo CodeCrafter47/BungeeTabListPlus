@@ -18,6 +18,8 @@
  */
 package codecrafter47.bungeetablistplus;
 
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.Constants;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
@@ -25,9 +27,14 @@ import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.player.BungeePlayerProvider;
+import codecrafter47.bungeetablistplus.player.FakePlayerManager;
+import codecrafter47.bungeetablistplus.player.RedisPlayerProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import gnu.trove.map.TObjectIntMap;
+import lombok.Getter;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -43,10 +50,7 @@ import net.md_5.bungee.protocol.Protocol;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -119,6 +123,9 @@ public class BungeeTabListPlus extends Plugin {
 
     private SkinManager skins;
 
+    @Getter
+    private BungeePlayerProvider bungeePlayerProvider = new BungeePlayerProvider();
+
     public PingTask getServerState(String o) {
         return serverState.get(o);
     }
@@ -138,6 +145,7 @@ public class BungeeTabListPlus extends Plugin {
             return;
         }
 
+        // TODO probably parsing the version string is a better idea
         try {
             Class.forName("net.md_5.bungee.tab.TabList");
         } catch (ClassNotFoundException ex) {
@@ -179,12 +187,25 @@ public class BungeeTabListPlus extends Plugin {
                 PingTask task = new PingTask(this, server);
                 serverState.put(server.getName(), task);
                 getProxy().getScheduler().schedule(this, task, config.
-                        getMainConfig().pingDelay,
+                                getMainConfig().pingDelay,
                         config.getMainConfig().pingDelay, TimeUnit.SECONDS);
             }
         }
 
-        players = new PlayerManager(this);
+        fakePlayerManager = new FakePlayerManager(this);
+
+        Collection<IPlayerProvider> playerProviders = new ArrayList<>();
+
+        playerProviders.add(fakePlayerManager);
+
+        // TODO make sure redisbungee is loaded before bungeetablistplus, or query this later
+        if (getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
+            playerProviders.add(new RedisPlayerProvider());
+        } else {
+            playerProviders.add(bungeePlayerProvider);
+        }
+
+        players = new PlayerManager(this, playerProviders);
 
         tabLists = new TabListManager(this);
         if (!tabLists.loadTabLists()) {
@@ -251,8 +272,6 @@ public class BungeeTabListPlus extends Plugin {
                         log(Level.SEVERE, null, ex);
             }
         }
-
-        fakePlayerManager = new FakePlayerManager(this);
     }
 
     private void startRefreshThread() {
@@ -400,8 +419,8 @@ public class BungeeTabListPlus extends Plugin {
      * @param player the player object for which the check should be performed
      * @return true if the player is hidden, false otherwise
      */
-    public static boolean isHidden(ProxiedPlayer player, ProxiedPlayer viewer) {
-        if(getInstance().getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished"))return false;
+    public static boolean isHidden(IPlayer player, ProxiedPlayer viewer) {
+        if (getInstance().getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished")) return false;
         boolean hidden;
         synchronized (hiddenPlayers) {
             String name = player.getName();
@@ -421,7 +440,7 @@ public class BungeeTabListPlus extends Plugin {
      * @param player the player object for which the check should be performed
      * @return true if the player is hidden, false otherwise
      */
-    public static boolean isHidden(ProxiedPlayer player) {
+    public static boolean isHidden(IPlayer player) {
         boolean hidden;
         synchronized (hiddenPlayers) {
             String name = player.getName();
@@ -443,7 +462,7 @@ public class BungeeTabListPlus extends Plugin {
     public static void hidePlayer(ProxiedPlayer player) {
         synchronized (hiddenPlayers) {
             String name = player.getName();
-            if(!hiddenPlayers.contains(name))
+            if (!hiddenPlayers.contains(name))
                 hiddenPlayers.add(name);
         }
     }
@@ -488,8 +507,8 @@ public class BungeeTabListPlus extends Plugin {
     public void reportError(Throwable th) {
         getLogger().log(Level.WARNING,
                 ChatColor.RED + "An internal error occurred! Please send the "
-                + "following StackTrace to the developer in order to help"
-                + " resolving the problem",
+                        + "following StackTrace to the developer in order to help"
+                        + " resolving the problem",
                 th);
     }
 
@@ -517,14 +536,14 @@ public class BungeeTabListPlus extends Plugin {
         tabListHandler.set(player, tabList);
     }
 
-    public static String[] getPlayerTexture(ProxiedPlayer player) {
+    public static String[] getPlayerTexture(IPlayer player) {
         if (!isVersion18()) {
             return null;
         }
-        if(player instanceof FakePlayerManager.FakePlayer){
+        if (!(player instanceof BungeePlayer)) {
             return getInstance().getSkinManager().getSkin(player.getName());
         }
-        LoginResult loginResult = ((UserConnection) player).
+        LoginResult loginResult = ((UserConnection) ((BungeePlayer) player).getPlayer()).
                 getPendingConnection().getLoginProfile();
         if (loginResult == null) {
             return null;

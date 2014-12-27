@@ -18,10 +18,11 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
-import java.io.File;
 import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.plugin.Plugin;
+
+import java.io.File;
 
 public class Messages extends Config {
 

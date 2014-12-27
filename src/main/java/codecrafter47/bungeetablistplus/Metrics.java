@@ -27,33 +27,20 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.zip.GZIPOutputStream;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
+
+import java.io.*;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.zip.GZIPOutputStream;
 
 public class Metrics {
 
@@ -133,18 +120,25 @@ public class Metrics {
                     getPath().contains("\\")) {
                 File parent = new File(configurationFile.getParent());
                 if (!parent.exists()) {
-                    parent.mkdir();
+                    if (!parent.mkdir()) {
+                        throw new RuntimeException("Failed to create directory");
+                    }
                 }
             }
 
-            configurationFile.createNewFile(); // config file
+            if (!configurationFile.createNewFile()) {
+                throw new RuntimeException("failed to create file");
+            }
             properties.put("opt-out", "false");
             properties.put("guid", UUID.randomUUID().toString());
             properties.put("debug", "false");
-            properties.store(new FileOutputStream(configurationFile),
-                    "http://mcstats.org");
+            FileOutputStream out = new FileOutputStream(configurationFile);
+            properties.store(out, "http://mcstats.org");
+            out.close();
         } else {
-            properties.load(new FileInputStream(configurationFile));
+            FileInputStream inStream = new FileInputStream(configurationFile);
+            properties.load(inStream);
+            inStream.close();
         }
 
         // Load the guid then
@@ -275,7 +269,9 @@ public class Metrics {
         synchronized (optOutLock) {
             try {
                 // Reload the metrics file
-                properties.load(new FileInputStream(configurationFile));
+                FileInputStream inStream = new FileInputStream(configurationFile);
+                properties.load(inStream);
+                inStream.close();
             } catch (IOException ex) {
                 if (debug) {
                     ProxyServer.getInstance().getLogger().log(Level.INFO,
@@ -300,8 +296,9 @@ public class Metrics {
             // Check if the server owner has already set opt-out, if not, set it.
             if (isOptOut()) {
                 properties.setProperty("opt-out", "false");
-                properties.store(new FileOutputStream(configurationFile),
-                        "http://mcstats.org");
+                FileOutputStream out = new FileOutputStream(configurationFile);
+                properties.store(out, "http://mcstats.org");
+                out.close();
             }
 
             // Enable Task, if it is not running
@@ -323,8 +320,9 @@ public class Metrics {
             // Check if the server owner has already set opt-out, if not, set it.
             if (!isOptOut()) {
                 properties.setProperty("opt-out", "true");
-                properties.store(new FileOutputStream(configurationFile),
-                        "http://mcstats.org");
+                FileOutputStream out = new FileOutputStream(configurationFile);
+                properties.store(out, "http://mcstats.org");
+                out.close();
             }
 
             // Disable Task, if it is running
@@ -566,7 +564,7 @@ public class Metrics {
      * @throws UnsupportedEncodingException
      */
     private static void appendJSONPair(StringBuilder json, String key,
-            String value) throws UnsupportedEncodingException {
+                                       String value) throws UnsupportedEncodingException {
         boolean isValueNumeric = false;
 
         try {
@@ -749,7 +747,7 @@ public class Metrics {
          * Construct a plotter with a specific plot name
          *
          * @param name the name of the plotter to use, which will show up on the
-         * website
+         *             website
          */
         public Plotter(final String name) {
             this.name = name;

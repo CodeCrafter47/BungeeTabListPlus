@@ -28,7 +28,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class ScoreboardTabList extends CustomTabListHandler implements
@@ -63,7 +62,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         if (getPlayer().getServer() != null) {
             if (BungeeTabListPlus.getInstance().getConfigManager().
                     getMainConfig().excludeServers.contains(getPlayer().
-                            getServer().getInfo().getName()) || isExcluded) {
+                    getServer().getInfo().getName()) || isExcluded) {
                 unload();
                 return;
             }
@@ -89,9 +88,9 @@ public class ScoreboardTabList extends CustomTabListHandler implements
                 line = new Slot("", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(line.text, super.getPlayer());
+                    replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
             text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(text);
+                    replaceVariables(getPlayer(), text);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);

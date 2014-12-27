@@ -18,17 +18,17 @@
  */
 package codecrafter47.bungeetablistplus.sorting;
 
+import codecrafter47.bungeetablistplus.player.IPlayer;
+
 import java.text.Collator;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class Alphabet implements ISortingRule {
 
     @Override
-    public int compare(ProxiedPlayer player1, ProxiedPlayer player2) {
+    public int compare(IPlayer player1, IPlayer player2) {
         String name1 = player1.getName();
         String name2 = player2.getName();
         return Collator.getInstance().compare(name1, name2);

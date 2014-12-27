@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 /**
- *
  * @author Florian Stober
  */
 public class ConfigParser {
@@ -86,7 +85,7 @@ public class ConfigParser {
                 } else {
                     plugin.getLogger().log(Level.WARNING,
                             "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
-                                config.getFileName()});
+                                    config.getFileName()});
                 }
             }
 
@@ -157,13 +156,13 @@ public class ConfigParser {
             }
         }
 
-        return new TabListProvider(topSections, botSections,
+        return new TabListProvider(plugin, topSections, botSections,
                 config.showEmptyGroups, config, this);
     }
 
     public List<Section> parseServerSections(String g_prefix, String g_suffix,
-            List<String> g_filter, String g_server, List<String> g_sort,
-            int maxplayers) throws ParseException {
+                                             List<String> g_filter, String g_server, List<String> g_sort,
+                                             int maxplayers) throws ParseException {
         List<Section> sections = new ArrayList<>();
         for (String line : config.groupLines) {
             // Its properties
@@ -196,7 +195,7 @@ public class ConfigParser {
                 } else {
                     plugin.getLogger().log(Level.WARNING,
                             "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
-                                config.getFileName()});
+                                    config.getFileName()});
                 }
             }
 
@@ -283,10 +282,10 @@ public class ConfigParser {
             if (!(rule.equalsIgnoreCase("you") || rule.equalsIgnoreCase(
                     "youfirst") || rule.equalsIgnoreCase("admin") || rule.
                     equalsIgnoreCase("adminfirst") || rule.equalsIgnoreCase(
-                            "alpha") || rule.equalsIgnoreCase("alphabet") || rule.
+                    "alpha") || rule.equalsIgnoreCase("alphabet") || rule.
                     equalsIgnoreCase("alphabetic") || rule.equalsIgnoreCase(
-                            "alphabetical") || rule.equalsIgnoreCase(
-                            "alphabetically"))) {
+                    "alphabetical") || rule.equalsIgnoreCase(
+                    "alphabetically"))) {
                 plugin.getLogger().warning(
                         ChatColor.RED + "Can't sort players using rule '" + rule + "': Unknown rule");
             }

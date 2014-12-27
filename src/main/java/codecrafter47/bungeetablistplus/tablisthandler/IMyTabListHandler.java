@@ -19,7 +19,6 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 /**
- *
  * @author Florian Stober
  */
 public interface IMyTabListHandler {

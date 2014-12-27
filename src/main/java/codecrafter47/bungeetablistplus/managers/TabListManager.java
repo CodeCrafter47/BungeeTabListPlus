@@ -23,17 +23,19 @@ import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.config.ConfigParser;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.config.TabListProvider;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
 import static net.md_5.bungee.event.EventPriority.HIGHEST;
 
 public class TabListManager implements Listener {
@@ -41,7 +43,7 @@ public class TabListManager implements Listener {
     private final BungeeTabListPlus plugin;
     TabListProvider defaultTab;
     List<TabListProvider> tabLists = new ArrayList<>();
-    
+
     private static Map<ProxiedPlayer, ITabListProvider> customTabLists = new HashMap<>();
 
     public TabListManager(BungeeTabListPlus plugin) {
@@ -83,7 +85,7 @@ public class TabListManager implements Listener {
     }
 
     public ITabListProvider getTabListForPlayer(ProxiedPlayer player) {
-        if(customTabLists.get(player) != null)return customTabLists.get(player);
+        if (customTabLists.get(player) != null) return customTabLists.get(player);
         for (TabListProvider tabList : tabLists) {
             if (tabList.appliesTo(player)) {
                 return tabList;
@@ -159,25 +161,25 @@ public class TabListManager implements Listener {
         plugin.getLogger().log(
                 Level.WARNING, "{0}{1}: showTo is partly or completly invalid",
                 new Object[]{ChatColor.RED,
-                    config.getFileName()});
+                        config.getFileName()});
     }
-    
-    public static void setCustomTabList(ProxiedPlayer player, ITabListProvider tabList){
+
+    public static void setCustomTabList(ProxiedPlayer player, ITabListProvider tabList) {
         customTabLists.put(player, tabList);
     }
-    
-    public static void removeCustomTabList(ProxiedPlayer player){
+
+    public static void removeCustomTabList(ProxiedPlayer player) {
         customTabLists.remove(player);
     }
-    
+
     @EventHandler
-    public void onDisconnect(PlayerDisconnectEvent event){
-        if(customTabLists.containsKey(event.getPlayer()))customTabLists.remove(event.getPlayer());
+    public void onDisconnect(PlayerDisconnectEvent event) {
+        if (customTabLists.containsKey(event.getPlayer())) customTabLists.remove(event.getPlayer());
     }
-    
+
     @EventHandler(priority = HIGHEST)
-    public void onDisconnect(ServerKickEvent event){
-        if(event.isCancelled())return;
-        if(customTabLists.containsKey(event.getPlayer()))customTabLists.remove(event.getPlayer());
+    public void onDisconnect(ServerKickEvent event) {
+        if (event.isCancelled()) return;
+        if (customTabLists.containsKey(event.getPlayer())) customTabLists.remove(event.getPlayer());
     }
 }

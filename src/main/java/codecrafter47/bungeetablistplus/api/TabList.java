@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.api;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 
 /**
- *
  * @author Florian Stober
  */
 public class TabList {

@@ -22,15 +22,16 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import com.google.common.base.Preconditions;
-import java.util.Collection;
-import java.util.HashSet;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public class MyCustom extends CustomTabListHandler {
 
     private static final char[] FILLER = new char[]{'0', '1', '2', '2', '4',
-        '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+            '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final int MAX_LEN = 16;
 
     private static char[] base(int n) {
@@ -45,6 +46,7 @@ public class MyCustom extends CustomTabListHandler {
         }
         return alloc;
     }
+
     /* ======================================================================== */
     private final Collection<String> sentStuff = new HashSet<>();
     /* ======================================================================== */

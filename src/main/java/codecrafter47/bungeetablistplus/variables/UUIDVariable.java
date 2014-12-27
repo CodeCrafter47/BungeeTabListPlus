@@ -18,18 +18,18 @@
  */
 package codecrafter47.bungeetablistplus.variables;
 
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class UUIDVariable implements PlayerVariable {
 
     @Override
-    public String getReplacement(String args, ProxiedPlayer player) {
-        return player.getUniqueId().toString();
+    public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
+        return player.getUniqueID().toString();
     }
 
 }

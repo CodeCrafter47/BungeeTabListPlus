@@ -19,10 +19,15 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +38,11 @@ public class PlayerManager {
 
     private final BungeeTabListPlus plugin;
 
-    public PlayerManager(BungeeTabListPlus plugin) {
+    private final Collection<IPlayerProvider> playerProviders;
+
+    public PlayerManager(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders) {
         this.plugin = plugin;
+        this.playerProviders = playerProviders;
     }
 
     public boolean isServer(String s) {
@@ -52,12 +60,16 @@ public class PlayerManager {
         return false;
     }
 
-    public List<ProxiedPlayer> getPlayers(Collection<String> filter,
-            ProxiedPlayer who) {
-        List<ProxiedPlayer> list = new ArrayList<>();
-        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
-        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
-        for (ProxiedPlayer p : players) {
+    public List<IPlayer> getPlayers(Collection<String> filter,
+                                    ProxiedPlayer who) {
+        List<IPlayer> list = new ArrayList<>();
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+            @Override
+            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+                return iPlayerProvider.getPlayers();
+            }
+        }));
+        for (IPlayer p : players) {
             boolean areGroupRules = false;
             boolean areServerRules = false;
             boolean fitGroupRules = false;
@@ -66,40 +78,42 @@ public class PlayerManager {
             for (String rule : filter) {
                 if (rule.isEmpty()) {
                     // ignore
-                } else if (rule.equalsIgnoreCase("currentserver")) {
-                    areServerRules = true;
-                    if (p.getServer() != null && who.getServer() != null) {
-                        if (p.getServer().getInfo().getName().equalsIgnoreCase(
-                                who.getServer().getInfo().getName())) {
-                            fitServerRules = true;
+                } else {
+                    Optional<ServerInfo> server = p.getServer();
+                    if (rule.equalsIgnoreCase("currentserver")) {
+                        areServerRules = true;
+                        if (server.isPresent() && who.getServer() != null) {
+                            if (server.get().getName().equalsIgnoreCase(
+                                    who.getServer().getInfo().getName())) {
+                                fitServerRules = true;
+                            }
                         }
-                    }
-                } else if (isServer(rule)) {
-                    areServerRules = true;
-                    Server server = p.getServer();
-                    if (server != null) {
-                        if (server.getInfo().getName().equalsIgnoreCase(rule)) {
-                            fitServerRules = true;
-                        }
-                        String[] s = rule.split("#");
-                        if (s.length == 2) {
-                            if (server.getInfo().getName().
-                                    equalsIgnoreCase(s[0])) {
-                                String world = plugin.getBridge().
-                                        getPlayerInformation(p, "world");
-                                if (world != null) {
-                                    if (world.equalsIgnoreCase(s[1])) {
-                                        fitServerRules = true;
+                    } else if (isServer(rule)) {
+                        areServerRules = true;
+                        if (server.isPresent()) {
+                            if (server.get().getName().equalsIgnoreCase(rule)) {
+                                fitServerRules = true;
+                            }
+                            String[] s = rule.split("#");
+                            if (s.length == 2) {
+                                if (server.get().getName().
+                                        equalsIgnoreCase(s[0])) {
+                                    String world = plugin.getBridge().
+                                            getPlayerInformation(p, "world");
+                                    if (world != null) {
+                                        if (world.equalsIgnoreCase(s[1])) {
+                                            fitServerRules = true;
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                } else {
-                    areGroupRules = true;
-                    if (group != null) {
-                        if (group.equalsIgnoreCase(rule)) {
-                            fitGroupRules = true;
+                    } else {
+                        areGroupRules = true;
+                        if (group != null) {
+                            if (group.equalsIgnoreCase(rule)) {
+                                fitGroupRules = true;
+                            }
                         }
                     }
                 }
@@ -114,12 +128,16 @@ public class PlayerManager {
 
     public int getServerPlayerCount(String server) {
         int num = 0;
-        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
-        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
-        for (ProxiedPlayer p : players) {
-            Server s = p.getServer();
-            if (s != null) {
-                if (s.getInfo().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+            @Override
+            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+                return iPlayerProvider.getPlayers();
+            }
+        }));
+        for (IPlayer p : players) {
+            Optional<ServerInfo> s = p.getServer();
+            if (s.isPresent()) {
+                if (s.get().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
                         isHidden(p)) {
                     num++;
                 }
@@ -130,12 +148,16 @@ public class PlayerManager {
 
     public int getServerPlayerCount(String server, ProxiedPlayer viewer) {
         int num = 0;
-        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
-        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
-        for (ProxiedPlayer p : players) {
-            Server s = p.getServer();
-            if (s != null) {
-                if (s.getInfo().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+            @Override
+            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+                return iPlayerProvider.getPlayers();
+            }
+        }));
+        for (IPlayer p : players) {
+            Optional<ServerInfo> s = p.getServer();
+            if (s.isPresent()) {
+                if (s.get().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
                         isHidden(p, viewer)) {
                     num++;
                 }
@@ -146,9 +168,13 @@ public class PlayerManager {
 
     public int getGlobalPlayerCount(ProxiedPlayer viewer) {
         int num = 0;
-        Collection<ProxiedPlayer> players = new ArrayList<>(plugin.getProxy().getPlayers());
-        players.addAll(BungeeTabListPlus.getInstance().getFakePlayerManager().getFakePlayers());
-        for (ProxiedPlayer p : players) {
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+            @Override
+            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+                return iPlayerProvider.getPlayers();
+            }
+        }));
+        for (IPlayer p : players) {
             if (!BungeeTabListPlus.isHidden(p, viewer)) {
                 num++;
             }

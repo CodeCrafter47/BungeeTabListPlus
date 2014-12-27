@@ -18,12 +18,11 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class CollumnSplitSection extends Section {
@@ -58,7 +57,7 @@ public class CollumnSplitSection extends Section {
 
     @Override
     public int calculate(ProxiedPlayer player, TabList tabList, int pos,
-            int size) {
+                         int size) {
         int sizePerCol = size / ConfigManager.getCols();
         for (int i = 0; i < pc.length; i++) {
             if (pc[i] != null) {

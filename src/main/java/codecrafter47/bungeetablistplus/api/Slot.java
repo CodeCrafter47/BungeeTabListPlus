@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.api;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+
 import java.util.UUID;
 
 public class Slot {

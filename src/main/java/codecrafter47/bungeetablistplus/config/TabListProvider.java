@@ -35,24 +35,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Florian Stober
  */
 public class TabListProvider implements ITabListProvider {
 
+    private final BungeeTabListPlus plugin;
     List<Section> top;
     List<Section> bot;
     boolean showEmptyGroups;
     TabListConfig config;
     ConfigParser parser;
 
-    public TabListProvider(List<Section> top, List<Section> bot,
-            boolean showEmpty, TabListConfig config, ConfigParser parser) {
+    public TabListProvider(BungeeTabListPlus plugin, List<Section> top, List<Section> bot,
+                           boolean showEmpty, TabListConfig config, ConfigParser parser) {
         this.top = top;
         this.bot = bot;
         showEmptyGroups = showEmpty;
         this.config = config;
         this.parser = parser;
+        // TODO as argument
+        this.plugin = plugin;
     }
 
     @Override
@@ -86,9 +88,9 @@ public class TabListProvider implements ITabListProvider {
                     Collections.sort(list, new Comparator<String>() {
                         @Override
                         public int compare(String s1, String s2) {
-                            int p1 = BungeeTabListPlus.getInstance().
+                            int p1 = plugin.
                                     getPlayerManager().getServerPlayerCount(s1, player);
-                            int p2 = BungeeTabListPlus.getInstance().
+                            int p2 = plugin.
                                     getPlayerManager().getServerPlayerCount(s2, player);
                             if (p1 < p2) {
                                 return 1;
@@ -102,8 +104,7 @@ public class TabListProvider implements ITabListProvider {
 
                     int j = i;
                     for (String server : list) {
-                        if (config.showEmptyGroups || BungeeTabListPlus.
-                                getInstance().getPlayerManager().
+                        if (config.showEmptyGroups || plugin.getPlayerManager().
                                 getServerPlayerCount(server, player) > 0) {
                             try {
                                 List<Section> sections = parser.
@@ -475,28 +476,28 @@ public class TabListProvider implements ITabListProvider {
         // header + footer
         if (this.config.shownFooterHeader) {
             String header = config.header;
-            header = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(header, player);
-            header = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(header);
+            header = plugin.getVariablesManager().
+                    replacePlayerVariables(player, header, plugin.getBungeePlayerProvider().wrapPlayer(player));
+            header = plugin.getVariablesManager().
+                    replaceVariables(player, header);
             header = ChatColor.translateAlternateColorCodes('&', header);
             header = header.replaceAll("\\{newline\\}", "\n");
             tabList.setHeader(header);
             String footer = config.footer;
-            footer = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(footer, player);
-            footer = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(footer);
+            footer = plugin.getVariablesManager().
+                    replacePlayerVariables(player, footer, plugin.getBungeePlayerProvider().wrapPlayer(player));
+            footer = plugin.getVariablesManager().
+                    replaceVariables(player, footer);
             footer = ChatColor.translateAlternateColorCodes('&', footer);
             footer = footer.replaceAll("\\{newline\\}", "\n");
             tabList.setFooter(footer);
         }
 
         if (BungeeTabListPlus.isVersion18()) {
-            tabList.setDefaultSkin(BungeeTabListPlus.getInstance().
+            tabList.setDefaultSkin(plugin.
                     getSkinManager().getSkin(config.defaultSkin));
         }
-        
+
         tabList.setDefaultPing(config.defaultPing);
 
         return tabList;

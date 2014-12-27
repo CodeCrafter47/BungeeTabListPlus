@@ -18,12 +18,12 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import java.util.LinkedList;
-import java.util.List;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
- *
  * @author Florian Stober
  */
 public class SendingQueue {

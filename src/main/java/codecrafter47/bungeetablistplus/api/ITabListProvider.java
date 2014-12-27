@@ -18,14 +18,12 @@ package codecrafter47.bungeetablistplus.api;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import codecrafter47.bungeetablistplus.api.TabList;
+
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-
-
 
 
 public interface ITabListProvider {
 
     TabList getTabList(final ProxiedPlayer player);
-    
+
 }

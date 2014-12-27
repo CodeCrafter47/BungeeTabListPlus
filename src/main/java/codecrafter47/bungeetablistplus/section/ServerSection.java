@@ -25,7 +25,6 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- *
  * @author Florian Stober
  */
 public class ServerSection extends StaticSection {
@@ -39,12 +38,12 @@ public class ServerSection extends StaticSection {
 
     @Override
     public int calculate(ProxiedPlayer player, TabList tabList, int pos,
-            int size) {
+                         int size) {
         for (Slot s : text) {
             Slot s2 = new Slot(s);
             s2.text = BungeeTabListPlus.getInstance().
-                    getVariablesManager().replaceServerVariables(s.text,
-                            ProxyServer.getInstance().getServerInfo(server));
+                    getVariablesManager().replaceServerVariables(player, s.text,
+                    ProxyServer.getInstance().getServerInfo(server));
             tabList.setSlot(pos++, s2);
         }
         return pos;
