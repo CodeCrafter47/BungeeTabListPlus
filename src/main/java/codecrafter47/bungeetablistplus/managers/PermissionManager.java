@@ -45,9 +45,12 @@ public class PermissionManager {
                 getPlugin("BungeePerms");
         if (bp != null) {
             try {
-                bpgroup = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(player.getName())).
-                        getName();
+                Group mainGroup = bp.getPermissionsManager().getMainGroup(bp.
+                        getPermissionsManager().getUser(player.getName()));
+                if (mainGroup != null) {
+                    bpgroup = mainGroup.
+                            getName();
+                }
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
