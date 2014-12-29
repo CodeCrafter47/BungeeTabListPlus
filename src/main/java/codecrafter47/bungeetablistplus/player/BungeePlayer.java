@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class BungeePlayer implements IPlayer {
 
-    private ProxiedPlayer player;
+    private final ProxiedPlayer player;
     private Skin skin = null;
 
     public BungeePlayer(ProxiedPlayer player) {

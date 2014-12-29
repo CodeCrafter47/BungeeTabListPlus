@@ -36,7 +36,7 @@ public class ConfigManager {
     private MainConfig config;
     private Messages messages;
     TabListConfig defaultTabList;
-    List<TabListConfig> tabLists = new ArrayList<>();
+    final List<TabListConfig> tabLists = new ArrayList<>();
 
     public ConfigManager(BungeeTabListPlus bungeeTabListPlus) throws
             InvalidConfigurationException {

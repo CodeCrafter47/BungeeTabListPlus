@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public class YouFirst implements ISortingRule {
 
-    ProxiedPlayer player;
+    private final ProxiedPlayer player;
 
     public YouFirst(ProxiedPlayer p) {
         player = p;

@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RedisPlayerProvider implements IPlayerProvider {
 
-    Cache<UUID, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    private final Cache<UUID, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
 
     @Override
     public Collection<IPlayer> getPlayers() {
@@ -28,7 +28,7 @@ public class RedisPlayerProvider implements IPlayerProvider {
     }
 
     @SneakyThrows
-    public IPlayer wrapPlayer(final UUID player) {
+    IPlayer wrapPlayer(final UUID player) {
         return cache.get(player, new Callable<IPlayer>() {
             @Override
             public IPlayer call() {

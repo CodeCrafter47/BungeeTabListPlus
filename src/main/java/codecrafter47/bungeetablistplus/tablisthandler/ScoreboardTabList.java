@@ -183,7 +183,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         return ret;
     }
 
-    public void unload() {
+    void unload() {
         resize(0);
     }
 }

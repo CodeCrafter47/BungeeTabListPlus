@@ -40,11 +40,11 @@ import java.util.logging.Logger;
 public class TabListProvider implements ITabListProvider {
 
     private final BungeeTabListPlus plugin;
-    List<Section> top;
-    List<Section> bot;
-    boolean showEmptyGroups;
-    TabListConfig config;
-    ConfigParser parser;
+    private final List<Section> top;
+    private final List<Section> bot;
+    private final boolean showEmptyGroups;
+    private final TabListConfig config;
+    private final ConfigParser parser;
 
     public TabListProvider(BungeeTabListPlus plugin, List<Section> top, List<Section> bot,
                            boolean showEmpty, TabListConfig config, ConfigParser parser) {

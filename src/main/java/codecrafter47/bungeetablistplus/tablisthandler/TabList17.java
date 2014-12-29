@@ -170,8 +170,8 @@ public class TabList17 extends CustomTabList18 implements
 
     }
 
-    public void updateTeam(Connection.Unsafe connection, String player,
-                           String prefix, String displayname, String suffix) {
+    void updateTeam(Connection.Unsafe connection, String player,
+                    String prefix, String displayname, String suffix) {
         Team t = new Team();
         t.setName("TAB" + player);
         t.setMode((byte) 2);
@@ -187,7 +187,7 @@ public class TabList17 extends CustomTabList18 implements
         slots_ping[row] = 0;
     }
 
-    public void createTeam(Connection.Unsafe connection, String player) {
+    void createTeam(Connection.Unsafe connection, String player) {
         Team t = new Team();
         t.setName("TAB" + player);
         t.setMode((byte) 0);
@@ -227,7 +227,7 @@ public class TabList17 extends CustomTabList18 implements
         return ret;
     }
 
-    public void unload() {
+    void unload() {
         resize(0);
     }
 }

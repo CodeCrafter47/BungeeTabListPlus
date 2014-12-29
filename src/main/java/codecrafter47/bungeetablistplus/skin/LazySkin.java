@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class LazySkin implements Skin {
 
-    String nameOrUUID;
+    private final String nameOrUUID;
 
     public LazySkin(String nameOrUUID) {
         this.nameOrUUID = nameOrUUID;

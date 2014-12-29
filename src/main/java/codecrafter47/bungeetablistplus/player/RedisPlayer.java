@@ -9,10 +9,10 @@ import net.md_5.bungee.api.config.ServerInfo;
 import java.util.UUID;
 
 public class RedisPlayer implements IPlayer {
-    String name;
-    final UUID uuid;
-    ServerInfo server;
-    long lastServerLookup = 0;
+    private String name;
+    private final UUID uuid;
+    private ServerInfo server;
+    private long lastServerLookup = 0;
 
     public RedisPlayer(UUID uuid) {
         this.uuid = uuid;

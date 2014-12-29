@@ -253,7 +253,7 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         sendTextures[row] = null;
     }
 
-    public void unload() {
+    void unload() {
         resize(0);
     }
 }

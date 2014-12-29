@@ -26,13 +26,13 @@ import java.io.File;
 
 public class Messages extends Config {
 
-    public String errorNoPermission = "&cYou don't have permission to do that";
-    public String errorNeedsPlayer = "&cThis command must be executed as Player";
-    public String errorAlreadyHidden = "&cYou are already hidden";
-    public String errorNotHidden = "&cCan't unhide, you're not hidden";
-    public String successReloadComplete = "&aReloaded BungeeTabListPlus successfully";
-    public String successPlayerHide = "&aYou have been hidden: Your name wont appear on the tablist";
-    public String successPlayerUnhide = "&aYou're not hidden any longer";
+    public final String errorNoPermission = "&cYou don't have permission to do that";
+    public final String errorNeedsPlayer = "&cThis command must be executed as Player";
+    public final String errorAlreadyHidden = "&cYou are already hidden";
+    public final String errorNotHidden = "&cCan't unhide, you're not hidden";
+    public final String successReloadComplete = "&aReloaded BungeeTabListPlus successfully";
+    public final String successPlayerHide = "&aYou have been hidden: Your name wont appear on the tablist";
+    public final String successPlayerUnhide = "&aYou're not hidden any longer";
 
     public Messages(Plugin plugin) throws InvalidConfigurationException {
         CONFIG_FILE = new File("plugins" + File.separator + plugin.

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author Florian Stober
  */
-public class SendingQueue {
+class SendingQueue {
 
     private final List<ProxiedPlayer> liste = new LinkedList<>();
 
@@ -47,7 +47,6 @@ public class SendingQueue {
         if (liste.isEmpty()) {
             return null;
         }
-        ProxiedPlayer p = liste.remove(0);
-        return p;
+        return liste.remove(0);
     }
 }

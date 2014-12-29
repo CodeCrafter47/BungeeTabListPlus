@@ -92,15 +92,14 @@ public class BungeeTabListPlus extends Plugin {
     private final TabListListener listener = new TabListListener(this);
 
     private final SendingQueue resendQueue = new SendingQueue();
-    private ResendThread resendThread;
 
     private ScheduledTask refreshThread = null;
 
     private final static Collection<String> hiddenPlayers = new HashSet<>();
 
-    BukkitBridge bukkitBridge;
+    private BukkitBridge bukkitBridge;
 
-    UpdateChecker updateChecker = null;
+    private UpdateChecker updateChecker = null;
 
     static private boolean is18 = true;
 
@@ -108,7 +107,7 @@ public class BungeeTabListPlus extends Plugin {
 
     private PacketManager packets;
 
-    Map<String, PingTask> serverState = new HashMap<>();
+    private final Map<String, PingTask> serverState = new HashMap<>();
 
     private SkinManager skins;
 
@@ -173,7 +172,7 @@ public class BungeeTabListPlus extends Plugin {
         // start server ping tasks
         if (config.getMainConfig().pingDelay > 0) {
             for (ServerInfo server : getProxy().getServers().values()) {
-                PingTask task = new PingTask(this, server);
+                PingTask task = new PingTask(server);
                 serverState.put(server.getName(), task);
                 getProxy().getScheduler().schedule(this, task, config.
                                 getMainConfig().pingDelay,
@@ -211,7 +210,7 @@ public class BungeeTabListPlus extends Plugin {
         ProxyServer.getInstance().getPluginManager().registerListener(this,
                 listener);
 
-        resendThread = new ResendThread(resendQueue,
+        ResendThread resendThread = new ResendThread(resendQueue,
                 config.getMainConfig().tablistUpdateIntervall);
         getProxy().getScheduler().schedule(this, resendThread, 1,
                 TimeUnit.SECONDS);

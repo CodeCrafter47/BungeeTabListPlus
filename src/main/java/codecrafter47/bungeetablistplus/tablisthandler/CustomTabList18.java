@@ -32,19 +32,19 @@ import java.util.Map.Entry;
 /**
  * @author Florian Stober
  */
-public class CustomTabList18 extends TabList {
+class CustomTabList18 extends TabList {
 
     boolean isExcluded = false;
 
-    protected final Collection<String> usernames = new HashSet<>();
-    protected final Map<UUID, Item> uuids = new HashMap<>();
-    public final List<String> bukkitplayers = new ArrayList<>(100);
+    final Collection<String> usernames = new HashSet<>();
+    final Map<UUID, Item> uuids = new HashMap<>();
+    private final List<String> bukkitplayers = new ArrayList<>(100);
 
-    public CustomTabList18(ProxiedPlayer player) {
+    CustomTabList18(ProxiedPlayer player) {
         super(player);
     }
 
-    protected ProxiedPlayer getPlayer() {
+    ProxiedPlayer getPlayer() {
         return player;
     }
 
@@ -101,7 +101,7 @@ public class CustomTabList18 extends TabList {
         isExcluded = false;
     }
 
-    public void exclude() {
+    void exclude() {
         isExcluded = true;
         // only 1.7 clients
         if (player.getPendingConnection().getVersion() < ProtocolConstants.MINECRAFT_SNAPSHOT) {

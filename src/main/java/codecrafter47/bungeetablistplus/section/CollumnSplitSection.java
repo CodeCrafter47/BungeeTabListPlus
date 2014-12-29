@@ -27,7 +27,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public class CollumnSplitSection extends Section {
 
-    PlayerColumn pc[] = new PlayerColumn[ConfigManager.getCols()];
+    private final PlayerColumn[] pc = new PlayerColumn[ConfigManager.getCols()];
 
     @Override
     public int getMinSize(ProxiedPlayer player) {

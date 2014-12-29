@@ -28,7 +28,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public abstract class Section {
 
-    public double id = Math.random();
+    public final double id = Math.random();
 
     public abstract int getMinSize(ProxiedPlayer player);
 

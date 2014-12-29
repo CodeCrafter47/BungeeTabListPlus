@@ -41,10 +41,10 @@ import static net.md_5.bungee.event.EventPriority.HIGHEST;
 public class TabListManager implements Listener {
 
     private final BungeeTabListPlus plugin;
-    TabListProvider defaultTab;
-    List<TabListProvider> tabLists = new ArrayList<>();
+    private TabListProvider defaultTab;
+    private final List<TabListProvider> tabLists = new ArrayList<>();
 
-    private static Map<ProxiedPlayer, ITabListProvider> customTabLists = new HashMap<>();
+    private static final Map<ProxiedPlayer, ITabListProvider> customTabLists = new HashMap<>();
 
     public TabListManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;

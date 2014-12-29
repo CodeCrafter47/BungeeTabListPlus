@@ -28,7 +28,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class MyCustom extends CustomTabListHandler {
+class MyCustom extends CustomTabListHandler {
 
     private static final char[] FILLER = new char[]{'0', '1', '2', '2', '4',
             '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -50,21 +50,17 @@ public class MyCustom extends CustomTabListHandler {
     /* ======================================================================== */
     private final Collection<String> sentStuff = new HashSet<>();
     /* ======================================================================== */
-    private String[] sent = new String[ConfigManager.getTabSize()];
-    private String[] slots = new String[ConfigManager.getTabSize()];
-    private int[] slots_ping = new int[ConfigManager.getTabSize()];
+    private final String[] sent = new String[ConfigManager.getTabSize()];
+    private final String[] slots = new String[ConfigManager.getTabSize()];
+    private final int[] slots_ping = new int[ConfigManager.getTabSize()];
 
     private int rowLim;
 
-    public MyCustom(ProxiedPlayer player) {
+    MyCustom(ProxiedPlayer player) {
         this.init(player);
     }
 
-    public synchronized String setSlot(int n, Slot line) {
-        return setSlot(n, line, true);
-    }
-
-    public synchronized String setSlot(int n, Slot line, boolean update) {
+    synchronized String setSlot(int n, Slot line, boolean update) {
         Preconditions.checkArgument(n >= 0 && n < ConfigManager.getTabSize(),
                 "row out of range");
 
@@ -114,7 +110,7 @@ public class MyCustom extends CustomTabListHandler {
                         + c;
                 try {
                     return attempt(attempt);
-                } catch (IllegalArgumentException ex) {
+                } catch (IllegalArgumentException ignored) {
 
                 }
             }
@@ -123,14 +119,14 @@ public class MyCustom extends CustomTabListHandler {
                 "List already contains all variants of string '" + s + "'");
     }
 
-    public synchronized void clear() {
+    synchronized void clear() {
         sentStuff.clear();
         for (int i = 0; i <= rowLim; i++) {
             slots[i] = null;
         }
     }
 
-    public synchronized void unload() {
+    synchronized void unload() {
         for (int i = 0; i < ConfigManager.getTabSize(); i++) {
             if (sent[i] != null) {
                 BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
@@ -141,7 +137,7 @@ public class MyCustom extends CustomTabListHandler {
         sentStuff.clear();
     }
 
-    public synchronized void update() {
+    synchronized void update() {
         boolean remove = false;
         for (int i = 0; i <= rowLim; i++) {
             if (sent[i] != null) {

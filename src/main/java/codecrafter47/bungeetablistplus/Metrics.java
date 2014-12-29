@@ -250,7 +250,7 @@ public class Metrics {
 
                                 try {
                                     Thread.sleep(100L);
-                                } catch (InterruptedException e) {
+                                } catch (InterruptedException ignored) {
                                 }
                             }
                         }
@@ -265,7 +265,7 @@ public class Metrics {
      *
      * @return true if metrics should be opted out of it
      */
-    public boolean isOptOut() {
+    boolean isOptOut() {
         synchronized (optOutLock) {
             try {
                 // Reload the metrics file
@@ -339,7 +339,7 @@ public class Metrics {
      *
      * @return the File object for the config file
      */
-    public File getConfigFile() {
+    File getConfigFile() {
         // return => base/plugins/PluginMetrics/config.yml
         return new File(new File("plugins", "PluginMetrics"),
                 "config.properties");
@@ -519,7 +519,7 @@ public class Metrics {
      * @param input
      * @return
      */
-    public static byte[] gzip(String input) {
+    private static byte[] gzip(String input) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         GZIPOutputStream gzos = null;
 
@@ -561,10 +561,9 @@ public class Metrics {
      * @param json
      * @param key
      * @param value
-     * @throws UnsupportedEncodingException
      */
     private static void appendJSONPair(StringBuilder json, String key,
-                                       String value) throws UnsupportedEncodingException {
+                                       String value) {
         boolean isValueNumeric = false;
 
         try {
@@ -722,7 +721,7 @@ public class Metrics {
          * Called when the server owner decides to opt-out of BukkitMetrics
          * while the server is running.
          */
-        protected void onOptOut() {
+        void onOptOut() {
         }
     }
 

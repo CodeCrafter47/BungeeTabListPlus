@@ -393,7 +393,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
         sendPing.put(offlineId, 0);
     }
 
-    public void unload() {
+    void unload() {
         resize(0);
     }
 }

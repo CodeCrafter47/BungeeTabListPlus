@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 
 public class FakePlayerManager implements IPlayerProvider {
-    List<IPlayer> online = new ArrayList<>();
-    List<String> offline;
-    BungeeTabListPlus plugin;
+    private List<IPlayer> online = new ArrayList<>();
+    private List<String> offline;
+    private final BungeeTabListPlus plugin;
 
     public FakePlayerManager(final BungeeTabListPlus plugin) {
         this.plugin = plugin;

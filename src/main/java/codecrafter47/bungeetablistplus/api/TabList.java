@@ -28,10 +28,10 @@ import lombok.Setter;
  */
 public class TabList {
 
-    private int rows;
-    private int collums;
+    private final int rows;
+    private final int collums;
     private int usedSlots;
-    private Slot[] slots;
+    private final Slot[] slots;
     private String header;
     private String footer;
     @Getter

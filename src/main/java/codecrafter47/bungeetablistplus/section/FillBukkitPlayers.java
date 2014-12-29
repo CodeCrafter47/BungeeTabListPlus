@@ -32,8 +32,8 @@ import java.util.List;
  */
 public class FillBukkitPlayers extends Section {
 
-    int startColumn;
-    TabListConfig config;
+    private final int startColumn;
+    private final TabListConfig config;
 
     public FillBukkitPlayers(int startColumn, TabListConfig config) {
         this.startColumn = startColumn;

@@ -35,17 +35,17 @@ public class MainConfig extends Config {
             "time in seconds after which the tabList will be resend to all players",
             "set this to -1 to disable scheduled update of the tabList"
     })
-    public double tablistUpdateIntervall = 1;
+    public final double tablistUpdateIntervall = 1;
 
     @Comments({
             "whether tabList should be resend if a player joins or leaves the server"
     })
-    public boolean updateOnPlayerJoinLeave = true;
+    public final boolean updateOnPlayerJoinLeave = true;
 
     @Comments({
             "whether tablist should be resend if a player switches the server"
     })
-    public boolean updateOnServerChange = true;
+    public final boolean updateOnServerChange = true;
 
     @Comments({
             "whether to use scoreboard functions to bypass the 16 character limit",
@@ -57,7 +57,7 @@ public class MainConfig extends Config {
             "You can limit the number of characters per slot here",
             "Color codes do not count as a character; -1 means unlimited"
     })
-    public int charLimit = -1;
+    public final int charLimit = -1;
 
     @Comments({
             "Decide from where BungeeTabListPlus takes informations like permissions,",
@@ -68,30 +68,30 @@ public class MainConfig extends Config {
             "BUNGEEPERMS - take informations from bungeeperms",
             "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
     })
-    public String permissionSource = "AUTO";
+    public final String permissionSource = "AUTO";
 
     @Comments({
             "whether ping is sent to clients",
             "setting this to false can help you reducing network traffic"
     })
-    public boolean sendPing = true;
+    public final boolean sendPing = true;
 
     @Comments({
             "if enabled the plugin checks for new versions automatically.",
             "Use /BTLP to see whether a new version is available",
             "this does NOT automatically install an update"
     })
-    public boolean checkForUpdates = true;
+    public final boolean checkForUpdates = true;
 
     @Comments({
             "this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available"
     })
-    public boolean notifyAdminsIfUpdateAvailable = true;
+    public final boolean notifyAdminsIfUpdateAvailable = true;
 
     @Comments({
             "server Alias fo the {server} Variable"
     })
-    public HashMap<String, String> serverAlias = new HashMap<>();
+    public final HashMap<String, String> serverAlias = new HashMap<>();
 
     {
         serverAlias.put("server1", "Spawn");
@@ -102,7 +102,7 @@ public class MainConfig extends Config {
     @Comments({
             "Alias fo the {world} Variable. Match 'server:world' to an alias"
     })
-    public HashMap<String, String> worldAlias = new HashMap<>();
+    public final HashMap<String, String> worldAlias = new HashMap<>();
 
     {
         worldAlias.put("server1:world1", "Spawn");
@@ -114,7 +114,7 @@ public class MainConfig extends Config {
             "the prefixes used for the {prefix} variable, based upon permission groups",
             "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
     })
-    public HashMap<String, String> prefixes = new HashMap<>();
+    public final HashMap<String, String> prefixes = new HashMap<>();
 
     {
         prefixes.put("default", "");
@@ -126,25 +126,25 @@ public class MainConfig extends Config {
             "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
             "setting this to -1 disables this feature"
     })
-    public int pingDelay = -1;
+    public final int pingDelay = -1;
 
     @Comment(
             "replacement for the {onlineState} variable if the server is online")
-    public String online_text = "&2 ON";
+    public final String online_text = "&2 ON";
 
     @Comment(
             "replacement for the {onlineState} variable if the server is offline")
-    public String offline_text = "&c OFF";
+    public final String offline_text = "&c OFF";
 
     @Comments({
             "those fakeplayers will randomly appear on the tablist. If you don't put any names there then no fakeplayers will appear"
     })
-    public List<String> fakePlayers = new ArrayList<>();
+    public final List<String> fakePlayers = new ArrayList<>();
 
     @Comments({
             "servers which you wish to show their own tabList (The one provided by bukkit)"
     })
-    public List<String> excludeServers = new ArrayList<>();
+    public final List<String> excludeServers = new ArrayList<>();
 
     {
         excludeServers.add("server2");

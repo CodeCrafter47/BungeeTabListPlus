@@ -44,14 +44,14 @@ import java.util.logging.Logger;
  */
 public class BukkitBridge implements Listener {
 
-    private final int currentVersion = 7;
+    private static final int currentVersion = 7;
 
-    byte[] Cinit, Cinit_player;
+    private byte[] Cinit, Cinit_player;
 
-    BungeeTabListPlus plugin;
+    private final BungeeTabListPlus plugin;
 
-    Map<String, Map<String, String>> serverInformation;
-    Map<String, Map<String, String>> playerInformation;
+    private Map<String, Map<String, String>> serverInformation;
+    private Map<String, Map<String, String>> playerInformation;
 
     public BukkitBridge(BungeeTabListPlus plugin) {
         this.plugin = plugin;
@@ -228,8 +228,8 @@ public class BukkitBridge implements Listener {
     public boolean isUpToDate(String server) {
         try {
             return Integer.valueOf(serverInformation.get(server).get(
-                    "bridgeVersion")) >= this.currentVersion;
-        } catch (Throwable ex) {
+                    "bridgeVersion")) >= currentVersion;
+        } catch (Throwable ignored) {
         }
         return true;
     }

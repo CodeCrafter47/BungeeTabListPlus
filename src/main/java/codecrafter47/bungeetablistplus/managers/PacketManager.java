@@ -26,8 +26,8 @@ import net.md_5.bungee.api.connection.Connection;
  */
 public class PacketManager {
 
-    ITeamPacket teamPacket;
-    IPlayerListPacket playerListPacket;
+    private ITeamPacket teamPacket;
+    private IPlayerListPacket playerListPacket;
 
     public PacketManager() {
         Class clazz;

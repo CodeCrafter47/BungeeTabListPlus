@@ -123,7 +123,7 @@ public class SkinManager {
         private String id;
         private String name;
 
-        List<Property> properties = new ArrayList<>();
+        final List<Property> properties = new ArrayList<>();
 
         private static class Property {
 
@@ -133,7 +133,7 @@ public class SkinManager {
 
     private class SkinFetchTask implements Runnable {
 
-        String nameOrUUID;
+        final String nameOrUUID;
 
         public SkinFetchTask(String nameOrUUID) {
             this.nameOrUUID = nameOrUUID;

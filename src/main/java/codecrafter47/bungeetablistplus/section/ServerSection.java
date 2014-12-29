@@ -29,7 +29,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public class ServerSection extends StaticSection {
 
-    String server;
+    private final String server;
 
     public ServerSection(int vAlign, String server) {
         super(vAlign);

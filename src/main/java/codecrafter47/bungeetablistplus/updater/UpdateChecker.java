@@ -37,9 +37,7 @@ public class UpdateChecker implements Runnable {
 
     private boolean updateAvailable = false;
 
-    private final long intervall = 120;
-
-    private int pid = -1;
+    private static final long intervall = 120;
 
     private boolean error = false;
 
@@ -50,7 +48,7 @@ public class UpdateChecker implements Runnable {
 
     private void enable() {
         plugin.getLogger().info("Starting UpdateChecker Task");
-        pid = plugin.getProxy().getScheduler().schedule(plugin, this, 0,
+        plugin.getProxy().getScheduler().schedule(plugin, this, 0,
                 intervall, TimeUnit.MINUTES).getId();
     }
 

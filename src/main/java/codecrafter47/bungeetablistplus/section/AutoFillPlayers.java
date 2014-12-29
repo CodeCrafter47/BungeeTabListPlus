@@ -28,9 +28,11 @@ import java.util.List;
  */
 public class AutoFillPlayers extends Section {
 
-    public String prefix, suffix;
-    public int startColumn, maxPlayers;
-    public List<String> sortRules;
+    public final String prefix;
+    public final String suffix;
+    public final int startColumn;
+    public final int maxPlayers;
+    public final List<String> sortRules;
 
     public AutoFillPlayers(int startColumn, String prefix, String suffix,
                            List<String> sortRules, int maxPlayers) {

@@ -30,7 +30,7 @@ import java.util.logging.Level;
  *
  * @author Florian Stober
  */
-public class ResendThread implements Runnable {
+class ResendThread implements Runnable {
 
     private final SendingQueue resendQueue;
     private double updateIntervall;

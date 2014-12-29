@@ -28,8 +28,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public class ServerState implements ServerVariable {
 
-    String errorText = "&cPlease set pingDelay in config.yml > 0";
-
     @Override
     public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
         if (args != null) {
@@ -38,16 +36,16 @@ public class ServerState implements ServerVariable {
         PingTask ping = BungeeTabListPlus.getInstance().getServerState(
                 server.getName());
         if (ping == null) {
+            String errorText = "&cPlease set pingDelay in config.yml > 0";
             BungeeTabListPlus.getInstance().getLogger().warning(
                     errorText);
             return errorText;
         }
 
         boolean isOnline = ping.isOnline();
-        String replacement = isOnline ? BungeeTabListPlus.getInstance().
+        return isOnline ? BungeeTabListPlus.getInstance().
                 getConfigManager().getMainConfig().online_text : BungeeTabListPlus.
                 getInstance().getConfigManager().getMainConfig().offline_text;
-        return replacement;
     }
 
 }

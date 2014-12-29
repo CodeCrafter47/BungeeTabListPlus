@@ -38,15 +38,15 @@ import java.util.*;
  */
 public class FillPlayersSection extends Section {
 
-    int vAlign;
-    Collection<String> filter;
-    TabListConfig config;
-    String prefix;
-    String suffix;
-    Skin skin;
-    List<IPlayer> players;
-    List<String> sort;
-    int maxPlayers;
+    private final int vAlign;
+    private final Collection<String> filter;
+    private final TabListConfig config;
+    private final String prefix;
+    private final String suffix;
+    private final Skin skin;
+    private List<IPlayer> players;
+    private final List<String> sort;
+    private final int maxPlayers;
 
     public FillPlayersSection(int vAlign, Collection<String> filter,
                               TabListConfig config, String prefix, String suffix, Skin skin,

@@ -27,7 +27,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  */
 public class UpdateNotifier implements Runnable {
 
-    BungeeTabListPlus plugin;
+    private final BungeeTabListPlus plugin;
 
     public UpdateNotifier(BungeeTabListPlus plugin) {
         this.plugin = plugin;

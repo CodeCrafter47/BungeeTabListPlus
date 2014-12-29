@@ -19,18 +19,15 @@ package codecrafter47.bungeetablistplus;
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.plugin.Plugin;
 
 public class PingTask
         implements Runnable {
 
     private final ServerInfo server;
-    private final Plugin plugin;
     private boolean online = true;
 
-    public PingTask(Plugin plugin, ServerInfo server) {
+    public PingTask(ServerInfo server) {
         this.server = server;
-        this.plugin = plugin;
     }
 
     public boolean isOnline() {

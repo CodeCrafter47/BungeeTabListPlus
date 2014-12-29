@@ -41,7 +41,7 @@ public class ConfigParser {
     //private static final Pattern formatThings = Pattern.compile("\\[ALIGN .*\\]");
     private final BungeeTabListPlus plugin;
 
-    public TabListConfig config;
+    private final TabListConfig config;
     int level = 1;
 
     public ConfigParser(TabListConfig config, BungeeTabListPlus plugin) {

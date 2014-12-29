@@ -30,8 +30,8 @@ import java.util.List;
  */
 public class StaticSection extends Section {
 
-    List<Slot> text;
-    int vAlign;
+    final List<Slot> text;
+    private final int vAlign;
 
     public StaticSection(int vAlign, List<Slot> text) {
         this.vAlign = vAlign;

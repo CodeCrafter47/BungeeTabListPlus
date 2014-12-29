@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BungeePlayerProvider implements IPlayerProvider {
 
-    Cache<ProxiedPlayer, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    private final Cache<ProxiedPlayer, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
 
     @Override
     public Collection<IPlayer> getPlayers() {
