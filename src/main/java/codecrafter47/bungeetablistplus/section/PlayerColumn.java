@@ -19,10 +19,12 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.sorting.AdminFirst;
 import codecrafter47.bungeetablistplus.sorting.Alphabet;
 import codecrafter47.bungeetablistplus.sorting.ISortingRule;
@@ -40,13 +42,13 @@ public class PlayerColumn {
     TabListConfig config;
     String prefix;
     String suffix;
-    String skin;
+    Skin skin;
     List<IPlayer> players;
     List<String> sort;
     int maxPlayers;
 
     public PlayerColumn(List<String> filter, TabListConfig config, String prefix,
-                        String suffix, String skin, List<String> sortrules, int maxPlayers) {
+                        String suffix, Skin skin, List<String> sortrules, int maxPlayers) {
         this.filter = filter;
         this.config = config;
         this.prefix = prefix;
@@ -94,10 +96,6 @@ public class PlayerColumn {
         });
     }
 
-    public int getMinSize(ProxiedPlayer player) {
-        return 0;
-    }
-
     public int getMaxSize(ProxiedPlayer player) {
         int m = players.size();
         if (m > maxPlayers) {
@@ -131,13 +129,10 @@ public class PlayerColumn {
                 tabList.setSlot(p, collumn + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
                                 getMainConfig().sendPing ? players.get(i).getPing() : 0));
-                if (skin != null && !skin.isEmpty())
+                if (skin != SkinManager.defaultSkin)
                     tabList.getSlot(p, collumn + c).setSkin(skin);
                 else if (config.showCorrectPlayerSkins)
-                    tabList.getSlot(p, collumn + c).setTextures(BungeeTabListPlus.
-                            getPlayerTexture(players.get(i)));
-                if (BungeeTabListPlus.isVersion18())
-                    tabList.getSlot(p, collumn + c).uuid = players.get(i).getUniqueID();
+                    tabList.getSlot(p, collumn + c).setSkin(players.get(i).getSkin());
                 c++;
                 if (c >= span) {
                     c = 0;
@@ -151,7 +146,7 @@ public class PlayerColumn {
                 line = prefix + line + suffix;
                 line = line.replace("{other_count}", "" + other_count);
                 tabList.setSlot(p, collumn + c, new Slot(line, config.defaultPing));
-                if (skin != null && !skin.isEmpty())
+                if (skin != SkinManager.defaultSkin)
                     tabList.getSlot(p, collumn + c).setSkin(skin);
                 c++;
                 if (c >= span) {

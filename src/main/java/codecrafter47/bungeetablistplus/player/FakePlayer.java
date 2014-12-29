@@ -1,14 +1,13 @@
 package codecrafter47.bungeetablistplus.player;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.UUID;
 
-/**
- * Created by florian on 27.12.14.
- */
 public class FakePlayer implements IPlayer {
     String name;
     ServerInfo server;
@@ -32,5 +31,10 @@ public class FakePlayer implements IPlayer {
     public int getPing() {
         // yeah... faked players have always good ping
         return 0;
+    }
+
+    @Override
+    public Skin getSkin() {
+        return BungeeTabListPlus.getInstance().getSkinManager().getSkin(name);
     }
 }

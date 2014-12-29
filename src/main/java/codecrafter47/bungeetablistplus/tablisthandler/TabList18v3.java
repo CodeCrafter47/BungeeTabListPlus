@@ -22,7 +22,9 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.ChatColor;
@@ -129,14 +131,14 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                     text = ColorParser.substringIgnoreColors(text, charLimit);
                 }
 
-                if (line.getTextures() == null) {
-                    line.setTextures(tabList.getDefaultSkin());
+                if (line.getSkin() == SkinManager.defaultSkin) {
+                    line.setSkin(tabList.getDefaultSkin());
                 }
 
                 UUID uuid = null;
                 boolean reorder = true;
-                if (line.getUUID() != null && list.contains(line.getUUID()) && super.uuids.get(line.getUUID()).getUsername().length() <= 13) {
-                    uuid = line.getUUID();
+                if (line.getSkin().getOwner() != null && list.contains(line.getSkin().getOwner()) && super.uuids.get(line.getSkin().getOwner()).getUsername().length() <= 13) {
+                    uuid = line.getSkin().getOwner();
                     list.remove(uuid);
                 }
                 if (uuid == null && !fakeUUIDs.isEmpty()) {
@@ -149,7 +151,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                     reorder = false;
                 }
 
-                updateSlot(uuid, i, text, line.ping, line.getTextures(), reorder);
+                updateSlot(uuid, i, text, line.ping, line.getSkin(), reorder);
             }
 
             for (UUID offlineId : list) {
@@ -222,8 +224,12 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
         sendUsernames.remove(offlineId);
     }
 
-    private void updateSlot(UUID offlineId, int row, String text, int ping, String[] textures, boolean reorder) {
+    private void updateSlot(UUID offlineId, int row, String text, int ping, Skin skin, boolean reorder) {
         boolean textureUpdate = false;
+        String[] textures = skin.toProperty();
+        if (textures != null) {
+            textures = new String[]{textures[1], textures[2]};
+        }
         // order
         if (reorder) {
             if (super.uuids.containsKey(offlineId)) {

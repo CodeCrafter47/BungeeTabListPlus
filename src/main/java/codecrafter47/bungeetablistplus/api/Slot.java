@@ -18,22 +18,27 @@
  */
 package codecrafter47.bungeetablistplus.api;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-
-import java.util.UUID;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.skin.Skin;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Slot {
 
+    @Getter
+    @Setter
     public String text;
+
+    @Getter
     public int ping;
-    private String[] textures = null;
-    private String skin = null;
-    public UUID uuid = null;
+
+    @Getter
+    @Setter
+    private Skin skin = SkinManager.defaultSkin;
 
     public Slot(String text, int ping) {
         super();
         this.text = text;
-        //this.ping = ping;//>1000?999:ping;
         if (ping < 0) {
             this.ping = -1;
         } else if (ping < 150) {
@@ -49,20 +54,20 @@ public class Slot {
         }
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public int getPing() {
-        return ping;
-    }
-
     public void setPing(int ping) {
-        this.ping = ping;
+        if (ping < 0) {
+            this.ping = -1;
+        } else if (ping < 150) {
+            this.ping = 0;
+        } else if (ping < 300) {
+            this.ping = 150;
+        } else if (ping < 600) {
+            this.ping = 300;
+        } else if (ping < 1000) {
+            this.ping = 600;
+        } else {
+            this.ping = 1000;
+        }
     }
 
     public Slot(String text) {
@@ -75,29 +80,5 @@ public class Slot {
         this.ping = s.ping;
         this.skin = s.skin;
         this.text = s.text;
-        this.textures = s.textures;
-    }
-
-    public String[] getTextures() {
-        if (textures != null) {
-            return textures;
-        }
-        if (skin != null) {
-            return BungeeTabListPlus.getInstance().getSkinManager().
-                    getSkin(skin);
-        }
-        return null;
-    }
-
-    public void setTextures(String[] textures) {
-        this.textures = textures;
-    }
-
-    public void setSkin(String name) {
-        this.skin = name;
-    }
-
-    public UUID getUUID() {
-        return uuid;
     }
 }

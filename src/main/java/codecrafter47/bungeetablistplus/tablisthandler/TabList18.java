@@ -23,7 +23,9 @@ import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.ChatColor;
@@ -94,10 +96,10 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
             }
 
-            if (line.getTextures() == null) {
-                line.setTextures(tabList.getDefaultSkin());
+            if (line.getSkin() == SkinManager.defaultSkin) {
+                line.setSkin(tabList.getDefaultSkin());
             }
-            updateSlot(i, text, line.ping, line.getTextures());
+            updateSlot(i, text, line.ping, line.getSkin());
         }
 
         // update header/footer
@@ -154,8 +156,12 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         getPlayer().unsafe().sendPacket(pli);
     }
 
-    private void updateSlot(int row, String text, int ping, String[] textures) {
+    private void updateSlot(int row, String text, int ping, Skin skin) {
         boolean textureUpdate = false;
+        String[] textures = skin.toProperty();
+        if (textures != null) {
+            textures = new String[]{textures[1], textures[2]};
+        }
         if ((sendTextures[row] == null && textures != null) || (sendTextures[row] != null && textures == null) || (textures != null && sendTextures[row] != null && !textures[0].
                 equals(
                         sendTextures[row]))) {

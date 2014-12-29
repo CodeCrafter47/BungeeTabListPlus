@@ -21,7 +21,10 @@ package codecrafter47.bungeetablistplus.config;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.section.*;
+import codecrafter47.bungeetablistplus.skin.LazySkin;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import net.md_5.bungee.api.ChatColor;
 
 import java.text.ParseException;
@@ -56,7 +59,7 @@ public class ConfigParser {
             int startColumn = -1;
             int collumn = -1;
             int maxplayers = 1000;
-            String skin = null;
+            Skin skin = SkinManager.defaultSkin;
             List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
@@ -81,7 +84,7 @@ public class ConfigParser {
                             substring(11, tag.length()));
                 } else if (tag.startsWith("SKIN=") && BungeeTabListPlus.
                         isVersion18()) {
-                    skin = tag.substring(5, tag.length());
+                    skin = new LazySkin(tag.substring(5, tag.length()));
                 } else {
                     plugin.getLogger().log(Level.WARNING,
                             "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
@@ -168,7 +171,7 @@ public class ConfigParser {
             // Its properties
             int ping = 0;
             int startColumn = -1;
-            String skin = null;
+            Skin skin = SkinManager.defaultSkin;
             List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
@@ -191,7 +194,7 @@ public class ConfigParser {
                             substring(11, tag.length()));
                 } else if (tag.startsWith("SKIN=") && BungeeTabListPlus.
                         isVersion18()) {
-                    skin = tag.substring(5, tag.length());
+                    skin = new LazySkin(tag.substring(5, tag.length()));
                 } else {
                     plugin.getLogger().log(Level.WARNING,
                             "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,

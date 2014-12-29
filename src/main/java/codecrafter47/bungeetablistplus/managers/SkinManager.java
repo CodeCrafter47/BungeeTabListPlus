@@ -19,10 +19,16 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -32,8 +38,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SkinManager {
@@ -41,29 +47,24 @@ public class SkinManager {
     private final BungeeTabListPlus plugin;
     private static final Gson gson = new Gson();
 
-    private final Map<String, String[]> cache = new ConcurrentHashMap<>();
+    private final Cache<String, Skin> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    public static final Skin defaultSkin = new PlayerSkin(UUID.randomUUID(), null);
 
-    private final List<String> skinsToFetch = new ArrayList<>();
-
-    private final List<String> badNames = new ArrayList<>();
+    private final Set<String> fetchingSkins = Sets.newConcurrentHashSet();
 
     public SkinManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;
-        plugin.getProxy().getScheduler().schedule(plugin, new SkinFetchTask(),
-                1, TimeUnit.SECONDS);
     }
 
-    public String[] getSkin(String nameOrUUID) {
-        if (cache.containsKey(nameOrUUID)) {
-            return cache.get(nameOrUUID);
+    @SneakyThrows
+    public Skin getSkin(String nameOrUUID) {
+        Skin skin = cache.getIfPresent(nameOrUUID);
+        if (skin != null) return skin;
+        if (!fetchingSkins.contains(nameOrUUID)) {
+            fetchingSkins.add(nameOrUUID);
+            plugin.getProxy().getScheduler().schedule(plugin, new SkinFetchTask(nameOrUUID), 0, TimeUnit.MILLISECONDS);
         }
-        synchronized (skinsToFetch) {
-            if (!skinsToFetch.contains(nameOrUUID) && !badNames.contains(
-                    nameOrUUID)) {
-                skinsToFetch.add(nameOrUUID);
-            }
-        }
-        return null;
+        return defaultSkin;
     }
 
     private String fetchUUID(String player) {
@@ -95,7 +96,7 @@ public class SkinManager {
 
     }
 
-    private String[] fetchSkin(final String uuid) {
+    private Skin fetchSkin(final String uuid) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(
                     "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").
@@ -103,24 +104,9 @@ public class SkinManager {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
-            return new String[]{skin.properties.get(0).value, skin.properties.
-                    get(0).signature};
-        } catch (IOException | JsonSyntaxException | JsonIOException e) {
-            if (e.getMessage().contains("429")) {
-                // mojang rate limit
-                // try again in 1 min
-                plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        badNames.remove(uuid);
-                        skinsToFetch.add(uuid);
-                    }
-
-                }, 1, TimeUnit.MINUTES);
-                return null;
-            }
-            plugin.reportError(e);
+            return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
+                    get(0).signature});
+        } catch (Exception ignored) {
         }
         return null;
 
@@ -147,55 +133,35 @@ public class SkinManager {
 
     private class SkinFetchTask implements Runnable {
 
+        String nameOrUUID;
+
+        public SkinFetchTask(String nameOrUUID) {
+            this.nameOrUUID = nameOrUUID;
+        }
+
         @Override
         public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-                    // ignore that
-                }
-                String next = null;
-                synchronized (skinsToFetch) {
-                    if (!skinsToFetch.isEmpty()) {
-                        next = skinsToFetch.get(0);
-                    }
-                }
-                if (next == null) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ex) {
-                        // ignore that
-                    }
-                    continue;
-                }
-                String uuid;
-                if (next.length() < 17) {
-                    uuid = fetchUUID(next);
-                } else {
-                    uuid = next;
-                }
-
-                if (uuid != null) {
-                    String[] skin = fetchSkin(uuid);
-                    if (skin != null) {
-                        cache.put(next, skin);
-                    } else {
-                        synchronized (skinsToFetch) {
-                            badNames.add(next);
-                        }
-                    }
-                } else {
-                    synchronized (skinsToFetch) {
-                        badNames.add(next);
-                    }
-                }
-
-                synchronized (skinsToFetch) {
-                    skinsToFetch.remove(next);
-                }
+            String uuid;
+            if (nameOrUUID.length() < 17) {
+                uuid = fetchUUID(nameOrUUID);
+            } else {
+                uuid = nameOrUUID;
             }
 
+            if (uuid != null) {
+                Skin skin = fetchSkin(uuid);
+                if (skin != null) {
+                    cache.put(nameOrUUID, skin);
+                    fetchingSkins.remove(nameOrUUID);
+                } else {
+                    plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            fetchingSkins.remove(nameOrUUID);
+                        }
+                    }, 1, TimeUnit.MINUTES);
+                }
+            }
         }
     }
 }

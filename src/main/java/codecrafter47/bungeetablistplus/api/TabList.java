@@ -19,6 +19,9 @@
 package codecrafter47.bungeetablistplus.api;
 
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.skin.Skin;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Florian Stober
@@ -31,16 +34,10 @@ public class TabList {
     private Slot[] slots;
     private String header;
     private String footer;
-    private String[] defaultSkin;
+    @Getter
+    @Setter
+    private Skin defaultSkin;
     private int defaultPing;
-
-    public String[] getDefaultSkin() {
-        return defaultSkin;
-    }
-
-    public void setDefaultSkin(String[] defaultSkin) {
-        this.defaultSkin = defaultSkin;
-    }
 
     public String getHeader() {
         return header;

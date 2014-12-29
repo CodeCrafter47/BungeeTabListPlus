@@ -19,10 +19,12 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.sorting.AdminFirst;
 import codecrafter47.bungeetablistplus.sorting.Alphabet;
 import codecrafter47.bungeetablistplus.sorting.ISortingRule;
@@ -41,13 +43,13 @@ public class FillPlayersSection extends Section {
     TabListConfig config;
     String prefix;
     String suffix;
-    String skin;
+    Skin skin;
     List<IPlayer> players;
     List<String> sort;
     int maxPlayers;
 
     public FillPlayersSection(int vAlign, Collection<String> filter,
-                              TabListConfig config, String prefix, String suffix, String skin,
+                              TabListConfig config, String prefix, String suffix, Skin skin,
                               List<String> sortrules, int maxPlayers) {
         this.vAlign = vAlign;
         this.filter = filter;
@@ -148,13 +150,10 @@ public class FillPlayersSection extends Section {
             tabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
                     getConfigManager().getMainConfig().sendPing ? player.
                     getPing() : 0));
-            if (skin != null && !skin.isEmpty())
+            if (skin != SkinManager.defaultSkin)
                 tabList.getSlot(i).setSkin(skin);
             else if (config.showCorrectPlayerSkins)
-                tabList.getSlot(i).setTextures(BungeeTabListPlus.getPlayerTexture(
-                        player));
-            if (BungeeTabListPlus.isVersion18())
-                tabList.getSlot(i).uuid = player.getUniqueID();
+                tabList.getSlot(i).setSkin(player.getSkin());
         }
         return i;
     }
@@ -165,7 +164,7 @@ public class FillPlayersSection extends Section {
             String line = prefix + config.morePlayersLines.get(i - pos) + suffix;
             line = line.replace("{other_count}", "" + other_count);
             tabList.setSlot(i, new Slot(line, 0));
-            if (skin != null && !skin.isEmpty())
+            if (skin != SkinManager.defaultSkin)
                 tabList.getSlot(i).setSkin(skin);
         }
         return i;

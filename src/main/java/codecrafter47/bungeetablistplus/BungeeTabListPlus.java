@@ -18,8 +18,6 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.Constants;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
@@ -27,10 +25,7 @@ import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
-import codecrafter47.bungeetablistplus.player.BungeePlayer;
-import codecrafter47.bungeetablistplus.player.BungeePlayerProvider;
-import codecrafter47.bungeetablistplus.player.FakePlayerManager;
-import codecrafter47.bungeetablistplus.player.RedisPlayerProvider;
+import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import gnu.trove.map.TObjectIntMap;
@@ -43,8 +38,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import net.md_5.bungee.connection.LoginResult;
-import net.md_5.bungee.connection.LoginResult.Property;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.Protocol;
 
@@ -85,10 +78,6 @@ public class BungeeTabListPlus extends Plugin {
      * provides access to the configuration
      */
     private ConfigManager config;
-
-    public FakePlayerManager getFakePlayerManager() {
-        return fakePlayerManager;
-    }
 
     private FakePlayerManager fakePlayerManager;
 
@@ -498,10 +487,7 @@ public class BungeeTabListPlus extends Plugin {
      * @return true if an newer version of BungeeTabListPlus is available
      */
     public boolean isUpdateAvailable() {
-        if (updateChecker != null) {
-            return updateChecker.isUpdateAvailable();
-        }
-        return false;
+        return updateChecker != null && updateChecker.isUpdateAvailable();
     }
 
     public void reportError(Throwable th) {
@@ -534,26 +520,6 @@ public class BungeeTabListPlus extends Plugin {
                 isVersion18() ? "tabListHandler" : "tabList");
         tabListHandler.setAccessible(true);
         tabListHandler.set(player, tabList);
-    }
-
-    public static String[] getPlayerTexture(IPlayer player) {
-        if (!isVersion18()) {
-            return null;
-        }
-        if (!(player instanceof BungeePlayer)) {
-            return getInstance().getSkinManager().getSkin(player.getName());
-        }
-        LoginResult loginResult = ((UserConnection) ((BungeePlayer) player).getPlayer()).
-                getPendingConnection().getLoginProfile();
-        if (loginResult == null) {
-            return null;
-        }
-        for (Property s : loginResult.getProperties()) {
-            if (s.getName().equals("textures")) {
-                return new String[]{s.getValue(), s.getSignature()};
-            }
-        }
-        return null;
     }
 
     public static boolean isAbove995() {

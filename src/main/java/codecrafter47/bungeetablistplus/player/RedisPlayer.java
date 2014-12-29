@@ -1,14 +1,13 @@
 package codecrafter47.bungeetablistplus.player;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Optional;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.UUID;
 
-/**
- * Created by florian on 27.12.14.
- */
 public class RedisPlayer implements IPlayer {
     String name;
     final UUID uuid;
@@ -45,5 +44,10 @@ public class RedisPlayer implements IPlayer {
     public int getPing() {
         // no way to know the real ping, so we just assume the best
         return 0;
+    }
+
+    @Override
+    public Skin getSkin() {
+        return BungeeTabListPlus.getInstance().getSkinManager().getSkin(uuid.toString());
     }
 }
