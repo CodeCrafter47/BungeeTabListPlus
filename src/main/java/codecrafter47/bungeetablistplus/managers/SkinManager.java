@@ -155,6 +155,9 @@ public class SkinManager {
                 if (skin != null) {
                     cache.put(nameOrUUID, skin);
                     fetchingSkins.remove(nameOrUUID);
+
+                    // we received a new skin -> update tab to all players
+                    BungeeTabListPlus.getInstance().resendTabLists();
                 } else {
                     plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
                         @Override
