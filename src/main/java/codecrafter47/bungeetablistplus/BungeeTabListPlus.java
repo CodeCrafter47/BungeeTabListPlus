@@ -188,9 +188,9 @@ public class BungeeTabListPlus extends Plugin {
 
         playerProviders.add(fakePlayerManager);
 
-        // TODO make sure redisbungee is loaded before bungeetablistplus, or query this later
         if (getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
             playerProviders.add(new RedisPlayerProvider());
+            getLogger().info("Hooked RedisBungee");
         } else {
             playerProviders.add(bungeePlayerProvider);
         }

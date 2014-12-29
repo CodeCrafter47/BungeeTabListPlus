@@ -98,6 +98,7 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>plugin.yml</include>
+                    <include>bungee.yml</include>
                 </includes>
             </resource>
         </resources>
