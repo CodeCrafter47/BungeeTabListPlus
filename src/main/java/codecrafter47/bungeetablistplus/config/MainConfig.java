@@ -113,6 +113,19 @@ public class MainConfig extends Config {
     }
 
     @Comments({
+            "list servers you wish to create custom prefixes for.",
+            "the use of custom prefixes would use a new variable such as {serverPrefix}",
+            "the name used below should be the alias name setup in the plugin's config file",
+            "same used for {fillplayers:<server>} function"
+    })
+    public final HashMap<String, String> serverPrefixes = new HashMap<>();
+
+    {
+        serverPrefixes.put("Minigames", "&8(&bM&8)");
+        serverPrefixes.put("SkyBlock", "&8(&dS&8) ");
+    }
+
+    @Comments({
             "the prefixes used for the {prefix} variable, based upon permission groups",
             "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
     })

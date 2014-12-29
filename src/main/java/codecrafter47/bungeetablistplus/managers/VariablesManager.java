@@ -93,6 +93,7 @@ public final class VariablesManager {
         addVariable("rplayers", new RedisPlayers());
         addVariable("internalServerName", new InternalServerNameVariable());
         addVariable("server_rplayer_count", new PerServerRedisPlayers());
+        addVariable("serverPrefix", new ServerPrefixVariable());
     }
 
     public void addVariable(String name, Variable var) {
