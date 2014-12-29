@@ -404,11 +404,7 @@ public class Metrics {
 
                 boolean firstGraph = true;
 
-                final Iterator<Graph> iter = graphs.iterator();
-
-                while (iter.hasNext()) {
-                    Graph graph = iter.next();
-
+                for (Graph graph : graphs) {
                     StringBuilder graphJson = new StringBuilder();
                     graphJson.append('{');
 
@@ -499,11 +495,8 @@ public class Metrics {
             if (response.equals("1") || response.contains(
                     "This is your first update this hour")) {
                 synchronized (graphs) {
-                    final Iterator<Graph> iter = graphs.iterator();
 
-                    while (iter.hasNext()) {
-                        final Graph graph = iter.next();
-
+                    for (Graph graph : graphs) {
                         for (Plotter plotter : graph.getPlotters()) {
                             plotter.reset();
                         }
@@ -660,7 +653,7 @@ public class Metrics {
         /**
          * The set of plotters that are contained within this graph
          */
-        private final Set<Plotter> plotters = new LinkedHashSet<Plotter>();
+        private final Set<Plotter> plotters = new LinkedHashSet<>();
 
         private Graph(final String name) {
             this.name = name;
@@ -745,10 +738,8 @@ public class Metrics {
         /**
          * Construct a plotter with a specific plot name
          *
-         * @param name the name of the plotter to use, which will show up on the
-         *             website
          */
-        public Plotter(final String name) {
+        public Plotter(String name) {
             this.name = name;
         }
 

@@ -1,20 +1,22 @@
 /*
- * BungeeTabListPlus - a bungeecord plugin to customize the tablist
  *
- * Copyright (C) 2014 Florian Stober
+ *  * BungeeTabListPlus - a bungeecord plugin to customize the tablist
+ *  *
+ *  * Copyright (C) 2014 Florian Stober
+ *  *
+ *  * This program is free software: you can redistribute it and/or modify
+ *  * it under the terms of the GNU General Public License as published by
+ *  * the Free Software Foundation, either version 3 of the License, or
+ *  * (at your option) any later version.
+ *  *
+ *  * This program is distributed in the hope that it will be useful,
+ *  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  * GNU General Public License for more details.
+ *  *
+ *  * You should have received a copy of the GNU General Public License
+ *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package codecrafter47.bungeetablistplus.tablisthandler;
 
@@ -143,8 +145,7 @@ class MyCustom extends CustomTabListHandler {
             if (sent[i] != null) {
                 if (remove
                         || !sent[i]
-                        .equals((slots[i] == null ? new StringBuilder()
-                                .append(base(i)).toString() : slots[i]))) {
+                        .equals((slots[i] == null ? String.valueOf(base(i)) : slots[i]))) {
                     String line = sent[i];
                     sent[i] = null;
                     /*
@@ -158,8 +159,7 @@ class MyCustom extends CustomTabListHandler {
         }
         sentStuff.clear();
         for (int i = 0; i <= rowLim; i++) {
-            String line = (slots[i] != null) ? slots[i] : new StringBuilder()
-                    .append(base(i)).toString();
+            String line = (slots[i] != null) ? slots[i] : String.valueOf(base(i));
             sent[i] = line;
             if (slots[i] != null) {
                 sentStuff.add(line);

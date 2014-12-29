@@ -1,20 +1,22 @@
 /*
- * BungeeTabListPlus - a bungeecord plugin to customize the tablist
  *
- * Copyright (C) 2014 Florian Stober
+ *  * BungeeTabListPlus - a bungeecord plugin to customize the tablist
+ *  *
+ *  * Copyright (C) 2014 Florian Stober
+ *  *
+ *  * This program is free software: you can redistribute it and/or modify
+ *  * it under the terms of the GNU General Public License as published by
+ *  * the Free Software Foundation, either version 3 of the License, or
+ *  * (at your option) any later version.
+ *  *
+ *  * This program is distributed in the hope that it will be useful,
+ *  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  * GNU General Public License for more details.
+ *  *
+ *  * You should have received a copy of the GNU General Public License
+ *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package codecrafter47.bungeetablistplus.bridge;
 
@@ -105,37 +107,41 @@ public class BukkitBridge implements Listener {
                         data.put(key, value);
                     }
 
-                    if (subchannel.equals(Constants.subchannel_init)) {
-                        serverInformation.put(server.getInfo().getName(), data);
-                    } else if (subchannel.equals(Constants.subchannel_update)) {
-                        if (serverInformation.get(server.getInfo().getName()) == null) {
-                            server.sendData(Constants.channel, Cinit);
-                        } else {
-                            for (Entry<String, String> entry : data.entrySet()) {
-                                serverInformation.get(server.getInfo().
-                                        getName()).put(entry.getKey(), entry.
-                                        getValue());
+                    switch (subchannel) {
+                        case Constants.subchannel_init:
+                            serverInformation.put(server.getInfo().getName(), data);
+                            break;
+                        case Constants.subchannel_update:
+                            if (serverInformation.get(server.getInfo().getName()) == null) {
+                                server.sendData(Constants.channel, Cinit);
+                            } else {
+                                for (Entry<String, String> entry : data.entrySet()) {
+                                    serverInformation.get(server.getInfo().
+                                            getName()).put(entry.getKey(), entry.
+                                            getValue());
+                                }
                             }
-                        }
-                    } else if (subchannel.
-                            equals(Constants.subchannel_initplayer)) {
-                        playerInformation.put(player.getName(), data);
-                        data.put("server", server.getInfo().getName());
-                    } else if (subchannel.equals(
-                            Constants.subchannel_updateplayer)) {
-                        if (playerInformation.get(player.getName()) == null) {
-                            player.getServer().sendData(Constants.channel,
-                                    Cinit_player);
-                        } else {
-                            for (Entry<String, String> entry : data.entrySet()) {
-                                playerInformation.get(player.getName()).put(
-                                        entry.getKey(), entry.getValue());
+                            break;
+                        case Constants.subchannel_initplayer:
+                            playerInformation.put(player.getName(), data);
+                            data.put("server", server.getInfo().getName());
+                            break;
+                        case Constants.subchannel_updateplayer:
+                            if (playerInformation.get(player.getName()) == null) {
+                                player.getServer().sendData(Constants.channel,
+                                        Cinit_player);
+                            } else {
+                                for (Entry<String, String> entry : data.entrySet()) {
+                                    playerInformation.get(player.getName()).put(
+                                            entry.getKey(), entry.getValue());
+                                }
                             }
-                        }
-                    } else {
-                        plugin.getLogger().log(Level.SEVERE,
-                                "BukkitBridge on server " + server.getInfo().
-                                        getName() + " send an unknown packet! Is everything up-to-date?");
+                            break;
+                        default:
+                            plugin.getLogger().log(Level.SEVERE,
+                                    "BukkitBridge on server " + server.getInfo().
+                                            getName() + " send an unknown packet! Is everything up-to-date?");
+                            break;
                     }
 
                 } catch (IOException ex) {

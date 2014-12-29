@@ -1,20 +1,22 @@
 /*
- * BungeeTabListPlus - a bungeecord plugin to customize the tablist
  *
- * Copyright (C) 2014 Florian Stober
+ *  * BungeeTabListPlus - a bungeecord plugin to customize the tablist
+ *  *
+ *  * Copyright (C) 2014 Florian Stober
+ *  *
+ *  * This program is free software: you can redistribute it and/or modify
+ *  * it under the terms of the GNU General Public License as published by
+ *  * the Free Software Foundation, either version 3 of the License, or
+ *  * (at your option) any later version.
+ *  *
+ *  * This program is distributed in the hope that it will be useful,
+ *  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  * GNU General Public License for more details.
+ *  *
+ *  * You should have received a copy of the GNU General Public License
+ *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package codecrafter47.bungeetablistplus.tablisthandler;
 
@@ -46,8 +48,7 @@ public class TabList17 extends CustomTabList18 implements
                 alloc[i] = hex.charAt(i / 2);
             }
         }
-        return new StringBuilder().append(ChatColor.MAGIC).append(alloc).append(
-                ChatColor.RESET).toString();
+        return String.valueOf(ChatColor.MAGIC) + alloc + ChatColor.RESET;
     }
 
     private final int[] slots_ping = new int[ConfigManager.getTabSize()];
@@ -166,17 +167,17 @@ public class TabList17 extends CustomTabList18 implements
         send[row] = text;
         slots_ping[row] = ping;
         String split[] = splitText(text);
-        updateTeam(getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
+        updateTeam(getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/  split[1]);
 
     }
 
     void updateTeam(Connection.Unsafe connection, String player,
-                    String prefix, String displayname, String suffix) {
+                    String prefix, String suffix) {
         Team t = new Team();
         t.setName("TAB" + player);
         t.setMode((byte) 2);
         t.setPrefix(prefix);
-        t.setDisplayName(displayname);
+        t.setDisplayName("");
         t.setSuffix(suffix);
         connection.sendPacket(t);
     }
