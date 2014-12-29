@@ -30,7 +30,7 @@ public class CurrentServerPlayerCountVariable implements ServerVariable {
     @Override
     public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
         return "" + BungeeTabListPlus.getInstance().getPlayerManager().
-                getServerPlayerCount(server.getName());
+                getServerPlayerCount(server.getName(), viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
     }
 
 }

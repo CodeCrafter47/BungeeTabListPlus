@@ -66,7 +66,7 @@ public class FillPlayersSection extends Section {
     @Override
     public void precalculate(ProxiedPlayer player) {
         players = BungeeTabListPlus.getInstance().getPlayerManager().getPlayers(
-                filter, player);
+                filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {

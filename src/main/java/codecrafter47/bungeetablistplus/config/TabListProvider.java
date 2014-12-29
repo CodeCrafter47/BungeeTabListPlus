@@ -91,9 +91,9 @@ public class TabListProvider implements ITabListProvider {
                         @Override
                         public int compare(String s1, String s2) {
                             int p1 = plugin.
-                                    getPlayerManager().getServerPlayerCount(s1, player);
+                                    getPlayerManager().getServerPlayerCount(s1, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
                             int p2 = plugin.
-                                    getPlayerManager().getServerPlayerCount(s2, player);
+                                    getPlayerManager().getServerPlayerCount(s2, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
                             if (p1 < p2) {
                                 return 1;
                             }
@@ -107,7 +107,7 @@ public class TabListProvider implements ITabListProvider {
                     int j = i;
                     for (String server : list) {
                         if (config.showEmptyGroups || plugin.getPlayerManager().
-                                getServerPlayerCount(server, player) > 0) {
+                                getServerPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
                             try {
                                 List<Section> sections = parser.
                                         parseServerSections(

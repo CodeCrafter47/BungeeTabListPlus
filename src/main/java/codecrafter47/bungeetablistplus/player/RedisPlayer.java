@@ -71,4 +71,10 @@ public class RedisPlayer implements IPlayer {
     public Skin getSkin() {
         return BungeeTabListPlus.getInstance().getSkinManager().getSkin(uuid.toString());
     }
+
+    @Override
+    public int getGameMode() {
+        // we don't know -> survival mode
+        return 0;
+    }
 }

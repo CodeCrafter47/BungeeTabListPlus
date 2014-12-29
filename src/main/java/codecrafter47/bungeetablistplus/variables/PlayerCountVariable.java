@@ -30,6 +30,6 @@ public class PlayerCountVariable implements Variable {
     public String getReplacement(ProxiedPlayer viewer, String args) {
         // TODO this shouldn't be a player variable
         return "" + BungeeTabListPlus.getInstance().getPlayerManager().
-                getGlobalPlayerCount(viewer);
+                getGlobalPlayerCount(viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
     }
 }

@@ -37,4 +37,6 @@ public interface IPlayer {
     int getPing();
 
     Skin getSkin();
+
+    int getGameMode();
 }

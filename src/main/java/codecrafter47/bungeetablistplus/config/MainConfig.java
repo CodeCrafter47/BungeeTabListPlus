@@ -79,6 +79,11 @@ public class MainConfig extends Config {
     public final boolean sendPing = true;
 
     @Comments({
+            "whether to show players in suspector mode"
+    })
+    public final boolean showPlayersInGamemode3 = true;
+
+    @Comments({
             "if enabled the plugin checks for new versions automatically.",
             "Use /BTLP to see whether a new version is available",
             "this does NOT automatically install an update"

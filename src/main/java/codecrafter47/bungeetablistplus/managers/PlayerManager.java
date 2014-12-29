@@ -63,7 +63,7 @@ public class PlayerManager {
     }
 
     public List<IPlayer> getPlayers(Collection<String> filter,
-                                    ProxiedPlayer who) {
+                                    ProxiedPlayer who, boolean includeSuspectors) {
         List<IPlayer> list = new ArrayList<>();
         Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
             @Override
@@ -121,14 +121,14 @@ public class PlayerManager {
                 }
             }
             if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.
-                    isHidden(p, who)) {
+                    isHidden(p, who) && (includeSuspectors || p.getGameMode() != 3)) {
                 list.add(p);
             }
         }
         return list;
     }
 
-    public int getServerPlayerCount(String server) {
+    public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSuspectors) {
         int num = 0;
         Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
             @Override
@@ -140,7 +140,7 @@ public class PlayerManager {
             Optional<ServerInfo> s = p.getServer();
             if (s.isPresent()) {
                 if (s.get().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
-                        isHidden(p)) {
+                        isHidden(p, viewer) && (includeSuspectors || p.getGameMode() != 3)) {
                     num++;
                 }
             }
@@ -148,7 +148,7 @@ public class PlayerManager {
         return num;
     }
 
-    public int getServerPlayerCount(String server, ProxiedPlayer viewer) {
+    public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSuspectors) {
         int num = 0;
         Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
             @Override
@@ -157,36 +157,16 @@ public class PlayerManager {
             }
         }));
         for (IPlayer p : players) {
-            Optional<ServerInfo> s = p.getServer();
-            if (s.isPresent()) {
-                if (s.get().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
-                        isHidden(p, viewer)) {
-                    num++;
-                }
-            }
-        }
-        return num;
-    }
-
-    public int getGlobalPlayerCount(ProxiedPlayer viewer) {
-        int num = 0;
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
-            @Override
-            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
-                return iPlayerProvider.getPlayers();
-            }
-        }));
-        for (IPlayer p : players) {
-            if (!BungeeTabListPlus.isHidden(p, viewer)) {
+            if (!BungeeTabListPlus.isHidden(p, viewer) && (includeSuspectors || p.getGameMode() != 3)) {
                 num++;
             }
         }
         return num;
     }
 
-    public int getPlayerCount(String args, ProxiedPlayer player) {
+    public int getPlayerCount(String args, ProxiedPlayer player, boolean includeSuspectors) {
         String tmp = args.replaceAll(",", "+");
         String[] all = tmp.split("\\+");
-        return this.getPlayers(Arrays.asList(all), player).size();
+        return this.getPlayers(Arrays.asList(all), player, includeSuspectors).size();
     }
 }

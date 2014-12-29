@@ -31,10 +31,10 @@ public class ServerPlayerCountVariable implements Variable {
         // TODO this shouldn't be a player variable
         if (args == null) {
             return Integer.toString(BungeeTabListPlus.getInstance().
-                    getPlayerManager().getGlobalPlayerCount(viewer));
+                    getPlayerManager().getGlobalPlayerCount(viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3));
         }
         return Integer.toString(BungeeTabListPlus.getInstance().
-                getPlayerManager().getPlayerCount(args, viewer));
+                getPlayerManager().getPlayerCount(args, viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3));
     }
 
 }

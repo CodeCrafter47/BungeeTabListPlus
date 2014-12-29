@@ -62,7 +62,7 @@ public class PlayerColumn {
 
     public void precalculate(ProxiedPlayer player) {
         this.players = BungeeTabListPlus.getInstance().getPlayerManager().
-                getPlayers(filter, player);
+                getPlayers(filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {

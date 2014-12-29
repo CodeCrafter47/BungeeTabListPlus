@@ -82,6 +82,11 @@ public class BungeePlayer implements IPlayer {
         return skin;
     }
 
+    @Override
+    public int getGameMode() {
+        return ((UserConnection) player).getGamemode();
+    }
+
     public ProxiedPlayer getPlayer() {
         return player;
     }

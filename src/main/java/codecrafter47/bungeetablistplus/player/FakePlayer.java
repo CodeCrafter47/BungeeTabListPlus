@@ -58,4 +58,10 @@ public class FakePlayer implements IPlayer {
     public Skin getSkin() {
         return BungeeTabListPlus.getInstance().getSkinManager().getSkin(name);
     }
+
+    @Override
+    public int getGameMode() {
+        // fake players are always in survival mode
+        return 0;
+    }
 }
