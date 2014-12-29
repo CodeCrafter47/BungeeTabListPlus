@@ -94,6 +94,7 @@ public final class VariablesManager {
         addVariable("internalServerName", new InternalServerNameVariable());
         addVariable("server_rplayer_count", new PerServerRedisPlayers());
         addVariable("serverPrefix", new ServerPrefixVariable());
+        addVariable("playerPoints", new BukkitBridgeVariable("playerPoints"));
     }
 
     public void addVariable(String name, Variable var) {

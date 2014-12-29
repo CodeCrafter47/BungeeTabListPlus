@@ -28,6 +28,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
@@ -43,7 +44,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 /**
  *
@@ -119,9 +119,14 @@ public class BukkitBridge extends JavaPlugin implements Listener,
         Plugin factions = getServer().getPluginManager().getPlugin("Factions");
         if (factions != null) {
             getLogger().info("hooked Factions");
-            // new factions
             this.registerPlayerInformationProvider(factions,
                     new FactionHook_7_3_0());
+        }
+
+        Plugin playerPoints = getServer().getPluginManager().getPlugin("PlayerPoints");
+        if (playerPoints != null) {
+            getLogger().info("Hooked PlayerPoints");
+            this.registerPlayerInformationProvider(playerPoints, new PlayerPointsHook(this));
         }
 
         BukkitHook bukkitHook = new BukkitHook(this);
