@@ -21,7 +21,6 @@
 
 package codecrafter47.bungeetablistplus.player;
 
-import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Optional;
@@ -77,7 +76,7 @@ public class BungeePlayer implements IPlayer {
                 }
             }
             if (skin == null) {
-                skin = SkinManager.defaultSkin;
+                skin = new PlayerSkin(player.getUniqueId(), null);
             }
         }
         return skin;
