@@ -95,6 +95,9 @@ public final class VariablesManager {
         addVariable("server_rplayer_count", new PerServerRedisPlayers());
         addVariable("serverPrefix", new ServerPrefixVariable());
         addVariable("playerPoints", new BukkitBridgeVariable("playerPoints"));
+        addVariable("insertIfGamemode3", new InsertIfGamemode3());
+        addVariable("insertIfHidden", new InsertIfHidden());
+        addVariable("insertIfServersSame", new InsertIfServersSame());
     }
 
     public void addVariable(String name, Variable var) {
