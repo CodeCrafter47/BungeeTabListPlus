@@ -103,7 +103,7 @@ public class VaultHook implements PlayerInformationProvider {
         }
         try {
             if (economy != null) {
-                map.put("balance", economy.getBalance(player.getName()));
+                map.put("balance", Math.round(economy.getBalance(player.getName()) * 100) / 100);
                 map.put("currency", economy.currencyNameSingular());
                 map.put("currencyPl", economy.currencyNamePlural());
             }
