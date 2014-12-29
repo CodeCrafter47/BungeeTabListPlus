@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -139,13 +140,24 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
 
                 UUID uuid = null;
                 boolean reorder = true;
-                if (line.getSkin().getOwner() != null && list.contains(line.getSkin().getOwner()) && super.uuids.get(line.getSkin().getOwner()).getUsername().length() <= 13) {
+                if (line.getSkin().getOwner() != null && list.contains(line.getSkin().getOwner()) && super.uuids.get(line.getSkin().getOwner()).getUsername().length() <= 13
+                        && (((UserConnection) getPlayer()).getGamemode() != 3 || !Objects.equals(line.getSkin().getOwner(), getPlayer().getUniqueId()))) {
                     uuid = line.getSkin().getOwner();
                     list.remove(uuid);
                 }
                 if (uuid == null && !fakeUUIDs.isEmpty()) {
                     uuid = fakeUUIDs.get(0);
                     fakeUUIDs.remove(uuid);
+                }
+                if (uuid == null) {
+                    for (int j = 0; j < list.size(); j++) {
+                        uuid = list.get(0);
+                        if (!(Objects.equals(uuid, getPlayer().getUniqueId()) && ((UserConnection) getPlayer()).getGamemode() == 3)) {
+                            list.remove(uuid);
+                            reorder = false;
+                            break;
+                        }
+                    }
                 }
                 if (uuid == null) {
                     uuid = list.get(0);
@@ -247,7 +259,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                                     fromLegacyText(text)));
 
                     item.setUsername(newName);
-                    item.setGamemode(0);
+                    item.setGamemode(super.uuids.get(offlineId).getGamemode());
                     item.setProperties(super.uuids.get(offlineId).getProperties());
                     pli.setItems(new Item[]{item});
                     getPlayer().unsafe().sendPacket(pli);
@@ -297,7 +309,7 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                                 fromLegacyText(text)));
 
                 item.setUsername(newName);
-                item.setGamemode(0);
+                item.setGamemode(super.uuids.get(offlineId).getGamemode());
                 item.setProperties(super.uuids.get(offlineId).getProperties());
                 pli.setItems(new Item[]{item});
                 getPlayer().unsafe().sendPacket(pli);

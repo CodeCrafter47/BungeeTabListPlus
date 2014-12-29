@@ -147,10 +147,10 @@ class CustomTabList18 extends TabList {
         if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
                 contains(getPlayer().getServer().getInfo().getName()) || isExcluded || getPlayer().
                 getPendingConnection().getVersion() >= 47) {
-            // Pass the Packet to the client
-            player.unsafe().sendPacket(pli);
-            if (((this instanceof TabList18v3) && ((pli.getAction() == Action.ADD_PLAYER) || (pli.
+            if (pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId()) || ((this instanceof TabList18v3) && ((pli.getAction() == Action.ADD_PLAYER) || (pli.
                     getAction() == Action.REMOVE_PLAYER)))) {
+                // Pass the Packet to the client
+                player.unsafe().sendPacket(pli);
                 // update list on the client
                 BungeeTabListPlus.getInstance().sendImmediate(player);
             }
@@ -171,6 +171,9 @@ class CustomTabList18 extends TabList {
                         } else {
                             usernames.remove(item.getUsername());
                         }
+                    } else if (pli.getAction() == Action.UPDATE_GAMEMODE && item.getUuid().equals(getPlayer().getUniqueId())) {
+                        Item item1 = uuids.get(item.getUuid());
+                        if (item1 != null) item1.setGamemode(item.getGamemode());
                     }
                 }
             }
