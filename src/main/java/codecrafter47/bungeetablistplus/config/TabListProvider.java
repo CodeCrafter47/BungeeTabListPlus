@@ -189,7 +189,6 @@ public class TabListProvider implements ITabListProvider {
 
         // calculating bot and top sections
         // TOP
-        // grob vorberechnen
         int len[] = new int[topSections.size()];
         List<Section> sections_left = new ArrayList<>(topSections);
         int space = topsize;//topSections.size();
@@ -283,7 +282,6 @@ public class TabListProvider implements ITabListProvider {
             sections_left.remove(found);
         }
 
-        // jetzt richtig berechnen
         int pos = 0;
         int i = 0;
         for (Section s : topSections) {
@@ -295,10 +293,9 @@ public class TabListProvider implements ITabListProvider {
         }
 
         // BOT
-        // grob vorberechnen
         len = new int[botSections.size()];
         sections_left = new ArrayList<>();
-        space = botsize;//botSections.size();
+        space = botsize;
 
         for (i = 0; i < len.length; i++) {
             len[i] = -1;
@@ -390,7 +387,6 @@ public class TabListProvider implements ITabListProvider {
             sections_left.remove(found);
         }
 
-        // jetzt richtig berechnen
         pos = tabList.getSize() - botsize;
         i = 0;
         for (Section s : botSections) {

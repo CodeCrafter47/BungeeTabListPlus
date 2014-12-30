@@ -112,6 +112,9 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 text = ChatColor.translateAlternateColorCodes('&', text);
                 if (charLimit > 0) {
                     text = ColorParser.substringIgnoreColors(text, charLimit);
+                    for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
+                        text += ' ';
+                    }
                 }
 
                 if (line.getSkin() == SkinManager.defaultSkin) {
