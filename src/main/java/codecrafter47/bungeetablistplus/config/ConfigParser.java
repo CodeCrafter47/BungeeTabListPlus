@@ -35,17 +35,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Florian Stober
  */
 public class ConfigParser {
 
-    //private static final Pattern formatThings = Pattern.compile("\\[ALIGN .*\\]");
     private final BungeeTabListPlus plugin;
 
     private final TabListConfig config;
-    int level = 1;
+    public static final Pattern PATTERN_TAGS = Pattern.compile("^(\\[[^]]*\\])*(?<text>.*)$");
 
     public ConfigParser(TabListConfig config, BungeeTabListPlus plugin) {
         this.config = config;
@@ -141,12 +142,12 @@ public class ConfigParser {
                                 config, prefix, suffix, skin, sortrules, maxplayers));
                     }
                 } else {
-                    CollumnSplitSection cs;
-                    if (sections.get(sections.size() - 1) instanceof CollumnSplitSection) {
-                        cs = (CollumnSplitSection) sections.get(
+                    ColumnSplitSection cs;
+                    if (sections.get(sections.size() - 1) instanceof ColumnSplitSection) {
+                        cs = (ColumnSplitSection) sections.get(
                                 sections.size() - 1);
                     } else {
-                        cs = new CollumnSplitSection();
+                        cs = new ColumnSplitSection();
                         sections.add(cs);
                     }
                     cs.addCollumn(column, new PlayerColumn(filter, config,
@@ -272,19 +273,9 @@ public class ConfigParser {
 
     private String stripTags(String line) throws ParseException {
         // TODO this can be optimized
-        int i = 0;
-        int end = -1;
-        while (i < line.length() && line.charAt(i) == '[') {
-            end = line.indexOf(']', i);
-            if (end == -1) {
-                throw new ParseException("Missing ']'", i);
-            }
-            i = end + 1;
-        }
-        if (end + 1 >= line.length() - 1) {
-            return "";
-        }
-        return line.substring(end + 1, line.length());
+        Matcher matcher = PATTERN_TAGS.matcher(line);
+        matcher.matches();
+        return matcher.group("text");
     }
 
     private boolean isFillPlayers(String s) {

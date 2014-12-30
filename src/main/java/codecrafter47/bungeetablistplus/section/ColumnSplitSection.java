@@ -27,7 +27,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 /**
  * @author Florian Stober
  */
-public class CollumnSplitSection extends Section {
+public class ColumnSplitSection extends Section {
 
     private final PlayerColumn[] pc = new PlayerColumn[ConfigManager.getCols()];
 
