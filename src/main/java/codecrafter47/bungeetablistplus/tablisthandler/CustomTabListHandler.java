@@ -2,6 +2,8 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.FakePlayer;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.tab.TabListAdapter;
 
@@ -91,5 +93,14 @@ abstract public class CustomTabListHandler extends TabListAdapter implements Pla
     @Override
     public boolean isExcluded() {
         return isExcluded;
+    }
+
+    @Override
+    public List<IPlayer> getPlayers() {
+        List<IPlayer> bukkitPlayers = new ArrayList<>();
+        for (String s : bukkitplayers) {
+            bukkitPlayers.add(new FakePlayer(s, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null));
+        }
+        return bukkitPlayers;
     }
 }

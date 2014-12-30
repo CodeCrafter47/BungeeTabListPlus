@@ -36,12 +36,14 @@ public class TabListConfig extends Config {
     @Comments({
             "Defines to which players this tabList applies",
             "No effect in the default tabList", "possible values:",
-            "'Player:<Name>' for spezific Player",
+            "'Player:<Name>' for specific Player",
             "'Players:<player1>,<player2>' for multiple Players",
             "'Server:<Server>' for all Players on that Server",
             "'Servers:<server1>,<server2>' for all Players which are on These Servers",
             "'group:<group>' for all players within that permission group",
             "'groups:<group1>,<group2>' same with multiple groups",
+            "'1.7' for all players with client version 1.7 or below",
+            "'1.8' for all players with client version 1.8 or above",
             "'all' for all players"
     })
     public String showTo = "all";
@@ -57,18 +59,18 @@ public class TabListConfig extends Config {
     public String footer = "&4play.minecraft.example.com";
 
     @Comments({
-            "whether to shown header/footer or not. You should set this to false if you are using a bukkit/spigot side plugin for that."
+            "whether to shown header/footer or not. You should set this to false if you wan to use a bukkit/spigot side plugin for that."
     })
     public boolean shownFooterHeader = true;
 
     @Comments({
             "The skin shown for non-players",
-            "leave empty for random skins"
+            "leave empty for default skins"
     })
     public String defaultSkin = "MHF_Question";
 
     @Comments({
-            "ping value for nonplayer slots, ",
+            "ping value tu use for non-player slots, ",
             "used if no other value is specified using [PING=?]"
     })
     public int defaultPing = 0;

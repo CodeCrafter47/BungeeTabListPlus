@@ -21,7 +21,10 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.List;
 
 /**
  * @author Florian Stober
@@ -37,4 +40,6 @@ public interface PlayerTablistHandler {
     void exclude();
 
     ProxiedPlayer getPlayer();
+
+    List<IPlayer> getPlayers();
 }

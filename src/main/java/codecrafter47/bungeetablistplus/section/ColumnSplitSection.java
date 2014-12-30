@@ -90,7 +90,7 @@ public class ColumnSplitSection extends Section {
     }
 
     @Override
-    public int getStartCollumn() {
+    public int getStartColumn() {
         return 0;
     }
 

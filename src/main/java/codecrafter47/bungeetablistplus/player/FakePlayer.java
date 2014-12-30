@@ -33,6 +33,14 @@ public class FakePlayer implements IPlayer {
     String name;
     ServerInfo server;
 
+    public FakePlayer(String name, ServerInfo server) {
+        this.name = name;
+        this.server = server;
+    }
+
+    public FakePlayer() {
+    }
+
     @Override
     public String getName() {
         return name;

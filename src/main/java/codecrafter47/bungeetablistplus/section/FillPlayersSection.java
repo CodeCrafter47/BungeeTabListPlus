@@ -65,8 +65,7 @@ public class FillPlayersSection extends Section {
 
     @Override
     public void precalculate(ProxiedPlayer player) {
-        players = BungeeTabListPlus.getInstance().getPlayerManager().getPlayers(
-                filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+        players = getPlayers(player);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {
@@ -100,6 +99,11 @@ public class FillPlayersSection extends Section {
                 return 1;
             }
         });
+    }
+
+    protected List<IPlayer> getPlayers(ProxiedPlayer player) {
+        return BungeeTabListPlus.getInstance().getPlayerManager().getPlayers(
+                filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
     }
 
     @Override
@@ -173,7 +177,7 @@ public class FillPlayersSection extends Section {
     }
 
     @Override
-    public int getStartCollumn() {
+    public int getStartColumn() {
         return vAlign;
     }
 

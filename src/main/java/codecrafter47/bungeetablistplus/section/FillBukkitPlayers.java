@@ -21,79 +21,29 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**
  * @author Florian Stober
  */
-public class FillBukkitPlayers extends Section {
+public class FillBukkitPlayers extends FillPlayersSection {
 
-    private final int startColumn;
-    private final TabListConfig config;
-
-    public FillBukkitPlayers(int startColumn, TabListConfig config) {
-        this.startColumn = startColumn;
-        this.config = config;
+    public FillBukkitPlayers(int startColumn, TabListConfig config, String prefix, String suffix, Skin skin,
+                             List<String> sortrules, int maxPlayers) {
+        super(startColumn, null, config, prefix, suffix, skin, sortrules, maxPlayers);
     }
 
     @Override
-    public int getMinSize(ProxiedPlayer player) {
-        return 0;
+    @SneakyThrows
+    protected List<IPlayer> getPlayers(ProxiedPlayer player) {
+        PlayerTablistHandler tabList = (PlayerTablistHandler) BungeeTabListPlus.getTabList(player);
+        return tabList.getPlayers();
     }
-
-    @Override
-    public int getMaxSize(ProxiedPlayer player) {
-        try {
-            Object tabList = BungeeTabListPlus.getTabList(player);
-            Class clasz = tabList.getClass();
-            Field bukkitplayers = clasz.getField("bukkitplayers");
-            bukkitplayers.setAccessible(true);
-            List<String> bplayers = (List<String>) bukkitplayers.get(tabList);
-            return bplayers.size();
-        } catch (NoSuchFieldException | SecurityException |
-                IllegalArgumentException | IllegalAccessException ex) {
-            BungeeTabListPlus.getInstance().reportError(ex);
-        }
-        return 0;
-    }
-
-    @Override
-    public int calculate(ProxiedPlayer player, ITabList ttabListI, int pos,
-                         int size) {
-        try {
-            Object tabList = BungeeTabListPlus.getTabList(player);
-            Class clasz = tabList.getClass();
-            Field bukkitplayers = clasz.getField("bukkitplayers");
-            bukkitplayers.setAccessible(true);
-            List<String> players = (List<String>) bukkitplayers.get(tabList);
-            int p = pos;
-            for (; p < pos + size; p++) {
-                if (players.size() > p - pos) {
-                    ttabListI.setSlot(p, new Slot(players.get(p - pos), config.defaultPing));
-                }
-            }
-            return p;
-        } catch (IllegalArgumentException | IllegalAccessException |
-                NoSuchFieldException ex) {
-            BungeeTabListPlus.getInstance().reportError(ex);
-        }
-        return pos;
-    }
-
-    @Override
-    public void precalculate(ProxiedPlayer player) {
-        // Do nothing
-    }
-
-    @Override
-    public int getStartCollumn() {
-        return this.startColumn;
-    }
-
 }

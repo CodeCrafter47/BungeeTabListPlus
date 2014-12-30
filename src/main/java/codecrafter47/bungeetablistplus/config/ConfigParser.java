@@ -154,7 +154,10 @@ public class ConfigParser {
                             prefix, suffix, skin, sortrules, maxplayers));
                 }
             } else if (isFillBukkitPlayers(line)) {
-                sections.add(new FillBukkitPlayers(startColumn, config));
+                String prefix = text.substring(0, text.indexOf("{fillbukkitplayers"));
+                String suffix = text.substring(text.
+                        indexOf('}', prefix.length()), text.length() - 1);
+                sections.add(new FillBukkitPlayers(startColumn, config, prefix, suffix, skin, sortrules, maxplayers));
             } // Parsing Normal text
             else {
                 StaticSection section;

@@ -73,7 +73,7 @@ public class StaticSection extends Section {
     }
 
     @Override
-    public int getStartCollumn() {
+    public int getStartColumn() {
         return vAlign;
     }
 }

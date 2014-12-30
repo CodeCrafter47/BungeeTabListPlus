@@ -70,7 +70,7 @@ public class AutoFillPlayers extends Section {
     }
 
     @Override
-    public int getStartCollumn() {
+    public int getStartColumn() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

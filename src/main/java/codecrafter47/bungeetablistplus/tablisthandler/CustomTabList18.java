@@ -21,6 +21,8 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.player.FakePlayer;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -54,19 +56,6 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
     @Override
     public void onServerChange() {
         // remove all those names from the clients tab, he's on another server now
-        /*
-         synchronized (usernames) {
-         for (String username : usernames) {
-         PlayerListItem pli = new PlayerListItem();
-         pli.setAction(PlayerListItem.Action.REMOVE_PLAYER);
-         Item item = new Item();
-         item.setUsername(username);
-         item.setProperties(new String[0][0]);
-         pli.setItems(new Item[]{item});
-         getPlayer().unsafe().sendPacket(pli);
-         }
-         usernames.clear();
-         }*/
         synchronized (bukkitplayers) {
             bukkitplayers.clear();
         }
@@ -204,5 +193,14 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
     @Override
     public boolean isExcluded() {
         return isExcluded;
+    }
+
+    @Override
+    public List<IPlayer> getPlayers() {
+        List<IPlayer> bukkitPlayers = new ArrayList<>();
+        for (String s : bukkitplayers) {
+            bukkitPlayers.add(new FakePlayer(s, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null));
+        }
+        return bukkitPlayers;
     }
 }

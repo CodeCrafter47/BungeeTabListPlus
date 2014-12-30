@@ -82,7 +82,7 @@ public class TabListProvider implements ITabListProvider {
             topMax += s.getMaxSize(player);
             if (i + 1 < topSections.size()) {
                 Section next = topSections.get(i + 1);
-                int startColumn = next.getStartCollumn();
+                int startColumn = next.getStartColumn();
                 if (startColumn != -1) {
                     topMax += (tabList.getColumns() + startColumn - (topMax % tabList.getColumns())) % tabList.getColumns();
                 }
@@ -97,7 +97,7 @@ public class TabListProvider implements ITabListProvider {
             topMin += tmin[i] = s.getMinSize(player);
             if (i + 1 < topSections.size()) {
                 Section next = topSections.get(i + 1);
-                int startColumn = next.getStartCollumn();
+                int startColumn = next.getStartColumn();
                 if (startColumn != -1) {
                     tmin[i] += (tabList.getColumns() + startColumn - (topMin % tabList.getColumns())) % tabList.getColumns();
                     topMin += (tabList.getColumns() + startColumn - (topMin % tabList.getColumns())) % tabList.getColumns();
@@ -110,7 +110,7 @@ public class TabListProvider implements ITabListProvider {
         for (int i = botSections.size() - 1; i >= 0; i--) {
             Section s = botSections.get(i);
             botMax += s.getMaxSize(player);
-            int startColumn = s.getStartCollumn();
+            int startColumn = s.getStartColumn();
             if (startColumn != -1) {
                 botMax += (startColumn - botMax % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
             }
@@ -122,7 +122,7 @@ public class TabListProvider implements ITabListProvider {
         for (int i = botSections.size() - 1; i >= 0; i--) {
             Section s = botSections.get(i);
             botMin += bmin[i] = s.getMinSize(player);
-            int startColumn = s.getStartCollumn();
+            int startColumn = s.getStartColumn();
             if (startColumn != -1) {
                 bmin[i] += (startColumn - botMin % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
                 botMin += (startColumn - botMin % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
@@ -135,7 +135,7 @@ public class TabListProvider implements ITabListProvider {
             int i = 0;
             int s = 0;
             do {
-                botAlign = botSections.get(i).getStartCollumn();
+                botAlign = botSections.get(i).getStartColumn();
                 if (botSections.get(i).getMaxSize(player) != botSections.get(i).
                         getMinSize(player) || botAlign != -1) {
                     break;
@@ -237,25 +237,25 @@ public class TabListProvider implements ITabListProvider {
             space -= size;
 
             int indexStart = index;
-            while (topSections.get(indexStart).getStartCollumn() == -1 && indexStart != 0) {
+            while (topSections.get(indexStart).getStartColumn() == -1 && indexStart != 0) {
                 indexStart--;
             }
             int startAlign;
             if (indexStart == 0) {
                 startAlign = 0;
             } else {
-                startAlign = topSections.get(indexStart).getStartCollumn();
+                startAlign = topSections.get(indexStart).getStartColumn();
             }
 
             int indexNext = index + 1;
             while (indexNext < topSections.size() && topSections.get(indexNext).
-                    getStartCollumn() == -1) {
+                    getStartColumn() == -1) {
                 indexNext++;
             }
 
             int nextAlign;
             if (topSections.size() > indexNext) {
-                nextAlign = topSections.get(indexNext).getStartCollumn();
+                nextAlign = topSections.get(indexNext).getStartColumn();
             } else {
                 nextAlign = topsize % tabList.getColumns();
             }
@@ -286,7 +286,7 @@ public class TabListProvider implements ITabListProvider {
         int pos = 0;
         int i = 0;
         for (Section s : topSections) {
-            int startColumn = s.getStartCollumn();
+            int startColumn = s.getStartColumn();
             if (startColumn != -1) {
                 pos += (tabList.getColumns() + startColumn - (pos % tabList.getColumns())) % tabList.getColumns();
             }
@@ -344,25 +344,25 @@ public class TabListProvider implements ITabListProvider {
             space -= size;
 
             int indexStart = index;
-            while (botSections.get(indexStart).getStartCollumn() == -1 && indexStart != 0) {
+            while (botSections.get(indexStart).getStartColumn() == -1 && indexStart != 0) {
                 indexStart--;
             }
             int startAlign;
             if (indexStart == 0) {
                 startAlign = botAlign;
             } else {
-                startAlign = botSections.get(indexStart).getStartCollumn();
+                startAlign = botSections.get(indexStart).getStartColumn();
             }
 
             int indexNext = index + 1;
             while (indexNext < botSections.size() && botSections.get(indexNext).
-                    getStartCollumn() == -1) {
+                    getStartColumn() == -1) {
                 indexNext++;
             }
 
             int nextAlign;
             if (botSections.size() > indexNext) {
-                nextAlign = botSections.get(indexNext).getStartCollumn();
+                nextAlign = botSections.get(indexNext).getStartColumn();
             } else {
                 nextAlign = 0;
             }
@@ -391,7 +391,7 @@ public class TabListProvider implements ITabListProvider {
         pos = tabList.getSize() - botsize;
         i = 0;
         for (Section s : botSections) {
-            int startColumn = s.getStartCollumn();
+            int startColumn = s.getStartColumn();
             if (startColumn != -1) {
                 pos += (tabList.getColumns() + startColumn - (pos % tabList.getColumns())) % tabList.getColumns();
             }

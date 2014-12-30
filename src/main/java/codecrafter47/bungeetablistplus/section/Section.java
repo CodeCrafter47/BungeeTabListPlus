@@ -42,7 +42,7 @@ public abstract class Section {
     public abstract void precalculate(ProxiedPlayer player);
 
     // can be -1 for N/A
-    public abstract int getStartCollumn();
+    public abstract int getStartColumn();
 }
 
 
