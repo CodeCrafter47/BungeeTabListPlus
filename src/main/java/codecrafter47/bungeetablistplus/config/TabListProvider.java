@@ -21,11 +21,11 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.api.TabList;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
+import codecrafter47.bungeetablistplus.tablist.FlippedTabList;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -55,87 +55,24 @@ public class TabListProvider implements ITabListProvider {
         showEmptyGroups = showEmpty;
         this.config = config;
         this.parser = parser;
-        // TODO as argument
         this.plugin = plugin;
     }
 
     @Override
-    public TabList getTabList(final ProxiedPlayer player) {
+    public void fillTabList(final ProxiedPlayer player, ITabList tabList) {
+        if (config.verticalMode) {
+            tabList = new FlippedTabList(tabList);
+        }
 
         List<Section> topSections = new ArrayList<>(top);
         List<Section> botSections = new ArrayList<>(bot);
 
-        for (int n = 0; n < 2; n++) {
-            List<Section> sectionList;
-            if (n == 0) {
-                sectionList = topSections;
-            } else {
-                sectionList = botSections;
-            }
-
-            for (int i = 0; i < sectionList.size(); i++) {
-                Section section = sectionList.get(i);
-                if (section instanceof AutoFillPlayers) {
-                    sectionList.remove(i);
-                    String prefix = ((AutoFillPlayers) section).prefix;
-                    String suffix = ((AutoFillPlayers) section).suffix;
-                    int startColumn = ((AutoFillPlayers) section).startColumn;
-                    int maxPlayers = ((AutoFillPlayers) section).maxPlayers;
-                    List<String> sortRules = ((AutoFillPlayers) section).sortRules;
-
-                    Map<String, ServerInfo> servers = ProxyServer.getInstance().
-                            getServers();
-
-                    List<String> list = new LinkedList<>(servers.keySet());
-                    Collections.sort(list, new Comparator<String>() {
-                        @Override
-                        public int compare(String s1, String s2) {
-                            int p1 = plugin.
-                                    getPlayerManager().getServerPlayerCount(s1, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
-                            int p2 = plugin.
-                                    getPlayerManager().getServerPlayerCount(s2, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
-                            if (p1 < p2) {
-                                return 1;
-                            }
-                            if (p1 > p2) {
-                                return -1;
-                            }
-                            return s1.compareTo(s2);
-                        }
-                    });
-
-                    int j = i;
-                    for (String server : list) {
-                        if (config.showEmptyGroups || plugin.getPlayerManager().
-                                getServerPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
-                            try {
-                                List<Section> sections = parser.
-                                        parseServerSections(
-                                                prefix, suffix, new ArrayList<String>(0),
-                                                server,
-                                                sortRules, maxPlayers);
-                                for (Section s : sections) {
-                                    sectionList.add(j++, s);
-                                }
-                            } catch (ParseException ex) {
-                                Logger.
-                                        getLogger(TabListProvider.class.
-                                                getName()).
-                                        log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        parseAutoFillplayers(player, topSections);
+        parseAutoFillplayers(player, botSections);
 
         // precalculate all sections
-        for (Section section : topSections) {
-            section.precalculate(player);
-        }
-        for (Section section : botSections) {
-            section.precalculate(player);
-        }
+        precalculateSections(player, topSections);
+        precalculateSections(player, botSections);
 
         // Calculation maximum space the top sections need
         int topMax = 0;
@@ -146,8 +83,7 @@ public class TabListProvider implements ITabListProvider {
                 Section next = topSections.get(i + 1);
                 int startColumn = next.getStartCollumn();
                 if (startColumn != -1) {
-                    topMax += (ConfigManager.getCols() + startColumn - (topMax % ConfigManager.
-                            getCols())) % ConfigManager.getCols();
+                    topMax += (tabList.getColumns() + startColumn - (topMax % tabList.getColumns())) % tabList.getColumns();
                 }
             }
         }
@@ -162,10 +98,8 @@ public class TabListProvider implements ITabListProvider {
                 Section next = topSections.get(i + 1);
                 int startColumn = next.getStartCollumn();
                 if (startColumn != -1) {
-                    tmin[i] += (ConfigManager.getCols() + startColumn - (topMin % ConfigManager.
-                            getCols())) % ConfigManager.getCols();
-                    topMin += (ConfigManager.getCols() + startColumn - (topMin % ConfigManager.
-                            getCols())) % ConfigManager.getCols();
+                    tmin[i] += (tabList.getColumns() + startColumn - (topMin % tabList.getColumns())) % tabList.getColumns();
+                    topMin += (tabList.getColumns() + startColumn - (topMin % tabList.getColumns())) % tabList.getColumns();
                 }
             }
         }
@@ -177,8 +111,7 @@ public class TabListProvider implements ITabListProvider {
             botMax += s.getMaxSize(player);
             int startColumn = s.getStartCollumn();
             if (startColumn != -1) {
-                botMax += (startColumn - botMax % ConfigManager.getCols() + ConfigManager.
-                        getCols()) % ConfigManager.getCols();
+                botMax += (startColumn - botMax % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
             }
         }
 
@@ -190,10 +123,8 @@ public class TabListProvider implements ITabListProvider {
             botMin += bmin[i] = s.getMinSize(player);
             int startColumn = s.getStartCollumn();
             if (startColumn != -1) {
-                bmin[i] += (startColumn - botMin % ConfigManager.getCols() + ConfigManager.
-                        getCols()) % ConfigManager.getCols();
-                botMin += (startColumn - botMin % ConfigManager.getCols() + ConfigManager.
-                        getCols()) % ConfigManager.getCols();
+                bmin[i] += (startColumn - botMin % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
+                botMin += (startColumn - botMin % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
             }
         }
 
@@ -218,7 +149,7 @@ public class TabListProvider implements ITabListProvider {
             if (botAlign != -1) {
                 botAlign -= s;
                 while (botAlign < 0) {
-                    botAlign += ConfigManager.getCols();
+                    botAlign += tabList.getColumns();
                 }
             }
         }
@@ -227,7 +158,7 @@ public class TabListProvider implements ITabListProvider {
         int topsize = topMin;
         int botsize = botMin;
         {
-            int left = ConfigManager.getTabSize() - topsize - botsize;
+            int left = tabList.getSize() - topsize - botsize;
 
             if (left > 0) {
                 int top_diff = topMax - topMin;
@@ -250,14 +181,13 @@ public class TabListProvider implements ITabListProvider {
             }
         }
 
-        if (topsize + botsize == ConfigManager.getTabSize()) {
-            topsize -= topsize % ConfigManager.getCols();
+        if (topsize + botsize == tabList.getSize()) {
+            topsize -= topsize % tabList.getColumns();
             topsize += botAlign;
-            botsize = ConfigManager.getTabSize() - topsize;
+            botsize = tabList.getSize() - topsize;
         }
 
         // calculating bot and top sections
-        TabList tabList = new TabList();
         // TOP
         // grob vorberechnen
         int len[] = new int[topSections.size()];
@@ -327,7 +257,7 @@ public class TabListProvider implements ITabListProvider {
             if (topSections.size() > indexNext) {
                 nextAlign = topSections.get(indexNext).getStartCollumn();
             } else {
-                nextAlign = topsize % ConfigManager.getCols();
+                nextAlign = topsize % tabList.getColumns();
             }
             boolean areAv = true;
             for (int i = indexStart; i < indexNext; i++) {
@@ -341,8 +271,7 @@ public class TabListProvider implements ITabListProvider {
                 for (int i = indexStart; i < indexNext; i++) {
                     s += len[i];
                 }
-                int diff = (ConfigManager.getCols() + nextAlign - (s % ConfigManager.
-                        getCols())) % ConfigManager.getCols();
+                int diff = (tabList.getColumns() + nextAlign - (s % tabList.getColumns())) % tabList.getColumns();
                 // diff -= startAlign;
                 //diff = (diff + ConfigManager.getCols()) % ConfigManager.getCols();
                 len[indexNext - 1] += diff;
@@ -360,8 +289,7 @@ public class TabListProvider implements ITabListProvider {
         for (Section s : topSections) {
             int startColumn = s.getStartCollumn();
             if (startColumn != -1) {
-                pos += (ConfigManager.getCols() + startColumn - (pos % ConfigManager.
-                        getCols())) % ConfigManager.getCols();
+                pos += (tabList.getColumns() + startColumn - (pos % tabList.getColumns())) % tabList.getColumns();
             }
             pos = s.calculate(player, tabList, pos, len[i++]);
         }
@@ -452,8 +380,7 @@ public class TabListProvider implements ITabListProvider {
                 for (i = indexStart; i < indexNext; i++) {
                     s += len[i];
                 }
-                int diff = (ConfigManager.getCols() + nextAlign - (s % ConfigManager.
-                        getCols())) % ConfigManager.getCols();
+                int diff = (tabList.getColumns() + nextAlign - (s % tabList.getColumns())) % tabList.getColumns();
                 len[indexNext - 1] += diff;
                 space -= diff;
             }
@@ -464,13 +391,12 @@ public class TabListProvider implements ITabListProvider {
         }
 
         // jetzt richtig berechnen
-        pos = ConfigManager.getTabSize() - botsize;
+        pos = tabList.getSize() - botsize;
         i = 0;
         for (Section s : botSections) {
             int startColumn = s.getStartCollumn();
             if (startColumn != -1) {
-                pos += (ConfigManager.getCols() + startColumn - (pos % ConfigManager.
-                        getCols())) % ConfigManager.getCols();
+                pos += (tabList.getColumns() + startColumn - (pos % tabList.getColumns())) % tabList.getColumns();
             }
             pos = s.calculate(player, tabList, pos, len[i++]);
         }
@@ -501,8 +427,69 @@ public class TabListProvider implements ITabListProvider {
         }
 
         tabList.setDefaultPing(config.defaultPing);
+    }
 
-        return tabList;
+    private void precalculateSections(ProxiedPlayer player, List<Section> topSections) {
+        for (Section section : topSections) {
+            section.precalculate(player);
+        }
+    }
+
+    private void parseAutoFillplayers(final ProxiedPlayer player, List<Section> sectionList) {
+        for (int i = 0; i < sectionList.size(); i++) {
+            Section section = sectionList.get(i);
+            if (section instanceof AutoFillPlayers) {
+                sectionList.remove(i);
+                String prefix = ((AutoFillPlayers) section).prefix;
+                String suffix = ((AutoFillPlayers) section).suffix;
+                int startColumn = ((AutoFillPlayers) section).startColumn;
+                int maxPlayers = ((AutoFillPlayers) section).maxPlayers;
+                List<String> sortRules = ((AutoFillPlayers) section).sortRules;
+
+                Map<String, ServerInfo> servers = ProxyServer.getInstance().
+                        getServers();
+
+                List<String> list = new LinkedList<>(servers.keySet());
+                Collections.sort(list, new Comparator<String>() {
+                    @Override
+                    public int compare(String s1, String s2) {
+                        int p1 = plugin.
+                                getPlayerManager().getServerPlayerCount(s1, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
+                        int p2 = plugin.
+                                getPlayerManager().getServerPlayerCount(s2, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
+                        if (p1 < p2) {
+                            return 1;
+                        }
+                        if (p1 > p2) {
+                            return -1;
+                        }
+                        return s1.compareTo(s2);
+                    }
+                });
+
+                int j = i;
+                for (String server : list) {
+                    if (showEmptyGroups || plugin.getPlayerManager().
+                            getServerPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
+                        try {
+                            List<Section> sections = parser.
+                                    parseServerSections(
+                                            prefix, suffix, new ArrayList<String>(0),
+                                            server,
+                                            sortRules, maxPlayers);
+                            for (Section s : sections) {
+                                sectionList.add(j++, s);
+                            }
+                        } catch (ParseException ex) {
+                            Logger.
+                                    getLogger(TabListProvider.class.
+                                            getName()).
+                                    log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public boolean appliesTo(ProxiedPlayer player) {

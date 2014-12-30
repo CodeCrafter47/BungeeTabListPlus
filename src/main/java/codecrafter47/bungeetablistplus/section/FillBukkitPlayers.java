@@ -21,8 +21,8 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -64,7 +64,7 @@ public class FillBukkitPlayers extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList ttabList, int pos,
+    public int calculate(ProxiedPlayer player, ITabList ttabListI, int pos,
                          int size) {
         try {
             Object tabList = BungeeTabListPlus.getTabList(player);
@@ -75,7 +75,7 @@ public class FillBukkitPlayers extends Section {
             int p = pos;
             for (; p < pos + size; p++) {
                 if (players.size() > p - pos) {
-                    ttabList.setSlot(p, new Slot(players.get(p - pos), config.defaultPing));
+                    ttabListI.setSlot(p, new Slot(players.get(p - pos), config.defaultPing));
                 }
             }
             return p;

@@ -20,7 +20,7 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public class AutoFillPlayers extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
                          int size) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

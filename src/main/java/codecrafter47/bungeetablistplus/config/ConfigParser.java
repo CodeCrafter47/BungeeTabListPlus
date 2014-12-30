@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.skin.LazySkin;
 import codecrafter47.bungeetablistplus.skin.Skin;
+import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ChatColor;
 
 import java.text.ParseException;
@@ -59,7 +60,7 @@ public class ConfigParser {
             // Its properties
             int ping = 0;
             int startColumn = -1;
-            int collumn = -1;
+            int column = -1;
             int maxplayers = 1000;
             Skin skin = SkinManager.defaultSkin;
             List<String> sortrules = new ArrayList<>();
@@ -68,15 +69,22 @@ public class ConfigParser {
             List<String> tags = parseTags(line);
             for (String tag : tags) {
                 if (tag.equals("ALIGN BOTTOM")) {
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN BOTTOM] in verticalMode");
                     bottom = true;
                 } else if (tag.equals("ALIGN LEFT")) {
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN LEFT] in verticalMode");
                     startColumn = 0;
-                } else if (tag.equals("ALIGN RIGHT")) { // Check at least two cols
+                } else if (tag.equals("ALIGN RIGHT")) {
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN RIGHT] in verticalMode");
                     startColumn = ConfigManager.getCols() - 1;
                 } else if (tag.startsWith("PING=")) {
                     ping = Integer.parseInt(tag.substring(5, tag.length()));
                 } else if (tag.startsWith("COLUMN=")) {
-                    collumn = Integer.parseInt(tag.substring(7, tag.length()));
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [COLUMN=?] in verticalMode");
+                    column = Integer.parseInt(tag.substring(7, tag.length()));
+                } else if (tag.startsWith("ROW=")) {
+                    Preconditions.checkArgument(config.verticalMode, "You can not use [ROW=?] in horizontalMode");
+                    column = Integer.parseInt(tag.substring(4, tag.length()));
                 } else if (tag.startsWith("SORT=")) {
                     sortrules = Arrays.asList(tag.substring(5, tag.length()).
                             split(","));
@@ -94,8 +102,8 @@ public class ConfigParser {
                 }
             }
 
-            if (startColumn == -1 && collumn != -1) {
-                startColumn = collumn;
+            if (startColumn == -1 && column != -1) {
+                startColumn = column;
             }
 
             // Get current section list
@@ -123,7 +131,7 @@ public class ConfigParser {
                 } else {
                     filter = new ArrayList<>();
                 }
-                if (collumn == -1) {
+                if (column == -1) {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.
                             isEmpty()) {
                         sections.add(new AutoFillPlayers(startColumn, prefix,
@@ -141,7 +149,7 @@ public class ConfigParser {
                         cs = new CollumnSplitSection();
                         sections.add(cs);
                     }
-                    cs.addCollumn(collumn, new PlayerColumn(filter, config,
+                    cs.addCollumn(column, new PlayerColumn(filter, config,
                             prefix, suffix, skin, sortrules, maxplayers));
                 }
             } else if (isFillBukkitPlayers(line)) {
@@ -180,8 +188,10 @@ public class ConfigParser {
             List<String> tags = parseTags(line);
             for (String tag : tags) {
                 if (tag.equals("ALIGN LEFT")) {
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN LEFT] in verticalMode");
                     startColumn = 0;
                 } else if (tag.equals("ALIGN RIGHT")) {
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN RIGHT] in verticalMode");
                     startColumn = ConfigManager.getCols() - 1;
                 } else if (tag.startsWith("PING=")) {
                     ping = Integer.parseInt(tag.substring(5, tag.length()));
@@ -189,8 +199,11 @@ public class ConfigParser {
                     sortrules = new ArrayList<>(Arrays.asList(tag.substring(5,
                             tag.length()).split(",")));
                 } else if (tag.startsWith("COLUMN=")) {
-                    startColumn = Integer.parseInt(tag.
-                            substring(7, tag.length()));
+                    Preconditions.checkArgument(!config.verticalMode, "You can not use [COLUMN=?] in verticalMode");
+                    startColumn = Integer.parseInt(tag.substring(7, tag.length()));
+                } else if (tag.startsWith("ROW=")) {
+                    Preconditions.checkArgument(config.verticalMode, "You can not use [ROW=?] in horizontalMode");
+                    startColumn = Integer.parseInt(tag.substring(4, tag.length()));
                 } else if (tag.startsWith("MAXPLAYERS=")) {
                     maxplayers = Integer.parseInt(tag.
                             substring(11, tag.length()));

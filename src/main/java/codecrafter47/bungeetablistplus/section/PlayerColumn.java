@@ -21,8 +21,8 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
@@ -106,7 +106,7 @@ public class PlayerColumn {
         return m * config.playerLines.size();
     }
 
-    public void calculate(ProxiedPlayer player, TabList tabList, int collumn,
+    public void calculate(ProxiedPlayer player, ITabList ITabList, int collumn,
                           int row, int size, int span) {
         int playersToShow = players.size();
         if (playersToShow > maxPlayers) {
@@ -128,13 +128,13 @@ public class PlayerColumn {
                 line = prefix + line + suffix;
                 line = BungeeTabListPlus.getInstance().getVariablesManager().
                         replacePlayerVariables(player, line, players.get(i));
-                tabList.setSlot(p, collumn + c, new Slot(line,
+                ITabList.setSlot(p, collumn + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
                                 getMainConfig().sendPing ? players.get(i).getPing() : 0));
                 if (skin != SkinManager.defaultSkin)
-                    tabList.getSlot(p, collumn + c).setSkin(skin);
+                    ITabList.getSlot(p, collumn + c).setSkin(skin);
                 else if (config.showCorrectPlayerSkins)
-                    tabList.getSlot(p, collumn + c).setSkin(players.get(i).getSkin());
+                    ITabList.getSlot(p, collumn + c).setSkin(players.get(i).getSkin());
                 c++;
                 if (c >= span) {
                     c = 0;
@@ -147,9 +147,9 @@ public class PlayerColumn {
             for (String line : config.morePlayersLines) {
                 line = prefix + line + suffix;
                 line = line.replace("{other_count}", "" + other_count);
-                tabList.setSlot(p, collumn + c, new Slot(line, config.defaultPing));
+                ITabList.setSlot(p, collumn + c, new Slot(line, config.defaultPing));
                 if (skin != SkinManager.defaultSkin)
-                    tabList.getSlot(p, collumn + c).setSkin(skin);
+                    ITabList.getSlot(p, collumn + c).setSkin(skin);
                 c++;
                 if (c >= span) {
                     c = 0;

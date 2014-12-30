@@ -40,8 +40,7 @@ public class OldSuperCommand extends Command {
     public void execute(CommandSender sender, String[] arg1) {
         if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
             if (sender.hasPermission("bungeetablistplus.admin")) {
-                BungeeTabListPlus.getInstance().reload();
-                sendReloadComplete(sender);
+                sendReloadComplete(sender, BungeeTabListPlus.getInstance().reload());
             } else {
                 sendNoPermission(sender);
             }
@@ -130,13 +129,17 @@ public class OldSuperCommand extends Command {
         target.sendMessage(message);
     }
 
-    private void sendReloadComplete(CommandSender target) {
-        String message = plugin.getConfigManager().getMessages().successReloadComplete;
-        if (message == null || message.isEmpty()) {
-            return;
+    private void sendReloadComplete(CommandSender target, boolean success) {
+        if (success) {
+            String message = plugin.getConfigManager().getMessages().successReloadComplete;
+            if (message == null || message.isEmpty()) {
+                return;
+            }
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            target.sendMessage(message);
+        } else {
+            target.sendMessage(ChatColor.RED + "Reloading BungeeTabListPlus failed");
         }
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        target.sendMessage(message);
     }
 
     private void sendPlayerHide(CommandSender target) {

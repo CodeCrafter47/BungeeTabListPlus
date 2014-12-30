@@ -44,51 +44,56 @@ public class TabListConfig extends Config {
             "'groups:<group1>,<group2>' same with multiple groups",
             "'all' for all players"
     })
-    public final String showTo = "all";
+    public String showTo = "all";
 
     @Comments({
             "This text will be shown above the tablist"
     })
-    public final String header = "&bWelcome &6{player}";
+    public String header = "&bWelcome &6{player}";
 
     @Comments({
             "This text will be shown below the tablist"
     })
-    public final String footer = "&4play.minecraft.example.com";
+    public String footer = "&4play.minecraft.example.com";
 
     @Comments({
             "whether to shown header/footer or not. You should set this to false if you are using a bukkit/spigot side plugin for that."
     })
-    public final boolean shownFooterHeader = true;
+    public boolean shownFooterHeader = true;
 
     @Comments({
             "The skin shown for non-players",
             "leave empty for random skins"
     })
-    public final String defaultSkin = "MHF_Question";
+    public String defaultSkin = "MHF_Question";
 
     @Comments({
             "ping value for nonplayer slots, ",
             "used if no other value is specified using [PING=?]"
     })
-    public final int defaultPing = 0;
+    public int defaultPing = 0;
 
     @Comments({
             "if true player skin is shown beneath name, otherwise default skin"
     })
-    public final boolean showCorrectPlayerSkins = true;
+    public boolean showCorrectPlayerSkins = true;
 
     @Comments({
             "how Players should be grouped",
             "You can use 'SERVER' or 'NONE'"
     })
-    public final String groupPlayers = "SERVER";
+    public String groupPlayers = "SERVER";
 
     @Comments({
             "Whether to Show Groups with no Players",
             "not effective if groupPlayers=NONE"
     })
-    public final boolean showEmptyGroups = false;
+    public boolean showEmptyGroups = false;
+
+    @Comments({
+            "If enabled slots are filled top-to-bottom instead of left-to-right"
+    })
+    public boolean verticalMode = false;
 
     @Comments({
             "This is how a group looks in the tabList",
@@ -97,19 +102,19 @@ public class TabListConfig extends Config {
             "not effective if groupPlayers=NONE",
             "You can also use {fillplayers:<group>}"
     })
-    public final List<String> groupLines = new ArrayList<>();
+    public List<String> groupLines = new ArrayList<>();
 
     @Comments({
             "This allows you to change the way players are listet",
             "You can also use multiple slots to displaye additional information"
     })
-    public final List<String> playerLines = new ArrayList<>();
+    public List<String> playerLines = new ArrayList<>();
 
     @Comments({
             "These lines are shown if there's not enough space",
             "for all players upon the tabList"
     })
-    public final List<String> morePlayersLines = new ArrayList<>();
+    public List<String> morePlayersLines = new ArrayList<>();
 
     @Comments({
             "And here finally is the tabList",
@@ -122,7 +127,7 @@ public class TabListConfig extends Config {
             "You can use Variables to display dynamic content",
             "more information at https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"
     })
-    public final List<String> tabList = new ArrayList<>();
+    public List<String> tabList = new ArrayList<>();
 
     {
         groupLines.add("[ALIGN LEFT][SKIN=MHF_ArrowRight]&9&l>&9 {server}({server_player_count}):");
@@ -172,8 +177,8 @@ public class TabListConfig extends Config {
                 "You can find more information on the wiki https://github.com/CodeCrafter47/BungeeTabListPlus/wiki",
                 ""
         };
-
-        this.init();
+        init();
+        save();
     }
 
     public boolean appliesTo(ProxiedPlayer player) {

@@ -20,15 +20,16 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.tablisthandler.IMyTabListHandler;
+import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.logging.Level;
-
 /**
  * Implementation of the ResendThread. Updates the tablist for all players after
- * the given intervall
+ * the given interval
  *
  * @author Florian Stober
  */
@@ -59,9 +60,10 @@ class ResendThread implements Runnable {
                 ProxiedPlayer player = resendQueue.getNext();
                 if (player != null) {
                     Object tabList = BungeeTabListPlus.getTabList(player);
-                    if (tabList instanceof IMyTabListHandler) {
+                    if (tabList instanceof PlayerTablistHandler) {
                         if (player.getServer() != null) {
-                            ((IMyTabListHandler) tabList).recreate();
+                            PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
+                            update(tablistHandler);
                         } else {
                             BungeeTabListPlus.getInstance().sendLater(player);
                         }
@@ -82,11 +84,33 @@ class ResendThread implements Runnable {
                     // don't care
                 }
             } catch (Throwable th) {
-                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE,
-                        "An internal Error occured, please send the following Stacktrace to the developer to help resolving the problem",
-                        th);
+                BungeeTabListPlus.getInstance().reportError(th);
             }
         }
+    }
+
+    private void update(PlayerTablistHandler tablistHandler) {
+        if (tablistHandler.getPlayer().getServer() != null) {
+            if (BungeeTabListPlus.getInstance().getConfigManager().
+                    getMainConfig().excludeServers.contains(tablistHandler.getPlayer().
+                    getServer().getInfo().getName()) || tablistHandler.isExcluded()) {
+                tablistHandler.unload();
+                return;
+            }
+        }
+
+        ITabListProvider tlp = BungeeTabListPlus.getInstance().
+                getTabListManager().getTabListForPlayer(tablistHandler.getPlayer());
+        if (tlp == null) {
+            tablistHandler.exclude();
+            tablistHandler.unload();
+            return;
+        }
+
+        ITabList tabList = new TabList();
+        tlp.fillTabList(tablistHandler.getPlayer(), tabList);
+
+        tablistHandler.sendTablist(tabList);
     }
 
 }

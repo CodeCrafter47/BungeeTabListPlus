@@ -21,9 +21,8 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.skin.Skin;
@@ -41,7 +40,7 @@ import java.text.Collator;
 import java.util.*;
 import java.util.logging.Level;
 
-public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
+public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler {
 
     private static String getSlotID(int n) {
         return getSlotPrefix(n) + " ?tab";
@@ -66,31 +65,12 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
     }
 
     @Override
-    public void recreate() {
+    public void sendTablist(ITabList tabList) {
         synchronized (super.usernames) {
-            if (getPlayer().getServer() != null) {
-                if (BungeeTabListPlus.getInstance().getConfigManager().
-                        getMainConfig().excludeServers.contains(getPlayer().
-                        getServer().getInfo().getName()) || isExcluded) {
-                    unload();
-                    return;
-                }
-            }
-
-            ITabListProvider tlp = BungeeTabListPlus.getInstance().
-                    getTabListManager().getTabListForPlayer(super.getPlayer());
-            if (tlp == null) {
-                exclude();
-                unload();
-                return;
-            }
-
             int numFakePlayers = 80;
 
-            TabList tabList = tlp.getTabList(super.getPlayer());
-
-            if (tabList.getRows() * tabList.getCollums() < 80) {
-                numFakePlayers = tabList.getCollums() * tabList.getRows() - super.uuids.size();
+            if (tabList.getRows() * tabList.getColumns() < 80) {
+                numFakePlayers = tabList.getColumns() * tabList.getRows() - super.uuids.size();
                 if (numFakePlayers < 0) {
                     BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", getPlayer().getName());
                 }
@@ -119,9 +99,9 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
                         ("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8)));
             }
 
-            for (int i = 0; i < tabList.getCollums() * tabList.getRows(); i++) {
+            for (int i = 0; i < tabList.getColumns() * tabList.getRows(); i++) {
                 Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
-                        getCollums() + (i / tabList.getRows()));
+                        getColumns() + (i / tabList.getRows()));
                 if (line == null) {
                     line = new Slot(" ", tabList.getDefaultPing());
                 }
@@ -407,7 +387,8 @@ public class TabList18v3 extends CustomTabList18 implements IMyTabListHandler {
         sendPing.put(offlineId, 0);
     }
 
-    void unload() {
+    @Override
+    public void unload() {
         resize(0);
     }
 }

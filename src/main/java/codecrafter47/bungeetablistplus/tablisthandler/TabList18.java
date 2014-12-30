@@ -21,9 +21,8 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
@@ -39,7 +38,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 
 import java.util.UUID;
 
-public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
+public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
 
     private static String getSlotID(int n) {
         String s = Integer.toString(n + 1000);
@@ -59,33 +58,15 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
     }
 
     @Override
-    public void recreate() {
-        if (getPlayer().getServer() != null) {
-            if (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(getPlayer().
-                    getServer().getInfo().getName()) || isExcluded) {
-                unload();
-                return;
-            }
-        }
-
-        ITabListProvider tlp = BungeeTabListPlus.getInstance().
-                getTabListManager().getTabListForPlayer(super.getPlayer());
-        if (tlp == null) {
-            exclude();
-            unload();
-            return;
-        }
-        TabList tabList = tlp.getTabList(super.getPlayer());
-
-        resize(tabList.getCollums() * tabList.getRows());
+    public void sendTablist(ITabList tabList) {
+        resize(tabList.getColumns() * tabList.getRows());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
                 getMainConfig().charLimit;
 
-        for (int i = 0; i < tabList.getCollums() * tabList.getRows(); i++) {
+        for (int i = 0; i < tabList.getColumns() * tabList.getRows(); i++) {
             Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
-                    getCollums() + (i / tabList.getRows()));
+                    getColumns() + (i / tabList.getRows()));
             if (line == null) {
                 line = new Slot(" ", tabList.getDefaultPing());
             }
@@ -255,7 +236,8 @@ public class TabList18 extends CustomTabList18 implements IMyTabListHandler {
         sendTextures[row] = null;
     }
 
-    void unload() {
+    @Override
+    public void unload() {
         resize(0);
     }
 }

@@ -44,8 +44,7 @@ public class SuperCommand extends Command {
         if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
             if (plugin.getPermissionManager().hasPermission(sender,
                     "bungeetablistplus.admin")) {
-                BungeeTabListPlus.getInstance().reload();
-                sendReloadComplete(sender);
+                sendReloadComplete(sender, BungeeTabListPlus.getInstance().reload());
             } else {
                 sendNoPermission(sender);
             }
@@ -186,17 +185,22 @@ public class SuperCommand extends Command {
         }
     }
 
-    private void sendReloadComplete(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().successReloadComplete;
-            if (message == null || message.isEmpty()) {
-                return;
+    private void sendReloadComplete(CommandSender target, boolean success) {
+        if (success) {
+            if (plugin.getConfigManager().getMessages() != null) {
+                String message = plugin.getConfigManager().getMessages().successReloadComplete;
+                if (message == null || message.isEmpty()) {
+                    return;
+                }
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                target.sendMessage(message);
+            } else {
+                target.sendMessage(getPrefix().append("reload complete").color(
+                        ChatColor.GREEN).create());
             }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
         } else {
-            target.sendMessage(getPrefix().append("reload complete").color(
-                    ChatColor.GREEN).create());
+            target.sendMessage(getPrefix().append("reload failed").color(
+                    ChatColor.RED).create());
         }
     }
 

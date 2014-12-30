@@ -20,8 +20,8 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
@@ -60,10 +60,10 @@ public class StaticSection extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
                          int size) {
         for (Slot s : text) {
-            tabList.setSlot(pos++, new Slot(s));
+            ITabList.setSlot(pos++, new Slot(s));
         }
         return pos;
     }

@@ -290,13 +290,14 @@ public class BungeeTabListPlus extends Plugin {
     /**
      * Reloads most settings of the plugin
      */
-    public void reload() {
+    public boolean reload() {
         try {
             config = new ConfigManager(this);
-            tabLists = new TabListManager(this);
-            if (!tabLists.loadTabLists()) {
-                return;
+            TabListManager tabListManager = new TabListManager(this);
+            if (!tabListManager.loadTabLists()) {
+                return false;
             }
+            tabLists = tabListManager;
             fakePlayerManager.reload();
         } catch (InvalidConfigurationException ex) {
             getLogger().warning("Unable to reload Config");
@@ -305,6 +306,7 @@ public class BungeeTabListPlus extends Plugin {
         if (refreshThread == null) {
             startRefreshThread();
         }
+        return true;
     }
 
     /**

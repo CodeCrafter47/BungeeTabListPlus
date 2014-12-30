@@ -21,8 +21,8 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -39,14 +39,14 @@ public class ServerSection extends StaticSection {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
                          int size) {
         for (Slot s : text) {
             Slot s2 = new Slot(s);
             s2.text = BungeeTabListPlus.getInstance().
                     getVariablesManager().replaceServerVariables(player, s.text,
                     ProxyServer.getInstance().getServerInfo(server));
-            tabList.setSlot(pos++, s2);
+            ITabList.setSlot(pos++, s2);
         }
         return pos;
     }

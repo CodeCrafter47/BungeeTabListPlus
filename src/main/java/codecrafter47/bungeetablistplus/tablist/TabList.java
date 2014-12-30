@@ -18,8 +18,10 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.tablist;
 
+import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import lombok.Getter;
@@ -28,7 +30,7 @@ import lombok.Setter;
 /**
  * @author Florian Stober
  */
-public class TabList {
+public class TabList implements ITabList {
 
     private final int rows;
     private final int collums;
@@ -40,19 +42,24 @@ public class TabList {
     @Setter
     private Skin defaultSkin;
     private int defaultPing;
+    private int size;
 
+    @Override
     public String getHeader() {
         return header;
     }
 
+    @Override
     public void setHeader(String header) {
         this.header = header;
     }
 
+    @Override
     public String getFooter() {
         return footer;
     }
 
+    @Override
     public void setFooter(String footer) {
         this.footer = footer;
     }
@@ -64,28 +71,35 @@ public class TabList {
         this.slots = new Slot[rows * collums];
         header = null;
         footer = null;
+        size = rows * collums;
     }
 
+    @Override
     public int getRows() {
         return this.rows;
     }
 
-    public int getCollums() {
+    @Override
+    public int getColumns() {
         return this.collums;
     }
 
+    @Override
     public int getUsedSlots() {
         return this.usedSlots;
     }
 
+    @Override
     public Slot getSlot(int n) {
         return this.slots[n];
     }
 
-    public Slot getSlot(int row, int collum) {
-        return getSlot(row * collums + collum);
+    @Override
+    public Slot getSlot(int row, int column) {
+        return getSlot(row * collums + column);
     }
 
+    @Override
     public void setSlot(int n, Slot s) {
         if (n >= slots.length) {
             return;
@@ -96,15 +110,23 @@ public class TabList {
         }
     }
 
-    public void setSlot(int row, int collum, Slot s) {
-        setSlot(row * collums + collum, s);
+    @Override
+    public void setSlot(int row, int column, Slot s) {
+        setSlot(row * collums + column, s);
     }
 
+    @Override
     public int getDefaultPing() {
         return defaultPing;
     }
 
+    @Override
     public void setDefaultPing(int defaultPing) {
         this.defaultPing = defaultPing;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 }

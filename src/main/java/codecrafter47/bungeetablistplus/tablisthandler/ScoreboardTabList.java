@@ -21,9 +21,8 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import net.md_5.bungee.api.ChatColor;
@@ -33,7 +32,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
  * @author Florian Stober
  */
 public class ScoreboardTabList extends CustomTabListHandler implements
-        IMyTabListHandler {
+        PlayerTablistHandler {
 
     private static String getSlotID(int n) {
         String hex = Integer.toHexString(n + 1);
@@ -59,25 +58,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
     }
 
     @Override
-    public void recreate() {
-        if (getPlayer().getServer() != null) {
-            if (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(getPlayer().
-                    getServer().getInfo().getName()) || isExcluded) {
-                unload();
-                return;
-            }
-        }
-
-        ITabListProvider tlp = BungeeTabListPlus.getInstance().
-                getTabListManager().getTabListForPlayer(super.getPlayer());
-        if (tlp == null) {
-            exclude();
-            unload();
-            return;
-        }
-        TabList tabList = tlp.getTabList(super.getPlayer());
-
+    public void sendTablist(ITabList tabList) {
         resize(tabList.getUsedSlots());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
@@ -184,7 +165,8 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         return ret;
     }
 
-    void unload() {
+    @Override
+    public void unload() {
         resize(0);
     }
 }

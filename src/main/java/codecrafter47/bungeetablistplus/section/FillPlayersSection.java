@@ -21,8 +21,8 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.api.TabList;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
@@ -117,7 +117,7 @@ public class FillPlayersSection extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, TabList tabList, int pos,
+    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
                          int size) {
         //System.out.println(size + " / " + getMaxSize(player));
         int playersToShow = players.size();
@@ -134,40 +134,40 @@ public class FillPlayersSection extends Section {
         int other_count = players.size() - playersToShow;
 
         for (int i = 0; i < playersToShow; i++) {
-            pos = drawPlayerLines(player, players.get(i), tabList, pos);
+            pos = drawPlayerLines(player, players.get(i), ITabList, pos);
         }
 
         if (other_count > 0) {
-            pos = drawMorePlayers(other_count, tabList, pos);
+            pos = drawMorePlayers(other_count, ITabList, pos);
         }
         return pos;
     }
 
-    private int drawPlayerLines(ProxiedPlayer viewer, IPlayer player, TabList tabList, int pos) {
+    private int drawPlayerLines(ProxiedPlayer viewer, IPlayer player, ITabList ITabList, int pos) {
         int i = pos;
         for (; i < pos + config.playerLines.size(); i++) {
             String line = prefix + config.playerLines.get(i - pos) + suffix;
             line = BungeeTabListPlus.getInstance().getVariablesManager().
                     replacePlayerVariables(viewer, line, player);
-            tabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
+            ITabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
                     getConfigManager().getMainConfig().sendPing ? player.
                     getPing() : 0));
             if (skin != SkinManager.defaultSkin)
-                tabList.getSlot(i).setSkin(skin);
+                ITabList.getSlot(i).setSkin(skin);
             else if (config.showCorrectPlayerSkins)
-                tabList.getSlot(i).setSkin(player.getSkin());
+                ITabList.getSlot(i).setSkin(player.getSkin());
         }
         return i;
     }
 
-    private int drawMorePlayers(int other_count, TabList tabList, int pos) {
+    private int drawMorePlayers(int other_count, ITabList ITabList, int pos) {
         int i = pos;
         for (; i < pos + config.morePlayersLines.size(); i++) {
             String line = prefix + config.morePlayersLines.get(i - pos) + suffix;
             line = line.replace("{other_count}", "" + other_count);
-            tabList.setSlot(i, new Slot(line, 0));
+            ITabList.setSlot(i, new Slot(line, 0));
             if (skin != SkinManager.defaultSkin)
-                tabList.getSlot(i).setSkin(skin);
+                ITabList.getSlot(i).setSkin(skin);
         }
         return i;
     }

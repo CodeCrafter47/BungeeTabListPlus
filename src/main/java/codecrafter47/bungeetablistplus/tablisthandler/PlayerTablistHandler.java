@@ -18,14 +18,23 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package codecrafter47.bungeetablistplus.tablisthandler;
 
-package codecrafter47.bungeetablistplus.api;
-
+import codecrafter47.bungeetablistplus.api.ITabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+/**
+ * @author Florian Stober
+ */
+public interface PlayerTablistHandler {
 
-public interface ITabListProvider {
+    void sendTablist(ITabList tabList);
 
-    void fillTabList(final ProxiedPlayer player, final ITabList ITabList);
+    boolean isExcluded();
 
+    void unload();
+
+    void exclude();
+
+    ProxiedPlayer getPlayer();
 }

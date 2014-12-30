@@ -22,7 +22,7 @@ package codecrafter47.bungeetablistplus.section;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import codecrafter47.bungeetablistplus.api.TabList;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
@@ -36,7 +36,7 @@ public abstract class Section {
 
     public abstract int getMaxSize(ProxiedPlayer player);
 
-    public abstract int calculate(ProxiedPlayer player, TabList tabList, int pos,
+    public abstract int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
                                   int size);
 
     public abstract void precalculate(ProxiedPlayer player);

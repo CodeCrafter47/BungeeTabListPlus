@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 /**
  * @author Florian Stober
  */
-class CustomTabList18 extends TabList {
+abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     boolean isExcluded = false;
 
@@ -46,7 +46,8 @@ class CustomTabList18 extends TabList {
         super(player);
     }
 
-    ProxiedPlayer getPlayer() {
+    @Override
+    public ProxiedPlayer getPlayer() {
         return player;
     }
 
@@ -103,7 +104,8 @@ class CustomTabList18 extends TabList {
         isExcluded = false;
     }
 
-    void exclude() {
+    @Override
+    public void exclude() {
         isExcluded = true;
         // only 1.7 clients
         if (player.getPendingConnection().getVersion() < ProtocolConstants.MINECRAFT_SNAPSHOT) {
@@ -197,5 +199,10 @@ class CustomTabList18 extends TabList {
 
     public int size() {
         return uuids.size();
+    }
+
+    @Override
+    public boolean isExcluded() {
+        return isExcluded;
     }
 }

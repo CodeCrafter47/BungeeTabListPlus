@@ -18,12 +18,41 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.tablisthandler;
 
-/**
- * @author Florian Stober
- */
-public interface IMyTabListHandler {
+package codecrafter47.bungeetablistplus.api;
 
-    void recreate();
+import codecrafter47.bungeetablistplus.skin.Skin;
+
+public interface ITabList {
+    String getHeader();
+
+    void setHeader(String header);
+
+    String getFooter();
+
+    void setFooter(String footer);
+
+    int getRows();
+
+    int getColumns();
+
+    int getUsedSlots();
+
+    Slot getSlot(int n);
+
+    Slot getSlot(int row, int column);
+
+    void setSlot(int n, Slot s);
+
+    void setSlot(int row, int column, Slot s);
+
+    int getDefaultPing();
+
+    void setDefaultPing(int defaultPing);
+
+    int getSize();
+
+    Skin getDefaultSkin();
+
+    void setDefaultSkin(Skin defaultSkin);
 }
