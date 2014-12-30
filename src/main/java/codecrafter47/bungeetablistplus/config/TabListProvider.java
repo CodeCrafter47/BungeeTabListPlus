@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.tablist.FlippedTabList;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -438,9 +439,9 @@ public class TabListProvider implements ITabListProvider {
                 sectionList.remove(i);
                 String prefix = ((AutoFillPlayers) section).prefix;
                 String suffix = ((AutoFillPlayers) section).suffix;
-                int startColumn = ((AutoFillPlayers) section).startColumn;
                 int maxPlayers = ((AutoFillPlayers) section).maxPlayers;
                 List<String> sortRules = ((AutoFillPlayers) section).sortRules;
+                Skin skin = ((AutoFillPlayers) section).skin;
 
                 Map<String, ServerInfo> servers = ProxyServer.getInstance().
                         getServers();
@@ -470,7 +471,7 @@ public class TabListProvider implements ITabListProvider {
                         try {
                             List<Section> sections = parser.
                                     parseServerSections(
-                                            prefix, suffix, new ArrayList<String>(0),
+                                            prefix, suffix, skin, new ArrayList<String>(0),
                                             server,
                                             sortRules, maxPlayers);
                             for (Section s : sections) {

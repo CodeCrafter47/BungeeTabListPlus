@@ -21,6 +21,7 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.skin.Skin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
@@ -35,14 +36,16 @@ public class AutoFillPlayers extends Section {
     public final int startColumn;
     public final int maxPlayers;
     public final List<String> sortRules;
+    public final Skin skin;
 
-    public AutoFillPlayers(int startColumn, String prefix, String suffix,
+    public AutoFillPlayers(int startColumn, String prefix, String suffix, Skin skin,
                            List<String> sortRules, int maxPlayers) {
         this.prefix = prefix;
         this.suffix = suffix;
         this.startColumn = startColumn;
         this.sortRules = sortRules;
         this.maxPlayers = maxPlayers;
+        this.skin = skin;
     }
 
     @Override

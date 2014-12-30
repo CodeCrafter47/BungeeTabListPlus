@@ -136,7 +136,7 @@ public class ConfigParser {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.
                             isEmpty()) {
                         sections.add(new AutoFillPlayers(startColumn, prefix,
-                                suffix, sortrules, maxplayers));
+                                suffix, skin, sortrules, maxplayers));
                     } else {
                         sections.add(new FillPlayersSection(startColumn, filter,
                                 config, prefix, suffix, skin, sortrules, maxplayers));
@@ -174,7 +174,7 @@ public class ConfigParser {
                 config.showEmptyGroups, config, this);
     }
 
-    public List<Section> parseServerSections(String g_prefix, String g_suffix,
+    public List<Section> parseServerSections(String g_prefix, String g_suffix, Skin g_skin,
                                              List<String> g_filter, String g_server, List<String> g_sort,
                                              int maxplayers) throws ParseException {
         List<Section> sections = new ArrayList<>();
@@ -182,7 +182,7 @@ public class ConfigParser {
             // Its properties
             int ping = 0;
             int startColumn = -1;
-            Skin skin = SkinManager.defaultSkin;
+            Skin skin = g_skin;
             List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
