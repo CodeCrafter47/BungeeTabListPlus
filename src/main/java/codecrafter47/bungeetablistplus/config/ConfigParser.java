@@ -93,8 +93,7 @@ public class ConfigParser {
                 } else if (tag.startsWith("MAXPLAYERS=")) {
                     maxplayers = Integer.parseInt(tag.
                             substring(11, tag.length()));
-                } else if (tag.startsWith("SKIN=") && BungeeTabListPlus.
-                        isVersion18()) {
+                } else if (tag.startsWith("SKIN=")) {
                     skin = new LazySkin(tag.substring(5, tag.length()));
                 } else {
                     plugin.getLogger().log(Level.WARNING,
@@ -211,8 +210,7 @@ public class ConfigParser {
                 } else if (tag.startsWith("MAXPLAYERS=")) {
                     maxplayers = Integer.parseInt(tag.
                             substring(11, tag.length()));
-                } else if (tag.startsWith("SKIN=") && BungeeTabListPlus.
-                        isVersion18()) {
+                } else if (tag.startsWith("SKIN=")) {
                     skin = new LazySkin(tag.substring(5, tag.length()));
                 } else {
                     plugin.getLogger().log(Level.WARNING,
