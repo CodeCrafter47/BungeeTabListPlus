@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <groupId>net.md-5</groupId>
+    <artifactId>bungeecord-module-cmd-send</artifactId>
+    <versioning>
+        <versions>
+            <version>1.8-SNAPSHOT</version>
+        </versions>
+        <lastUpdated>20140914095622</lastUpdated>
+    </versioning>
+</metadata>

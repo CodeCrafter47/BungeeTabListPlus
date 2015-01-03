@@ -1,0 +1,10 @@
+#NOTE: This is an internal implementation file, its format can be changed without prior notice.
+#Sat Dec 27 15:28:03 CET 2014
+bungeecord-api-1.8-20140926.222813-21.pom>bungeecord-repo=
+bungeecord-api-1.8-SNAPSHOT.jar>bungeecord-repo=
+bungeecord-api-1.8-SNAPSHOT.pom>=
+bungeecord-api-1.8-SNAPSHOT.jar>sonatype-nexus-snapshots=
+bungeecord-api-1.8-SNAPSHOT.pom>bungeecord-repo=
+bungeecord-api-1.8-20140926.222813-21.jar>bungeecord-repo=
+bungeecord-api-1.8-SNAPSHOT.jar>=
+bungeecord-api-1.8-SNAPSHOT.pom>sonatype-nexus-snapshots=

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <groupId>net.md-5</groupId>
+    <artifactId>bungeecord-protocol</artifactId>
+    <versioning>
+        <versions>
+            <version>1.8-SNAPSHOT</version>
+        </versions>
+        <lastUpdated>20140914095614</lastUpdated>
+    </versioning>
+</metadata>
