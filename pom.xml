@@ -11,6 +11,10 @@
 
     <repositories>
         <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <repository>
             <id>md5-repo</id>
             <url>http://repo.md-5.net/content/repositories/snapshots/</url>
         </repository>
@@ -124,7 +128,8 @@
                             <relocations>
                                 <relocation>
                                     <pattern>net.cubespace.Yamler</pattern>
-                                    <shadedPattern>codecrafter47.bungeetablistplus.libs.net.cubespace.Yamler</shadedPattern>
+                                    <shadedPattern>codecrafter47.bungeetablistplus.libs.net.cubespace.Yamler
+                                    </shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
