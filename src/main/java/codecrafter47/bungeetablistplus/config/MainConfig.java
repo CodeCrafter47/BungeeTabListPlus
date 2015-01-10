@@ -119,9 +119,7 @@ public class MainConfig extends Config {
 
     @Comments({
             "list servers you wish to create custom prefixes for.",
-            "to use the custom prefixes use the new {serverPrefix} variable",
-            "the name used below should be the alias name setup in the plugin's config file",
-            "same used for {fillplayers:<server>} function"
+            "to use the custom prefixes use the new {serverPrefix} variable"
     })
     public HashMap<String, String> serverPrefixes = new HashMap<>();
 
