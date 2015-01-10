@@ -42,30 +42,37 @@ public class FakePlayerManager implements IPlayerProvider {
             plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
                 @Override
                 public void run() {
-                    if (Math.random() < 0.3 && online.size() > 0) {
-                        // do a server switch
-                        FakePlayer player = (FakePlayer) online.get((int) (Math.random() * online.size()));
-                        player.server = new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size()));
-                    } else if (Math.random() < 0.9 && offline.size() > 0) {
-                        // add player
-                        String name = offline.get((int) (Math.random() * offline.size()));
-                        FakePlayer player = new FakePlayer();
-                        player.name = name;
-                        player.server = new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size()));
-                        offline.remove(name);
-                        online.add(player);
-                    } else if (online.size() > 0) {
-                        // remove player
-                        offline.add(online.remove((int) (online.size() * Math.random())).getName());
-                    }
+                    triggerRandomEvent();
                 }
             }, 10, 10, TimeUnit.SECONDS);
+        }
+    }
+
+    private void triggerRandomEvent() {
+        if (Math.random() < 0.3 && online.size() > 0) {
+            // do a server switch
+            FakePlayer player = (FakePlayer) online.get((int) (Math.random() * online.size()));
+            player.server = new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size()));
+        } else if (Math.random() < 0.9 && offline.size() > 0) {
+            // add player
+            String name = offline.get((int) (Math.random() * offline.size()));
+            FakePlayer player = new FakePlayer();
+            player.name = name;
+            player.server = new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size()));
+            offline.remove(name);
+            online.add(player);
+        } else if (online.size() > 0) {
+            // remove player
+            offline.add(online.remove((int) (online.size() * Math.random())).getName());
         }
     }
 
     public void reload() {
         offline = new ArrayList<>(plugin.getConfigManager().getMainConfig().fakePlayers);
         online = new ArrayList<>();
+        for (int i = offline.size(); i > 0; i--) {
+            triggerRandomEvent();
+        }
     }
 
     @Override
