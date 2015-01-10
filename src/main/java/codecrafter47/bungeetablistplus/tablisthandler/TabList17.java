@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.util.ColorParser;
+import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -47,7 +48,7 @@ public class TabList17 extends CustomTabList18 implements
                 alloc[i] = hex.charAt(i / 2);
             }
         }
-        return String.valueOf(ChatColor.MAGIC) + alloc + ChatColor.RESET;
+        return String.valueOf(ChatColor.MAGIC) + String.valueOf(alloc) + ChatColor.RESET;
     }
 
     private final int[] slots_ping = new int[ConfigManager.getTabSize()];
@@ -170,6 +171,7 @@ public class TabList17 extends CustomTabList18 implements
     }
 
     void createTeam(Connection.Unsafe connection, String player) {
+        Preconditions.checkArgument(player.length() <= 13);
         Team t = new Team();
         t.setName("TAB" + player);
         t.setMode((byte) 0);

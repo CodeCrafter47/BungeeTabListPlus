@@ -44,7 +44,7 @@ public class ScoreboardTabList extends CustomTabListHandler implements
                 alloc[i] = hex.charAt(i / 2);
             }
         }
-        return String.valueOf(ChatColor.MAGIC) + alloc + ChatColor.RESET;
+        return String.valueOf(ChatColor.MAGIC) + String.valueOf(alloc) + ChatColor.RESET;
     }
 
     private final int[] slots_ping = new int[ConfigManager.getTabSize()];

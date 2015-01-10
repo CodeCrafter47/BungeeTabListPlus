@@ -21,6 +21,7 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.packets.*;
+import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.connection.Connection;
 
 /**
@@ -86,24 +87,32 @@ public class PacketManager {
     }
 
     public void createTeam(Connection.Unsafe connection, String player) {
+        Preconditions.checkArgument(player.length() <= 13);
         teamPacket.createTeam(connection, player);
     }
 
     public void updateTeam(Connection.Unsafe connection, String player,
                            String prefix, String displayname, String suffix) {
+        Preconditions.checkArgument(player.length() <= 13);
+        Preconditions.checkArgument(prefix.length() <= 16);
+        Preconditions.checkArgument(displayname.length() <= 16);
+        Preconditions.checkArgument(suffix.length() <= 16);
         teamPacket.updateTeam(connection, player, prefix, displayname, suffix);
     }
 
     public void removeTeam(Connection.Unsafe connection, String player) {
+        Preconditions.checkArgument(player.length() <= 13);
         teamPacket.removeTeam(connection, player);
     }
 
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
                                      int ping) {
+        Preconditions.checkArgument(player.length() <= 16);
         playerListPacket.createOrUpdatePlayer(connection, player, ping);
     }
 
     public void removePlayer(Connection.Unsafe connection, String player) {
+        Preconditions.checkArgument(player.length() <= 16);
         playerListPacket.removePlayer(connection, player);
     }
 

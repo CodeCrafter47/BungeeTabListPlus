@@ -33,7 +33,7 @@ import java.util.Objects;
 public class InsertIfServersSame implements ServerVariable {
     @Override
     public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
-        if (Objects.equals(server, viewer.getServer())) return args;
+        if (viewer.getServer() != null && Objects.equals(server, viewer.getServer().getInfo())) return args;
         return "";
     }
 }

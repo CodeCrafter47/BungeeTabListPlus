@@ -21,6 +21,8 @@
 
 package codecrafter47.bungeetablistplus.player;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Optional;
@@ -65,6 +67,7 @@ public class BungeePlayer implements IPlayer {
 
     @Override
     public Skin getSkin() {
+        if (!BungeeTabListPlus.isVersion18()) return SkinManager.defaultSkin;
         if (skin == null) {
             LoginResult loginResult = ((UserConnection) player).
                     getPendingConnection().getLoginProfile();
