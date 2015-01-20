@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.User;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -45,11 +46,24 @@ public class PermissionManager {
                 getPlugin("BungeePerms");
         if (bp != null) {
             try {
-                Group mainGroup = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(player.getName()));
+                User user = bp.getPermissionsManager().getUser(player.getName());
+                Group mainGroup = null;
+                if (user != null) {
+                    mainGroup = bp.getPermissionsManager().getMainGroup(user);
+                }
+                if (mainGroup == null) {
+                    if (!bp.getPermissionsManager().getDefaultGroups().isEmpty()) {
+                        mainGroup = bp.getPermissionsManager().getDefaultGroups().get(0);
+                        for (int i = 1; i < bp.getPermissionsManager().getDefaultGroups().size(); ++i) {
+                            if (bp.getPermissionsManager().getDefaultGroups().get(i).getWeight() < mainGroup.getWeight()) {
+                                mainGroup = bp.getPermissionsManager().getDefaultGroups().get(i);
+                            }
+                        }
+                    }
+                }
+
                 if (mainGroup != null) {
-                    bpgroup = mainGroup.
-                            getName();
+                    bpgroup = mainGroup.getName();
                 }
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
