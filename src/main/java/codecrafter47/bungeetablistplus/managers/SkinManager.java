@@ -92,7 +92,12 @@ public class SkinManager {
             }
             return null;
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
-            plugin.reportError(e);
+            if (e instanceof IOException && e.getMessage().contains("503")) {
+                // mojang rate limit; try again later
+                fetchingSkins.remove(player);
+            } else {
+                plugin.reportError(e);
+            }
         }
         return null;
 
@@ -108,7 +113,13 @@ public class SkinManager {
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
             return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
                     get(0).signature});
-        } catch (Exception ignored) {
+        } catch (IOException | JsonSyntaxException | JsonIOException e) {
+            if (e instanceof IOException && e.getMessage().contains("503")) {
+                // mojang rate limit; try again later
+            } else {
+                // this will spam some users logs, but we can ignore more exceptions later
+                plugin.reportError(e);
+            }
         }
         return null;
 
