@@ -116,6 +116,9 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                         text += ' ';
                     }
                 }
+                if (text.endsWith("" + ChatColor.COLOR_CHAR)) {
+                    text = text.substring(0, text.length() - 1);
+                }
 
                 if (line.getSkin() == SkinManager.defaultSkin) {
                     line.setSkin(tabList.getDefaultSkin());
@@ -163,20 +166,26 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
             }
 
             // update header/footer
-            if (tabList.getHeader() != null || tabList.getFooter() != null) {
+            String header = tabList.getHeader();
+            if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
+                header = header.substring(0, header.length() - 1);
+            }
+            String footer = tabList.getFooter();
+            if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
+                footer = footer.substring(0, footer.length() - 1);
+            }
+            if (header != null || footer != null) {
                 if (BungeeTabListPlus.isAbove995()) {
-                    player.setTabHeader(TextComponent.fromLegacyText(tabList.
-                            getHeader()), TextComponent.fromLegacyText(tabList.
-                            getFooter()));
+                    player.setTabHeader(TextComponent.fromLegacyText(header), TextComponent.fromLegacyText(footer));
                 } else {
                     TabHeaderPacket packet = new TabHeaderPacket();
-                    if (tabList.getHeader() != null) {
+                    if (header != null) {
                         packet.setHeader(ComponentSerializer.toString(TextComponent.
-                                fromLegacyText(tabList.getHeader())));
+                                fromLegacyText(header)));
                     }
-                    if (tabList.getFooter() != null) {
+                    if (footer != null) {
                         packet.setFooter(ComponentSerializer.toString(TextComponent.
-                                fromLegacyText(tabList.getFooter())));
+                                fromLegacyText(footer)));
                     }
                     player.unsafe().sendPacket(packet);
                 }
