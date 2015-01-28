@@ -49,7 +49,7 @@ public class SkinManager {
     private final BungeeTabListPlus plugin;
     private static final Gson gson = new Gson();
 
-    private final Cache<String, Skin> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    private final Cache<String, Skin> cache = CacheBuilder.newBuilder().expireAfterAccess(300, TimeUnit.SECONDS).build();
     public static final Skin defaultSkin = new PlayerSkin(UUID.randomUUID(), null);
 
     private final Set<String> fetchingSkins = Sets.newConcurrentHashSet();
