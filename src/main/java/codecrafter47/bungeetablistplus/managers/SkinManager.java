@@ -103,7 +103,7 @@ public class SkinManager {
 
     }
 
-    private Skin fetchSkin(final String uuid) {
+    private Skin fetchSkin(String uuid) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(
                     "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").
@@ -111,6 +111,7 @@ public class SkinManager {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
+            uuid = uuid.replace("-", "");
             return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
                     get(0).signature});
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
