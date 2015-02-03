@@ -69,7 +69,7 @@ public class SkinManager {
         return defaultSkin;
     }
 
-    private String fetchUUID(String player) {
+    private String fetchUUID(final String player) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(
                     "https://api.mojang.com/profiles/minecraft").
@@ -94,7 +94,13 @@ public class SkinManager {
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
             if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
-                fetchingSkins.remove(player);
+                plugin.getLogger().warning("Hit mojang rate limits while fetching uuid for " + player + ".");
+                plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        fetchingSkins.remove(player);
+                    }
+                }, 5, TimeUnit.SECONDS);
             } else {
                 plugin.reportError(e);
             }
@@ -105,21 +111,22 @@ public class SkinManager {
 
     private Skin fetchSkin(String uuid) {
         try {
+            uuid = uuid.replace("-", "");
             HttpURLConnection connection = (HttpURLConnection) new URL(
                     "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").
                     openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
-            uuid = uuid.replace("-", "");
             return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
                     get(0).signature});
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
             if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
+                plugin.getLogger().info("Hit mojang rate limits while fetching skin for " + uuid + ". Will retry in 5 minutes. (This is not an error)");
             } else {
                 // this will spam some users logs, but we can ignore more exceptions later
-                plugin.reportError(e);
+                plugin.reportError(new Exception("Unable to resolve skin for " + uuid, e));
             }
         }
         return null;
@@ -176,7 +183,7 @@ public class SkinManager {
                         public void run() {
                             fetchingSkins.remove(nameOrUUID);
                         }
-                    }, 1, TimeUnit.MINUTES);
+                    }, 5, TimeUnit.MINUTES);
                 }
             }
         }
