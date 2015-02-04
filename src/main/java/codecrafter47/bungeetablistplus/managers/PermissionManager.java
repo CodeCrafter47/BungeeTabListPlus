@@ -163,9 +163,10 @@ public class PermissionManager {
         String bpprefix = null;
         if (bp != null) {
             try {
-                bpprefix = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(player.getName())).
-                        getPrefix();
+                User user = bp.getPermissionsManager().getUser(player.getName());
+                if (user != null) {
+                    bpprefix = bp.getPermissionsManager().getMainGroup(user).getPrefix();
+                }
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
@@ -205,9 +206,10 @@ public class PermissionManager {
         String display = null;
         if (bp != null) {
             try {
-                display = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(player.getName())).
-                        getDisplay();
+                User user = bp.getPermissionsManager().getUser(player.getName());
+                if (user != null) {
+                    display = bp.getPermissionsManager().getMainGroup(user).getDisplay();
+                }
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
@@ -227,9 +229,10 @@ public class PermissionManager {
         String suffix = null;
         if (bp != null) {
             try {
-                suffix = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(player.getName())).
-                        getSuffix();
+                User user = bp.getPermissionsManager().getUser(player.getName());
+                if (user != null) {
+                    suffix = bp.getPermissionsManager().getMainGroup(user).getSuffix();
+                }
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
