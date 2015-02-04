@@ -28,8 +28,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
@@ -91,7 +89,7 @@ public class SkinManager {
                 return profiles[0].id;
             }
             return null;
-        } catch (IOException | JsonSyntaxException | JsonIOException e) {
+        } catch (Throwable e) {
             if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
                 plugin.getLogger().warning("Hit mojang rate limits while fetching uuid for " + player + ".");
@@ -120,7 +118,7 @@ public class SkinManager {
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
             return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
                     get(0).signature});
-        } catch (IOException | JsonSyntaxException | JsonIOException e) {
+        } catch (Throwable e) {
             if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
                 plugin.getLogger().info("Hit mojang rate limits while fetching skin for " + uuid + ". Will retry in 5 minutes. (This is not an error)");
