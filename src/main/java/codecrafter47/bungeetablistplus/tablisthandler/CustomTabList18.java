@@ -138,8 +138,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
         if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
                 contains(getPlayer().getServer().getInfo().getName()) || isExcluded || getPlayer().
                 getPendingConnection().getVersion() >= 47) {
-            if (pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId()) || (((pli.getAction() == Action.ADD_PLAYER) || (pli.
-                    getAction() == Action.REMOVE_PLAYER)))) {
+            if ((pli.getAction() == Action.ADD_PLAYER) || (pli.getAction() == Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
                 // Pass the Packet to the client
                 player.unsafe().sendPacket(pli);
                 // update list on the client
