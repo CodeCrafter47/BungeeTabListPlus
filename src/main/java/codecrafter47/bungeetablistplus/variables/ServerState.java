@@ -36,6 +36,10 @@ public class ServerState implements ServerVariable {
     public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
         if (args != null) {
             server = ProxyServer.getInstance().getServerInfo(args);
+            if (server == null) {
+                BungeeTabListPlus.getInstance().getLogger().warning("Server " + args + " does not exist.");
+                return "&cunknown server";
+            }
         }
         PingTask ping = BungeeTabListPlus.getInstance().getServerState(
                 server.getName());
