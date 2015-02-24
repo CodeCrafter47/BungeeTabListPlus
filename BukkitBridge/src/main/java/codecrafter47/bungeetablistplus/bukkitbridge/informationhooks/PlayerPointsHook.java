@@ -40,9 +40,13 @@ public class PlayerPointsHook implements PlayerInformationProvider {
 
     @Override
     public Map<String, Object> getInformation(Player player) {
-        PlayerPointsAPI playerPoints = ((PlayerPoints) plugin.getServer().getPluginManager().getPlugin("PlayerPoints")).getAPI();
         Map<String, Object> map = new HashMap<>();
-        map.put("playerPoints", playerPoints.look(player.getUniqueId()));
+        try {
+            PlayerPointsAPI playerPoints = ((PlayerPoints) plugin.getServer().getPluginManager().getPlugin("PlayerPoints")).getAPI();
+            map.put("playerPoints", playerPoints.look(player.getUniqueId()));
+        } catch (Throwable th) {
+            plugin.getLogger().warning("An error occurred while getting PlayerPoints for " + player.getName());
+        }
         return map;
     }
 }
