@@ -121,10 +121,10 @@ public class PermissionManager {
                 int r1 = g1.getRank();
                 int r2 = g2.getRank();
                 if (r1 > r2) {
-                    return 1;
+                    return -1;
                 }
                 if (r2 > r1) {
-                    return -1;
+                    return 1;
                 }
                 return 0;
             } catch (Throwable th) {
@@ -147,10 +147,10 @@ public class PermissionManager {
                 }
             }
             if (i > j) {
-                return 1;
+                return -1;
             }
             if (j > i) {
-                return -1;
+                return 1;
             }
         }
         return 0;
