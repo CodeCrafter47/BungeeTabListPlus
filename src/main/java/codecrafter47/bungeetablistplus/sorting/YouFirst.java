@@ -39,10 +39,10 @@ public class YouFirst implements ISortingRule {
     @Override
     public int compare(IPlayer player1, IPlayer player2) {
         if (Objects.equals(player1.getName(), player.getName())) {
-            return 1;
+            return -1;
         }
         if (Objects.equals(player2.getName(), player.getName())) {
-            return -1;
+            return 1;
         }
         return 0;
     }

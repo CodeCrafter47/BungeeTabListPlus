@@ -90,7 +90,7 @@ public class FillPlayersSection extends Section {
                 for (ISortingRule rule : srules) {
                     int i = rule.compare(p1, p2);
                     if (i != 0) {
-                        return -i;
+                        return i;
                     }
                 }
                 if (players.indexOf(p2) > players.indexOf(p1)) {
