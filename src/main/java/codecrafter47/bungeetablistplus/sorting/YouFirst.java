@@ -41,7 +41,7 @@ public class YouFirst implements ISortingRule {
         if (Objects.equals(player1.getName(), player.getName())) {
             return 1;
         }
-        if (Objects.equals(player1.getName(), player.getName())) {
+        if (Objects.equals(player2.getName(), player.getName())) {
             return -1;
         }
         return 0;
