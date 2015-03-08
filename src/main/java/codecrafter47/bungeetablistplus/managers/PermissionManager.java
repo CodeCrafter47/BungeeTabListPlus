@@ -42,8 +42,7 @@ public class PermissionManager {
     public String getMainGroup(IPlayer player) {
         String bpgroup = null;
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
-                getPlugin("BungeePerms");
+        BungeePerms bp = BungeePerms.getInstance();
         if (bp != null) {
             try {
                 User user = bp.getPermissionsManager().getUser(player.getName());
@@ -110,8 +109,7 @@ public class PermissionManager {
     public int comparePlayers(IPlayer p1, IPlayer p2) {
         // TODO Vault/Bukkit support
 
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
-                getPlugin("BungeePerms");
+        BungeePerms bp = BungeePerms.getInstance();
         if (bp != null) {
             try {
                 Group g1 = bp.getPermissionsManager().getMainGroup(bp.
@@ -158,8 +156,7 @@ public class PermissionManager {
 
     public String getPrefix(IPlayer player) {
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
-                getPlugin("BungeePerms");
+        BungeePerms bp = BungeePerms.getInstance();
         String bpprefix = null;
         if (bp != null) {
             try {
@@ -201,8 +198,7 @@ public class PermissionManager {
 
     public String getDisplayPrefix(IPlayer player) {
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
-                getPlugin("BungeePerms");
+        BungeePerms bp = BungeePerms.getInstance();
         String display = null;
         if (bp != null) {
             try {
@@ -224,8 +220,7 @@ public class PermissionManager {
 
     public String getSuffix(IPlayer player) {
         // BungeePerms
-        BungeePerms bp = (BungeePerms) plugin.getProxy().getPluginManager().
-                getPlugin("BungeePerms");
+        BungeePerms bp = BungeePerms.getInstance();
         String suffix = null;
         if (bp != null) {
             try {
