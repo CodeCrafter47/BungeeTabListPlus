@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Action;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
@@ -74,7 +73,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
                 item.setDisplayName(username);
             }
             packet.setItems(items);
-            if (player.getPendingConnection().getVersion() >= ProtocolConstants.MINECRAFT_SNAPSHOT) {
+            if (player.getPendingConnection().getVersion() >= 47) {
                 player.unsafe().sendPacket(packet);
             } else {
                 // Split up the packet
@@ -97,7 +96,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
     public void exclude() {
         isExcluded = true;
         // only 1.7 clients
-        if (player.getPendingConnection().getVersion() < ProtocolConstants.MINECRAFT_SNAPSHOT) {
+        if (player.getPendingConnection().getVersion() < 47) {
             synchronized (bukkitplayers) {
                 synchronized (usernames) {
                     for (String s : bukkitplayers) {
