@@ -87,7 +87,7 @@ public class BungeePlayer implements IPlayer {
 
     @Override
     public int getGameMode() {
-        return ((UserConnection) player).getGamemode();
+        return player.getPendingConnection().getVersion() < 47 ? 0 : ((UserConnection) player).getGamemode();
     }
 
     public ProxiedPlayer getPlayer() {
