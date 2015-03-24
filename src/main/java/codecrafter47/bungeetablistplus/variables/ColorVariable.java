@@ -43,7 +43,7 @@ public class ColorVariable implements Variable {
             String array[] = args.split(",");
             all = new ChatColor[array.length];
             for (int i = 0; i < array.length; i++) {
-                String color = array[i];
+                String color = array[i].trim().toUpperCase();
                 try {
                     all[i] = ChatColor.valueOf(color);
                 } catch (Exception ex) {
