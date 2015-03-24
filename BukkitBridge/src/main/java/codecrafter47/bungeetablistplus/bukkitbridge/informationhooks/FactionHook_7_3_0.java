@@ -42,7 +42,7 @@ public class FactionHook_7_3_0 implements PlayerInformationProvider {
         MPlayer uplayer = MPlayer.get(player);
         map.put("factionName", uplayer.getFactionName());
         Faction faction = uplayer.getFaction();
-        map.put("onlineFactionMembers", faction.getOnlinePlayers());
+        map.put("onlineFactionMembers", faction.getOnlinePlayers().size());
         faction = BoardColl.get().
                 getFactionAt(PS.valueOf(player.getLocation()));
         if (faction != null) {
