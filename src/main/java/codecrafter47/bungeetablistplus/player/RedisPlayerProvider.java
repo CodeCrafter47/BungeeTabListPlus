@@ -37,9 +37,20 @@ import java.util.concurrent.TimeUnit;
 public class RedisPlayerProvider implements IPlayerProvider {
 
     private final Cache<UUID, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    private Collection<IPlayer> players;
+    private long last = 0;
 
     @Override
     public Collection<IPlayer> getPlayers() {
+        long now = System.currentTimeMillis();
+        if (now - last > 2000) {
+            players = getPlayers0();
+            last = now;
+        }
+        return players;
+    }
+
+    private Collection<IPlayer> getPlayers0() {
         return Collections2.transform(RedisBungee.getApi().getPlayersOnline(), new Function<UUID, IPlayer>() {
             @Override
             public IPlayer apply(UUID player) {
