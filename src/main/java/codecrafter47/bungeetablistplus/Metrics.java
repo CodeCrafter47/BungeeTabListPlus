@@ -139,6 +139,12 @@ public class Metrics {
             FileInputStream inStream = new FileInputStream(configurationFile);
             properties.load(inStream);
             inStream.close();
+            if (!properties.containsKey("guid")) {
+                properties.put("guid", UUID.randomUUID().toString());
+                FileOutputStream out = new FileOutputStream(configurationFile);
+                properties.store(out, "http://mcstats.org");
+                out.close();
+            }
         }
 
         // Load the guid then
