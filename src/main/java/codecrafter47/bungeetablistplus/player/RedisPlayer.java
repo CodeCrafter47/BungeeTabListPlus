@@ -25,6 +25,8 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Optional;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
+import lombok.SneakyThrows;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.UUID;
@@ -37,12 +39,24 @@ public class RedisPlayer implements IPlayer {
 
     public RedisPlayer(UUID uuid) {
         this.uuid = uuid;
+        ProxyServer.getInstance().getScheduler().runAsync(BungeeTabListPlus.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                name = RedisBungee.getApi().getNameFromUuid(RedisPlayer.this.uuid);
+            }
+        });
     }
 
     @Override
+    @SneakyThrows
     public String getName() {
+        int i = 0;
+        while (name == null && i < 1000) {
+            Thread.sleep(1);
+            i++;
+        }
         if (name == null) {
-            name = RedisBungee.getApi().getNameFromUuid(uuid);
+            return uuid.toString();
         }
         return name;
     }

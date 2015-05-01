@@ -21,14 +21,17 @@
 
 package codecrafter47.bungeetablistplus.player;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Collections2;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import lombok.SneakyThrows;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -37,16 +40,19 @@ import java.util.concurrent.TimeUnit;
 public class RedisPlayerProvider implements IPlayerProvider {
 
     private final Cache<UUID, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
-    private Collection<IPlayer> players;
-    private long last = 0;
+    private Collection<IPlayer> players = Collections.emptySet();
+
+    public RedisPlayerProvider() {
+        ProxyServer.getInstance().getScheduler().schedule(BungeeTabListPlus.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                players = getPlayers0();
+            }
+        }, 1, 1, TimeUnit.SECONDS);
+    }
 
     @Override
     public Collection<IPlayer> getPlayers() {
-        long now = System.currentTimeMillis();
-        if (now - last > 2000) {
-            players = getPlayers0();
-            last = now;
-        }
         return players;
     }
 
