@@ -29,6 +29,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class ServerPrefixVariable implements ServerVariable {
     @Override
     public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
+        if (args != null) {
+            return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(args);
+        }
         return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(server.getName());
     }
 }
