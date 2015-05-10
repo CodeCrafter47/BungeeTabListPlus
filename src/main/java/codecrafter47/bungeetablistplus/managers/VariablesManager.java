@@ -90,7 +90,7 @@ public final class VariablesManager {
         addVariable("tabName", new TabNameVariable());
         addVariable("tps", new BukkitBridgeVariable("tps"));
         addVariable("onlineState", new ServerState());
-        addVariable("rplayers", new RedisPlayers());
+        addVariable("rplayers", new ServerPlayerCountVariable());
         addVariable("internalServerName", new InternalServerNameVariable());
         addVariable("server_rplayer_count", new PerServerRedisPlayers());
         addVariable("serverPrefix", new ServerPrefixVariable());
