@@ -116,7 +116,7 @@ public class SkinManager {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
-            if (skin.properties != null && !skin.properties.isEmpty()) {
+            if (skin != null && skin.properties != null && !skin.properties.isEmpty()) {
                 return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
                         get(0).signature});
             }
