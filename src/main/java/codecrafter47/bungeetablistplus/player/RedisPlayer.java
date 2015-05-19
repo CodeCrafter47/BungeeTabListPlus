@@ -51,14 +51,14 @@ public class RedisPlayer implements IPlayer {
     @SneakyThrows
     public String getName() {
         int i = 0;
-        while (name == null && i < 1000) {
-            Thread.sleep(1);
-            i++;
-        }
         if (name == null) {
             return uuid.toString();
         }
         return name;
+    }
+
+    public boolean hasName() {
+        return name != null;
     }
 
     @Override

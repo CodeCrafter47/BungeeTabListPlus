@@ -25,5 +25,5 @@ import java.util.Collection;
 
 public interface IPlayerProvider {
 
-    Collection<IPlayer> getPlayers();
+    Collection<? extends IPlayer> getPlayers();
 }

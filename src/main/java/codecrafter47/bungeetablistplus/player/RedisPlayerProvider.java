@@ -23,6 +23,7 @@ package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Collections2;
@@ -39,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 
 public class RedisPlayerProvider implements IPlayerProvider {
 
-    private final Cache<UUID, IPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
-    private Collection<IPlayer> players = Collections.emptySet();
+    private final Cache<UUID, RedisPlayer> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.SECONDS).build();
+    private Collection<? extends IPlayer> players = Collections.emptySet();
 
     public RedisPlayerProvider() {
         ProxyServer.getInstance().getScheduler().schedule(BungeeTabListPlus.getInstance(), new Runnable() {
@@ -52,24 +53,29 @@ public class RedisPlayerProvider implements IPlayerProvider {
     }
 
     @Override
-    public Collection<IPlayer> getPlayers() {
+    public Collection<? extends IPlayer> getPlayers() {
         return players;
     }
 
-    private Collection<IPlayer> getPlayers0() {
-        return Collections2.transform(RedisBungee.getApi().getPlayersOnline(), new Function<UUID, IPlayer>() {
+    private Collection<? extends IPlayer> getPlayers0() {
+        return Collections2.filter(Collections2.transform(RedisBungee.getApi().getPlayersOnline(), new Function<UUID, RedisPlayer>() {
             @Override
-            public IPlayer apply(UUID player) {
+            public RedisPlayer apply(UUID player) {
                 return wrapPlayer(player);
+            }
+        }), new Predicate<RedisPlayer>() {
+            @Override
+            public boolean apply(RedisPlayer input) {
+                return input.hasName();
             }
         });
     }
 
     @SneakyThrows
-    IPlayer wrapPlayer(final UUID player) {
-        return cache.get(player, new Callable<IPlayer>() {
+    RedisPlayer wrapPlayer(final UUID player) {
+        return cache.get(player, new Callable<RedisPlayer>() {
             @Override
-            public IPlayer call() {
+            public RedisPlayer call() {
                 return new RedisPlayer(player);
             }
         });

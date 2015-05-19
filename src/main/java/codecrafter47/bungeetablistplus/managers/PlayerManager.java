@@ -65,9 +65,9 @@ public class PlayerManager {
     public List<IPlayer> getPlayers(Collection<String> filter,
                                     ProxiedPlayer who, boolean includeSuspectors) {
         List<IPlayer> list = new ArrayList<>();
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<? extends IPlayer>>() {
             @Override
-            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+            public Iterable<? extends IPlayer> apply(IPlayerProvider iPlayerProvider) {
                 return iPlayerProvider.getPlayers();
             }
         }));
@@ -130,9 +130,9 @@ public class PlayerManager {
 
     public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSuspectors) {
         int num = 0;
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Collection<? extends IPlayer>>() {
             @Override
-            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+            public Collection<? extends IPlayer> apply(IPlayerProvider iPlayerProvider) {
                 return iPlayerProvider.getPlayers();
             }
         }));
@@ -150,9 +150,9 @@ public class PlayerManager {
 
     public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSuspectors) {
         int num = 0;
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<IPlayer>>() {
+        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Collection<? extends IPlayer>>() {
             @Override
-            public Iterable<IPlayer> apply(IPlayerProvider iPlayerProvider) {
+            public Collection<? extends IPlayer> apply(IPlayerProvider iPlayerProvider) {
                 return iPlayerProvider.getPlayers();
             }
         }));
