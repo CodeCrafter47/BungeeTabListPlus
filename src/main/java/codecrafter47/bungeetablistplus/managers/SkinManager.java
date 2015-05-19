@@ -68,8 +68,9 @@ public class SkinManager {
     }
 
     private String fetchUUID(final String player) {
+        HttpURLConnection connection = null;
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(
+            connection = (HttpURLConnection) new URL(
                     "https://api.mojang.com/profiles/minecraft").
                     openConnection();
             connection.setRequestMethod("POST");
@@ -93,12 +94,13 @@ public class SkinManager {
             if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
                 plugin.getLogger().warning("Hit mojang rate limits while fetching uuid for " + player + ".");
+                String headerField = connection.getHeaderField("Retry-After");
                 plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
                     @Override
                     public void run() {
                         fetchingSkins.remove(player);
                     }
-                }, 5, TimeUnit.SECONDS);
+                }, headerField == null ? 300 : Integer.valueOf(headerField), TimeUnit.SECONDS);
             } else {
                 plugin.reportError(e);
             }
