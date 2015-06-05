@@ -98,6 +98,7 @@ public final class VariablesManager {
         addVariable("insertIfGamemode3", new InsertIfGamemode3());
         addVariable("insertIfHidden", new InsertIfHidden());
         addVariable("insertIfServersSame", new InsertIfServersSame());
+        addVariable("insertIfServersDifferent", new InsertIfServersDifferent());
     }
 
     public void addVariable(String name, Variable var) {
