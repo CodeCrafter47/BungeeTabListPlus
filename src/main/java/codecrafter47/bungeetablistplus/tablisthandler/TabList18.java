@@ -42,7 +42,7 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
 
     private static String getSlotID(int n) {
         String s = Integer.toString(n + 1000);
-        return "0000tab#" + s;
+        return " ?tab" + s;
     }
 
     private final int[] slots_ping = new int[ConfigManager.getTabSize()];
