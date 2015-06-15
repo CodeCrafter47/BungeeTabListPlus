@@ -20,9 +20,10 @@
  */
 package codecrafter47.bungeetablistplus.api;
 
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public abstract interface Variable {
+public interface PlayerVariable {
 
-    public abstract String getReplacement(ProxiedPlayer viewer, String args);
+    String getReplacement(ProxiedPlayer viewer, IPlayer player, String args);
 }

@@ -20,10 +20,9 @@
  */
 package codecrafter47.bungeetablistplus.api;
 
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public abstract interface ServerVariable {
+public interface Variable {
 
-    public abstract String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args);
+    String getReplacement(ProxiedPlayer viewer, String args);
 }

@@ -18,21 +18,12 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.sorting;
+package codecrafter47.bungeetablistplus.api;
 
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-/**
- * @author Florian Stober
- */
-public interface ISortingRule {
+public interface ServerVariable {
 
-    /**
-     * return 1: player1 before player2 return 0: invoke next sorting rule
-     * return -1: player2 before player1
-     *
-     * @param player1
-     * @param player2
-     */
-    public int compare(IPlayer player1, IPlayer player2);
+    String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args);
 }
