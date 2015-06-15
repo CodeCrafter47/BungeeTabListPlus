@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
+import codecrafter47.bungeetablistplus.packets.TeamPacket;
 import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
@@ -45,6 +46,8 @@ import net.md_5.bungee.protocol.Protocol;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -258,6 +261,20 @@ public class BungeeTabListPlus extends Plugin {
                 packetMap.put(TabHeaderPacket.class, 0x47);
             } catch (IllegalArgumentException | IllegalAccessException |
                     NoSuchFieldException | SecurityException ex) {
+                Logger.getLogger(BungeeTabListPlus.class.getName()).
+                        log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if (isVersion18()) {
+            try {
+                // register team packet
+                Class clazz = Protocol.DirectionData.class;
+                Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, Class.class);
+                registerPacket.setAccessible(true);
+                registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, TeamPacket.class);
+            } catch (IllegalArgumentException | NoSuchMethodException |
+                    SecurityException | InvocationTargetException | IllegalAccessException ex) {
                 Logger.getLogger(BungeeTabListPlus.class.getName()).
                         log(Level.SEVERE, null, ex);
             }
