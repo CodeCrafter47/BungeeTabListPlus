@@ -28,9 +28,10 @@ import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Collection;
-import net.md_5.bungee.api.plugin.Plugin;
+import java.util.logging.Level;
 
 public class PermissionManager {
 
@@ -66,6 +67,8 @@ public class PermissionManager {
                 if (mainGroup != null) {
                     bpgroup = mainGroup.getName();
                 }
+            } catch (NullPointerException ex) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
@@ -168,6 +171,8 @@ public class PermissionManager {
                 if (user != null) {
                     bpprefix = bp.getPermissionsManager().getMainGroup(user).getPrefix();
                 }
+            } catch (NullPointerException ex) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
@@ -211,6 +216,8 @@ public class PermissionManager {
                 if (user != null) {
                     display = bp.getPermissionsManager().getMainGroup(user).getDisplay();
                 }
+            } catch (NullPointerException ex) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
@@ -234,6 +241,8 @@ public class PermissionManager {
                 if (user != null) {
                     suffix = bp.getPermissionsManager().getMainGroup(user).getSuffix();
                 }
+            } catch (NullPointerException ex) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
