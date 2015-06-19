@@ -27,22 +27,27 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author florian
  */
 public class ServerState implements ServerVariable {
 
     @Override
-    public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
         if (args != null) {
-            server = ProxyServer.getInstance().getServerInfo(args);
+            ServerInfo server = ProxyServer.getInstance().getServerInfo(args);
             if (server == null) {
                 BungeeTabListPlus.getInstance().getLogger().warning("Server " + args + " does not exist.");
                 return "&cunknown server";
+            } else {
+                servers = Collections.singletonList(server);
             }
         }
         PingTask ping = BungeeTabListPlus.getInstance().getServerState(
-                server.getName());
+                servers.get(0).getName());
         if (ping == null) {
             String errorText = "&cPlease set pingDelay in config.yml > 0";
             BungeeTabListPlus.getInstance().getLogger().warning(

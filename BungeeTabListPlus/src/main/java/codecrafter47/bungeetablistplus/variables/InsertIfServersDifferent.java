@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.api.ServerVariable;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,8 +33,8 @@ import java.util.Objects;
  */
 public class InsertIfServersDifferent implements ServerVariable {
     @Override
-    public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
-        if (viewer.getServer() != null && !Objects.equals(server, viewer.getServer().getInfo())) return args;
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
+        if (viewer.getServer() != null && !Objects.equals(servers, viewer.getServer().getInfo())) return args;
         return "";
     }
 }

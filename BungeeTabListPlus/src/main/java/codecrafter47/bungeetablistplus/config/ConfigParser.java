@@ -237,7 +237,7 @@ public class ConfigParser {
                         ",")));
                 checkServer(filter);
                 filter.addAll(g_filter);
-                filter.add(g_server);
+                filter.addAll(Arrays.asList(g_server.split(",")));
                 sections.add(new FillPlayersSection(startColumn, filter, config,
                         prefix, suffix, skin, sortrules, maxplayers));
             } // Parsing Normal text
@@ -246,7 +246,7 @@ public class ConfigParser {
                 if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof ServerSection && startColumn == -1) {
                     section = (ServerSection) sections.get(sections.size() - 1);
                 } else {
-                    section = new ServerSection(startColumn, g_server);
+                    section = new ServerSection(startColumn, Arrays.asList(g_server.split(",")));
                     sections.add(section);
                 }
                 Slot slot = new Slot(g_prefix + text + g_suffix, ping);

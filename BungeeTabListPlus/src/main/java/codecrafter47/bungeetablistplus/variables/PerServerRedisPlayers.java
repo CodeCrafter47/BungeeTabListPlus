@@ -26,10 +26,16 @@ import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.List;
+
 public class PerServerRedisPlayers implements ServerVariable {
 
     @Override
-    public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
-        return Integer.toString(RedisBungee.getApi().getPlayersOnServer(server.getName()).size());
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
+        int sum = 0;
+        for (ServerInfo server : servers) {
+            sum += RedisBungee.getApi().getPlayersOnServer(server.getName()).size();
+        }
+        return Integer.toString(sum);
     }
 }

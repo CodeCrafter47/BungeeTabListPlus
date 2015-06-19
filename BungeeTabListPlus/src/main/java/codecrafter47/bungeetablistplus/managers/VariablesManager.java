@@ -28,7 +28,9 @@ import codecrafter47.bungeetablistplus.variables.*;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,7 +146,7 @@ public final class VariablesManager {
 
     public String replacePlayerVariables(ProxiedPlayer viewer, String s, IPlayer player) {
         if (player.getServer().isPresent()) {
-            s = replaceServerVariables(viewer, s, player.getServer().get());
+            s = replaceServerVariables(viewer, s, Collections.singletonList(player.getServer().get()));
         }
 
         StringBuffer sb = new StringBuffer();
@@ -175,7 +177,7 @@ public final class VariablesManager {
         return sb.toString();
     }
 
-    public String replaceServerVariables(ProxiedPlayer viewer, String s, ServerInfo server) {
+    public String replaceServerVariables(ProxiedPlayer viewer, String s, List<ServerInfo> servers) {
         StringBuffer sb = new StringBuffer();
         Pattern pattern = Pattern.compile("\\{[^}]+\\}");
         Matcher matcher = pattern.matcher(s);
@@ -192,7 +194,7 @@ public final class VariablesManager {
 
             ServerVariable variable = this.serverVariables.get(var);
             if (variable != null) {
-                String str = variable.getReplacement(viewer, server, arg);
+                String str = variable.getReplacement(viewer, servers, arg);
                 if (str != null) {
                     replacement = str;
                 }

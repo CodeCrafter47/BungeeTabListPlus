@@ -22,15 +22,25 @@ package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.List;
 
 public class CurrentServerPlayerCountVariable implements ServerVariable {
 
     @Override
-    public String getReplacement(ProxiedPlayer viewer, ServerInfo server, String args) {
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
         return "" + BungeeTabListPlus.getInstance().getPlayerManager().
-                getServerPlayerCount(server.getName(), viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+                getPlayerCount(Joiner.on(',').join(Collections2.transform(servers, new Function<ServerInfo, Object>() {
+                    @Override
+                    public Object apply(ServerInfo input) {
+                        return input.getName();
+                    }
+                })), viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
     }
 
 }

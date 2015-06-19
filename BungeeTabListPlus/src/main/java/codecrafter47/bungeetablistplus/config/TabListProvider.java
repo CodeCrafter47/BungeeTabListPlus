@@ -27,6 +27,8 @@ import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.tablist.FlippedTabList;
+import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -446,7 +448,29 @@ public class TabListProvider implements ITabListProvider {
                 Map<String, ServerInfo> servers = ProxyServer.getInstance().
                         getServers();
 
-                List<String> list = new LinkedList<>(servers.keySet());
+                Set<String> serverSet = new HashSet<>(servers.keySet());
+                HashMultimap<String, String> aliasToServerMap = HashMultimap.create();
+                for (Map.Entry<String, String> entry : BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.entrySet()) {
+                    if (ProxyServer.getInstance().getServerInfo(entry.getKey()) == null) {
+                        BungeeTabListPlus.getInstance().getLogger().warning("Configuration Error: Server \"" + entry.getKey() + "\" used in the alias map does not exist.");
+                        continue;
+                    }
+                    aliasToServerMap.put(entry.getValue(), entry.getKey());
+                }
+                List<String> list = new ArrayList<>();
+                while (!serverSet.isEmpty()) {
+                    String server = serverSet.iterator().next();
+                    String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.get(server);
+                    if (alias != null) {
+                        Set<String> strings = aliasToServerMap.get(alias);
+                        serverSet.removeAll(strings);
+                        list.add(Joiner.on(',').join(strings));
+                    } else {
+                        serverSet.remove(server);
+                        list.add(server);
+                    }
+                }
+
                 Collections.sort(list, new Comparator<String>() {
                     @Override
                     public int compare(String s1, String s2) {
@@ -467,7 +491,7 @@ public class TabListProvider implements ITabListProvider {
                 int j = i;
                 for (String server : list) {
                     if (showEmptyGroups || plugin.getPlayerManager().
-                            getServerPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
+                            getPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
                         try {
                             List<Section> sections = parser.
                                     parseServerSections(
