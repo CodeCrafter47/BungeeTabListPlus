@@ -54,8 +54,14 @@ public class TeamPacket extends Team {
         if (handler instanceof DownstreamBridge) {
             getPlayerField(DownstreamBridge.class);
             if (playerField != null) {
-                playerField.setAccessible(true);
-                ProxiedPlayer player = (ProxiedPlayer) playerField.get(handler);
+                ProxiedPlayer player;
+                try {
+                    playerField.setAccessible(true);
+                    player = (ProxiedPlayer) playerField.get(handler);
+                } catch (IllegalAccessException ex) {
+                    BungeeTabListPlus.getInstance().getLogger().warning("Failed to access player object in TeamPacketHandler for " + handler);
+                    return;
+                }
                 if (BungeeTabListPlus.getTabList(player) instanceof TabList18v3) {
                     Server server = player.getServer();
                     if (server != null) {
