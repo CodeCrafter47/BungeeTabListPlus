@@ -54,6 +54,7 @@ public class TeamPacket extends Team {
         if (handler instanceof DownstreamBridge) {
             getPlayerField(DownstreamBridge.class);
             if (playerField != null) {
+                playerField.setAccessible(true);
                 ProxiedPlayer player = (ProxiedPlayer) playerField.get(handler);
                 if (BungeeTabListPlus.getTabList(player) instanceof TabList18v3) {
                     Server server = player.getServer();
@@ -75,7 +76,6 @@ public class TeamPacket extends Team {
         for (Field field : clazz.getDeclaredFields()) {
             if (ProxiedPlayer.class.isAssignableFrom(field.getType())) {
                 playerField = field;
-                playerField.setAccessible(true);
                 return field;
             }
         }
