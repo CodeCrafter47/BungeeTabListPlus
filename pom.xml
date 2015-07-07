@@ -14,4 +14,17 @@
         <module>BukkitBridge</module>
     </modules>
 
+    <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
