@@ -170,6 +170,16 @@ public class MainConfig extends Config {
     }
 
     @Comments({
+            "1.8 ONLY",
+            "When enabled the tablist will adjust it's size to the number of players online/ slots used, instead of using",
+            "the static tab_size set in bungee's config.yml.",
+            "WARNING: This is an experimental feature an will most likely cause bugs",
+            "WARNING: [ALIGN=LEFT] and other formatting tags will not operate correctly",
+            "WARNING: If this is enabled verticalMode is forced to true to avoid issues"
+    })
+    public boolean autoShrinkTabList = false;
+
+    @Comments({
             "Detects which servers are using a bukkit-side tabList-plugin",
             "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
             "This is disabled by default because it could be accidentially triggered by other plugins (Essentials nicknames etc.)",

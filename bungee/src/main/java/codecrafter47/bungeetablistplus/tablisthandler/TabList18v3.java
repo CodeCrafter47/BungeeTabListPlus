@@ -71,10 +71,18 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
     @Override
     public void sendTablist(ITabList tabList) {
         synchronized (super.usernames) {
+            tabList = tabList.flip();
+
             int numFakePlayers = 80;
 
-            if (tabList.getRows() * tabList.getColumns() < 80) {
-                numFakePlayers = tabList.getColumns() * tabList.getRows() - super.uuids.size();
+            int tab_size = tabList.getRows() * tabList.getColumns();
+
+            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList) {
+                tab_size = tabList.getUsedSlots();
+            }
+
+            if (tab_size < 80) {
+                numFakePlayers = tab_size - super.uuids.size();
                 if (numFakePlayers < 0) {
                     BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", getPlayer().getName());
                 }
@@ -103,9 +111,8 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
             List<Team> additions = new LinkedList<>();
             List<Team> removals = new LinkedList<>();
 
-            for (int i = 0; i < tabList.getColumns() * tabList.getRows(); i++) {
-                Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
-                        getColumns() + (i / tabList.getRows()));
+            for (int i = 0; i < tab_size; i++) {
+                Slot line = tabList.getSlot(i);
                 if (line == null) {
                     line = new Slot(" ", tabList.getDefaultPing());
                 }
@@ -346,6 +353,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
         pli.setItems(new Item[]{item});
         getPlayer().unsafe().sendPacket(pli);
         sendPing.put(offlineId, 0);
+        send.put(offlineId, null);
     }
 
     @Override

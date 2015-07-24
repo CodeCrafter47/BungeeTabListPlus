@@ -57,14 +57,13 @@ public class TabListListener implements Listener {
             if (e.getPlayer().getPendingConnection().getVersion() < 47) {
                 tab = new TabList17(e.getPlayer());
             } else {
-                if (ConfigManager.getTabSize() >= 80) {
+                if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
                     tab = new TabList18(e.getPlayer());
                 } else {
                     tab = new TabList18v3(e.getPlayer());
                 }
             }
         }
-        // e.getPlayer().setTabList(tab);
         ProxiedPlayer player = e.getPlayer();
         BungeeTabListPlus.setTabList(player, tab);
     }

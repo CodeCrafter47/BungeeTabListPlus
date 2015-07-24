@@ -63,8 +63,8 @@ public class TabListProvider implements ITabListProvider {
 
     @Override
     public void fillTabList(final ProxiedPlayer player, ITabList tabList) {
-        if (config.verticalMode) {
-            tabList = new FlippedTabList(tabList);
+        if (config.verticalMode || (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList && player.getPendingConnection().getVersion() >= 47)) {
+            tabList = tabList.flip();
         }
 
         List<Section> topSections = new ArrayList<>(top);

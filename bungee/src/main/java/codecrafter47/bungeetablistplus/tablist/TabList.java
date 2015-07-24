@@ -35,6 +35,7 @@ public class TabList implements ITabList {
     private final int rows;
     private final int collums;
     private int usedSlots;
+    int usedSlotsFlipped;
     private final Slot[] slots;
     private String header;
     private String footer;
@@ -68,6 +69,7 @@ public class TabList implements ITabList {
         this.rows = ConfigManager.getRows();
         this.collums = ConfigManager.getCols();
         this.usedSlots = 0;
+        this.usedSlotsFlipped = 0;
         this.slots = new Slot[rows * collums];
         header = null;
         footer = null;
@@ -108,6 +110,12 @@ public class TabList implements ITabList {
         if (n + 1 > usedSlots) {
             usedSlots = n + 1;
         }
+        int column = n % collums;
+        int row = (n - column) / collums;
+        int nr = column * rows + row;
+        if (nr + 1 > usedSlotsFlipped) {
+            usedSlotsFlipped = nr + 1;
+        }
     }
 
     @Override
@@ -128,5 +136,10 @@ public class TabList implements ITabList {
     @Override
     public int getSize() {
         return size;
+    }
+
+    @Override
+    public ITabList flip() {
+        return new FlippedTabList(this);
     }
 }

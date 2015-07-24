@@ -55,4 +55,6 @@ public interface ITabList {
     Skin getDefaultSkin();
 
     void setDefaultSkin(Skin defaultSkin);
+
+    ITabList flip();
 }

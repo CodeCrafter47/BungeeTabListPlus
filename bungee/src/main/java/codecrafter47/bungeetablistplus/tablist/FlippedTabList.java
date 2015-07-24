@@ -27,9 +27,9 @@ import codecrafter47.bungeetablistplus.skin.Skin;
 
 public class FlippedTabList implements ITabList {
 
-    ITabList tabList;
+    TabList tabList;
 
-    public FlippedTabList(ITabList tabList) {
+    public FlippedTabList(TabList tabList) {
         this.tabList = tabList;
     }
 
@@ -65,7 +65,7 @@ public class FlippedTabList implements ITabList {
 
     @Override
     public int getUsedSlots() {
-        return getSize();
+        return tabList.usedSlotsFlipped;
     }
 
     @Override
@@ -115,5 +115,10 @@ public class FlippedTabList implements ITabList {
     @Override
     public void setDefaultSkin(Skin defaultSkin) {
         tabList.setDefaultSkin(defaultSkin);
+    }
+
+    @Override
+    public ITabList flip() {
+        return tabList;
     }
 }
