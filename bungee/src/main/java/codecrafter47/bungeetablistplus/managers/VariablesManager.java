@@ -86,6 +86,10 @@ public final class VariablesManager {
         addVariable("factionName", new BukkitBridgePlayerVariable<>(Values.Player.Factions.FactionName));
         addVariable("onlineFactionMembers", new BukkitBridgePlayerVariable<>(Values.Player.Factions.OnlineFactionMembers, num -> num.orElse(-1).toString()));
         addVariable("factionsWhere", new BukkitBridgePlayerVariable<>(Values.Player.Factions.FactionsWhere));
+        addVariable("factionPower", new BukkitBridgePlayerVariable<>(Values.Player.Factions.FactionPower));
+        addVariable("factionsPlayerPower", new BukkitBridgePlayerVariable<>(Values.Player.Factions.PlayerPower));
+        addVariable("factionMembers", new BukkitBridgePlayerVariable<>(Values.Player.Factions.FactionMembers));
+        addVariable("factionRank", new BukkitBridgePlayerVariable<>(Values.Player.Factions.FactionsRank));
         addVariable("health", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.Health, health -> health.map(h -> MathUtils.round(h, 1)).orElse(-1D).toString()));
         addVariable("level", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.Level, level -> level.orElse(-1).toString()));
         addVariable("currency", new BukkitBridgeServerVariable<>(Values.Server.Vault.CurrencyNameSingular));
