@@ -10,9 +10,11 @@
     <packaging>pom</packaging>
     <version>2.1-SNAPSHOT</version>
     <modules>
-        <module>BungeeTabListPlus</module>
-        <module>BukkitBridge</module>
+        <module>bungee</module>
+        <module>bukkit</module>
         <module>common</module>
+        <module>bootstrap-bungee</module>
+        <module>bootstrap-bukkit</module>
     </modules>
 
     <distributionManagement>

@@ -1,6 +1,0 @@
-name: ${project.artifactId}
-main: codecrafter47.bungeetablistplus.bukkitbridge.BukkitBridge
-version: ${project.version}
-authors:
-  - CodeCrafter47
-softdepend: [Factions, Vault, VanishNoPacket, PlayerPoints]

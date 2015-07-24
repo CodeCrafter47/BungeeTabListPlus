@@ -1,4 +1,0 @@
-name: ${project.artifactId}
-main : codecrafter47.bungeetablistplus.BungeeTabListPlus
-version: ${project.version}
-author: CodeCrafter47
