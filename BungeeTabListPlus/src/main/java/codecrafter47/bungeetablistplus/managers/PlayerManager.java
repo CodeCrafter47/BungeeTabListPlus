@@ -23,18 +23,15 @@ package codecrafter47.bungeetablistplus.managers;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import codecrafter47.data.Values;
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class PlayerManager {
 
@@ -100,10 +97,9 @@ public class PlayerManager {
                             if (s.length == 2) {
                                 if (server.get().getName().
                                         equalsIgnoreCase(s[0])) {
-                                    String world = plugin.getBridge().
-                                            getPlayerInformation(p, "world");
-                                    if (world != null) {
-                                        if (world.equalsIgnoreCase(s[1])) {
+                                    Optional<String> world = plugin.getBridge().getPlayerInformation(p, Values.Player.Bukkit.World);
+                                    if (world.isPresent()) {
+                                        if (world.get().equalsIgnoreCase(s[1])) {
                                             fitServerRules = true;
                                         }
                                     }

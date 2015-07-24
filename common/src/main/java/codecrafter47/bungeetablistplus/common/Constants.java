@@ -18,15 +18,21 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.bukkitbridge.api;
-
-import java.util.Map;
+package codecrafter47.bungeetablistplus.common;
 
 /**
- *
  * @author Florian Stober
  */
-public interface GeneralInformationProvider {
+public class Constants {
 
-    Map<String, Object> getInformation();
+    public final static String channel = "BTLP";
+
+    public final static String subchannelRequestPlayerVariable = "reqP";
+
+    public final static String subchannelRequestServerVariable = "reqS";
+
+    public final static String subchannelUpdateServer = "updateS";
+
+    public final static String subchannelUpdatePlayer = "updateP";
+
 }

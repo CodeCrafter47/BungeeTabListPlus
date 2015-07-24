@@ -18,21 +18,13 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.bridge;
 
-/**
- * @author Florian Stober
- */
-public class Constants {
+package codecrafter47.bungeetablistplus.util;
 
-    public final static String channel = "BTLP";
-
-    public final static String subchannel_init = "init";
-
-    public final static String subchannel_initplayer = "initplayer";
-
-    public final static String subchannel_update = "update";
-
-    public final static String subchannel_updateplayer = "updateplayer";
-
+public class MathUtils {
+    public static double round(double d, int digits) {
+        double pow = Math.pow(10, digits);
+        int i = (int) (d * pow);
+        return ((double) i) / pow;
+    }
 }

@@ -23,7 +23,10 @@ package codecrafter47.bungeetablistplus.variables;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.data.Values;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.Optional;
 
 /**
  * @author Florian Stober
@@ -32,15 +35,14 @@ public class WorldVariable implements PlayerVariable {
 
     @Override
     public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
-        String world = BungeeTabListPlus.getInstance().getBridge().
-                getPlayerInformation(player, "world");
-        if (world == null) {
+        Optional<String> world = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player, Values.Player.Bukkit.World);
+        if (!world.isPresent()) {
             return "";
         }
         if (!player.getServer().isPresent()) return "";
-        String key = player.getServer().get().getName() + ":" + world;
+        String key = player.getServer().get().getName() + ":" + world.get();
         String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().worldAlias.get(key);
         if (alias != null) return alias;
-        return world;
+        return world.get();
     }
 }

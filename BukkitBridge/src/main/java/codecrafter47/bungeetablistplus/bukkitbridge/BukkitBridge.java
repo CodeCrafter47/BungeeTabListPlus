@@ -20,287 +20,199 @@
  */
 package codecrafter47.bungeetablistplus.bukkitbridge;
 
-import codecrafter47.bungeetablistplus.bukkitbridge.api.BungeeTabListPlusBukkitBridge;
-import codecrafter47.bungeetablistplus.bukkitbridge.api.GeneralInformationProvider;
-import codecrafter47.bungeetablistplus.bukkitbridge.api.PlayerInformationProvider;
-import codecrafter47.bungeetablistplus.bukkitbridge.informationhooks.*;
-import org.bukkit.ChatColor;
+import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.common.PermissionValues;
+import codecrafter47.data.DataAggregator;
+import codecrafter47.data.Value;
+import codecrafter47.data.Values;
+import codecrafter47.data.bukkit.PlayerDataAggregator;
+import codecrafter47.data.bukkit.ServerDataAggregator;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 /**
- *
  * @author Florian Stober
  */
-public class BukkitBridge extends JavaPlugin implements Listener,
-        BungeeTabListPlusBukkitBridge {
+public class BukkitBridge extends JavaPlugin implements Listener {
 
-    GeneralInformationUpdateTask generalInformationUpdateTask = null;
+    private ServerDataUpdateTask serverDataUpdateTask = null;
 
-    Map<Player, PlayerInformationUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
+    private final Map<UUID, PlayerDataUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
 
-    Collection<GeneralInformationProvider> generalInformationProviders = new HashSet<>();
+    private PlayerDataAggregator playerDataAggregator;
+    private ServerDataAggregator serverDataAggregator;
 
-    Collection<PlayerInformationProvider> playerInformationProviders = new HashSet<>();
-
-    Map<Plugin, Collection<GeneralInformationProvider>> pluginsGeneralInformationProviders = new HashMap<>();
-
-    Map<Plugin, Collection<PlayerInformationProvider>> pluginsPlayerInformationProviders = new HashMap<>();
-
-    private boolean useAsyncThreads = true;
 
     @Override
     public void onEnable() {
-        super.saveResource("config.yml", false);
-
-        useAsyncThreads = super.getConfig().getBoolean("useAsyncThreads",
-                useAsyncThreads);
-
         getServer().getMessenger().registerOutgoingPluginChannel(this,
                 Constants.channel);
         getServer().getMessenger().registerIncomingPluginChannel(this,
-                Constants.channel, new PluginMessageListener() {
+                Constants.channel, (string, player, bytes) -> {
+                    try {
+                        DataInputStream in = new DataInputStream(
+                                new ByteArrayInputStream(bytes));
 
-                    @Override
-                    public void onPluginMessageReceived(String string,
-                            Player player, byte[] bytes) {
-                        try {
-                            DataInputStream in = new DataInputStream(
-                                    new ByteArrayInputStream(bytes));
-
-                            String subchannel = in.readUTF();
-                            if (subchannel.equals(Constants.subchannel_init)) {
-                                reinitialize();
+                        String subchannel = in.readUTF();
+                        if (subchannel.equals(Constants.subchannelRequestPlayerVariable)) {
+                            String id = in.readUTF();
+                            Value<Object> value = Values.getValue(id);
+                            if (value != null) {
+                                getPlayerDataUpdateTask(player).requestValue(value);
+                            } else {
+                                getLogger().warning("Proxy requested unknown value \"" + id + "\". Proxy/Bukkit plugin version mismatch?");
                             }
-                            if (subchannel.equals(
-                                    Constants.subchannel_initplayer)) {
-                                addPlayer(player);
+                        } else if (subchannel.equals(Constants.subchannelRequestServerVariable)) {
+                            String id = in.readUTF();
+                            Value<Object> value = Values.getValue(id);
+                            if (value != null) {
+                                this.serverDataUpdateTask.requestValue(value);
+                            } else {
+                                getLogger().warning("Proxy requested unknown value \"" + id + "\". Proxy/Bukkit plugin version mismatch?");
                             }
-                        } catch (IOException ex) {
-                            reinitialize();
+                        } else {
+                            getLogger().severe("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
                         }
+                    } catch (IOException ex) {
+                        getLogger().log(Level.SEVERE, "An error occurred while handling an incoming plugin message", ex);
                     }
                 });
         getServer().getPluginManager().registerEvents(this, this);
 
-        // register own informationhooks
-        // Hook VanishNoPackets
-        Plugin vanishNoPackets = getServer().getPluginManager().getPlugin(
-                "VanishNoPacket");
-        if (vanishNoPackets != null) {
-            getLogger().info("hooked VanishNoPacket");
-            this.registerPlayerInformationProvider(vanishNoPackets,
-                    new VanishNoPacketHook(this));
-        }
-
-        Plugin vault = getServer().getPluginManager().getPlugin("Vault");
-        if (vault != null) {
-            getLogger().info("hooked Vault");
-            this.registerPlayerInformationProvider(vault, new VaultHook(this));
-        }
-
-        Plugin factions = getServer().getPluginManager().getPlugin("Factions");
-        if (factions != null) {
-            getLogger().info("hooked Factions");
-            this.registerPlayerInformationProvider(factions,
-                    new FactionHook_7_3_0());
-        }
-
-        Plugin playerPoints = getServer().getPluginManager().getPlugin("PlayerPoints");
-        if (playerPoints != null) {
-            getLogger().info("Hooked PlayerPoints");
-            this.registerPlayerInformationProvider(playerPoints, new PlayerPointsHook(this));
-        }
-
-        BukkitHook bukkitHook = new BukkitHook(this);
-        this.registerInformationProvider(this, bukkitHook);
-        this.registerPlayerInformationProvider(this, bukkitHook);
+        updateDataHooks();
 
         // start generalInformation update task
-        this.generalInformationUpdateTask = new GeneralInformationUpdateTask(
-                this);
-        if (useAsyncThreads) {
-            this.generalInformationUpdateTask.
-                    runTaskTimerAsynchronously(this, 0,
-                            Constants.updateDelay);
-        } else {
-            this.generalInformationUpdateTask.runTaskTimer(this, 0,
-                    Constants.updateDelay);
-        }
+        this.serverDataUpdateTask = new ServerDataUpdateTask();
+        this.serverDataUpdateTask.runTaskTimerAsynchronously(this, 0, 20);
+    }
 
-        // add all players yet on the server
-        for (Player player : getServer().getOnlinePlayers()) {
-            addPlayer(player);
-        }
-
-        // start autoreinitialize every 5 minutes
-        new BukkitRunnable() {
-
+    private void updateDataHooks() {
+        playerDataAggregator = new PlayerDataAggregator(getLogger()) {
             @Override
-            public void run() {
-                reinitialize();
+            protected void init() {
+                super.init();
+                for (String permission : PermissionValues.getRegisteredPermissions()) {
+                    bind(PermissionValues.getValueForPermission(permission), player -> player.hasPermission(permission));
+                }
             }
-
-        }.runTaskTimer(this, Constants.completeUpdateDelay,
-                Constants.completeUpdateDelay);
+        };
+        serverDataAggregator = new ServerDataAggregator(this);
     }
 
-    private void reinitialize() {
-        BukkitBridge.this.generalInformationUpdateTask.setInitialized(false);
-        for (PlayerInformationUpdateTask task
-                : BukkitBridge.this.playerInformationUpdaters.values()) {
-            task.setInitialized(false);
+    private PlayerDataUpdateTask getPlayerDataUpdateTask(Player player) {
+        if (playerInformationUpdaters.get(player.getUniqueId()) == null) {
+            PlayerDataUpdateTask playerDataUpdateTask = new PlayerDataUpdateTask(player);
+            playerDataUpdateTask.runTaskTimerAsynchronously(this, 0, 20);
+            playerInformationUpdaters.put(player.getUniqueId(), playerDataUpdateTask);
         }
-    }
-
-    private void addPlayer(Player player) {
-        if (playerInformationUpdaters.containsKey(player)) {
-            try {
-                playerInformationUpdaters.get(player).cancel();
-            } catch (Exception ex) {
-                // TODO do something
-            } finally {
-                playerInformationUpdaters.remove(player);
-            }
-        }
-        PlayerInformationUpdateTask playerInformationUpdateTask = new PlayerInformationUpdateTask(
-                this, player);
-        if (this.useAsyncThreads) {
-            playerInformationUpdateTask.runTaskTimerAsynchronously(this, 0,
-                    Constants.updateDelay);
-        } else {
-            playerInformationUpdateTask.runTaskTimer(this, 0,
-                    Constants.updateDelay);
-        }
-        playerInformationUpdaters.put(player, playerInformationUpdateTask);
+        return playerInformationUpdaters.get(player.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (playerInformationUpdaters.containsKey(player)) {
+        if (playerInformationUpdaters.containsKey(player.getUniqueId())) {
             try {
-                playerInformationUpdaters.get(player).cancel();
+                playerInformationUpdaters.remove(player.getUniqueId()).cancel();
             } catch (Exception ex) {
-                // TODO do something
-            } finally {
-                playerInformationUpdaters.remove(player);
+                getLogger().log(Level.WARNING, "An exception occurred while removing a player", ex);
             }
         }
     }
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
-        Plugin plugin = event.getPlugin();
-
-        if (this.pluginsPlayerInformationProviders.containsKey(plugin)) {
-            this.playerInformationProviders.removeAll(
-                    this.pluginsPlayerInformationProviders.get(plugin));
-            this.pluginsPlayerInformationProviders.remove(plugin);
-        }
-
-        if (this.pluginsGeneralInformationProviders.containsKey(plugin)) {
-            this.generalInformationProviders.removeAll(
-                    this.pluginsGeneralInformationProviders.get(plugin));
-            this.pluginsGeneralInformationProviders.remove(plugin);
-        }
-
-        reinitialize();
+        updateDataHooks();
     }
 
-    @Override
-    public void registerInformationProvider(Plugin pl,
-            GeneralInformationProvider ip) {
-        this.generalInformationProviders.add(ip);
-        if (!this.pluginsGeneralInformationProviders.containsKey(pl)) {
-            this.pluginsGeneralInformationProviders.put(pl,
-                    new HashSet<GeneralInformationProvider>());
-        }
-        this.pluginsGeneralInformationProviders.get(pl).add(ip);
-    }
-
-    @Override
-    public void registerPlayerInformationProvider(Plugin pl,
-            PlayerInformationProvider ip) {
-        this.playerInformationProviders.add(ip);
-        if (!this.pluginsPlayerInformationProviders.containsKey(pl)) {
-            this.pluginsPlayerInformationProviders.put(pl,
-                    new HashSet<PlayerInformationProvider>());
-        }
-        this.pluginsPlayerInformationProviders.get(pl).add(ip);
-    }
-
-    // run addPlayer even if the bungee forgets about it
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
-        getServer().getScheduler().runTaskLater(this, new Runnable() {
-
-            @Override
-            public void run() {
-                if(player.isOnline()){
-                    addPlayer(player);
-                }
-            }
-        }, 20);
-        getServer().getScheduler().runTaskLater(this, new Runnable() {
-
-            @Override
-            public void run() {
-                if(player.isOnline()){
-                    addPlayer(player);
-                }
-            }
-        }, 200);
+    public void onPluginEnable(PluginEnableEvent event) {
+        updateDataHooks();
     }
 
-    protected void sendInformation(String subchannel,
-            Map<String, Object> information, Player player) {
+    protected void sendInformation(String subchannel, Map<String, Object> delta, Player player) {
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(os);
+            ObjectOutputStream out = new ObjectOutputStream(os);
             out.writeUTF(subchannel);
-            out.writeInt(information.size());
-            for (Entry<String, Object> entry : information.entrySet()) {
-                out.writeUTF(entry.getKey());
-                out.writeUTF(entry.getValue().toString());
-            }
+            out.writeObject(delta);
+            out.close();
             player.sendPluginMessage(this, Constants.channel, os.toByteArray());
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
         }
     }
 
-    protected Collection<GeneralInformationProvider> getGeneralInformationProviders() {
-        return this.generalInformationProviders;
+    public abstract class DataUpdateTask<B, V extends DataAggregator<B>> extends BukkitRunnable {
+        Map<Value<?>, Object> sentData = new ConcurrentHashMap<>();
+        List<Value<?>> requestedData = new CopyOnWriteArrayList<>();
+
+        protected final void update(Player player, V dataAggregator, B boundType, String subchannel) {
+            Map<Value<?>, Object> newData = new HashMap<>();
+            requestedData.parallelStream().forEach(value -> {
+                dataAggregator.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
+            });
+            Map<String, Object> delta = new HashMap<>();
+            for (Map.Entry<Value<?>, Object> entry : sentData.entrySet()) {
+                if (!newData.containsKey(entry.getKey())) {
+                    delta.put(entry.getKey().getId(), null);
+                } else if (!newData.get(entry.getKey()).equals(entry.getValue())) {
+                    delta.put(entry.getKey().getId(), newData.get(entry.getKey()));
+                }
+            }
+            for (Map.Entry<Value<?>, Object> entry : newData.entrySet()) {
+                if (!sentData.containsKey(entry.getKey())) {
+                    delta.put(entry.getKey().getId(), entry.getValue());
+                }
+            }
+            if (!delta.isEmpty()) {
+                sendInformation(subchannel, delta, player);
+            }
+            sentData = newData;
+        }
+
+        public void requestValue(Value<?> value) {
+            requestedData.add(value);
+        }
     }
 
-    protected Collection<PlayerInformationProvider> getPlayerInformationProviders() {
-        return this.playerInformationProviders;
+    public class ServerDataUpdateTask extends DataUpdateTask<Server, ServerDataAggregator> {
+
+        @Override
+        public void run() {
+            getServer().getOnlinePlayers().stream().findAny().ifPresent(player -> {
+                update(player, serverDataAggregator, getServer(), Constants.subchannelUpdateServer);
+            });
+        }
+
     }
 
-    public void reportError(Throwable th) {
-        getLogger().log(Level.WARNING,
-                ChatColor.RED + "An internal error occured! Please send the "
-                + "following stacktrace to the developer in order to help"
-                + " resolving the problem",
-                th);
+    public class PlayerDataUpdateTask extends DataUpdateTask<Player, PlayerDataAggregator> {
+        private final Player player;
+
+        public PlayerDataUpdateTask(Player player) {
+            this.player = player;
+        }
+
+        @Override
+        public void run() {
+            update(player, playerDataAggregator, player, Constants.subchannelUpdatePlayer);
+        }
     }
 }

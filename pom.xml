@@ -12,6 +12,7 @@
     <modules>
         <module>BungeeTabListPlus</module>
         <module>BukkitBridge</module>
+        <module>common</module>
     </modules>
 
     <distributionManagement>

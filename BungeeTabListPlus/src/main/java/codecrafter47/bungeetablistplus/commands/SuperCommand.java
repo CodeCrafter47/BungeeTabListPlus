@@ -128,13 +128,6 @@ public class SuperCommand extends Command {
                     "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
                     create());
         }
-        for (String s : plugin.getProxy().getServers().keySet()) {
-            if (!plugin.getBridge().isUpToDate(s)) {
-                target.sendMessage(getPrefix().append(
-                        "BukkitBridge on server '" + s + "' is outdated. Please update!").
-                        color(ChatColor.RED).create());
-            }
-        }
         target.sendMessage(
                 getPrefix().append("Commands:").color(ChatColor.AQUA).bold(true).
                         create());

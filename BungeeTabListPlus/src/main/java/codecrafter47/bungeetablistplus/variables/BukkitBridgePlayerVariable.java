@@ -23,27 +23,31 @@ package codecrafter47.bungeetablistplus.variables;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.data.Value;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Florian Stober
  */
-public class BukkitBridgeVariable implements PlayerVariable {
+public class BukkitBridgePlayerVariable<T> implements PlayerVariable {
+    private final Value<T> value;
+    private final Function<Optional<T>, String> toString;
 
-    private final String attribute;
+    public BukkitBridgePlayerVariable(Value<T> value) {
+        this(value, t -> t.map(Object::toString).orElse(""));
+    }
 
-    public BukkitBridgeVariable(String attribute) {
-        this.attribute = attribute;
+    public BukkitBridgePlayerVariable(Value<T> value, Function<Optional<T>, String> toString) {
+        this.value = value;
+        this.toString = toString;
     }
 
     @Override
     public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
-        String result = BungeeTabListPlus.getInstance().getBridge().
-                getPlayerInformation(player, attribute);
-        if (result == null) {
-            return "-";
-        }
-        return result;
+        return toString.apply(BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player, value));
     }
 
 }

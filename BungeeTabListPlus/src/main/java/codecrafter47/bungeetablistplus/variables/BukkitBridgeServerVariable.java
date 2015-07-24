@@ -22,36 +22,34 @@ package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
+import codecrafter47.bungeetablistplus.api.ServerVariable;
 import codecrafter47.bungeetablistplus.player.IPlayer;
-import net.md_5.bungee.api.ProxyServer;
+import codecrafter47.data.Value;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * @author Florian Stober
  */
-public class BalanceVariable implements PlayerVariable {
+public class BukkitBridgeServerVariable<T> implements ServerVariable {
+    private final Value<T> value;
+    private final Function<Optional<T>, String> toString;
 
-    @Override
-    public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
-        if (args == null) {
-            String balance = BungeeTabListPlus.getInstance().getBridge().
-                    getPlayerInformation(player, "balance");
-            if (balance == null) {
-                return "-";
-            }
-            return balance;
-        } else {
-            ProxiedPlayer player2 = ProxyServer.getInstance().getPlayer(args);
-            if (player2 != null) {
-                String balance = BungeeTabListPlus.getInstance().getBridge().
-                        getPlayerInformation(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(player2), "balance");
-                if (balance == null) {
-                    return "-";
-                }
-                return balance;
-            }
-        }
-        return "-";
+    public BukkitBridgeServerVariable(Value<T> value) {
+        this(value, t -> t.map(Object::toString).orElse(""));
     }
 
+    public BukkitBridgeServerVariable(Value<T> value, Function<Optional<T>, String> toString) {
+        this.value = value;
+        this.toString = toString;
+    }
+
+    @Override
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
+        return toString.apply(BungeeTabListPlus.getInstance().getBridge().getServerInformation(servers.get(0), value));
+    }
 }

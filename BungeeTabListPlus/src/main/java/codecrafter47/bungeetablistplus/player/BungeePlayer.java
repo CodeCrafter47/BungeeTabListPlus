@@ -25,7 +25,8 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.skin.Skin;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -56,7 +57,7 @@ public class BungeePlayer implements IPlayer {
     @Override
     public Optional<ServerInfo> getServer() {
         Server server = player.getServer();
-        if (server == null) return Optional.absent();
+        if (server == null) return Optional.empty();
         return Optional.of(server.getInfo());
     }
 

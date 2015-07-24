@@ -21,8 +21,11 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.common.PermissionValues;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.data.Value;
+import codecrafter47.data.Values;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.User;
@@ -31,6 +34,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class PermissionManager {
@@ -75,7 +79,7 @@ public class PermissionManager {
         }
 
         // Vault
-        String vgroup = plugin.getBridge().getPlayerInformation(player, "group");
+        Optional<String> vgroup = plugin.getBridge().getPlayerInformation(player, Values.Player.Vault.PermissionGroup);
 
         // BungeeCord
         String bgroup = null;
@@ -97,7 +101,7 @@ public class PermissionManager {
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return bpgroup != null ? bpgroup : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
-            return vgroup != null ? vgroup : "";
+            return vgroup.isPresent() ? vgroup.get() : "";
         } else if (mode.equalsIgnoreCase("Bungee")) {
             return bgroup;
         }
@@ -105,8 +109,8 @@ public class PermissionManager {
         if (bpgroup != null) {
             return bpgroup;
         }
-        if (vgroup != null) {
-            return vgroup;
+        if (vgroup.isPresent()) {
+            return vgroup.get();
         }
         return bgroup;
     }
@@ -181,14 +185,13 @@ public class PermissionManager {
         String bprefix = plugin.getConfigManager().getMainConfig().prefixes.get(
                 getMainGroup(player));
 
-        String vprefix = plugin.getBridge().getPlayerInformation(player,
-                "prefix");
+        Optional<String> vprefix = plugin.getBridge().getPlayerInformation(player, Values.Player.Vault.Prefix);
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return bpprefix != null ? bpprefix : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
-            return vprefix != null ? vprefix : "";
+            return vprefix.isPresent() ? vprefix.get() : "";
         } else if (mode.equalsIgnoreCase("Bungee")) {
             return bprefix != null ? bprefix : "";
         }
@@ -199,8 +202,8 @@ public class PermissionManager {
         if (bpprefix != null) {
             return bpprefix;
         }
-        if (vprefix != null) {
-            return vprefix;
+        if (vprefix.isPresent()) {
+            return vprefix.get();
         }
         return "";
     }
@@ -248,22 +251,21 @@ public class PermissionManager {
             }
         }
 
-        String vsuffix = plugin.getBridge().getPlayerInformation(player,
-                "suffix");
+        Optional<String> vsuffix = plugin.getBridge().getPlayerInformation(player, Values.Player.Vault.Suffix);
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return suffix;
         } else if (mode.equalsIgnoreCase("Bukkit")) {
-            return vsuffix != null ? vsuffix : "";
+            return vsuffix.orElse("");
         }
 
         if (suffix != null) {
             return suffix;
         }
 
-        if (vsuffix != null) {
-            return vsuffix;
+        if (vsuffix.isPresent()) {
+            return vsuffix.get();
         }
 
         return "";
@@ -275,10 +277,10 @@ public class PermissionManager {
         }
 
         try {
-            Boolean b = Boolean.valueOf(plugin.getBridge().getPlayerInformation(
-                    plugin.getBungeePlayerProvider().wrapPlayer((ProxiedPlayer) sender), permission));
-            if (b != null) {
-                return b;
+            Value<Boolean> value = PermissionValues.getValueForPermission(permission);
+            if (value != null) {
+                Optional<Boolean> has = plugin.getBridge().getPlayerInformation(plugin.getBungeePlayerProvider().wrapPlayer((ProxiedPlayer) sender), value);
+                if (has.isPresent()) return has.get();
             }
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);

@@ -21,9 +21,9 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
-import codecrafter47.bungeetablistplus.bridge.Constants;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
+import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
@@ -31,6 +31,7 @@ import codecrafter47.bungeetablistplus.packets.TeamPacket;
 import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
+import codecrafter47.data.Values;
 import gnu.trove.map.TObjectIntMap;
 import lombok.Getter;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
@@ -207,7 +208,6 @@ public class BungeeTabListPlus extends Plugin {
 
         getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
-        bukkitBridge.enable();
 
         pm = new PermissionManager(this);
         variables = new VariablesManager();
@@ -430,17 +430,7 @@ public class BungeeTabListPlus extends Plugin {
      */
     public static boolean isHidden(IPlayer player, ProxiedPlayer viewer) {
         if (getInstance().getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished")) return false;
-        boolean hidden;
-        synchronized (hiddenPlayers) {
-            String name = player.getName();
-            hidden = hiddenPlayers.contains(name);
-        }
-        String s = getInstance().bukkitBridge.getPlayerInformation(player,
-                "isVanished");
-        if (s != null) {
-            hidden |= Boolean.valueOf(s);
-        }
-        return hidden;
+        return isHidden(player);
     }
 
     /**
@@ -450,17 +440,16 @@ public class BungeeTabListPlus extends Plugin {
      * @return true if the player is hidden, false otherwise
      */
     public static boolean isHidden(IPlayer player) {
-        boolean hidden;
+        final boolean[] hidden = new boolean[1];
         synchronized (hiddenPlayers) {
             String name = player.getName();
-            hidden = hiddenPlayers.contains(name);
+            hidden[0] = hiddenPlayers.contains(name);
         }
-        String s = getInstance().bukkitBridge.getPlayerInformation(player,
-                "isVanished");
-        if (s != null) {
-            hidden |= Boolean.valueOf(s);
-        }
-        return hidden;
+        BukkitBridge bukkitBridge = getInstance().bukkitBridge;
+        bukkitBridge.getPlayerInformation(player, Values.Player.VanishNoPacket.IsVanished).ifPresent(b -> hidden[0] |= b);
+        bukkitBridge.getPlayerInformation(player, Values.Player.SuperVanish.IsVanished).ifPresent(b -> hidden[0] |= b);
+        bukkitBridge.getPlayerInformation(player, Values.Player.Essentials.IsVanished).ifPresent(b -> hidden[0] |= b);
+        return hidden[0];
     }
 
     /**

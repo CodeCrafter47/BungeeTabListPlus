@@ -24,16 +24,18 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlayerVariable;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.data.Values;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.Optional;
 
 public class TabNameVariable implements PlayerVariable {
 
     @Override
     public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
-        String vname = BungeeTabListPlus.getInstance().getBridge().
-                getPlayerInformation(player, "tabName");
-        if (vname != null) {
-            return vname;
+        Optional<String> tabName = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(player, Values.Player.Bukkit.PlayerListName);
+        if (tabName.isPresent()) {
+            return tabName.get();
         }
         if (player instanceof BungeePlayer)
             return ((BungeePlayer) player).getPlayer().getDisplayName();
