@@ -27,4 +27,17 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>codecrafter47-repo</id>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/public/</url>
+        </repository>
+    </repositories>
+
 </project>

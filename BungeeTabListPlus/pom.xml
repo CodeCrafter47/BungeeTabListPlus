@@ -25,7 +25,7 @@
             <url>http://repo.md-5.net/content/repositories/releases/</url>
         </repository>
         <repository>
-            <id>repository</id>
+            <id>local-repo</id>
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>ignore</checksumPolicy>

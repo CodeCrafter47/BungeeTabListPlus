@@ -32,7 +32,7 @@
             <url>http://repo.kitteh.org/content/repositories/releases</url>
         </repository>
         <repository>
-            <id>repository</id>
+            <id>local-repo</id>
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>ignore</checksumPolicy>
