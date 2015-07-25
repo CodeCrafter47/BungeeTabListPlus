@@ -44,57 +44,6 @@ public class OldSuperCommand extends Command {
             } else {
                 sendNoPermission(sender);
             }
-        } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
-            if (sender.hasPermission("bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        BungeeTabListPlus.unhidePlayer(player);
-                        sendPlayerUnhide(player);
-                    } else {
-                        BungeeTabListPlus.hidePlayer(player);
-                        sendPlayerHide(player);
-                    }
-                } else {
-                    sendNeedsPlayer(sender);
-                }
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
-                equalsIgnoreCase("on")) {
-            if (sender.hasPermission("bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        sendAlreadyHidden(player);
-                    } else {
-                        BungeeTabListPlus.hidePlayer(player);
-                        sendPlayerHide(player);
-                    }
-                } else {
-                    sendNeedsPlayer(sender);
-                }
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
-                equalsIgnoreCase("off")) {
-            if (sender.hasPermission("bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        BungeeTabListPlus.unhidePlayer(player);
-                        sendPlayerUnhide(player);
-                    } else {
-                        sendErrorNotHidden(player);
-                    }
-                } else {
-                    sendNeedsPlayer(sender);
-                }
-            } else {
-                sendNoPermission(sender);
-            }
         } else {
             if (sender.hasPermission("bungeetablistplus.help") || sender.
                     hasPermission("bungeetablistplus.admin")) {
@@ -103,8 +52,6 @@ public class OldSuperCommand extends Command {
                                 getInstance().getPlugin().getDescription().getVersion());
                 sender.sendMessage(
                         ChatColor.DARK_PURPLE + "/BungeeTabListPlus reload");
-                sender.sendMessage(
-                        ChatColor.DARK_PURPLE + "/BungeeTabListPlus hide [on/off]");
             } else {
                 sendNoPermission(sender);
             }
@@ -140,41 +87,5 @@ public class OldSuperCommand extends Command {
         } else {
             target.sendMessage(ChatColor.RED + "Reloading BungeeTabListPlus failed");
         }
-    }
-
-    private void sendPlayerHide(CommandSender target) {
-        String message = plugin.getConfigManager().getMessages().successPlayerHide;
-        if (message == null || message.isEmpty()) {
-            return;
-        }
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        target.sendMessage(message);
-    }
-
-    private void sendPlayerUnhide(CommandSender target) {
-        String message = plugin.getConfigManager().getMessages().successPlayerUnhide;
-        if (message == null || message.isEmpty()) {
-            return;
-        }
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        target.sendMessage(message);
-    }
-
-    private void sendAlreadyHidden(CommandSender target) {
-        String message = plugin.getConfigManager().getMessages().errorAlreadyHidden;
-        if (message == null || message.isEmpty()) {
-            return;
-        }
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        target.sendMessage(message);
-    }
-
-    private void sendErrorNotHidden(CommandSender target) {
-        String message = plugin.getConfigManager().getMessages().errorNotHidden;
-        if (message == null || message.isEmpty()) {
-            return;
-        }
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        target.sendMessage(message);
     }
 }
