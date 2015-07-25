@@ -63,7 +63,7 @@ public class TabListProvider implements ITabListProvider {
 
     @Override
     public void fillTabList(final ProxiedPlayer player, ITabList tabList) {
-        if (config.verticalMode || (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList && player.getPendingConnection().getVersion() >= 47)) {
+        if (config.verticalMode) {
             tabList = tabList.flip();
         }
 

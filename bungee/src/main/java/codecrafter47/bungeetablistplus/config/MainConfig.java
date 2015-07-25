@@ -175,7 +175,7 @@ public class MainConfig extends Config {
             "the static tab_size set in bungee's config.yml.",
             "WARNING: This is an experimental feature an will most likely cause bugs",
             "WARNING: [ALIGN=LEFT] and other formatting tags will not operate correctly",
-            "WARNING: If this is enabled verticalMode is forced to true to avoid issues"
+            "WARNING: If this is enabled it is STRONGLY recommended to also enable verticalMode"
     })
     public boolean autoShrinkTabList = false;
 
