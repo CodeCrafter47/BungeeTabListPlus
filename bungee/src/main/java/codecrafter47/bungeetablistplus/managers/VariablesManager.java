@@ -97,6 +97,12 @@ public final class VariablesManager {
         addVariable("SimpleClans_ClanTagLabel", new BukkitBridgePlayerVariable<>(Values.Player.SimpleClans.ClanTagLabel));
         addVariable("SimpleClans_ClanColorTag", new BukkitBridgePlayerVariable<>(Values.Player.SimpleClans.ClanColorTag));
         addVariable("health", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.Health, health -> health.map(h -> MathUtils.round(h, 1)).orElse(-1D).toString()));
+        addVariable("maxHealth", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.MaxHealth, health -> health.map(h -> MathUtils.round(h, 1)).orElse(-1D).toString()));
+        addVariable("posX", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.PosX));
+        addVariable("posY", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.PosY));
+        addVariable("posZ", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.PosZ));
+        addVariable("XP", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.XP, xp -> xp.map(f -> MathUtils.round(f, 3)).map(Object::toString).orElse("")));
+        addVariable("totalXP", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.TotalXP));
         addVariable("level", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.Level, level -> level.orElse(-1).toString()));
         addVariable("currency", new BukkitBridgeServerVariable<>(Values.Server.Vault.CurrencyNameSingular));
         addVariable("currencyPl", new BukkitBridgeServerVariable<>(Values.Server.Vault.CurrencyNamePlural));
