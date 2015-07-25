@@ -46,6 +46,14 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>codecrafter47.util</pattern>
+                                    <shadedPattern>codecrafter47.bungeetablistplus.util</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
