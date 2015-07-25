@@ -105,7 +105,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
             for (int i = 0; i < numFakePlayers; i++) {
                 UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
                 fakeUUIDs.add(uuid);
-                sendUsernames.put(uuid, "?tab " + i);
+                sendUsernames.put(uuid, getSlotID(i));
             }
 
             List<Team> additions = new LinkedList<>();
@@ -345,7 +345,8 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
         UUID offlineId = java.util.UUID.nameUUIDFromBytes(
                 ("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
         item.setUuid(offlineId);
-        item.setDisplayName(" ");
+        item.setDisplayName(ComponentSerializer.toString(TextComponent.
+                fromLegacyText(" ")));
         item.setGamemode(0);
         item.setPing(0);
         item.setUsername(getSlotID(row));
