@@ -33,7 +33,7 @@ import lombok.Setter;
 public class TabList implements ITabList {
 
     private final int rows;
-    private final int collums;
+    private final int columns;
     private int usedSlots;
     int usedSlotsFlipped;
     private final Slot[] slots;
@@ -67,13 +67,13 @@ public class TabList implements ITabList {
 
     public TabList() {
         this.rows = ConfigManager.getRows();
-        this.collums = ConfigManager.getCols();
+        this.columns = ConfigManager.getCols();
         this.usedSlots = 0;
         this.usedSlotsFlipped = 0;
-        this.slots = new Slot[rows * collums];
+        this.slots = new Slot[rows * columns];
         header = null;
         footer = null;
-        size = rows * collums;
+        size = rows * columns;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class TabList implements ITabList {
 
     @Override
     public int getColumns() {
-        return this.collums;
+        return this.columns;
     }
 
     @Override
@@ -98,7 +98,7 @@ public class TabList implements ITabList {
 
     @Override
     public Slot getSlot(int row, int column) {
-        return getSlot(row * collums + column);
+        return getSlot(row * columns + column);
     }
 
     @Override
@@ -110,8 +110,8 @@ public class TabList implements ITabList {
         if (n + 1 > usedSlots) {
             usedSlots = n + 1;
         }
-        int column = n % collums;
-        int row = (n - column) / collums;
+        int column = n % columns;
+        int row = (n - column) / columns;
         int nr = column * rows + row;
         if (nr + 1 > usedSlotsFlipped) {
             usedSlotsFlipped = nr + 1;
@@ -120,7 +120,7 @@ public class TabList implements ITabList {
 
     @Override
     public void setSlot(int row, int column, Slot s) {
-        setSlot(row * collums + column, s);
+        setSlot(row * columns + column, s);
     }
 
     @Override
