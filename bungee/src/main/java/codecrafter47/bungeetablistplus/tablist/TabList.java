@@ -65,15 +65,19 @@ public class TabList implements ITabList {
         this.footer = footer;
     }
 
-    public TabList() {
-        this.rows = ConfigManager.getRows();
-        this.columns = ConfigManager.getCols();
+    public TabList(int rows, int columns) {
+        this.rows = rows;
+        this.columns = columns;
         this.usedSlots = 0;
         this.usedSlotsFlipped = 0;
         this.slots = new Slot[rows * columns];
         header = null;
         footer = null;
         size = rows * columns;
+    }
+
+    public TabList() {
+        this(ConfigManager.getRows(), ConfigManager.getCols());
     }
 
     @Override
