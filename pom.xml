@@ -15,7 +15,14 @@
         <module>common</module>
         <module>bootstrap-bungee</module>
         <module>bootstrap-bukkit</module>
+        <module>network</module>
+        <module>legacy</module>
     </modules>
+
+    <properties>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+    </properties>
 
     <distributionManagement>
         <repository>
