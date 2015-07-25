@@ -161,7 +161,7 @@ public class BukkitBridge implements Listener {
                     out.writeUTF(Constants.subchannelRequestPlayerVariable);
                     out.writeUTF(key.getId());
                     out.close();
-                    proxiedPlayer.getServer().sendData(Constants.channel, os.toByteArray());
+                    Optional.ofNullable(proxiedPlayer.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
                 } catch (IOException ex) {
                     plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
                 }
