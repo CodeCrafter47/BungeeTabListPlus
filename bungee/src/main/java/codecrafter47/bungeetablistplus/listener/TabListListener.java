@@ -22,10 +22,7 @@ package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
-import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;
+import codecrafter47.bungeetablistplus.tablisthandler.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -46,18 +43,16 @@ public class TabListListener implements Listener {
     public void onPlayerJoin(PostLoginEvent e) throws NoSuchFieldException,
             IllegalArgumentException, IllegalAccessException {
         Object tab;
-        if (!BungeeTabListPlus.isVersion18() || e.getPlayer().getPendingConnection().getVersion() < 47) {
+        if (!BungeeTabListPlus.isVersion18()) {
             if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
                 tab = new MyTabList(e.getPlayer());
-                if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
-                    plugin.resendTabLists();
-                }
-                plugin.sendImmediate(e.getPlayer());
             } else {
                 tab = new ScoreboardTabList(e.getPlayer());
             }
         } else {
-            if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
+            if (e.getPlayer().getPendingConnection().getVersion() < 47) {
+                tab = new TabList17(e.getPlayer());
+            } else if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
                 tab = new TabList18(e.getPlayer());
             } else {
                 tab = new TabList18v3(e.getPlayer());
@@ -65,6 +60,11 @@ public class TabListListener implements Listener {
         }
         ProxiedPlayer player = e.getPlayer();
         BungeeTabListPlus.setTabList(player, tab);
+
+        if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
+            plugin.resendTabLists();
+        }
+        plugin.sendImmediate(e.getPlayer());
     }
 
     @EventHandler
