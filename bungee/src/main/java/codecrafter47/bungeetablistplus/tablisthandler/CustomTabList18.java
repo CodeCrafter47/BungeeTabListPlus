@@ -23,7 +23,10 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Action;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
@@ -119,6 +122,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     @Override
     public void onUpdate(PlayerListItem pli) {
+        pli = CustomTabList18.rewrite(pli);
 
         // TODO fillbukkitplayers
         for (Item i : pli.getItems()) {
@@ -198,5 +202,44 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
             bukkitPlayers.add(new FakePlayer(s, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null));
         }
         return bukkitPlayers;
+    }
+
+    /**
+     * Fixes some things.
+     */
+    public static PlayerListItem rewrite(PlayerListItem playerListItem) {
+        for (PlayerListItem.Item item : playerListItem.getItems()) {
+            if (item.getUuid() == null) // Old style ping
+            {
+                continue;
+            }
+            UserConnection player = BungeeCord.getInstance().getPlayerByOfflineUUID(item.getUuid());
+            if (player == null) {
+                player = (UserConnection) BungeeCord.getInstance().getPlayer(item.getUuid());
+            }
+            if (player != null) {
+                item.setUuid(player.getUniqueId());
+                LoginResult loginResult = player.getPendingConnection().getLoginProfile();
+                if (loginResult != null) {
+                    String[][] props = new String[loginResult.getProperties().length][];
+                    for (int i = 0; i < props.length; i++) {
+                        props[i] = new String[]
+                                {
+                                        loginResult.getProperties()[i].getName(),
+                                        loginResult.getProperties()[i].getValue(),
+                                        loginResult.getProperties()[i].getSignature()
+                                };
+                    }
+                    item.setProperties(props);
+                } else {
+                    item.setProperties(new String[0][0]);
+                }
+                if (playerListItem.getAction() == PlayerListItem.Action.ADD_PLAYER || playerListItem.getAction() == PlayerListItem.Action.UPDATE_GAMEMODE) {
+                    player.setGamemode(item.getGamemode());
+                }
+                player.setPing(player.getPing());
+            }
+        }
+        return playerListItem;
     }
 }
