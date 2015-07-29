@@ -107,7 +107,7 @@ public final class VariablesManager {
         addVariable("currency", new BukkitBridgeServerVariable<>(Values.Server.Vault.CurrencyNameSingular));
         addVariable("currencyPl", new BukkitBridgeServerVariable<>(Values.Server.Vault.CurrencyNamePlural));
         addVariable("tabName", new TabNameVariable());
-        addVariable("tps", new BukkitBridgeServerVariable<>(Values.Server.TPS));
+        addVariable("tps", new BukkitBridgeServerVariable<>(Values.Server.TPS, tps -> tps.map(d -> MathUtils.round(d, 1)).map(Object::toString).orElse("")));
         addVariable("onlineState", new ServerState());
         addVariable("rplayers", new ServerPlayerCountVariable());
         addVariable("internalServerName", new InternalServerNameVariable());
