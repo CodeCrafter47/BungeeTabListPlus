@@ -21,8 +21,8 @@
 package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.PingTask;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
+import codecrafter47.util.bungee.PingTask;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

@@ -32,6 +32,7 @@ import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.data.Values;
+import codecrafter47.util.bungee.PingTask;
 import gnu.trove.map.TObjectIntMap;
 import lombok.Getter;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
