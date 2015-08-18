@@ -193,7 +193,9 @@ public class BukkitBridge implements Listener {
         }
 
         public void requestValue(Value<?> value) {
-            requestedData.add(value);
+            if (!requestedData.contains(value)) {
+                requestedData.add(value);
+            }
         }
     }
 
