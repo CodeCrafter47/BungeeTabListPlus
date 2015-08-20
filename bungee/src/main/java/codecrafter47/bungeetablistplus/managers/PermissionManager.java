@@ -28,6 +28,7 @@ import codecrafter47.data.Value;
 import codecrafter47.data.Values;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.PermissionsManager;
 import net.alpenblock.bungeeperms.User;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -53,24 +54,27 @@ public class PermissionManager {
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
             try {
-                User user = bp.getPermissionsManager().getUser(player.getName());
-                Group mainGroup = null;
-                if (user != null) {
-                    mainGroup = bp.getPermissionsManager().getMainGroup(user);
-                }
-                if (mainGroup == null) {
-                    if (!bp.getPermissionsManager().getDefaultGroups().isEmpty()) {
-                        mainGroup = bp.getPermissionsManager().getDefaultGroups().get(0);
-                        for (int i = 1; i < bp.getPermissionsManager().getDefaultGroups().size(); ++i) {
-                            if (bp.getPermissionsManager().getDefaultGroups().get(i).getWeight() < mainGroup.getWeight()) {
-                                mainGroup = bp.getPermissionsManager().getDefaultGroups().get(i);
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    Group mainGroup = null;
+                    if (user != null) {
+                        mainGroup = pm.getMainGroup(user);
+                    }
+                    if (mainGroup == null) {
+                        if (!pm.getDefaultGroups().isEmpty()) {
+                            mainGroup = pm.getDefaultGroups().get(0);
+                            for (int i = 1; i < pm.getDefaultGroups().size(); ++i) {
+                                if (pm.getDefaultGroups().get(i).getWeight() < mainGroup.getWeight()) {
+                                    mainGroup = pm.getDefaultGroups().get(i);
+                                }
                             }
                         }
                     }
-                }
 
-                if (mainGroup != null) {
-                    bpgroup = mainGroup.getName();
+                    if (mainGroup != null) {
+                        bpgroup = mainGroup.getName();
+                    }
                 }
             } catch (NullPointerException ex) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
@@ -123,21 +127,24 @@ public class PermissionManager {
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
             try {
-                User u1 = bp.getPermissionsManager().getUser(p1.getName());
-                User u2 = bp.getPermissionsManager().getUser(p2.getName());
-                if (u1 != null && u2 != null) {
-                    Group g1 = bp.getPermissionsManager().getMainGroup(u1);
-                    Group g2 = bp.getPermissionsManager().getMainGroup(u2);
-                    if (g1 != null && g2 != null) {
-                        int r1 = g1.getRank();
-                        int r2 = g2.getRank();
-                        if (r1 > r2) {
-                            return -1;
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User u1 = pm.getUser(p1.getName());
+                    User u2 = pm.getUser(p2.getName());
+                    if (u1 != null && u2 != null) {
+                        Group g1 = pm.getMainGroup(u1);
+                        Group g2 = pm.getMainGroup(u2);
+                        if (g1 != null && g2 != null) {
+                            int r1 = g1.getRank();
+                            int r2 = g2.getRank();
+                            if (r1 > r2) {
+                                return -1;
+                            }
+                            if (r2 > r1) {
+                                return 1;
+                            }
+                            return 0;
                         }
-                        if (r2 > r1) {
-                            return 1;
-                        }
-                        return 0;
                     }
                 }
             } catch (Throwable th) {
@@ -176,9 +183,12 @@ public class PermissionManager {
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
             try {
-                User user = bp.getPermissionsManager().getUser(player.getName());
-                if (user != null) {
-                    bpprefix = bp.getPermissionsManager().getMainGroup(user).getPrefix();
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        bpprefix = pm.getMainGroup(user).getPrefix();
+                    }
                 }
             } catch (NullPointerException ex) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
@@ -220,9 +230,12 @@ public class PermissionManager {
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
             try {
-                User user = bp.getPermissionsManager().getUser(player.getName());
-                if (user != null) {
-                    display = bp.getPermissionsManager().getMainGroup(user).getDisplay();
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        display = pm.getMainGroup(user).getDisplay();
+                    }
                 }
             } catch (NullPointerException ex) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
@@ -245,9 +258,12 @@ public class PermissionManager {
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
             try {
-                User user = bp.getPermissionsManager().getUser(player.getName());
-                if (user != null) {
-                    suffix = bp.getPermissionsManager().getMainGroup(user).getSuffix();
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        suffix = pm.getMainGroup(user).getSuffix();
+                    }
                 }
             } catch (NullPointerException ex) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occured while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
