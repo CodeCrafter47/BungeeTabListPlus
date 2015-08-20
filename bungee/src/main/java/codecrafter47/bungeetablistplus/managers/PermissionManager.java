@@ -123,19 +123,23 @@ public class PermissionManager {
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
             try {
-                Group g1 = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(p1.getName()));
-                Group g2 = bp.getPermissionsManager().getMainGroup(bp.
-                        getPermissionsManager().getUser(p2.getName()));
-                int r1 = g1.getRank();
-                int r2 = g2.getRank();
-                if (r1 > r2) {
-                    return -1;
+                User u1 = bp.getPermissionsManager().getUser(p1.getName());
+                User u2 = bp.getPermissionsManager().getUser(p2.getName());
+                if (u1 != null && u2 != null) {
+                    Group g1 = bp.getPermissionsManager().getMainGroup(u1);
+                    Group g2 = bp.getPermissionsManager().getMainGroup(u2);
+                    if (g1 != null && g2 != null) {
+                        int r1 = g1.getRank();
+                        int r2 = g2.getRank();
+                        if (r1 > r2) {
+                            return -1;
+                        }
+                        if (r2 > r1) {
+                            return 1;
+                        }
+                        return 0;
+                    }
                 }
-                if (r2 > r1) {
-                    return 1;
-                }
-                return 0;
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
