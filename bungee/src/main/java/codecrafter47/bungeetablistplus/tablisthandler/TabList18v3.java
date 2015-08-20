@@ -78,6 +78,9 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
             int tab_size = tabList.getRows() * tabList.getColumns();
 
             if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList) {
+                if (tabList.flip().getUsedSlots() < tabList.getUsedSlots()) {
+                    tabList = tabList.flip();
+                }
                 tab_size = tabList.getUsedSlots();
                 if (tab_size < super.uuids.size()) {
                     tab_size = super.uuids.size();
