@@ -183,20 +183,11 @@ public class BukkitBridge implements Listener {
                     delta.put(entry.getKey().getId(), entry.getValue());
                 }
             }
-            for (Map.Entry<String, Object> entry : delta.entrySet()) {
-                if (entry.getValue() == null) {
-                    onErrorValueNotAvailable(entry.getKey());
-                }
-            }
 
             if (!delta.isEmpty()) {
                 sendInformation(subchannel, delta, player);
             }
             sentData = newData;
-        }
-
-        protected void onErrorValueNotAvailable(String key) {
-            plugin.getLogger().warning("Unable to obtain value " + key);
         }
 
         public void requestValue(Value<?> value) {
@@ -227,11 +218,6 @@ public class BukkitBridge implements Listener {
         @Override
         public void run() {
             update(player, playerDataAggregator, player, Constants.subchannelUpdatePlayer);
-        }
-
-        @Override
-        protected void onErrorValueNotAvailable(String key) {
-            plugin.getLogger().warning("Unable to obtain value " + key + " for player " + player.getName());
         }
     }
 }
