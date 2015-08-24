@@ -39,10 +39,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -177,7 +174,7 @@ public class BukkitBridge implements Listener {
             for (Map.Entry<Value<?>, Object> entry : sentData.entrySet()) {
                 if (!newData.containsKey(entry.getKey())) {
                     delta.put(entry.getKey().getId(), null);
-                } else if (!newData.get(entry.getKey()).equals(entry.getValue())) {
+                } else if (!Objects.equals(newData.get(entry.getKey()), entry.getValue())) {
                     delta.put(entry.getKey().getId(), newData.get(entry.getKey()));
                 }
             }
