@@ -169,7 +169,7 @@ public class BukkitBridge implements Listener {
         List<Value<?>> requestedData = new CopyOnWriteArrayList<>();
 
         protected final void update(Player player, V dataAggregator, B boundType, String subchannel) {
-            Map<Value<?>, Object> newData = new HashMap<>();
+            Map<Value<?>, Object> newData = new ConcurrentHashMap<>();
             requestedData.parallelStream().forEach(value -> {
                 dataAggregator.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
             });
