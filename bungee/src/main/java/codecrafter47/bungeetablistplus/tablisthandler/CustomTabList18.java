@@ -76,7 +76,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
                 item.setDisplayName(username);
             }
             packet.setItems(items);
-            if (player.getPendingConnection().getVersion() >= 47) {
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47) {
                 player.unsafe().sendPacket(packet);
             } else {
                 // Split up the packet
@@ -99,7 +99,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
     public void exclude() {
         isExcluded = true;
         // only 1.7 clients
-        if (player.getPendingConnection().getVersion() < 47) {
+        if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47) {
             synchronized (bukkitplayers) {
                 synchronized (usernames) {
                     for (String s : bukkitplayers) {
@@ -139,8 +139,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
         }
 
         if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
-                contains(getPlayer().getServer().getInfo().getName()) || isExcluded || getPlayer().
-                getPendingConnection().getVersion() >= 47) {
+                contains(getPlayer().getServer().getInfo().getName()) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
             if ((pli.getAction() == Action.ADD_PLAYER) || (pli.getAction() == Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
                 // Pass the Packet to the client
                 player.unsafe().sendPacket(pli);

@@ -50,7 +50,7 @@ public class TabListListener implements Listener {
                 tab = new ScoreboardTabList(e.getPlayer());
             }
         } else {
-            if (e.getPlayer().getPendingConnection().getVersion() < 47) {
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(e.getPlayer()) < 47) {
                 tab = new TabList17(e.getPlayer());
             } else if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
                 tab = new TabList18(e.getPlayer());

@@ -31,6 +31,9 @@ import codecrafter47.bungeetablistplus.packets.TeamPacket;
 import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
+import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
+import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
+import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import codecrafter47.data.Values;
 import codecrafter47.util.bungee.PingTask;
 import gnu.trove.map.TObjectIntMap;
@@ -136,6 +139,9 @@ public class BungeeTabListPlus {
         return serverState.get(o);
     }
 
+    @Getter
+    private ProtocolVersionProvider protocolVersionProvider;
+
     /**
      * Called when the plugin is enabled
      */
@@ -222,6 +228,12 @@ public class BungeeTabListPlus {
 
         pm = new PermissionManager(this);
         variables = new VariablesManager();
+
+        if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
+            protocolVersionProvider = new ProtocolSupportVersionProvider();
+        } else {
+            protocolVersionProvider = new BungeeProtocolVersionProvider();
+        }
 
         ProxyServer.getInstance().getPluginManager().registerListener(plugin,
                 listener);
