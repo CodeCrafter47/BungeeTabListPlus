@@ -339,6 +339,7 @@ public class BungeeTabListPlus {
             }
             tabLists = tabListManager;
             fakePlayerManager.reload();
+            resendTabLists();
         } catch (InvalidConfigurationException ex) {
             plugin.getLogger().warning("Unable to reload Config");
             plugin.getLogger().log(Level.WARNING, null, ex);
