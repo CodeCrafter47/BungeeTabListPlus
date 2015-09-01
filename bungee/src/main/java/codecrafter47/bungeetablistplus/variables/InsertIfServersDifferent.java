@@ -34,7 +34,7 @@ import java.util.Objects;
 public class InsertIfServersDifferent implements ServerVariable {
     @Override
     public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
-        if (viewer.getServer() != null && !Objects.equals(servers, viewer.getServer().getInfo())) return args;
+        if (viewer.getServer() != null && !servers.contains(viewer.getServer().getInfo())) return args;
         return "";
     }
 }

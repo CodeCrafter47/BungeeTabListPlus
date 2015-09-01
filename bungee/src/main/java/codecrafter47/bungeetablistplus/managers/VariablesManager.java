@@ -96,8 +96,8 @@ public final class VariablesManager {
         addVariable("SimpleClans_ClanTag", new BukkitBridgePlayerVariable<>(Values.Player.SimpleClans.ClanTag));
         addVariable("SimpleClans_ClanTagLabel", new BukkitBridgePlayerVariable<>(Values.Player.SimpleClans.ClanTagLabel));
         addVariable("SimpleClans_ClanColorTag", new BukkitBridgePlayerVariable<>(Values.Player.SimpleClans.ClanColorTag));
-        addVariable("health", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.Health, health -> health.map(h -> String.format("%1.1f", h)).orElse("-").toString()));
-        addVariable("maxHealth", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.MaxHealth, health -> health.map(h -> String.format("%1.1f", h)).orElse("-").toString()));
+        addVariable("health", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.Health, health -> health.map(h -> String.format("%1.1f", h)).orElse("-")));
+        addVariable("maxHealth", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.MaxHealth, health -> health.map(h -> String.format("%1.1f", h)).orElse("-")));
         addVariable("posX", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.PosX, pos -> pos.map(d -> String.format("%1.0f", d)).orElse("")));
         addVariable("posY", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.PosY, pos -> pos.map(d -> String.format("%1.0f", d)).orElse("")));
         addVariable("posZ", new BukkitBridgePlayerVariable<>(Values.Player.Minecraft.PosZ, pos -> pos.map(d -> String.format("%1.0f", d)).orElse("")));
