@@ -21,6 +21,7 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
@@ -31,7 +32,6 @@ import codecrafter47.bungeetablistplus.sorting.AdminFirst;
 import codecrafter47.bungeetablistplus.sorting.Alphabet;
 import codecrafter47.bungeetablistplus.sorting.ISortingRule;
 import codecrafter47.bungeetablistplus.sorting.YouFirst;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
 
@@ -60,15 +60,15 @@ public class PlayerColumn {
         this.maxPlayers = maxPlayers;
     }
 
-    public void precalculate(ProxiedPlayer player) {
+    public void precalculate(TabListContext context) {
         this.players = BungeeTabListPlus.getInstance().getPlayerManager().
-                getPlayers(filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+                getPlayers(filter, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {
             if (rule.equalsIgnoreCase("you") || rule.
                     equalsIgnoreCase("youfirst")) {
-                srules.add(new YouFirst(player));
+                srules.add(new YouFirst(context.getViewer()));
             } else if (rule.equalsIgnoreCase("admin") || rule.equalsIgnoreCase(
                     "adminfirst")) {
                 srules.add(new AdminFirst());
@@ -98,7 +98,7 @@ public class PlayerColumn {
         });
     }
 
-    public int getMaxSize(ProxiedPlayer player) {
+    public int getMaxSize() {
         int m = players.size();
         if (m > maxPlayers) {
             m = maxPlayers;
@@ -106,7 +106,7 @@ public class PlayerColumn {
         return m * config.playerLines.size();
     }
 
-    public void calculate(ProxiedPlayer player, ITabList ITabList, int collumn,
+    public void calculate(TabListContext context, ITabList ITabList, int column,
                           int row, int size, int span) {
         int playersToShow = players.size();
         if (playersToShow > maxPlayers) {
@@ -127,14 +127,14 @@ public class PlayerColumn {
             for (String line : config.playerLines) {
                 line = prefix + line + suffix;
                 line = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(player, line, players.get(i));
-                ITabList.setSlot(p, collumn + c, new Slot(line,
+                        replacePlayerVariables(context.getViewer(), line, players.get(i));
+                ITabList.setSlot(p, column + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
                                 getMainConfig().sendPing ? players.get(i).getPing() : 0));
                 if (skin != SkinManager.defaultSkin)
-                    ITabList.getSlot(p, collumn + c).setSkin(skin);
+                    ITabList.getSlot(p, column + c).setSkin(skin);
                 else if (config.showCorrectPlayerSkins)
-                    ITabList.getSlot(p, collumn + c).setSkin(players.get(i).getSkin());
+                    ITabList.getSlot(p, column + c).setSkin(players.get(i).getSkin());
                 c++;
                 if (c >= span) {
                     c = 0;
@@ -147,9 +147,9 @@ public class PlayerColumn {
             for (String line : config.morePlayersLines) {
                 line = prefix + line + suffix;
                 line = line.replace("{other_count}", "" + other_count);
-                ITabList.setSlot(p, collumn + c, new Slot(line, config.defaultPing));
+                ITabList.setSlot(p, column + c, new Slot(line, config.defaultPing));
                 if (skin != SkinManager.defaultSkin)
-                    ITabList.getSlot(p, collumn + c).setSkin(skin);
+                    ITabList.getSlot(p, column + c).setSkin(skin);
                 c++;
                 if (c >= span) {
                     c = 0;

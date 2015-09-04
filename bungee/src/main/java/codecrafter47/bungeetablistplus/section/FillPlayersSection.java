@@ -21,6 +21,7 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
@@ -40,7 +41,7 @@ import java.util.*;
  */
 public class FillPlayersSection extends Section {
 
-    private final int vAlign;
+    private final OptionalInt vAlign;
     private final Collection<String> filter;
     private final TabListConfig config;
     private final String prefix;
@@ -53,7 +54,7 @@ public class FillPlayersSection extends Section {
     public FillPlayersSection(int vAlign, Collection<String> filter,
                               TabListConfig config, String prefix, String suffix, Skin skin,
                               List<String> sortrules, int maxPlayers) {
-        this.vAlign = vAlign;
+        this.vAlign = vAlign == -1 ? OptionalInt.empty() : OptionalInt.of(vAlign);
         this.filter = filter;
         this.config = config;
         this.prefix = prefix;
@@ -64,14 +65,14 @@ public class FillPlayersSection extends Section {
     }
 
     @Override
-    public void precalculate(ProxiedPlayer player) {
-        players = getPlayers(player);
+    public void precalculate(TabListContext context) {
+        players = getPlayers(context.getViewer());
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {
             if (rule.equalsIgnoreCase("you") || rule.
                     equalsIgnoreCase("youfirst")) {
-                srules.add(new YouFirst(player));
+                srules.add(new YouFirst(context.getViewer()));
             } else if (rule.equalsIgnoreCase("admin") || rule.equalsIgnoreCase(
                     "adminfirst")) {
                 srules.add(new AdminFirst());
@@ -107,12 +108,12 @@ public class FillPlayersSection extends Section {
     }
 
     @Override
-    public int getMinSize(ProxiedPlayer player) {
+    public int getMinSize() {
         return 0;
     }
 
     @Override
-    public int getMaxSize(ProxiedPlayer player) {
+    public int getMaxSize() {
         int m = players.size();
         if (m > this.maxPlayers) {
             m = this.maxPlayers;
@@ -121,9 +122,29 @@ public class FillPlayersSection extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
+    public boolean isSizeConstant() {
+        return false;
+    }
+
+    @Override
+    public int getEffectiveSize(int proposedSize) {
+        int playersToShow = players.size();
+        if (playersToShow > this.maxPlayers) {
+            playersToShow = this.maxPlayers;
+        }
+        if (playersToShow * config.playerLines.size() > proposedSize) {
+            playersToShow = (proposedSize - config.morePlayersLines.size()) / config.playerLines.size();
+            if (playersToShow < 0) {
+                playersToShow = 0;
+            }
+        }
+        int other_count = players.size() - playersToShow;
+        return playersToShow * config.playerLines.size() + other_count * config.morePlayersLines.size();
+    }
+
+    @Override
+    public int calculate(TabListContext context, ITabList ITabList, int pos,
                          int size) {
-        //System.out.println(size + " / " + getMaxSize(player));
         int playersToShow = players.size();
         if (playersToShow > this.maxPlayers) {
             playersToShow = this.maxPlayers;
@@ -138,7 +159,7 @@ public class FillPlayersSection extends Section {
         int other_count = players.size() - playersToShow;
 
         for (int i = 0; i < playersToShow; i++) {
-            pos = drawPlayerLines(player, players.get(i), ITabList, pos);
+            pos = drawPlayerLines(context, players.get(i), ITabList, pos);
         }
 
         if (other_count > 0) {
@@ -147,12 +168,12 @@ public class FillPlayersSection extends Section {
         return pos;
     }
 
-    private int drawPlayerLines(ProxiedPlayer viewer, IPlayer player, ITabList ITabList, int pos) {
+    private int drawPlayerLines(TabListContext context, IPlayer player, ITabList ITabList, int pos) {
         int i = pos;
         for (; i < pos + config.playerLines.size(); i++) {
             String line = prefix + config.playerLines.get(i - pos) + suffix;
             line = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(viewer, line, player);
+                    replacePlayerVariables(context.getViewer(), line, player);
             ITabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
                     getConfigManager().getMainConfig().sendPing ? player.
                     getPing() : 0));
@@ -177,7 +198,7 @@ public class FillPlayersSection extends Section {
     }
 
     @Override
-    public int getStartColumn() {
+    public OptionalInt getStartColumn() {
         return vAlign;
     }
 

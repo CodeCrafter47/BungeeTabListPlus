@@ -20,19 +20,17 @@
  */
 package codecrafter47.bungeetablistplus.layout;
 
-import codecrafter47.bungeetablistplus.TabListContext;
-
 import java.util.OptionalInt;
 
 public interface LayoutSection {
 
-    int getMinSize(TabListContext context);
+    int getMinSize();
 
-    int getMaxSize(TabListContext context);
+    int getMaxSize();
 
     boolean isSizeConstant();
 
-    int getEffectiveSize(TabListContext context, int proposedSize);
+    int getEffectiveSize(int proposedSize);
 
     OptionalInt getStartColumn();
 }

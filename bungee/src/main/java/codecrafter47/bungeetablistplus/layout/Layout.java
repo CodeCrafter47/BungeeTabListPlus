@@ -75,6 +75,11 @@ public class Layout<S> {
         Preconditions.checkElementIndex(row, rows, "row");
         Preconditions.checkElementIndex(column, columns, "column");
         int index = coordinatesToInt(row, column);
+        return getSlotData(index);
+    }
+
+    public Optional<SlotData> getSlotData(int index) {
+        Preconditions.checkElementIndex(index, tabSize, "index");
         int sectionId = effectiveSection[index];
         if(sectionId != -1){
             return Optional.of(new SlotData(sections.get(sectionId), effectiveSectionSizes.get(sectionId), slotIndex[index]));

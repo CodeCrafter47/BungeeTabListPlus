@@ -19,17 +19,40 @@
  *
  */
 
-package codecrafter47.bungeetablistplus;
+package codecrafter47.bungeetablistplus.layout;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public interface TabListContext {
+public class TabListContextImpl implements TabListContext {
+    private final int rows;
+    private final int columns;
+    private final int size;
+    private final ProxiedPlayer player;
 
-    int getTabSize();
+    public TabListContextImpl(int rows, int columns, ProxiedPlayer player) {
+        this.rows = rows;
+        this.columns = columns;
+        this.size = rows * columns;
+        this.player = player;
+    }
 
-    int getRows();
+    @Override
+    public int getTabSize() {
+        return size;
+    }
 
-    int getColumns();
+    @Override
+    public int getRows() {
+        return rows;
+    }
 
-    ProxiedPlayer getViewer();
+    @Override
+    public int getColumns() {
+        return columns;
+    }
+
+    @Override
+    public ProxiedPlayer getViewer() {
+        return player;
+    }
 }

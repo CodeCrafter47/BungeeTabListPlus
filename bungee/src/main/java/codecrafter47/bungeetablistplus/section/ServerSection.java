@@ -21,12 +21,12 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
 
@@ -43,12 +43,12 @@ public class ServerSection extends StaticSection {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
+    public int calculate(TabListContext context, ITabList ITabList, int pos,
                          int size) {
         for (Slot s : text) {
             Slot s2 = new Slot(s);
             s2.text = BungeeTabListPlus.getInstance().
-                    getVariablesManager().replaceServerVariables(player, s.text, Lists.transform(server, new Function<String, ServerInfo>() {
+                    getVariablesManager().replaceServerVariables(context.getViewer(), s.text, Lists.transform(server, new Function<String, ServerInfo>() {
                 @Override
                 public ServerInfo apply(String input) {
                     return BungeeTabListPlus.getInstance().getProxy().getServerInfo(input);

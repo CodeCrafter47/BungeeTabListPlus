@@ -21,12 +21,15 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.layout.Layout;
+import codecrafter47.bungeetablistplus.layout.TabListContextImpl;
+import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.skin.Skin;
-import codecrafter47.bungeetablistplus.tablist.FlippedTabList;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import net.md_5.bungee.api.ChatColor;
@@ -50,6 +53,7 @@ public class TabListProvider implements ITabListProvider {
     private final boolean showEmptyGroups;
     private final TabListConfig config;
     private final ConfigParser parser;
+    private final TablistLayoutManager<Section> layoutManager = new TablistLayoutManager<>();
 
     public TabListProvider(BungeeTabListPlus plugin, List<Section> top, List<Section> bot,
                            boolean showEmpty, TabListConfig config, ConfigParser parser) {
@@ -62,7 +66,7 @@ public class TabListProvider implements ITabListProvider {
     }
 
     @Override
-    public void fillTabList(final ProxiedPlayer player, ITabList tabList) {
+    public void fillTabList(ProxiedPlayer player, ITabList tabList) {
         if (config.verticalMode) {
             tabList = tabList.flip();
         }
@@ -73,331 +77,37 @@ public class TabListProvider implements ITabListProvider {
         parseAutoFillplayers(player, topSections);
         parseAutoFillplayers(player, botSections);
 
+        TabListContext context = new TabListContextImpl(tabList.getRows(), tabList.getColumns(), player);
+
         // precalculate all sections
-        precalculateSections(player, topSections);
-        precalculateSections(player, botSections);
+        precalculateSections(context, topSections);
+        precalculateSections(context, botSections);
 
-        // Calculation maximum space the top sections need
-        int topMax = 0;
-        for (int i = 0; i < topSections.size(); i++) {
-            Section s = topSections.get(i);
-            topMax += s.getMaxSize(player);
-            if (i + 1 < topSections.size()) {
-                Section next = topSections.get(i + 1);
-                int startColumn = next.getStartColumn();
-                if (startColumn != -1) {
-                    topMax += (tabList.getColumns() + startColumn - (topMax % tabList.getColumns())) % tabList.getColumns();
-                }
+        // remove empty sections
+        for (Iterator<Section> iterator = topSections.iterator(); iterator.hasNext(); ) {
+            Section topSection = iterator.next();
+            if(topSection.getMinSize() == 0){
+                iterator.remove();
+            }
+        }
+        for (Iterator<Section> iterator = botSections.iterator(); iterator.hasNext(); ) {
+            Section botSection = iterator.next();
+            if(botSection.getMaxSize() == 0){
+                iterator.remove();
             }
         }
 
-        // Calculating minimum space the top sections need
-        int[] tmin = new int[topSections.size()];
-        int topMin = 0;
-        for (int i = 0; i < topSections.size(); i++) {
-            Section s = topSections.get(i);
-            topMin += tmin[i] = s.getMinSize(player);
-            if (i + 1 < topSections.size()) {
-                Section next = topSections.get(i + 1);
-                int startColumn = next.getStartColumn();
-                if (startColumn != -1) {
-                    tmin[i] += (tabList.getColumns() + startColumn - (topMin % tabList.getColumns())) % tabList.getColumns();
-                    topMin += (tabList.getColumns() + startColumn - (topMin % tabList.getColumns())) % tabList.getColumns();
+
+        // calc tablist
+        Layout<Section> layout = layoutManager.calculateLayout(topSections, botSections, context);
+        for(int i = 0; i < tabList.getSize(); i++){
+            Optional<Layout<Section>.SlotData> slotData = layout.getSlotData(i);
+            if(slotData.isPresent()){
+                Layout<Section>.SlotData data = slotData.get();
+                if(data.getSlotIndex() == 0){
+                    data.getSection().calculate(context, tabList, i, data.getSectionSize());
                 }
             }
-        }
-
-        // calculating maximum space the bot sections need
-        int botMax = 0;
-        for (int i = botSections.size() - 1; i >= 0; i--) {
-            Section s = botSections.get(i);
-            botMax += s.getMaxSize(player);
-            int startColumn = s.getStartColumn();
-            if (startColumn != -1) {
-                botMax += (startColumn - botMax % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
-            }
-        }
-
-        // calculating minimum space the bot sections need
-        int[] bmin = new int[botSections.size()];
-        int botMin = 0;
-        for (int i = botSections.size() - 1; i >= 0; i--) {
-            Section s = botSections.get(i);
-            botMin += bmin[i] = s.getMinSize(player);
-            int startColumn = s.getStartColumn();
-            if (startColumn != -1) {
-                bmin[i] += (startColumn - botMin % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
-                botMin += (startColumn - botMin % tabList.getColumns() + tabList.getColumns()) % tabList.getColumns();
-            }
-        }
-
-        // calculating bot align
-        int botAlign = 0;
-        if (!botSections.isEmpty()) {
-            int i = 0;
-            int s = 0;
-            do {
-                botAlign = botSections.get(i).getStartColumn();
-                if (botSections.get(i).getMaxSize(player) != botSections.get(i).
-                        getMinSize(player) || botAlign != -1) {
-                    break;
-                }
-                s += botSections.get(i).getMaxSize(player);
-                i++;
-                if (i == botSections.size() && botAlign == -1) {
-                    botAlign = 0;
-                }
-            } while (botAlign == -1 && i < botSections.size());
-
-            if (botAlign != -1) {
-                botAlign -= s;
-                while (botAlign < 0) {
-                    botAlign += tabList.getColumns();
-                }
-            }
-        }
-
-        // determine how much space top and bottom sections get
-        int topsize = topMin;
-        int botsize = botMin;
-        {
-            int left = tabList.getSize() - topsize - botsize;
-
-            if (left > 0) {
-                int top_diff = topMax - topMin;
-                int bot_diff = botMax - botMin;
-                int avrg = left / 2;
-
-                if (top_diff + bot_diff < left) {
-                    topsize = topMax;
-                    botsize = botMax;
-                } else if (top_diff < avrg) {
-                    topsize += top_diff;
-                    botsize += left - top_diff;
-                } else if (bot_diff < avrg) {
-                    botsize += bot_diff;
-                    topsize += left - bot_diff;
-                } else {
-                    botsize += avrg;
-                    topsize += avrg;
-                }
-            }
-        }
-
-        if (topsize + botsize == tabList.getSize()) {
-            topsize -= topsize % tabList.getColumns();
-            topsize += botAlign;
-            botsize = tabList.getSize() - topsize;
-        }
-
-        // calculating bot and top sections
-        // TOP
-        int len[] = new int[topSections.size()];
-        List<Section> sections_left = new ArrayList<>(topSections);
-        int space = topsize;//topSections.size();
-
-        for (int i = 0; i < len.length; i++) {
-            len[i] = -1;
-        }
-
-        Collections.sort(sections_left, new Comparator<Section>() {
-
-            @Override
-            public int compare(Section t, Section t1) {
-                int minA = t.getMaxSize(player) - t.getMinSize(player);
-                int minB = t1.getMaxSize(player) - t1.getMinSize(player);
-                if (minA < minB) {
-                    return -1;
-                }
-                if (minB < minA) {
-                    return 1;
-                }
-                if (t.id < t1.id) {
-                    return 1;
-                }
-                return -1;
-            }
-        });
-
-        while (sections_left.size() > 0) {
-            int average_diff = (space - topMin) / sections_left.size();
-
-            Section found = sections_left.get(0);
-            int min_diff = found.getMaxSize(player) - found.getMinSize(player);
-
-            int size = found.getMinSize(player) + ((min_diff <= average_diff)
-                    ? min_diff
-                    : average_diff);
-
-            if (size > found.getMaxSize(player)) {
-                size = found.getMaxSize(player);
-            }
-
-            int index = topSections.indexOf(found);
-
-            len[index] = size;
-            space -= size;
-
-            int indexStart = index;
-            while (topSections.get(indexStart).getStartColumn() == -1 && indexStart != 0) {
-                indexStart--;
-            }
-            int startAlign;
-            if (indexStart == 0) {
-                startAlign = 0;
-            } else {
-                startAlign = topSections.get(indexStart).getStartColumn();
-            }
-
-            int indexNext = index + 1;
-            while (indexNext < topSections.size() && topSections.get(indexNext).
-                    getStartColumn() == -1) {
-                indexNext++;
-            }
-
-            int nextAlign;
-            if (topSections.size() > indexNext) {
-                nextAlign = topSections.get(indexNext).getStartColumn();
-            } else {
-                nextAlign = topsize % tabList.getColumns();
-            }
-            boolean areAv = true;
-            for (int i = indexStart; i < indexNext; i++) {
-                if (len[i] == -1) {
-                    areAv = false;
-                }
-            }
-
-            if (areAv) {
-                int s = startAlign;
-                for (int i = indexStart; i < indexNext; i++) {
-                    s += len[i];
-                }
-                int diff = (tabList.getColumns() + nextAlign - (s % tabList.getColumns())) % tabList.getColumns();
-                // diff -= startAlign;
-                //diff = (diff + ConfigManager.getCols()) % ConfigManager.getCols();
-                len[indexNext - 1] += diff;
-                space -= diff;
-            }
-
-            topMin -= tmin[index];
-
-            sections_left.remove(found);
-        }
-
-        int pos = 0;
-        int i = 0;
-        for (Section s : topSections) {
-            int startColumn = s.getStartColumn();
-            if (startColumn != -1) {
-                pos += (tabList.getColumns() + startColumn - (pos % tabList.getColumns())) % tabList.getColumns();
-            }
-            pos = s.calculate(player, tabList, pos, len[i++]);
-        }
-
-        // BOT
-        len = new int[botSections.size()];
-        sections_left = new ArrayList<>();
-        space = botsize;
-
-        for (i = 0; i < len.length; i++) {
-            len[i] = -1;
-        }
-
-        for (Section section : botSections) {
-            sections_left.add(section);
-        }
-
-        Collections.sort(sections_left, new Comparator<Section>() {
-
-            @Override
-            public int compare(Section t, Section t1) {
-                int minA = t.getMaxSize(player) - t.getMinSize(player);
-                int minB = t1.getMaxSize(player) - t1.getMinSize(player);
-                if (minA < minB) {
-                    return -1;
-                }
-                if (minB < minA) {
-                    return 1;
-                }
-                if (t.id < t1.id) {
-                    return 1;
-                }
-                return -1;
-            }
-        });
-
-        while (sections_left.size() > 0) {
-            int average_diff = (space - botMin) / sections_left.size();
-            Section found = sections_left.get(0);
-            int min_diff = found.getMaxSize(player) - found.getMinSize(player);
-
-            int size = found.getMinSize(player) + ((min_diff <= average_diff)
-                    ? min_diff
-                    : average_diff);
-
-            if (size > found.getMaxSize(player)) {
-                size = found.getMaxSize(player);
-            }
-
-            int index = botSections.indexOf(found);
-
-            len[index] = size;
-            space -= size;
-
-            int indexStart = index;
-            while (botSections.get(indexStart).getStartColumn() == -1 && indexStart != 0) {
-                indexStart--;
-            }
-            int startAlign;
-            if (indexStart == 0) {
-                startAlign = botAlign;
-            } else {
-                startAlign = botSections.get(indexStart).getStartColumn();
-            }
-
-            int indexNext = index + 1;
-            while (indexNext < botSections.size() && botSections.get(indexNext).
-                    getStartColumn() == -1) {
-                indexNext++;
-            }
-
-            int nextAlign;
-            if (botSections.size() > indexNext) {
-                nextAlign = botSections.get(indexNext).getStartColumn();
-            } else {
-                nextAlign = 0;
-            }
-            boolean areAv = true;
-            for (i = indexStart; i < indexNext; i++) {
-                if (len[i] == -1) {
-                    areAv = false;
-                }
-            }
-
-            if (areAv) {
-                int s = startAlign;
-                for (i = indexStart; i < indexNext; i++) {
-                    s += len[i];
-                }
-                int diff = (tabList.getColumns() + nextAlign - (s % tabList.getColumns())) % tabList.getColumns();
-                len[indexNext - 1] += diff;
-                space -= diff;
-            }
-
-            botMin -= bmin[index];
-
-            sections_left.remove(found);
-        }
-
-        pos = tabList.getSize() - botsize;
-        i = 0;
-        for (Section s : botSections) {
-            int startColumn = s.getStartColumn();
-            if (startColumn != -1) {
-                pos += (tabList.getColumns() + startColumn - (pos % tabList.getColumns())) % tabList.getColumns();
-            }
-            pos = s.calculate(player, tabList, pos, len[i++]);
         }
 
         // header + footer
@@ -428,9 +138,9 @@ public class TabListProvider implements ITabListProvider {
         tabList.setDefaultPing(config.defaultPing);
     }
 
-    private void precalculateSections(ProxiedPlayer player, List<Section> topSections) {
+    private void precalculateSections(TabListContext context, List<Section> topSections) {
         for (Section section : topSections) {
-            section.precalculate(player);
+            section.precalculate(context);
         }
     }
 

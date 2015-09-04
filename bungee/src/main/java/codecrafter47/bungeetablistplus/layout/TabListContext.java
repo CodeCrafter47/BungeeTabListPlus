@@ -18,18 +18,18 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.layout.LayoutSection;
+package codecrafter47.bungeetablistplus.layout;
 
-/**
- * @author Florian Stober
- */
-public abstract class Section implements LayoutSection {
-    public abstract int calculate(TabListContext context, ITabList ITabList, int pos,
-                                  int size);
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-    public abstract void precalculate(TabListContext context);
+public interface TabListContext {
+
+    int getTabSize();
+
+    int getRows();
+
+    int getColumns();
+
+    ProxiedPlayer getViewer();
 }

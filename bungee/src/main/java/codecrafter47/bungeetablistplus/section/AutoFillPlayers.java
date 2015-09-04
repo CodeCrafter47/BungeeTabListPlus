@@ -20,15 +20,13 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.skin.Skin;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
+import java.util.OptionalInt;
 
-/**
- * @author Florian Stober
- */
 public class AutoFillPlayers extends Section {
 
     public final String prefix;
@@ -49,29 +47,37 @@ public class AutoFillPlayers extends Section {
     }
 
     @Override
-    public int getMinSize(ProxiedPlayer player) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int calculate(TabListContext player, ITabList ITabList, int pos, int size) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public int getMaxSize(ProxiedPlayer player) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void precalculate(TabListContext context) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
-                         int size) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int getMinSize() {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void precalculate(ProxiedPlayer player) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int getMaxSize() {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public int getStartColumn() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean isSizeConstant() {
+        throw new UnsupportedOperationException("Not supported");
     }
 
+    @Override
+    public int getEffectiveSize(int proposedSize) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public OptionalInt getStartColumn() {
+        throw new UnsupportedOperationException("Not supported");
+    }
 }

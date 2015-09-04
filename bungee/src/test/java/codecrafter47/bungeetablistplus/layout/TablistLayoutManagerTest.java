@@ -21,7 +21,6 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
-import codecrafter47.bungeetablistplus.TabListContext;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -328,12 +327,12 @@ public class TablistLayoutManagerTest {
         }
 
         @Override
-        public int getMinSize(TabListContext context) {
+        public int getMinSize() {
             return minSize;
         }
 
         @Override
-        public int getMaxSize(TabListContext context) {
+        public int getMaxSize() {
             return maxSize;
         }
 
@@ -343,7 +342,7 @@ public class TablistLayoutManagerTest {
         }
 
         @Override
-        public int getEffectiveSize(TabListContext context, int proposedSize) {
+        public int getEffectiveSize(int proposedSize) {
             return proposedSize;
         }
 

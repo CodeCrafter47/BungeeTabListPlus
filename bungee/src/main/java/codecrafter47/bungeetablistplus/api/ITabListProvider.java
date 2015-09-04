@@ -26,6 +26,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public interface ITabListProvider {
 
-    void fillTabList(final ProxiedPlayer player, final ITabList ITabList);
+    void fillTabList(ProxiedPlayer player, ITabList ITabList);
 
 }

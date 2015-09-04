@@ -20,12 +20,13 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 /**
  * @author Florian Stober
@@ -33,25 +34,34 @@ import java.util.List;
 public class StaticSection extends Section {
 
     final List<Slot> text;
-    private final int vAlign;
+    private final OptionalInt vAlign;
 
     public StaticSection(int vAlign, List<Slot> text) {
-        this.vAlign = vAlign;
+        this.vAlign = vAlign == -1 ? OptionalInt.empty() : OptionalInt.of(vAlign);
         this.text = text;
     }
 
     public StaticSection(int vAlign) {
-        this.vAlign = vAlign;
-        this.text = new ArrayList<>();
+        this(vAlign, new ArrayList<>());
     }
 
     @Override
-    public int getMinSize(ProxiedPlayer player) {
+    public int getMinSize() {
         return text.size();
     }
 
     @Override
-    public int getMaxSize(ProxiedPlayer player) {
+    public int getMaxSize() {
+        return text.size();
+    }
+
+    @Override
+    public boolean isSizeConstant() {
+        return true;
+    }
+
+    @Override
+    public int getEffectiveSize(int proposedSize) {
         return text.size();
     }
 
@@ -60,7 +70,7 @@ public class StaticSection extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
+    public int calculate(TabListContext context, ITabList ITabList, int pos,
                          int size) {
         for (Slot s : text) {
             ITabList.setSlot(pos++, new Slot(s));
@@ -69,11 +79,11 @@ public class StaticSection extends Section {
     }
 
     @Override
-    public void precalculate(ProxiedPlayer player) {
+    public void precalculate(TabListContext context) {
     }
 
     @Override
-    public int getStartColumn() {
+    public OptionalInt getStartColumn() {
         return vAlign;
     }
 }

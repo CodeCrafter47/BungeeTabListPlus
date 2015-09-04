@@ -20,28 +20,27 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-/**
- * @author Florian Stober
- */
+import java.util.OptionalInt;
+
 public class ColumnSplitSection extends Section {
 
     private final PlayerColumn[] pc = new PlayerColumn[ConfigManager.getCols()];
 
     @Override
-    public int getMinSize(ProxiedPlayer player) {
+    public int getMinSize() {
         return 0;
     }
 
     @Override
-    public int getMaxSize(ProxiedPlayer player) {
+    public int getMaxSize() {
         int max = 0;
         for (int i = 0; i < pc.length; i++) {
             if (pc[i] != null) {
-                int m = pc[i].getMaxSize(player);
+                int m = pc[i].getMaxSize();
                 int span = 1;
                 while (i + span != pc.length && pc[i + span] != null && (i + span < pc.length && pc[i + span - 1].filter.
                         equals(pc[i + span].filter))) {
@@ -58,7 +57,17 @@ public class ColumnSplitSection extends Section {
     }
 
     @Override
-    public int calculate(ProxiedPlayer player, ITabList ITabList, int pos,
+    public boolean isSizeConstant() {
+        return false;
+    }
+
+    @Override
+    public int getEffectiveSize(int proposedSize) {
+        return (proposedSize / ConfigManager.getCols()) * ConfigManager.getCols();
+    }
+
+    @Override
+    public int calculate(TabListContext context, ITabList ITabList, int pos,
                          int size) {
         int sizePerCol = size / ConfigManager.getCols();
         for (int i = 0; i < pc.length; i++) {
@@ -68,7 +77,7 @@ public class ColumnSplitSection extends Section {
                         equals(pc[i + span].filter))) {
                     span++;
                 }
-                pc[i].calculate(player, ITabList, i, pos / ConfigManager.
+                pc[i].calculate(context, ITabList, i, pos / ConfigManager.
                         getCols(), sizePerCol * span, span);
                 i += span - 1;
             }
@@ -81,17 +90,17 @@ public class ColumnSplitSection extends Section {
     }
 
     @Override
-    public void precalculate(ProxiedPlayer player) {
+    public void precalculate(TabListContext context) {
         for (PlayerColumn aPc : pc) {
             if (aPc != null) {
-                aPc.precalculate(player);
+                aPc.precalculate(context);
             }
         }
     }
 
     @Override
-    public int getStartColumn() {
-        return 0;
+    public OptionalInt getStartColumn() {
+        return OptionalInt.of(0);
     }
 
 }

@@ -21,11 +21,9 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
-import codecrafter47.bungeetablistplus.TabListContext;
-
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.function.ToIntBiFunction;
+import java.util.function.ToIntFunction;
 
 public class TablistLayoutManager<Section extends LayoutSection> {
 
@@ -66,21 +64,21 @@ public class TablistLayoutManager<Section extends LayoutSection> {
 
         // calc bottom sections
         int pos = context.getTabSize();
-        int availableAdditionalSpace = bottomSize - calculateSizeNoAlign(bottomSections, context, LayoutSection::getMinSize);
+        int availableAdditionalSpace = bottomSize - bottomMin;
         for (int i = bottomSections.size() - 1; i >= 0; i--) {
             Section section = bottomSections.get(i);
             int additionalSpace = 0;
             if(!section.isSizeConstant() && availableAdditionalSpace > 0) {
-                additionalSpace = availableAdditionalSpace * (section.getMaxSize(context) - section.getMinSize(context)) / (bottomMax - bottomMin);
+                additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (bottomMax - bottomMin);
             }
-            int size = section.getMinSize(context) + additionalSpace;
+            int size = section.getMinSize() + additionalSpace;
             OptionalInt startColumn = section.getStartColumn();
             if(startColumn.isPresent()){
                 size += calculateSpace(startColumn.getAsInt(), pos - size, context);
             }
-            availableAdditionalSpace -= (size - section.getMinSize(context));
+            availableAdditionalSpace -= (size - section.getMinSize());
             pos -= size;
-            size = section.getEffectiveSize(context, size);
+            size = section.getEffectiveSize(size);
             layout.placeSection(section, pos, size);
         }
 
@@ -94,9 +92,9 @@ public class TablistLayoutManager<Section extends LayoutSection> {
             Section section = topSections.get(i);
             int additionalSpace = 0;
             if (!section.isSizeConstant() && availableAdditionalSpace > 0) {
-                additionalSpace = availableAdditionalSpace * (section.getMaxSize(context) - section.getMinSize(context)) / (topMax - topMin);
+                additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (topMax - topMin);
             }
-            int size = section.getMinSize(context) + additionalSpace;
+            int size = section.getMinSize() + additionalSpace;
             if(i + 1 < topSections.size()) {
                 OptionalInt nextStartColumn = topSections.get(i + 1).getStartColumn();
                 if (nextStartColumn.isPresent()) {
@@ -105,7 +103,7 @@ public class TablistLayoutManager<Section extends LayoutSection> {
             } else {
                 size += calculateSpace(pos + size, bottomStart, context);
             }
-            size = section.getEffectiveSize(context, size);
+            size = section.getEffectiveSize(size);
             int space = 0;
             OptionalInt startColumn = section.getStartColumn();
             if(startColumn.isPresent()){
@@ -115,24 +113,16 @@ public class TablistLayoutManager<Section extends LayoutSection> {
             availableAdditionalSpace -= space;
             layout.placeSection(section, pos, size);
             pos += size;
-            availableAdditionalSpace -= size - section.getMinSize(context);
+            availableAdditionalSpace -= size - section.getMinSize();
         }
         return layout;
     }
 
-    int calculateSizeNoAlign(List<Section> sections, TabListContext context, ToIntBiFunction<Section, TabListContext> getSize){
-        int size = 0;
-        for (Section section : sections) {
-            size += getSize.applyAsInt(section, context);
-        }
-        return size;
-    }
-
-    int calculateSizeBottom(List<Section> bottomSections, TabListContext context, ToIntBiFunction<Section, TabListContext> getSize) {
+    int calculateSizeBottom(List<Section> bottomSections, TabListContext context, ToIntFunction<Section> getSize) {
         int bottomSize = 0;
         for (int i = bottomSections.size() - 1; i >= 0; i--) {
             Section section = bottomSections.get(i);
-            bottomSize += getSize.applyAsInt(section, context);
+            bottomSize += getSize.applyAsInt(section);
             OptionalInt startColumn = section.getStartColumn();
             if (startColumn.isPresent()) {
                 bottomSize += calculateSpace(startColumn.getAsInt(), context.getColumns() - (bottomSize % context.getColumns()), context);
@@ -141,14 +131,14 @@ public class TablistLayoutManager<Section extends LayoutSection> {
         return bottomSize;
     }
 
-    int calculateSizeTop(List<Section> topSections, TabListContext context, ToIntBiFunction<Section, TabListContext> getSize) {
+    int calculateSizeTop(List<Section> topSections, TabListContext context, ToIntFunction<Section> getSize) {
         int topSize = 0;
         for (Section section : topSections) {
             OptionalInt startColumn = section.getStartColumn();
             if (startColumn.isPresent()) {
                 topSize += calculateSpace(topSize, startColumn.getAsInt(), context);
             }
-            topSize += getSize.applyAsInt(section, context);
+            topSize += getSize.applyAsInt(section);
         }
         return topSize;
     }
