@@ -446,7 +446,7 @@ public class BungeeTabListPlus {
      */
     public static boolean isHidden(IPlayer player, ProxiedPlayer viewer) {
         if (getInstance().getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished")) return false;
-        return isHidden(player);
+        return isHidden(player) || isHiddenServer(player.getServer().orElse(null));
     }
 
     /**
@@ -462,6 +462,12 @@ public class BungeeTabListPlus {
         bukkitBridge.getPlayerInformation(player, Values.Player.SuperVanish.IsVanished).ifPresent(b -> hidden[0] |= b);
         bukkitBridge.getPlayerInformation(player, Values.Player.Essentials.IsVanished).ifPresent(b -> hidden[0] |= b);
         return hidden[0];
+    }
+
+    public static boolean isHiddenServer(ServerInfo server) {
+        if (server == null)
+            return false;
+        return getInstance().config.getMainConfig().hiddenServers.contains(server.getName());
     }
 
     /**

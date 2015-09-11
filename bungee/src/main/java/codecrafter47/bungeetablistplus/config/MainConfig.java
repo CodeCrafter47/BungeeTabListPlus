@@ -170,6 +170,19 @@ public class MainConfig extends Config {
     }
 
     @Comments({
+            "servers which you wish to hide from the global tabList",
+            "Note that this is different from excludeServers above: this hides all players on the hidden servers from appearing",
+            "on the tablist, whereas excluded servers' players are still on the BungeeTabListPlus tablist, but they do not see",
+            "the global tab list"
+    })
+    public List<String> hiddenServers = new ArrayList<>();
+
+    {
+        hiddenServers.add("server3");
+        hiddenServers.add("server9");
+    }
+
+    @Comments({
             "1.8 ONLY",
             "When enabled the tablist will adjust it's size to the number of players online/ slots used, instead of using",
             "the static tab_size set in bungee's config.yml.",
