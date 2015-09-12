@@ -31,6 +31,7 @@ import net.md_5.bungee.protocol.AbstractPacketHandler;
 import net.md_5.bungee.protocol.packet.Team;
 
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 
 /**
  * Created by florian on 15.06.15.
@@ -59,7 +60,7 @@ public class TeamPacket extends Team {
                     playerField.setAccessible(true);
                     player = (ProxiedPlayer) playerField.get(handler);
                 } catch (IllegalAccessException ex) {
-                    BungeeTabListPlus.getInstance().getLogger().warning("Failed to access player object in TeamPacketHandler for " + handler);
+                    BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
                     return;
                 }
                 if (BungeeTabListPlus.getTabList(player) instanceof TabList18v3) {

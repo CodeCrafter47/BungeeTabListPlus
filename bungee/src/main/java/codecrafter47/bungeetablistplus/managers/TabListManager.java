@@ -67,9 +67,7 @@ public class TabListManager implements Listener {
             defaultTab = new ConfigParser(
                     plugin.getConfigManager().defaultTabList, plugin).parse();
         } catch (Throwable ex) {
-            plugin.getLogger().log(Level.WARNING,
-                    "Could not load default tabList");
-            plugin.getLogger().log(Level.WARNING, null, ex);
+            plugin.getLogger().log(Level.SEVERE, "Could not load default tabList", ex);
             plugin.getLogger().log(Level.WARNING, "Disabling plugin");
             return false;
         }
@@ -78,9 +76,7 @@ public class TabListManager implements Listener {
                 validateShowTo(c);
                 tabLists.add(new ConfigParser(c, plugin).parse());
             } catch (Throwable ex) {
-                plugin.getLogger().log(Level.WARNING, "Could not load {0}", c.
-                        getFileName());
-                plugin.getLogger().log(Level.WARNING, null, ex);
+                plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getFileName(), ex);
             }
         }
         return true;

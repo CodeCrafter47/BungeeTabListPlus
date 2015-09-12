@@ -31,6 +31,11 @@ import net.md_5.bungee.protocol.packet.PacketD1Team;
  * @author Florian Stober
  */
 public class TeamPacket16 implements ITeamPacket {
+    private final Logger logger;
+
+    public TeamPacket16(Logger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void createTeam(Connection.Unsafe connection, String player) {
@@ -38,7 +43,7 @@ public class TeamPacket16 implements ITeamPacket {
             PacketD1Team t = new PacketD1Team("TAB" + player);
             Field mode = t.getClass().getDeclaredField("mode");
             mode.setAccessible(true);
-            mode.set(t, Byte.valueOf((byte) 0));
+            mode.set(t, (byte) 0);
 
             Field players = t.getClass().getDeclaredField("players");
             players.setAccessible(true);
@@ -61,14 +66,8 @@ public class TeamPacket16 implements ITeamPacket {
             playerCount.set(t, (short) 1);
 
             connection.sendPacket(t);
-        } catch (NoSuchFieldException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException ex) {
+            logger.log(Level.SEVERE, "Failed to send create team packet", ex);
         }
     }
 
@@ -78,7 +77,7 @@ public class TeamPacket16 implements ITeamPacket {
             PacketD1Team t = new PacketD1Team("TAB" + player);
             Field mode = t.getClass().getDeclaredField("mode");
             mode.setAccessible(true);
-            mode.set(t, Byte.valueOf((byte) 2));
+            mode.set(t, (byte) 2);
 
             Field prefix = t.getClass().getDeclaredField("prefix");
             prefix.setAccessible(true);
@@ -92,14 +91,8 @@ public class TeamPacket16 implements ITeamPacket {
             displayName.setAccessible(true);
             displayName.set(t, displayname);
             connection.sendPacket(t);
-        } catch (NoSuchFieldException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(TeamPacket16.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchFieldException | SecurityException | IllegalAccessException | IllegalArgumentException ex) {
+            logger.log(Level.SEVERE, "Failed to send update team packet", ex);
         }
     }
 

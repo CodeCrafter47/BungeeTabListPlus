@@ -61,7 +61,7 @@ public class PacketManager {
                 } catch (ClassNotFoundException ex) {
                     clazz = Class.forName(
                             "net.md_5.bungee.protocol.packet.PacketD1Team");
-                    teamPacket = new TeamPacket16();
+                    teamPacket = new TeamPacket16(logger);
                 }
             } catch (Throwable th) {
                 teamPacket = null;

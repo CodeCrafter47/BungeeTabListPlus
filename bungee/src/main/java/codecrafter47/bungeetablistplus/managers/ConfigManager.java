@@ -73,9 +73,7 @@ public class ConfigManager {
                 try {
                     tabLists.add(new TabListConfig(plugin, s));
                 } catch (InvalidConfigurationException ex) {
-                    plugin.getLogger().log(Level.WARNING, "Unable to load {0}",
-                            s);
-                    plugin.getLogger().log(Level.WARNING, null, ex);
+                    plugin.getLogger().log(Level.WARNING, "Unable to load " + s, ex);
                 }
             }
         }

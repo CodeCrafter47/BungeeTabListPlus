@@ -133,7 +133,7 @@ public class BukkitBridge implements Listener {
             try {
                 playerInformationUpdaters.remove(player.getUniqueId()).cancel();
             } catch (Exception ex) {
-                plugin.getLogger().log(Level.WARNING, "An exception occurred while removing a player", ex);
+                plugin.getLogger().log(Level.SEVERE, "An exception occurred while removing a player", ex);
             }
         }
     }

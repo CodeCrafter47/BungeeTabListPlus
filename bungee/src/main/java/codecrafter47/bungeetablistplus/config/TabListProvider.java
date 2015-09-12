@@ -205,17 +205,14 @@ public class TabListProvider implements ITabListProvider {
                         try {
                             List<Section> sections = parser.
                                     parseServerSections(
-                                            prefix, suffix, skin, new ArrayList<String>(0),
+                                            prefix, suffix, skin, new ArrayList<>(0),
                                             server,
                                             sortRules, maxPlayers);
                             for (Section s : sections) {
                                 sectionList.add(j++, s);
                             }
                         } catch (ParseException ex) {
-                            Logger.
-                                    getLogger(TabListProvider.class.
-                                            getName()).
-                                    log(Level.SEVERE, null, ex);
+                            BungeeTabListPlus.getInstance().reportError(ex);
                         }
                     }
                 }

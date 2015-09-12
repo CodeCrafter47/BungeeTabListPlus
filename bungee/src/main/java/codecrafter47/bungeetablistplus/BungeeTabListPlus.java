@@ -152,7 +152,7 @@ public class BungeeTabListPlus {
         } catch (InvalidConfigurationException ex) {
             plugin.getLogger().warning("Unable to load Config");
             plugin.getLogger().log(Level.WARNING, null, ex);
-            plugin.getLogger().info("Disabling Plugin");
+            plugin.getLogger().warning("Disabling Plugin");
             return;
         }
 
@@ -175,15 +175,13 @@ public class BungeeTabListPlus {
             packets = new PacketManager();
 
             if (!packets.isTabModificationSupported()) {
-                plugin.getLogger().warning(
-                        "Your BungeeCord Version isn't supported yet");
-                plugin.getLogger().info("Disabling Plugin");
+                plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
+                plugin.getLogger().warning("Disabling Plugin");
                 return;
             }
 
             if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
-                plugin.getLogger().warning(
-                        "Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
+                plugin.getLogger().warning("Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
                 plugin.getLogger().warning("This option will be disabled");
                 config.getMainConfig().useScoreboardToBypass16CharLimit = false;
             }
@@ -264,8 +262,7 @@ public class BungeeTabListPlus {
             Metrics metrics = new Metrics(plugin);
             metrics.start();
         } catch (IOException e) {
-            plugin.getLogger().warning("Failed to initialize Metrics");
-            plugin.getLogger().warning(e.getLocalizedMessage());
+            plugin.getLogger().log(Level.SEVERE, "Failed to initialize Metrics", e);
         }
 
         // Load updateCheck thread
@@ -282,10 +279,8 @@ public class BungeeTabListPlus {
                 TObjectIntMap<Class<? extends DefinedPacket>> packetMap = (TObjectIntMap<Class<? extends DefinedPacket>>) tabListHandler.
                         get(Protocol.GAME.TO_CLIENT);
                 packetMap.put(TabHeaderPacket.class, 0x47);
-            } catch (IllegalArgumentException | IllegalAccessException |
-                    NoSuchFieldException | SecurityException ex) {
-                Logger.getLogger(BungeeTabListPlus.class.getName()).
-                        log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
+                getLogger().log(Level.SEVERE, "Failed to hook TabHeaderPacket", ex);
             }
         }
 
@@ -296,10 +291,8 @@ public class BungeeTabListPlus {
                 Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, Class.class);
                 registerPacket.setAccessible(true);
                 registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, TeamPacket.class);
-            } catch (IllegalArgumentException | NoSuchMethodException |
-                    SecurityException | InvocationTargetException | IllegalAccessException ex) {
-                Logger.getLogger(BungeeTabListPlus.class.getName()).
-                        log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException ex) {
+                getLogger().log(Level.SEVERE, "Failed to hook team packet", ex);
             }
         }
     }
@@ -341,8 +334,7 @@ public class BungeeTabListPlus {
             fakePlayerManager.reload();
             resendTabLists();
         } catch (InvalidConfigurationException ex) {
-            plugin.getLogger().warning("Unable to reload Config");
-            plugin.getLogger().log(Level.WARNING, null, ex);
+            plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
         }
         if (refreshThread == null) {
             startRefreshThread();
@@ -491,7 +483,7 @@ public class BungeeTabListPlus {
     }
 
     public void reportError(Throwable th) {
-        plugin.getLogger().log(Level.WARNING,
+        plugin.getLogger().log(Level.SEVERE,
                 ChatColor.RED + "An internal error occurred! Please send the "
                         + "following StackTrace to the developer in order to help"
                         + " resolving the problem",

@@ -112,7 +112,7 @@ public class BukkitBridge implements Listener {
         for (Entry<String, Object> entry : ((Map<String, Object>) in.readObject()).entrySet()) {
             Value<Object> value = Values.getValue(entry.getKey());
             if (value == null) {
-                plugin.getLogger().warning("Received unknown data \"" + entry.getKey() + "\" from bukkit.");
+                plugin.getLogger().severe("Received unknown data \"" + entry.getKey() + "\" from bukkit.");
             } else {
                 dataCache.updateValue(value, entry.getValue());
             }
