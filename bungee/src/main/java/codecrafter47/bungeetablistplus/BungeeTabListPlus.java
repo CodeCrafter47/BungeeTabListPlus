@@ -23,6 +23,7 @@ package codecrafter47.bungeetablistplus;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
+import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
@@ -154,6 +155,11 @@ public class BungeeTabListPlus {
             plugin.getLogger().log(Level.WARNING, null, ex);
             plugin.getLogger().warning("Disabling Plugin");
             return;
+        }
+
+        if(config.getMainConfig().automaticallySendBugReports){
+            BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), getPlugin().getDescription().getVersion(), command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
+            bugReportingService.registerLogger(getLogger());
         }
 
         // TODO probably parsing the version string is a better idea

@@ -20,6 +20,7 @@
  */
 package codecrafter47.bungeetablistplus.bukkitbridge;
 
+import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.common.PermissionValues;
 import codecrafter47.data.DataAggregator;
@@ -27,6 +28,8 @@ import codecrafter47.data.Value;
 import codecrafter47.data.Values;
 import codecrafter47.data.bukkit.PlayerDataAggregator;
 import codecrafter47.data.bukkit.ServerDataAggregator;
+import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -58,11 +61,25 @@ public class BukkitBridge implements Listener {
     private PlayerDataAggregator playerDataAggregator;
     private ServerDataAggregator serverDataAggregator;
 
+    private MainConfig config = new MainConfig();
+
     public BukkitBridge(Plugin plugin) {
         this.plugin = plugin;
     }
 
     public void onEnable() {
+        try {
+            File file = new File(plugin.getDataFolder(), "config.yml");
+            config.load(file);
+            config.save(file);
+        } catch (InvalidConfigurationException e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to load config.yml", e);
+            config.automaticallySendBugReports = false;
+        }
+        if(config.automaticallySendBugReports){
+            BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, plugin.getDescription().getName(), plugin.getDescription().getVersion(), command -> Bukkit.getScheduler().runTaskAsynchronously(plugin, command));
+            bugReportingService.registerLogger(plugin.getLogger());
+        }
         plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin,
                 Constants.channel);
         plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin,

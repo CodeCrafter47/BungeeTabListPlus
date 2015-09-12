@@ -52,6 +52,10 @@
                                     <pattern>codecrafter47.util</pattern>
                                     <shadedPattern>codecrafter47.bungeetablistplus.util</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>net.cubespace.Yamler</pattern>
+                                    <shadedPattern>codecrafter47.bungeetablistplus.bukkitbridge.libs.net.cubespace.Yamler</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>

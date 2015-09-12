@@ -96,6 +96,13 @@ public class MainConfig extends Config {
     public boolean notifyAdminsIfUpdateAvailable = true;
 
     @Comments({
+            "If this is set to true and the plugin encounters an issue a bugreport is sent automatically",
+            "Bug reports do not contain any sensitive or identifying information",
+            "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log"
+    })
+    public boolean automaticallySendBugReports = true;
+
+    @Comments({
             "server Alias fo the {server} Variable"
     })
     public HashMap<String, String> serverAlias = new HashMap<>();
