@@ -27,7 +27,7 @@ abstract public class CustomTabListHandler extends TabListAdapter implements Pla
         // remove all those names from the clients tab, he's on another server now
         synchronized (usernames) {
             for (String username : usernames) {
-                BungeeTabListPlus.getInstance().getPacketManager().removePlayer(
+                BungeeTabListPlus.getInstance().getLegacyPacketManager().removePlayer(
                         getPlayer().unsafe(), username);
             }
             usernames.clear();
@@ -81,7 +81,7 @@ abstract public class CustomTabListHandler extends TabListAdapter implements Pla
             synchronized (usernames) {
                 for (String s : bukkitplayers) {
                     if (!usernames.contains(s)) {
-                        BungeeTabListPlus.getInstance().getPacketManager().
+                        BungeeTabListPlus.getInstance().getLegacyPacketManager().
                                 createOrUpdatePlayer(getPlayer().unsafe(), s, 0);
                         usernames.add(s);
                     }

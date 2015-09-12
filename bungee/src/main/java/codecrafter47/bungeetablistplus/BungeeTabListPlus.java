@@ -27,7 +27,6 @@ import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
-import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.packets.TeamPacket;
 import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
@@ -37,7 +36,6 @@ import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import codecrafter47.data.Values;
 import codecrafter47.util.bungee.PingTask;
-import gnu.trove.map.TObjectIntMap;
 import lombok.Getter;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
@@ -47,7 +45,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.Protocol;
 
 import java.io.IOException;
@@ -75,7 +72,6 @@ public class BungeeTabListPlus {
     private final Plugin plugin;
 
     public BungeeTabListPlus(Plugin plugin) {
-
         this.plugin = plugin;
     }
 
@@ -127,7 +123,9 @@ public class BungeeTabListPlus {
 
     static private boolean isAbove995 = false;
 
-    private PacketManager packets;
+    private LegacyPacketManager packets;
+
+    private PacketManager packetManager;
 
     private final Map<String, PingTask> serverState = new HashMap<>();
 
@@ -157,12 +155,11 @@ public class BungeeTabListPlus {
             return;
         }
 
-        if(config.getMainConfig().automaticallySendBugReports){
+        if (config.getMainConfig().automaticallySendBugReports) {
             BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), getPlugin().getDescription().getVersion(), command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
             bugReportingService.registerLogger(getLogger());
         }
 
-        // TODO probably parsing the version string is a better idea
         try {
             Class.forName("net.md_5.bungee.tab.TabList");
         } catch (ClassNotFoundException ex) {
@@ -176,23 +173,26 @@ public class BungeeTabListPlus {
             isAbove995 = false;
         }
 
-        if (!isVersion18()) {
+        packets = new LegacyPacketManager();
 
-            packets = new PacketManager();
+        if (!packets.isTabModificationSupported()) {
+            plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
+            plugin.getLogger().warning("Disabling Plugin");
+            return;
+        }
 
-            if (!packets.isTabModificationSupported()) {
-                plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
-                plugin.getLogger().warning("Disabling Plugin");
-                return;
+        if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
+            plugin.getLogger().warning("Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
+            plugin.getLogger().warning("This option will be disabled");
+            config.getMainConfig().useScoreboardToBypass16CharLimit = false;
+        }
+
+        if(isVersion18()) {
+            packetManager = new PacketManager(getLogger());
+            if (!packetManager.isTabHeaderFooterSupported()) {
+                plugin.getLogger().warning("Your BungeeCord version doesn't support tablist header and footer modification");
             }
 
-            if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
-                plugin.getLogger().warning("Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
-                plugin.getLogger().warning("This option will be disabled");
-                config.getMainConfig().useScoreboardToBypass16CharLimit = false;
-            }
-        } else {
-            packets = null;
             skins = new SkinManager(plugin);
         }
 
@@ -274,20 +274,6 @@ public class BungeeTabListPlus {
         // Load updateCheck thread
         if (config.getMainConfig().checkForUpdates) {
             updateChecker = new UpdateChecker(plugin);
-        }
-
-        if (isVersion18() && !isAbove995) {
-            try {
-                // register tabheaderpacket
-                Class clazz = Protocol.DirectionData.class;
-                Field tabListHandler = clazz.getDeclaredField("packetMap");
-                tabListHandler.setAccessible(true);
-                TObjectIntMap<Class<? extends DefinedPacket>> packetMap = (TObjectIntMap<Class<? extends DefinedPacket>>) tabListHandler.
-                        get(Protocol.GAME.TO_CLIENT);
-                packetMap.put(TabHeaderPacket.class, 0x47);
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
-                getLogger().log(Level.SEVERE, "Failed to hook TabHeaderPacket", ex);
-            }
         }
 
         if (isVersion18()) {
@@ -391,12 +377,16 @@ public class BungeeTabListPlus {
     }
 
     /**
-     * Getter of the PacketManager. For internal use only
+     * Getter of the LegacyPacketManager. For internal use only
      *
-     * @return an instance of the PacketManager or null
+     * @return an instance of the LegacyPacketManager or null
      */
-    public PacketManager getPacketManager() {
+    public LegacyPacketManager getLegacyPacketManager() {
         return packets;
+    }
+
+    public PacketManager getPacketManager() {
+        return packetManager;
     }
 
     /**

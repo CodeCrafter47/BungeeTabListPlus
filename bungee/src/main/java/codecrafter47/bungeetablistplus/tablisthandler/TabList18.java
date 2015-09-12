@@ -24,8 +24,9 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.managers.LegacyPacketManager;
+import codecrafter47.bungeetablistplus.managers.PacketManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.packets.TabHeaderPacket;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
@@ -92,28 +93,20 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
         }
 
         // update header/footer
-        String header = tabList.getHeader();
-        if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
-            header = header.substring(0, header.length() - 1);
-        }
-        String footer = tabList.getFooter();
-        if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
-            footer = footer.substring(0, footer.length() - 1);
-        }
-        if (header != null || footer != null) {
-            if (BungeeTabListPlus.isAbove995()) {
-                player.setTabHeader(TextComponent.fromLegacyText(header), TextComponent.fromLegacyText(footer));
-            } else {
-                TabHeaderPacket packet = new TabHeaderPacket();
-                if (header != null) {
-                    packet.setHeader(ComponentSerializer.toString(TextComponent.
-                            fromLegacyText(header)));
-                }
-                if (footer != null) {
-                    packet.setFooter(ComponentSerializer.toString(TextComponent.
-                            fromLegacyText(footer)));
-                }
-                player.unsafe().sendPacket(packet);
+        PacketManager packetManager = BungeeTabListPlus.getInstance().getPacketManager();
+        if(packetManager.isTabHeaderFooterSupported()) {
+            String header = tabList.getHeader();
+            if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
+                header = header.substring(0, header.length() - 1);
+            }
+            String footer = tabList.getFooter();
+            if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
+                footer = footer.substring(0, footer.length() - 1);
+            }
+            if (header != null || footer != null) {
+                String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
+                String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
+                packetManager.setTabHeaderAndFooter(player.unsafe(), headerJson, footerJson);
             }
         }
     }
