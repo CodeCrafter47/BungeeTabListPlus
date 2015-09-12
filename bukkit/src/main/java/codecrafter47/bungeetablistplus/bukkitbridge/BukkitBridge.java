@@ -69,6 +69,9 @@ public class BukkitBridge implements Listener {
 
     public void onEnable() {
         try {
+            if(!plugin.getDataFolder().exists()){
+                plugin.getDataFolder().mkdir();
+            }
             File file = new File(plugin.getDataFolder(), "config.yml");
             config.load(file);
             config.save(file);
