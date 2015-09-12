@@ -16,33 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_7_2;
 
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.protocol.packet.Team;
 
 /**
  * @author Florian Stober
  */
-public class NewTeamPacket implements ITeamPacket {
+public class OldTeamPacketAccess implements LegacyPacketAccess.TeamPacketAccess {
 
     @Override
     public void createTeam(Connection.Unsafe connection, String player) {
         Team t = new Team();
-        t.setName("TAB" + player);
+        t.setName(player);
         t.setMode((byte) 0);
         t.setPrefix(" ");
         t.setDisplayName(" ");
         t.setSuffix(" ");
         t.setPlayers(new String[]{player});
+        t.setPlayerCount((short) 1);
         connection.sendPacket(t);
     }
 
     @Override
-    public void updateTeam(Connection.Unsafe connection, String player,
-                           String prefix, String displayname, String suffix) {
+    public void updateTeam(Connection.Unsafe connection, String player, String prefix, String displayname, String suffix) {
         Team t = new Team();
-        t.setName("TAB" + player);
+        t.setName(player);
         t.setMode((byte) 2);
         t.setPrefix(prefix);
         t.setDisplayName(displayname);
@@ -53,8 +54,9 @@ public class NewTeamPacket implements ITeamPacket {
     @Override
     public void removeTeam(Connection.Unsafe connection, String player) {
         Team t = new Team();
-        t.setName("TAB" + player);
+        t.setName(player);
         t.setMode((byte) 1);
         connection.sendPacket(t);
     }
+
 }

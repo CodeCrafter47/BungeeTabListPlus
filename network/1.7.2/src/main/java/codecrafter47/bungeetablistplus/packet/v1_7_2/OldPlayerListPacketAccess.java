@@ -16,16 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_7_2;
 
-import net.md_5.bungee.api.connection.Connection.Unsafe;
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
+import net.md_5.bungee.api.connection.Connection;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 /**
  * @author Florian Stober
  */
-public interface IPlayerListPacket {
+public class OldPlayerListPacketAccess implements LegacyPacketAccess.PlayerListPacketAccess {
 
-    void createOrUpdatePlayer(Unsafe connection, String player, int ping);
+    @Override
+    public void createOrUpdatePlayer(Connection.Unsafe connection, String player, int ping) {
+        connection.sendPacket(new PlayerListItem(player, true, (short) ping));
+    }
 
-    void removePlayer(Unsafe connection, String player);
+    @Override
+    public void removePlayer(Connection.Unsafe connection, String player) {
+        connection.sendPacket(new PlayerListItem(player, false, (short) 9999));
+    }
+
 }

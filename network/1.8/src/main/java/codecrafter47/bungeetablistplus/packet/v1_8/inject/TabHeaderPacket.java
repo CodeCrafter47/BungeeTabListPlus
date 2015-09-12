@@ -18,7 +18,7 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_8.inject;
 
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.api.chat.TextComponent;

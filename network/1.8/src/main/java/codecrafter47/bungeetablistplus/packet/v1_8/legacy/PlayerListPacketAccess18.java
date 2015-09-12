@@ -18,15 +18,16 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_8.legacy;
 
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 /**
  * @author Florian Stober
  */
-public class PlayerListPacket18 implements IPlayerListPacket {
+public class PlayerListPacketAccess18 implements LegacyPacketAccess.PlayerListPacketAccess {
 
     @Override
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,

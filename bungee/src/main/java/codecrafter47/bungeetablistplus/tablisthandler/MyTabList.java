@@ -158,7 +158,7 @@ public class MyTabList extends CustomTabListHandler {
     public synchronized void unload() {
         for (int i = 0; i < ConfigManager.getTabSize(); i++) {
             if (sent[i] != null) {
-                BungeeTabListPlus.getInstance().getLegacyPacketManager().removePlayer(
+                BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
                         getPlayer().unsafe(), sent[i]);
             }
             sent[i] = null;
@@ -175,7 +175,7 @@ public class MyTabList extends CustomTabListHandler {
                         .equals((slots[i] == null ? String.valueOf(MyTabList.base(i)) : slots[i]))) {
                     String line = sent[i];
                     sent[i] = null;
-                    BungeeTabListPlus.getInstance().getLegacyPacketManager().
+                    BungeeTabListPlus.getInstance().getLegacyPacketAccess().
                             removePlayer(getPlayer().unsafe(), line);
                     remove = true;
                 }
@@ -188,7 +188,7 @@ public class MyTabList extends CustomTabListHandler {
             if (slots[i] != null) {
                 sentStuff.add(line);
             }
-            BungeeTabListPlus.getInstance().getLegacyPacketManager().
+            BungeeTabListPlus.getInstance().getLegacyPacketAccess().
                     createOrUpdatePlayer(getPlayer().unsafe(), line,
                             slots_ping[i]);
         }

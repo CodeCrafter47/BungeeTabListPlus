@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ChatColor;
@@ -35,8 +36,7 @@ import net.md_5.bungee.protocol.packet.Team;
 /**
  * @author Florian Stober
  */
-public class TabList17 extends CustomTabList18 implements
-        PlayerTablistHandler {
+public class TabList17 extends CustomTabList18 implements PlayerTablistHandler {
 
     private static String getSlotID(int n) {
         String hex = Integer.toHexString(n + 1);
@@ -56,6 +56,8 @@ public class TabList17 extends CustomTabList18 implements
     private int sendSlots = 0;
 
     private final String send[] = new String[ConfigManager.getTabSize()];
+
+    private final LegacyPacketAccess packetAccess = BungeeTabListPlus.getInstance().getLegacyPacketAccess();
 
     public TabList17(ProxiedPlayer player) {
         super(player);
@@ -111,77 +113,28 @@ public class TabList17 extends CustomTabList18 implements
         if (i >= ConfigManager.getTabSize()) {
             return;
         }
-        PlayerListItem pli = new PlayerListItem();
-        pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-        PlayerListItem.Item item = new PlayerListItem.Item();
-        item.setDisplayName(getSlotID(i));
-        item.setPing(0);
-        pli.setItems(new PlayerListItem.Item[]{item});
-        getPlayer().unsafe().sendPacket(pli);
-
+        packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(i), 0);
     }
 
     private void removeSlot(int i) {
-        PlayerListItem pli = new PlayerListItem();
-        pli.setAction(PlayerListItem.Action.REMOVE_PLAYER);
-        PlayerListItem.Item item = new PlayerListItem.Item();
-        item.setDisplayName(getSlotID(i));
-        item.setPing(0);
-        pli.setItems(new PlayerListItem.Item[]{item});
-        getPlayer().unsafe().sendPacket(pli);
-        Team t = new Team();
-        t.setName("TAB" + getSlotID(i));
-        t.setMode((byte) 1);
-        getPlayer().unsafe().sendPacket(t);
-
+        packetAccess.removePlayer(getPlayer().unsafe(), getSlotID(i));
+        packetAccess.removeTeam(getPlayer().unsafe(), getSlotID(i));
     }
 
     private void updateSlot(int row, String text, int ping) {
         if (ping != slots_ping[row]) {
-            PlayerListItem pli = new PlayerListItem();
-            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-            PlayerListItem.Item item = new PlayerListItem.Item();
-            item.setDisplayName(getSlotID(row));
-            item.setPing(ping);
-            pli.setItems(new PlayerListItem.Item[]{item});
-            getPlayer().unsafe().sendPacket(pli);
+            packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(row), ping);
         }
         send[row] = text;
         slots_ping[row] = ping;
         String split[] = splitText(text);
-        updateTeam(getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/  split[1]);
-
-    }
-
-    void updateTeam(Connection.Unsafe connection, String player,
-                    String prefix, String suffix) {
-        Team t = new Team();
-        t.setName("TAB" + player);
-        t.setMode((byte) 2);
-        t.setPrefix(prefix);
-        t.setDisplayName("");
-        t.setSuffix(suffix);
-        connection.sendPacket(t);
+        packetAccess.updateTeam(getPlayer().unsafe(), getSlotID(row), split[0], "",  split[1]);
     }
 
     private void createSlot(int row) {
-        createTeam(getPlayer().unsafe(), getSlotID(row));
+        packetAccess.createTeam(getPlayer().unsafe(), getSlotID(row));
         send[row] = null;
         slots_ping[row] = 0;
-    }
-
-    void createTeam(Connection.Unsafe connection, String player) {
-        Preconditions.checkArgument(player.length() <= 13);
-        Team t = new Team();
-        t.setName("TAB" + player);
-        t.setMode((byte) 0);
-        t.setPrefix(" ");
-        t.setDisplayName(" ");
-        t.setSuffix(" ");
-        t.setPlayers(new String[]{player});
-        // TODO FIXME
-        //t.setNameTagVisibility("never");
-        connection.sendPacket(t);
     }
 
     private String[] splitText(String s) {

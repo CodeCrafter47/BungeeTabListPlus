@@ -108,33 +108,33 @@ public class ScoreboardTabList extends CustomTabListHandler implements
         if (i >= ConfigManager.getTabSize()) {
             return;
         }
-        BungeeTabListPlus.getInstance().getLegacyPacketManager().createOrUpdatePlayer(
+        BungeeTabListPlus.getInstance().getLegacyPacketAccess().createOrUpdatePlayer(
                 getPlayer().unsafe(), getSlotID(i), slots_ping[i]);
         send[i] = "";
     }
 
     private void removeSlot(int i) {
-        BungeeTabListPlus.getInstance().getLegacyPacketManager().removePlayer(
+        BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
                 getPlayer().unsafe(), getSlotID(i));
-        BungeeTabListPlus.getInstance().getLegacyPacketManager().removeTeam(
+        BungeeTabListPlus.getInstance().getLegacyPacketAccess().removeTeam(
                 getPlayer().unsafe(), getSlotID(i));
     }
 
     private void updateSlot(int row, String text, int ping) {
         if (ping != slots_ping[row]) {
-            BungeeTabListPlus.getInstance().getLegacyPacketManager().
+            BungeeTabListPlus.getInstance().getLegacyPacketAccess().
                     createOrUpdatePlayer(getPlayer().unsafe(), getSlotID(row),
                             ping);
         }
         send[row] = text;
         slots_ping[row] = ping;
         String split[] = splitText(text);
-        BungeeTabListPlus.getInstance().getLegacyPacketManager().updateTeam(
+        BungeeTabListPlus.getInstance().getLegacyPacketAccess().updateTeam(
                 getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
     }
 
     private void createSlot(int row) {
-        BungeeTabListPlus.getInstance().getLegacyPacketManager().createTeam(
+        BungeeTabListPlus.getInstance().getLegacyPacketAccess().createTeam(
                 getPlayer().unsafe(), getSlotID(row));
     }
 

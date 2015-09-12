@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_8;
 
+import codecrafter47.bungeetablistplus.packet.PacketAccess;
+import codecrafter47.bungeetablistplus.packet.v1_8.inject.TabHeaderPacket;
 import com.google.common.base.Preconditions;
 import gnu.trove.map.TObjectIntMap;
 import net.md_5.bungee.api.connection.Connection;
@@ -27,9 +29,9 @@ import net.md_5.bungee.protocol.Protocol;
 
 import java.lang.reflect.Field;
 
-public class InjectedTabHeaderPacket implements ITabHeaderPacket{
+public class InjectedTabHeaderPacketAccess implements PacketAccess.TabHeaderPacketAccess {
 
-    public InjectedTabHeaderPacket() throws Exception {
+    public InjectedTabHeaderPacketAccess() throws Exception {
         // register tabheaderpacket
         Class clazz = Protocol.DirectionData.class;
         Field tabListHandler = clazz.getDeclaredField("packetMap");

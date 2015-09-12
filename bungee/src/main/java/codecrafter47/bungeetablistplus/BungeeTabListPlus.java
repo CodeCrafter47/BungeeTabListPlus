@@ -27,7 +27,7 @@ import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
-import codecrafter47.bungeetablistplus.packets.TeamPacket;
+import codecrafter47.bungeetablistplus.packet.*;
 import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
@@ -123,9 +123,9 @@ public class BungeeTabListPlus {
 
     static private boolean isAbove995 = false;
 
-    private LegacyPacketManager packets;
+    private LegacyPacketAccess legacyPacketAccess;
 
-    private PacketManager packetManager;
+    private PacketAccess packetAccess;
 
     private final Map<String, PingTask> serverState = new HashMap<>();
 
@@ -173,23 +173,23 @@ public class BungeeTabListPlus {
             isAbove995 = false;
         }
 
-        packets = new LegacyPacketManager();
+        legacyPacketAccess = new LegacyPacketAccessImpl();
 
-        if (!packets.isTabModificationSupported()) {
+        if (!legacyPacketAccess.isTabModificationSupported()) {
             plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
             plugin.getLogger().warning("Disabling Plugin");
             return;
         }
 
-        if ((!packets.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
+        if ((!legacyPacketAccess.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
             plugin.getLogger().warning("Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
             plugin.getLogger().warning("This option will be disabled");
             config.getMainConfig().useScoreboardToBypass16CharLimit = false;
         }
 
         if(isVersion18()) {
-            packetManager = new PacketManager(getLogger());
-            if (!packetManager.isTabHeaderFooterSupported()) {
+            packetAccess = new PacketAccessImpl(getLogger());
+            if (!packetAccess.isTabHeaderFooterSupported()) {
                 plugin.getLogger().warning("Your BungeeCord version doesn't support tablist header and footer modification");
             }
 
@@ -376,17 +376,12 @@ public class BungeeTabListPlus {
         return skins;
     }
 
-    /**
-     * Getter of the LegacyPacketManager. For internal use only
-     *
-     * @return an instance of the LegacyPacketManager or null
-     */
-    public LegacyPacketManager getLegacyPacketManager() {
-        return packets;
+    public LegacyPacketAccess getLegacyPacketAccess() {
+        return legacyPacketAccess;
     }
 
-    public PacketManager getPacketManager() {
-        return packetManager;
+    public PacketAccess getPacketAccess() {
+        return packetAccess;
     }
 
     /**

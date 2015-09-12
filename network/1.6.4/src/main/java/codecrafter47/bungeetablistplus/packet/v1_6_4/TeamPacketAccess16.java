@@ -18,22 +18,23 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_6_4;
 
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.protocol.packet.PacketD1Team;
 
 /**
  * @author Florian Stober
  */
-public class TeamPacket16 implements ITeamPacket {
+public class TeamPacketAccess16 implements LegacyPacketAccess.TeamPacketAccess {
     private final Logger logger;
 
-    public TeamPacket16(Logger logger) {
+    public TeamPacketAccess16(Logger logger) {
         this.logger = logger;
     }
 

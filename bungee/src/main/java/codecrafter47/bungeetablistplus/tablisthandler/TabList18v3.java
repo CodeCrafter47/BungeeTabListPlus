@@ -23,8 +23,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.managers.LegacyPacketManager;
-import codecrafter47.bungeetablistplus.managers.PacketManager;
+import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.util.ColorParser;
@@ -64,6 +63,8 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
     private final Map<UUID, String> sendUsernames = new HashMap<>();
 
     private final TIntObjectMap<String> sendTeam = new TIntObjectHashMap<>();
+
+    private final PacketAccess packetAccess = BungeeTabListPlus.getInstance().getPacketAccess();
 
     public TabList18v3(ProxiedPlayer player) {
         super(player);
@@ -114,9 +115,6 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 fakeUUIDs.add(uuid);
                 sendUsernames.put(uuid, getSlotID(i));
             }
-
-            List<Team> additions = new LinkedList<>();
-            List<Team> removals = new LinkedList<>();
 
             for (int i = 0; i < tab_size; i++) {
                 Slot line = tabList.getSlot(i);
@@ -171,43 +169,20 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 String oldPlayer = sendTeam.get(i);
                 if (oldPlayer != null) {
                     if (!oldPlayer.equals(sendUsernames.get(uuid))) {
-                        Team team = new Team(getSlotID(i));
-                        team.setMode((byte) 4);
-                        team.setPlayers(new String[]{oldPlayer});
-                        removals.add(team);
-                        team = new Team(getSlotID(i));
-                        team.setMode((byte) 3);
-                        team.setPlayers(new String[]{sendUsernames.get(uuid)});
-                        additions.add(team);
+                        packetAccess.removePlayerFromTeam(getPlayer().unsafe(), getSlotID(i), oldPlayer);
+                        packetAccess.addPlayerToTeam(getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
                         sendTeam.put(i, sendUsernames.get(uuid));
                     }
                 } else {
-                    Team team = new Team(getSlotID(i));
-                    team.setMode((byte) 0);
-                    team.setColor((byte) 0);
-                    team.setDisplayName(getSlotID(i));
-                    team.setNameTagVisibility("always");
-                    team.setPrefix("");
-                    team.setSuffix("");
-                    team.setPlayers(new String[]{sendUsernames.get(uuid)});
-                    additions.add(team);
+                    packetAccess.createTeam(getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
                     sendTeam.put(i, sendUsernames.get(uuid));
                 }
 
                 updateSlot(uuid, text, line.ping, line.getSkin());
             }
 
-            for (Team removal : removals) {
-                getPlayer().unsafe().sendPacket(removal);
-            }
-
-            for (Team addition : additions) {
-                getPlayer().unsafe().sendPacket(addition);
-            }
-
             // update header/footer
-            PacketManager packetManager = BungeeTabListPlus.getInstance().getPacketManager();
-            if(packetManager.isTabHeaderFooterSupported()) {
+            if(packetAccess.isTabHeaderFooterSupported()) {
                 String header = tabList.getHeader();
                 if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
                     header = header.substring(0, header.length() - 1);
@@ -219,7 +194,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 if (header != null || footer != null) {
                     String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
                     String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
-                    packetManager.setTabHeaderAndFooter(player.unsafe(), headerJson, footerJson);
+                    packetAccess.setTabHeaderAndFooter(player.unsafe(), headerJson, footerJson);
                 }
             }
         }
@@ -243,19 +218,8 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
     }
 
     private void removeSlot(int i) {
-        PlayerListItem pli = new PlayerListItem();
-        pli.setAction(PlayerListItem.Action.REMOVE_PLAYER);
-        Item item = new Item();
-        UUID offlineId = java.util.UUID.nameUUIDFromBytes(
-                ("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
-        item.setUuid(offlineId);
-        item.setDisplayName(" ");
-        item.setGamemode(0);
-        item.setPing(0);
-        item.setUsername(getSlotID(i));
-        item.setProperties(new String[0][0]);
-        pli.setItems(new Item[]{item});
-        getPlayer().unsafe().sendPacket(pli);
+        UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
+        packetAccess.removePlayer(getPlayer().unsafe(), offlineId);
         send.remove(offlineId);
         sendTextures.remove(offlineId);
         sendPing.remove(offlineId);
@@ -268,34 +232,19 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
             textures = new String[]{textures[1], textures[2]};
         }
         // textures
-        if (!super.uuids.containsKey(offlineId) && ((sendTextures.get(offlineId) == null && textures != null) || (sendTextures.get(offlineId) != null && textures == null) || (textures != null && sendTextures.get(offlineId) != null && !textures[0].
-                equals(
-                        sendTextures.get(offlineId))))) {
+        if (!super.uuids.containsKey(offlineId) && ((sendTextures.get(offlineId) == null && textures != null) || (sendTextures.get(offlineId) != null && textures == null) || (textures != null && sendTextures.get(offlineId) != null && !textures[0].equals(sendTextures.get(offlineId))))) {
             // update texture
-            PlayerListItem pli = new PlayerListItem();
-            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-            Item item = new Item();
-            item.setUuid(offlineId);
-            item.setPing(ping);
-            item.setDisplayName(ComponentSerializer.toString(
-                    TextComponent.
-                            fromLegacyText(text)));
-
-            item.setUsername(sendUsernames.get(offlineId));
-            item.setGamemode(0);
+            String[][] properties;
             if (textures != null) {
-                item.setProperties(new String[][]{{"textures", textures[0],
-                        textures[1]
-                }});
-                sendTextures.put(offlineId, item.getProperties()[0][1]);
+                properties = new String[][]{{"textures", textures[0], textures[1]}};
+                sendTextures.put(offlineId, textures[0]);
             } else {
-                item.setProperties(new String[0][0]);
+                properties = new String[0][0];
                 sendTextures.remove(offlineId);
-
             }
-            pli.setItems(new Item[]{item});
-            getPlayer().unsafe().sendPacket(pli);
+            packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), offlineId, sendUsernames.get(offlineId), 0, ping, properties);
             textureUpdate = true;
+            sendPing.put(offlineId, 0);
         }
 
         // update ping
@@ -304,53 +253,20 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
         }
         if (ping != sendPing.get(offlineId)) {
             sendPing.put(offlineId, ping);
-            PlayerListItem pli = new PlayerListItem();
-            pli.setAction(PlayerListItem.Action.UPDATE_LATENCY);
-            Item item = new Item();
-            item.setUuid(offlineId);
-            item.setPing(ping);
-            item.setUsername(sendUsernames.get(offlineId));
-            item.setProperties(new String[0][0]);
-            pli.setItems(new Item[]{item});
-            getPlayer().unsafe().sendPacket(pli);
+            packetAccess.updatePing(getPlayer().unsafe(), offlineId, ping);
         }
 
         // update name
         String old = send.get(offlineId);
         if (textureUpdate || old == null || !old.equals(text) || super.uuids.containsKey(offlineId)) {
             send.put(offlineId, text);
-            PlayerListItem pli = new PlayerListItem();
-            pli.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
-            Item item = new Item();
-            item.setUuid(offlineId);
-            item.setPing(ping);
-            item.setDisplayName(ComponentSerializer.toString(TextComponent.
-                    fromLegacyText(text)));
-
-            item.setUsername(sendUsernames.get(offlineId));
-            item.setGamemode(0);
-            item.setProperties(new String[0][0]);
-            pli.setItems(new Item[]{item});
-            getPlayer().unsafe().sendPacket(pli);
-
+            packetAccess.updateDisplayName(getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
     }
 
     private void createSlot(int row) {
-        PlayerListItem pli = new PlayerListItem();
-        pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-        Item item = new Item();
-        UUID offlineId = java.util.UUID.nameUUIDFromBytes(
-                ("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-        item.setUuid(offlineId);
-        item.setDisplayName(ComponentSerializer.toString(TextComponent.
-                fromLegacyText(" ")));
-        item.setGamemode(0);
-        item.setPing(0);
-        item.setUsername(getSlotID(row));
-        item.setProperties(new String[0][0]);
-        pli.setItems(new Item[]{item});
-        getPlayer().unsafe().sendPacket(pli);
+        UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
+        packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
         sendPing.put(offlineId, 0);
         send.put(offlineId, null);
     }

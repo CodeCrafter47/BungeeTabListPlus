@@ -19,7 +19,7 @@
  *
  */
 
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;

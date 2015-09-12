@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_8;
 
+import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 
-public class TabHeaderPacket18 implements ITabHeaderPacket {
+public class TabHeaderPacketAccess18 implements PacketAccess.TabHeaderPacketAccess {
     @Override
     public void setTabHeaderFooter(Connection.Unsafe connection, String header, String footer) {
         Preconditions.checkNotNull(header, "header");

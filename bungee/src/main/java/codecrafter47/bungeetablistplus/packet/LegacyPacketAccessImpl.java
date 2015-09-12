@@ -18,27 +18,34 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package codecrafter47.bungeetablistplus.managers;
+package codecrafter47.bungeetablistplus.packet;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.packets.*;
+import codecrafter47.bungeetablistplus.packet.v1_6_4.PlayerListPacketAccess16;
+import codecrafter47.bungeetablistplus.packet.v1_6_4.TeamPacketAccess16;
+import codecrafter47.bungeetablistplus.packet.v1_7_10.NewPlayerListPacketAccess;
+import codecrafter47.bungeetablistplus.packet.v1_7_10.NewTeamPacketAccess;
+import codecrafter47.bungeetablistplus.packet.v1_7_2.OldPlayerListPacketAccess;
+import codecrafter47.bungeetablistplus.packet.v1_7_2.OldTeamPacketAccess;
+import codecrafter47.bungeetablistplus.packet.v1_8.legacy.PlayerListPacketAccess18;
+import codecrafter47.bungeetablistplus.packet.v1_8.legacy.TeamPacketAccess18;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.connection.Connection;
 
 /**
  * @author Florian Stober
  */
-public class LegacyPacketManager {
+public class LegacyPacketAccessImpl implements LegacyPacketAccess{
 
-    private ITeamPacket teamPacket;
-    private IPlayerListPacket playerListPacket;
+    private TeamPacketAccess teamPacket;
+    private PlayerListPacketAccess playerListPacket;
 
-    public LegacyPacketManager() {
+    public LegacyPacketAccessImpl() {
         Class clazz;
 
         if (BungeeTabListPlus.isVersion18()) {
-            teamPacket = new TeamPacket18();
-            playerListPacket = new PlayerListPacket18();
+            teamPacket = new TeamPacketAccess18();
+            playerListPacket = new PlayerListPacketAccess18();
         } else {
             try {
                 try {
@@ -52,15 +59,15 @@ public class LegacyPacketManager {
                         clazz.getMethod("setPlayers", String[].class);
                         try {
                             clazz.getMethod("setPlayerCount", short.class);
-                            teamPacket = new OldTeamPacket();
+                            teamPacket = new OldTeamPacketAccess();
                         } catch (NoSuchMethodException ex) {
-                            teamPacket = new NewTeamPacket();
+                            teamPacket = new NewTeamPacketAccess();
                         }
                     }
                 } catch (ClassNotFoundException ex) {
                     clazz = Class.forName(
                             "net.md_5.bungee.protocol.packet.PacketD1Team");
-                    teamPacket = new TeamPacket16(BungeeTabListPlus.getInstance().getLogger());
+                    teamPacket = new TeamPacketAccess16(BungeeTabListPlus.getInstance().getLogger());
                 }
             } catch (Throwable th) {
                 teamPacket = null;
@@ -75,15 +82,15 @@ public class LegacyPacketManager {
                         clazz.getMethod("setOnline", boolean.class);
                         try {
                             clazz.getMethod("setPing", short.class);
-                            playerListPacket = new OldPlayerListPacket();
+                            playerListPacket = new OldPlayerListPacketAccess();
                         } catch (NoSuchMethodException ex) {
-                            playerListPacket = new NewPlayerListPacket();
+                            playerListPacket = new NewPlayerListPacketAccess();
                         }
                     }
                 } catch (ClassNotFoundException ex) {
                     clazz = Class.forName(
                             "net.md_5.bungee.protocol.packet.PacketC9PlayerListItem");
-                    playerListPacket = new PlayerListPacket16();
+                    playerListPacket = new PlayerListPacketAccess16();
                 }
             } catch (Throwable th) {
                 playerListPacket = null;
@@ -91,11 +98,13 @@ public class LegacyPacketManager {
         }
     }
 
+    @Override
     public void createTeam(Connection.Unsafe connection, String player) {
         Preconditions.checkArgument(player.length() <= 13);
         teamPacket.createTeam(connection, player);
     }
 
+    @Override
     public void updateTeam(Connection.Unsafe connection, String player,
                            String prefix, String displayname, String suffix) {
         Preconditions.checkArgument(player.length() <= 13);
@@ -105,26 +114,31 @@ public class LegacyPacketManager {
         teamPacket.updateTeam(connection, player, prefix, displayname, suffix);
     }
 
+    @Override
     public void removeTeam(Connection.Unsafe connection, String player) {
         Preconditions.checkArgument(player.length() <= 13);
         teamPacket.removeTeam(connection, player);
     }
 
+    @Override
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
                                      int ping) {
         Preconditions.checkArgument(player.length() <= 16);
         playerListPacket.createOrUpdatePlayer(connection, player, ping);
     }
 
+    @Override
     public void removePlayer(Connection.Unsafe connection, String player) {
         Preconditions.checkArgument(player.length() <= 16);
         playerListPacket.removePlayer(connection, player);
     }
 
+    @Override
     public boolean isScoreboardSupported() {
         return teamPacket != null;
     }
 
+    @Override
     public boolean isTabModificationSupported() {
         return playerListPacket != null;
     }

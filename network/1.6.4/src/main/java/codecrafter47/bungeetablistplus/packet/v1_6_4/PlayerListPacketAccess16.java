@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.packets;
+package codecrafter47.bungeetablistplus.packet.v1_6_4;
 
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.protocol.packet.PacketC9PlayerListItem;
 
 /**
  * @author Florian Stober
  */
-public class PlayerListPacket16 implements IPlayerListPacket {
+public class PlayerListPacketAccess16 implements LegacyPacketAccess.PlayerListPacketAccess {
 
     @Override
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player, int ping) {
