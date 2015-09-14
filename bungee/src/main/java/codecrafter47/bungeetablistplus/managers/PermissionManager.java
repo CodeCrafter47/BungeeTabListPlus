@@ -137,13 +137,7 @@ public class PermissionManager {
                         if (g1 != null && g2 != null) {
                             int r1 = g1.getRank();
                             int r2 = g2.getRank();
-                            if (r1 > r2) {
-                                return -1;
-                            }
-                            if (r2 > r1) {
-                                return 1;
-                            }
-                            return 0;
+                            return r1 - r2;
                         }
                     }
                 }
@@ -154,24 +148,25 @@ public class PermissionManager {
 
         // BungeeCord
         if (p1 instanceof BungeePlayer && p2 instanceof BungeePlayer) {
-            int i = 0;
+            int r1 = 0;
             for (String group : ((BungeePlayer) p1).getPlayer().getGroups()) {
                 if (!group.equals("default")) {
-                    i = 1;
+                    r1 += 1;
+                }
+                if(group.equals("admin")) {
+                    r1 += 2;
                 }
             }
-            int j = 0;
+            int r2 = 0;
             for (String group : ((BungeePlayer) p2).getPlayer().getGroups()) {
                 if (!group.equals("default")) {
-                    j = 1;
+                    r2 += 1;
+                }
+                if(group.equals("admin")) {
+                    r2 += 2;
                 }
             }
-            if (i > j) {
-                return -1;
-            }
-            if (j > i) {
-                return 1;
-            }
+            return r1 - r2;
         }
         return 0;
     }
