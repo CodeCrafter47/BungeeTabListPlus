@@ -38,7 +38,7 @@ import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 
 import java.util.UUID;
 
-public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
+public class TabList18 implements TabListHandler {
 
     private static String getSlotID(int n) {
         String s = Integer.toString(n + 1000);
@@ -55,12 +55,14 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
 
     private final PacketAccess packetAccess = BungeeTabListPlus.getInstance().getPacketAccess();
 
-    public TabList18(ProxiedPlayer player) {
-        super(player);
+    private final PlayerTablistHandler playerTablistHandler;
+
+    public TabList18(PlayerTablistHandler playerTablistHandler) {
+        this.playerTablistHandler = playerTablistHandler;
     }
 
     @Override
-    public void sendTablist(ITabList tabList) {
+    public void sendTabList(ITabList tabList) {
         resize(tabList.getColumns() * tabList.getRows());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
@@ -73,9 +75,9 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
                 line = new Slot(" ", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
+                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()));
             text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(getPlayer(), text);
+                    replaceVariables(playerTablistHandler.getPlayer(), text);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);
@@ -106,7 +108,7 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
             if (header != null || footer != null) {
                 String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
                 String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
-                packetAccess.setTabHeaderAndFooter(player.unsafe(), headerJson, footerJson);
+                packetAccess.setTabHeaderAndFooter(playerTablistHandler.getPlayer().unsafe(), headerJson, footerJson);
             }
         }
     }
@@ -130,7 +132,7 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
 
     private void removeSlot(int i) {
         UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
-        packetAccess.removePlayer(getPlayer().unsafe(), uuid);
+        packetAccess.removePlayer(playerTablistHandler.getPlayer().unsafe(), uuid);
     }
 
     private void updateSlot(int row, String text, int ping, Skin skin) {
@@ -150,7 +152,7 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
                 properties = new String[0][0];
                 sendTextures[row] = null;
             }
-            packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), offlineId, getSlotID(row), 0, ping, properties);
+            packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, getSlotID(row), 0, ping, properties);
             textureUpdate = true;
             slots_ping[row] = ping;
         }
@@ -159,7 +161,7 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
         if (ping != slots_ping[row]) {
             slots_ping[row] = ping;
             UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-            packetAccess.updatePing(getPlayer().unsafe(), offlineId, ping);
+            packetAccess.updatePing(playerTablistHandler.getPlayer().unsafe(), offlineId, ping);
         }
 
         // update name
@@ -167,13 +169,13 @@ public class TabList18 extends CustomTabList18 implements PlayerTablistHandler {
         if (old == null || !old.equals(text) || textureUpdate) {
             send[row] = text;
             UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-            packetAccess.updateDisplayName(getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
+            packetAccess.updateDisplayName(playerTablistHandler.getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
     }
 
     private void createSlot(int row) {
         UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-        packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
+        packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
         send[row] = null;
         slots_ping[row] = 0;
         sendTextures[row] = null;

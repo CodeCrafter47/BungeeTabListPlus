@@ -27,12 +27,11 @@ import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-public class MyTabList extends CustomTabListHandler {
+public class MyTabList implements TabListHandler {
 
     private static final char[] FILLER = new char[]{'0', '1', '2', '2', '4',
             '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -44,9 +43,10 @@ public class MyTabList extends CustomTabListHandler {
     private final String[] slots = new String[ConfigManager.getTabSize()];
     private final int[] slots_ping = new int[ConfigManager.getTabSize()];
     private int rowLim;
+    private final PlayerTablistHandler playerTablistHandler;
 
-    public MyTabList(ProxiedPlayer player) {
-        init(player);
+    public MyTabList(PlayerTablistHandler playerTablistHandler) {
+        this.playerTablistHandler = playerTablistHandler;
     }
 
     private static char[] base(int n) {
@@ -63,7 +63,7 @@ public class MyTabList extends CustomTabListHandler {
     }
 
     @Override
-    public void sendTablist(ITabList tabList) {
+    public void sendTabList(ITabList tabList) {
         clear();
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
@@ -75,9 +75,9 @@ public class MyTabList extends CustomTabListHandler {
                 line = new Slot("", tabList.getDefaultPing());
             }
             line.text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
+                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()));
             line.text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(getPlayer(), line.text);
+                    replaceVariables(playerTablistHandler.getPlayer(), line.text);
             line.text = ChatColor.translateAlternateColorCodes('&', line.text);
             if (charLimit > 0) {
                 line.text = ColorParser.substringIgnoreColors(line.text,
@@ -159,7 +159,7 @@ public class MyTabList extends CustomTabListHandler {
         for (int i = 0; i < ConfigManager.getTabSize(); i++) {
             if (sent[i] != null) {
                 BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
-                        getPlayer().unsafe(), sent[i]);
+                        playerTablistHandler.getPlayer().unsafe(), sent[i]);
             }
             sent[i] = null;
         }
@@ -176,7 +176,7 @@ public class MyTabList extends CustomTabListHandler {
                     String line = sent[i];
                     sent[i] = null;
                     BungeeTabListPlus.getInstance().getLegacyPacketAccess().
-                            removePlayer(getPlayer().unsafe(), line);
+                            removePlayer(playerTablistHandler.getPlayer().unsafe(), line);
                     remove = true;
                 }
             }
@@ -189,7 +189,7 @@ public class MyTabList extends CustomTabListHandler {
                 sentStuff.add(line);
             }
             BungeeTabListPlus.getInstance().getLegacyPacketAccess().
-                    createOrUpdatePlayer(getPlayer().unsafe(), line,
+                    createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), line,
                             slots_ping[i]);
         }
     }

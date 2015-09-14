@@ -21,32 +21,47 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.packet.TeamPacket;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Action;
 import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
+import net.md_5.bungee.protocol.packet.Team;
 import net.md_5.bungee.tab.TabList;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Florian Stober
  */
-abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
-
+public class CustomTabList18 extends TabList implements PlayerTablistHandler {
+    protected TabListHandler tabListHandler;
     boolean isExcluded = false;
 
     final Collection<String> usernames = new HashSet<>();
     final Map<UUID, Item> uuids = new HashMap<>();
     private final List<String> bukkitplayers = new ArrayList<>(100);
+    private final Multimap<String, String> teamToPlayerMap = MultimapBuilder.hashKeys().arrayListValues().build();
+    private final ReentrantLock teamLock = new ReentrantLock();
+    private boolean allowTeamPackets = true;
 
-    CustomTabList18(ProxiedPlayer player) {
+    private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
+
+    public CustomTabList18(ProxiedPlayer player) {
         super(player);
     }
 
@@ -93,6 +108,12 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
             usernames.clear();
         }
         isExcluded = false;
+        teamLock.lock();
+        try {
+            teamToPlayerMap.clear();
+        } finally {
+            teamLock.unlock();
+        }
     }
 
     @Override
@@ -118,6 +139,7 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
                 }
             }
         }
+        setAllowTeamPackets(true);
     }
 
     @Override
@@ -240,5 +262,106 @@ abstract class CustomTabList18 extends TabList implements PlayerTablistHandler {
             }
         }
         return playerListItem;
+    }
+
+    @Override
+    public void sendTablist(ITabList tabList) {
+        if(tabListHandler instanceof TabList18){
+            if(tabList.getSize() < 80 || BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList){
+                setTabListHandler(new TabList18v3(this));
+            }
+        } else if(tabListHandler instanceof TabList18v3) {
+            if(tabList.getSize() >= 80 && !BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList){
+                setTabListHandler(new TabList18(this));
+            }
+        } else if(tabListHandler instanceof ScoreboardTabList){
+            if(!BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
+                setTabListHandler(new MyTabList(this));
+            }
+        } else if(tabListHandler instanceof MyTabList){
+            if(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
+                setTabListHandler(new ScoreboardTabList(this));
+            }
+        }
+        tabListHandler.sendTabList(tabList);
+    }
+
+    @Override
+    public void unload() {
+        tabListHandler.unload();
+    }
+
+    @Override
+    public void setTabListHandler(TabListHandler tabListHandler) {
+        if(this.tabListHandler != null){
+            this.tabListHandler.unload();
+        }
+        this.tabListHandler = tabListHandler;
+        if(tabListHandler instanceof TabList18v3){
+            setAllowTeamPackets(false);
+        } else {
+            setAllowTeamPackets(true);
+        }
+    }
+
+    public void onTeamPacket(Team packet) {
+        teamLock.lock();
+        try {
+            if (packet.getMode() == 0 || packet.getMode() == 3) {
+                // add players
+                Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches()).collect(Collectors.toSet());
+                if(!humanPlayers.isEmpty()){
+                    teamToPlayerMap.putAll(packet.getName(), humanPlayers);
+                    if(!allowTeamPackets){
+                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
+                        packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
+                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                    }
+                }
+            } else if (packet.getMode() == 4) {
+                // remove players
+                Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches()).collect(Collectors.toSet());
+                if(!humanPlayers.isEmpty()){
+                    for (String humanPlayer : humanPlayers) {
+                        teamToPlayerMap.remove(packet.getName(), humanPlayer);
+                    }
+                    if(!allowTeamPackets){
+                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
+                        packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
+                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                    }
+                }
+            } else if (packet.getMode() == 1) {
+                teamToPlayerMap.removeAll(packet.getName());
+            }
+        } finally {
+            teamLock.unlock();
+        }
+    }
+
+    public void setAllowTeamPackets(boolean allowTeamPackets){
+        teamLock.lock();
+        try {
+            if(allowTeamPackets != this.allowTeamPackets){
+                if(allowTeamPackets){
+                    // send all missing players
+                    for (Entry<String, Collection<String>> entry : teamToPlayerMap.asMap().entrySet()) {
+                        Team team = new Team(entry.getKey());
+                        team.setMode((byte) 3);
+                        team.setPlayers(entry.getValue().toArray(new String[entry.getValue().size()]));
+                    }
+                } else {
+                    // remove players
+                    for (Entry<String, Collection<String>> entry : teamToPlayerMap.asMap().entrySet()) {
+                        Team team = new Team(entry.getKey());
+                        team.setMode((byte) 4);
+                        team.setPlayers(entry.getValue().toArray(new String[entry.getValue().size()]));
+                    }
+                }
+            }
+            this.allowTeamPackets = allowTeamPackets;
+        } finally {
+            teamLock.unlock();
+        }
     }
 }

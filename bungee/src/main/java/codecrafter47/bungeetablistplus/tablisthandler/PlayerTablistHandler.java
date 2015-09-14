@@ -42,4 +42,6 @@ public interface PlayerTablistHandler {
     ProxiedPlayer getPlayer();
 
     List<IPlayer> getPlayers();
+
+    void setTabListHandler(TabListHandler tabListHandler);
 }

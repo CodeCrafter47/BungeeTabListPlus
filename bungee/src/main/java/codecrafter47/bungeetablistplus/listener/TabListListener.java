@@ -40,31 +40,41 @@ public class TabListListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PostLoginEvent e) throws NoSuchFieldException,
-            IllegalArgumentException, IllegalAccessException {
-        Object tab;
-        if (!BungeeTabListPlus.isVersion18()) {
-            if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
-                tab = new MyTabList(e.getPlayer());
+    public void onPlayerJoin(PostLoginEvent e) {
+        try {
+            PlayerTablistHandler tab;
+            TabListHandler handler;
+            if (!BungeeTabListPlus.isVersion18()) {
+                tab = new CustomTabListHandler(e.getPlayer());
+                if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
+                    handler = new MyTabList(tab);
+                } else {
+                    handler = new ScoreboardTabList(tab);
+                }
             } else {
-                tab = new ScoreboardTabList(e.getPlayer());
+                tab = new CustomTabList18(e.getPlayer());
+                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(e.getPlayer()) < 47) {
+                    if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
+                        handler = new MyTabList(tab);
+                    } else {
+                        handler = new ScoreboardTabList(tab);
+                    }
+                } else if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
+                    handler = new TabList18(tab);
+                } else {
+                    handler = new TabList18v3((CustomTabList18) tab);
+                }
             }
-        } else {
-            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(e.getPlayer()) < 47) {
-                tab = new TabList17(e.getPlayer());
-            } else if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
-                tab = new TabList18(e.getPlayer());
-            } else {
-                tab = new TabList18v3(e.getPlayer());
-            }
-        }
-        ProxiedPlayer player = e.getPlayer();
-        BungeeTabListPlus.setTabList(player, tab);
+            tab.setTabListHandler(handler);
+            BungeeTabListPlus.setTabList(e.getPlayer(), tab);
 
-        if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
-            plugin.resendTabLists();
+            if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
+                plugin.resendTabLists();
+            }
+            plugin.sendImmediate(e.getPlayer());
+        } catch (Throwable th){
+            BungeeTabListPlus.getInstance().reportError(th);
         }
-        plugin.sendImmediate(e.getPlayer());
     }
 
     @EventHandler

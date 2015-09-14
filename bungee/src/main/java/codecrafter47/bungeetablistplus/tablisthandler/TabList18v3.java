@@ -42,7 +42,7 @@ import net.md_5.bungee.protocol.packet.Team;
 import java.util.*;
 import java.util.logging.Level;
 
-public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler {
+public class TabList18v3 implements TabListHandler {
 
     private static String getSlotID(int n) {
         return getSlotPrefix(n) + " ?tab";
@@ -66,13 +66,15 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
 
     private final PacketAccess packetAccess = BungeeTabListPlus.getInstance().getPacketAccess();
 
-    public TabList18v3(ProxiedPlayer player) {
-        super(player);
+    private final CustomTabList18 playerTabListHandler;
+
+    public TabList18v3(CustomTabList18 playerTabListHandler) {
+        this.playerTabListHandler = playerTabListHandler;
     }
 
     @Override
-    public void sendTablist(ITabList tabList) {
-        synchronized (super.usernames) {
+    public void sendTabList(ITabList tabList) {
+        synchronized (playerTabListHandler.usernames) {
             tabList = tabList.flip();
 
             int numFakePlayers = 80;
@@ -84,15 +86,15 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                     tabList = tabList.flip();
                 }
                 tab_size = tabList.getUsedSlots();
-                if (tab_size < super.uuids.size()) {
-                    tab_size = super.uuids.size();
+                if (tab_size < playerTabListHandler.uuids.size()) {
+                    tab_size = playerTabListHandler.uuids.size();
                 }
             }
 
             if (tab_size < 80) {
-                numFakePlayers = tab_size - super.uuids.size();
+                numFakePlayers = tab_size - playerTabListHandler.uuids.size();
                 if (numFakePlayers < 0) {
-                    BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", getPlayer().getName());
+                    BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", playerTabListHandler.getPlayer().getName());
                 }
             }
 
@@ -102,11 +104,11 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                     getMainConfig().charLimit;
 
             // create uuidList
-            List<UUID> list = new ArrayList<>(super.uuids.keySet());
+            List<UUID> list = new ArrayList<>(playerTabListHandler.uuids.keySet());
 
             sendUsernames.clear();
             for (UUID uuid : list) {
-                sendUsernames.put(uuid, super.uuids.get(uuid).getUsername());
+                sendUsernames.put(uuid, playerTabListHandler.uuids.get(uuid).getUsername());
             }
 
             List<UUID> fakeUUIDs = new ArrayList<>();
@@ -122,9 +124,9 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                     line = new Slot(" ", tabList.getDefaultPing());
                 }
                 String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(super.getPlayer()));
+                        replacePlayerVariables(playerTabListHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTabListHandler.getPlayer()));
                 text = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replaceVariables(getPlayer(), text);
+                        replaceVariables(playerTabListHandler.getPlayer(), text);
                 text = ChatColor.translateAlternateColorCodes('&', text);
                 if (charLimit > 0) {
                     text = ColorParser.substringIgnoreColors(text, charLimit);
@@ -142,7 +144,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
 
                 UUID uuid = null;
                 boolean reorder = true;
-                if (line.getSkin().getOwner() != null && list.contains(line.getSkin().getOwner()) && (((UserConnection) getPlayer()).getGamemode() != 3 || !Objects.equals(line.getSkin().getOwner(), getPlayer().getUniqueId()))) {
+                if (line.getSkin().getOwner() != null && list.contains(line.getSkin().getOwner()) && (((UserConnection) playerTabListHandler.getPlayer()).getGamemode() != 3 || !Objects.equals(line.getSkin().getOwner(), playerTabListHandler.getPlayer().getUniqueId()))) {
                     uuid = line.getSkin().getOwner();
                     list.remove(uuid);
                 }
@@ -153,7 +155,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 if (uuid == null) {
                     for (int j = 0; j < list.size(); j++) {
                         uuid = list.get(0);
-                        if (!(Objects.equals(uuid, getPlayer().getUniqueId()) && ((UserConnection) getPlayer()).getGamemode() == 3)) {
+                        if (!(Objects.equals(uuid, playerTabListHandler.getPlayer().getUniqueId()) && ((UserConnection) playerTabListHandler.getPlayer()).getGamemode() == 3)) {
                             list.remove(uuid);
                             reorder = false;
                             break;
@@ -169,12 +171,12 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 String oldPlayer = sendTeam.get(i);
                 if (oldPlayer != null) {
                     if (!oldPlayer.equals(sendUsernames.get(uuid))) {
-                        packetAccess.removePlayerFromTeam(getPlayer().unsafe(), getSlotID(i), oldPlayer);
-                        packetAccess.addPlayerToTeam(getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
+                        packetAccess.removePlayerFromTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(i), oldPlayer);
+                        packetAccess.addPlayerToTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
                         sendTeam.put(i, sendUsernames.get(uuid));
                     }
                 } else {
-                    packetAccess.createTeam(getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
+                    packetAccess.createTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
                     sendTeam.put(i, sendUsernames.get(uuid));
                 }
 
@@ -194,7 +196,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 if (header != null || footer != null) {
                     String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
                     String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
-                    packetAccess.setTabHeaderAndFooter(player.unsafe(), headerJson, footerJson);
+                    packetAccess.setTabHeaderAndFooter(playerTabListHandler.getPlayer().unsafe(), headerJson, footerJson);
                 }
             }
         }
@@ -219,7 +221,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
 
     private void removeSlot(int i) {
         UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
-        packetAccess.removePlayer(getPlayer().unsafe(), offlineId);
+        packetAccess.removePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId);
         send.remove(offlineId);
         sendTextures.remove(offlineId);
         sendPing.remove(offlineId);
@@ -232,7 +234,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
             textures = new String[]{textures[1], textures[2]};
         }
         // textures
-        if (!super.uuids.containsKey(offlineId) && ((sendTextures.get(offlineId) == null && textures != null) || (sendTextures.get(offlineId) != null && textures == null) || (textures != null && sendTextures.get(offlineId) != null && !textures[0].equals(sendTextures.get(offlineId))))) {
+        if (!playerTabListHandler.uuids.containsKey(offlineId) && ((sendTextures.get(offlineId) == null && textures != null) || (sendTextures.get(offlineId) != null && textures == null) || (textures != null && sendTextures.get(offlineId) != null && !textures[0].equals(sendTextures.get(offlineId))))) {
             // update texture
             String[][] properties;
             if (textures != null) {
@@ -242,7 +244,7 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
                 properties = new String[0][0];
                 sendTextures.remove(offlineId);
             }
-            packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), offlineId, sendUsernames.get(offlineId), 0, ping, properties);
+            packetAccess.createOrUpdatePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId, sendUsernames.get(offlineId), 0, ping, properties);
             textureUpdate = true;
             sendPing.put(offlineId, 0);
         }
@@ -253,20 +255,20 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
         }
         if (ping != sendPing.get(offlineId)) {
             sendPing.put(offlineId, ping);
-            packetAccess.updatePing(getPlayer().unsafe(), offlineId, ping);
+            packetAccess.updatePing(playerTabListHandler.getPlayer().unsafe(), offlineId, ping);
         }
 
         // update name
         String old = send.get(offlineId);
-        if (textureUpdate || old == null || !old.equals(text) || super.uuids.containsKey(offlineId)) {
+        if (textureUpdate || old == null || !old.equals(text) || playerTabListHandler.uuids.containsKey(offlineId)) {
             send.put(offlineId, text);
-            packetAccess.updateDisplayName(getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
+            packetAccess.updateDisplayName(playerTabListHandler.getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
     }
 
     private void createSlot(int row) {
         UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-        packetAccess.createOrUpdatePlayer(getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
+        packetAccess.createOrUpdatePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
         sendPing.put(offlineId, 0);
         send.put(offlineId, null);
     }
@@ -274,5 +276,10 @@ public class TabList18v3 extends CustomTabList18 implements PlayerTablistHandler
     @Override
     public void unload() {
         resize(0);
+        sendTeam.forEachKey(value -> {
+            packetAccess.removeTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(value));
+            return true;
+        });
+        sendTeam.clear();
     }
 }

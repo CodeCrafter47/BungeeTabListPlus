@@ -2,9 +2,11 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.tab.TabListAdapter;
 
 import java.util.ArrayList;
@@ -15,12 +17,25 @@ import java.util.List;
 /**
  * @author Florian Stober
  */
-abstract public class CustomTabListHandler extends TabListAdapter implements PlayerTablistHandler {
+public class CustomTabListHandler extends TabListAdapter implements PlayerTablistHandler {
 
     boolean isExcluded = false;
 
     private final Collection<String> usernames = new HashSet<>();
     public final List<String> bukkitplayers = new ArrayList<>(100);
+
+    private TabListHandler tabListHandler;
+
+    public CustomTabListHandler(ProxiedPlayer player) {
+        init(player);
+    }
+
+    public void setTabListHandler(TabListHandler tabListHandler) {
+        if(this.tabListHandler != null){
+            this.tabListHandler.unload();
+        }
+        this.tabListHandler = tabListHandler;
+    }
 
     @Override
     public void onServerChange() {
@@ -91,8 +106,27 @@ abstract public class CustomTabListHandler extends TabListAdapter implements Pla
     }
 
     @Override
+    public void sendTablist(ITabList tabList) {
+        if(tabListHandler instanceof ScoreboardTabList){
+            if(!BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
+                setTabListHandler(new MyTabList(this));
+            }
+        } else if(tabListHandler instanceof MyTabList){
+            if(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
+                setTabListHandler(new ScoreboardTabList(this));
+            }
+        }
+        tabListHandler.sendTabList(tabList);
+    }
+
+    @Override
     public boolean isExcluded() {
         return isExcluded;
+    }
+
+    @Override
+    public void unload() {
+        tabListHandler.unload();
     }
 
     @Override

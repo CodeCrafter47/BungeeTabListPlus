@@ -22,6 +22,7 @@
 package codecrafter47.bungeetablistplus.packet;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -33,9 +34,6 @@ import net.md_5.bungee.protocol.packet.Team;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
-/**
- * Created by florian on 15.06.15.
- */
 public class TeamPacket extends Team {
     private static Field playerField = null;
 
@@ -63,14 +61,9 @@ public class TeamPacket extends Team {
                     BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
                     return;
                 }
-                if (BungeeTabListPlus.getTabList(player) instanceof TabList18v3) {
-                    Server server = player.getServer();
-                    if (server != null) {
-                        BungeeTabListPlus.getInstance().getLogger().warning("Server " + server.getInfo().getName() + " uses Scoreboard teams. This feature is not compatible with BungeeTabListPlus.");
-                    } else {
-                        BungeeTabListPlus.getInstance().getLogger().warning("Player " + player.getName() + " received a Scoreboard team packet. This feature is not compatible with BungeeTabListPlus.");
-                    }
-                    throw CancelSendSignal.INSTANCE;
+                Object tabList = BungeeTabListPlus.getTabList(player);
+                if (tabList instanceof CustomTabList18) {
+                    ((CustomTabList18)tabList).onTeamPacket(this);
                 }
             } else {
                 BungeeTabListPlus.getInstance().getLogger().severe("Could not get player for " + handler);
