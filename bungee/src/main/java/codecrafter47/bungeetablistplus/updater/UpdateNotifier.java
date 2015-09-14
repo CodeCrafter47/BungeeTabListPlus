@@ -58,6 +58,7 @@ public class UpdateNotifier implements Runnable {
                         create());
             }
         }
+        plugin.getLogger().info("A new version of BungeeTabListPlus is available. Download from http://www.spigotmc.org/resources/bungeetablistplus.313/");
     }
 
     private ComponentBuilder getPrefix() {
