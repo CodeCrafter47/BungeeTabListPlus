@@ -46,6 +46,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.protocol.Protocol;
+import net.md_5.bungee.protocol.ProtocolConstants;
+import net.md_5.bungee.protocol.packet.Team;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -56,6 +58,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Main Class of BungeeTabListPlus
@@ -278,11 +281,32 @@ public class BungeeTabListPlus {
 
         if (isVersion18()) {
             try {
+                List<Integer> supportedProtocolVersions = Arrays.stream(ProtocolConstants.class.getDeclaredFields()).filter(f -> (f.getModifiers() & 8) != 0).filter(f -> f.getType() == int.class).map(f -> {
+                    try {
+                        f.setAccessible(true);
+                        return f.getInt(null);
+                    } catch (IllegalAccessException e) {
+                        reportError(e);
+                        return 0;
+                    }
+                }).collect(Collectors.toList());
                 // register team packet
-                Class clazz = Protocol.DirectionData.class;
-                Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, Class.class);
-                registerPacket.setAccessible(true);
-                registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, TeamPacket.class);
+                int maxProtocolVersion = supportedProtocolVersions.stream().mapToInt(Integer::intValue).max().getAsInt();
+                if(maxProtocolVersion > 47){
+                    // 1.9
+                    Class clazz = Protocol.DirectionData.class;
+                    Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, int.class, Class.class);
+                    Method getId = clazz.getDeclaredMethod("getId", Class.class, int.class);
+                    getId.setAccessible(true);
+                    registerPacket.setAccessible(true);
+                    registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, getId.invoke(Protocol.GAME.TO_CLIENT, Team.class, maxProtocolVersion), TeamPacket.class);
+                } else {
+                    // 1.8
+                    Class clazz = Protocol.DirectionData.class;
+                    Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, Class.class);
+                    registerPacket.setAccessible(true);
+                    registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, TeamPacket.class);
+                }
             } catch (IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException ex) {
                 getLogger().log(Level.SEVERE, "Failed to hook team packet", ex);
             }
