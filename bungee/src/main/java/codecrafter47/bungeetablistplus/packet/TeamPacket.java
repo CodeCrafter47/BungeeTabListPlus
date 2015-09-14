@@ -50,26 +50,50 @@ public class TeamPacket extends Team {
 
     @Override
     public void handle(AbstractPacketHandler handler) throws Exception {
-        if (handler instanceof DownstreamBridge) {
-            getPlayerField(DownstreamBridge.class);
-            if (playerField != null) {
-                ProxiedPlayer player;
-                try {
-                    playerField.setAccessible(true);
-                    player = (ProxiedPlayer) playerField.get(handler);
-                } catch (IllegalAccessException ex) {
-                    BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
-                    return;
+        boolean modified = false;
+        ProxiedPlayer player = null;
+        try {
+            if (handler instanceof DownstreamBridge) {
+                getPlayerField(DownstreamBridge.class);
+                if (playerField != null) {
+                    try {
+                        playerField.setAccessible(true);
+                        player = (ProxiedPlayer) playerField.get(handler);
+                    } catch (IllegalAccessException ex) {
+                        BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
+                    }
+                    if (player != null) {
+                        Object tabList = BungeeTabListPlus.getTabList(player);
+                        if (tabList instanceof CustomTabList18) {
+                            modified = ((CustomTabList18) tabList).onTeamPacket(this);
+                        }
+                    }
+                } else {
+                    BungeeTabListPlus.getInstance().getLogger().severe("Could not get player for " + handler);
                 }
-                Object tabList = BungeeTabListPlus.getTabList(player);
-                if (tabList instanceof CustomTabList18) {
-                    ((CustomTabList18)tabList).onTeamPacket(this);
-                }
-            } else {
-                BungeeTabListPlus.getInstance().getLogger().severe("Could not get player for " + handler);
             }
+        } catch (Throwable th){
+            BungeeTabListPlus.getInstance().reportError(th);
         }
-        super.handle(handler);
+        try {
+            super.handle(handler);
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
+        }
+        try {
+            if(modified){
+                if(player != null){
+                    player.unsafe().sendPacket(this);
+                    throw CancelSendSignal.INSTANCE;
+                } else {
+                    BungeeTabListPlus.getInstance().getLogger().severe("Packet " + this + " has been modified but player is null");
+                }
+            }
+        } catch (CancelSendSignal e){
+            throw e;
+        } catch (Throwable th){
+            BungeeTabListPlus.getInstance().reportError(th);
+        }
     }
 
     private static Field getPlayerField(Class<?> clazz) {

@@ -304,7 +304,13 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
         }
     }
 
-    public void onTeamPacket(Team packet) {
+    /**
+     * listener method to team packets sent to the client
+     * @param packet the packet
+     * @return whether the packet has been modified
+     */
+    public boolean onTeamPacket(Team packet) {
+        boolean modified = false;
         teamLock.lock();
         try {
             if (packet.getMode() == 0 || packet.getMode() == 3) {
@@ -316,6 +322,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
                         packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                        modified = true;
                     }
                 }
             } else if (packet.getMode() == 4) {
@@ -329,6 +336,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
                         packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                        modified = true;
                     }
                 }
             } else if (packet.getMode() == 1) {
@@ -337,6 +345,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
         } finally {
             teamLock.unlock();
         }
+        return modified;
     }
 
     public void setAllowTeamPackets(boolean allowTeamPackets){
