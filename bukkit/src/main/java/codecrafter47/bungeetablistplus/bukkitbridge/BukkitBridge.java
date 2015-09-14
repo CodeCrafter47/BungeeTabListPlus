@@ -125,7 +125,7 @@ public class BukkitBridge implements Listener {
     }
 
     private void updateDataHooks() {
-        playerDataAggregator = new PlayerDataAggregator(plugin.getLogger()) {
+        playerDataAggregator = new PlayerDataAggregator(plugin) {
             @Override
             protected void init() {
                 super.init();
