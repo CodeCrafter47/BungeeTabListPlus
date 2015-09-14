@@ -100,11 +100,8 @@ public class ConfigManager {
         this.config = config;
     }
 
-    // TODO optimize
     public static int getTabSize() {
-        //return ProxyServer.getInstance().getConfigurationAdapter().getInt("listeners.tab_size", 60);
-        return ProxyServer.getInstance().getConfigurationAdapter().
-                getListeners().iterator().next().getTabListSize();
+        return ProxyServer.getInstance().getConfig().getListeners().iterator().next().getTabListSize();
     }
 
     public static int getCols() {
