@@ -102,6 +102,14 @@ public class TabListManager implements Listener {
             return;
         }
 
+        if (showTo.equalsIgnoreCase("1.7")) {
+            return;
+        }
+
+        if (showTo.equalsIgnoreCase("1.8")) {
+            return;
+        }
+
         String s[] = showTo.split(":");
 
         if (s.length != 2) {
@@ -157,7 +165,7 @@ public class TabListManager implements Listener {
 
     private void invalidShowTo(TabListConfig config) {
         plugin.getLogger().log(
-                Level.WARNING, "{0}{1}: showTo is partly or completly invalid",
+                Level.WARNING, "{0}{1}: showTo is partly or completely invalid",
                 new Object[]{ChatColor.RED,
                         config.getFileName()});
     }
