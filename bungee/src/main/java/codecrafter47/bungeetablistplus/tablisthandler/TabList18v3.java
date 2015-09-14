@@ -81,7 +81,7 @@ public class TabList18v3 implements TabListHandler {
 
             int tab_size = tabList.getRows() * tabList.getColumns();
 
-            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList) {
+            if (tabList.shouldShrink()) {
                 if (tabList.flip().getUsedSlots() < tabList.getUsedSlots()) {
                     tabList = tabList.flip();
                 }

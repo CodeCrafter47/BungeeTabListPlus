@@ -71,6 +71,10 @@ public class TabListProvider implements ITabListProvider {
             tabList = tabList.flip();
         }
 
+        if(config.autoShrinkTabList){
+            tabList.setShouldShrink(true);
+        }
+
         List<Section> topSections = new ArrayList<>(top);
         List<Section> botSections = new ArrayList<>(bot);
 

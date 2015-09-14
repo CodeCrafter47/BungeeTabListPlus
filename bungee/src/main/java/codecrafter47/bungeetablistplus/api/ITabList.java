@@ -57,4 +57,8 @@ public interface ITabList {
     void setDefaultSkin(Skin defaultSkin);
 
     ITabList flip();
+
+    boolean shouldShrink();
+
+    void setShouldShrink(boolean shouldShrink);
 }

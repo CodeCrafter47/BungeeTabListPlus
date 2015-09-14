@@ -44,6 +44,7 @@ public class TabList implements ITabList {
     private Skin defaultSkin;
     private int defaultPing;
     private int size;
+    private boolean shouldShrink;
 
     @Override
     public String getHeader() {
@@ -74,6 +75,7 @@ public class TabList implements ITabList {
         header = null;
         footer = null;
         size = rows * columns;
+        shouldShrink = false;
     }
 
     public TabList() {
@@ -145,5 +147,15 @@ public class TabList implements ITabList {
     @Override
     public ITabList flip() {
         return new FlippedTabList(this);
+    }
+
+    @Override
+    public boolean shouldShrink() {
+        return shouldShrink;
+    }
+
+    @Override
+    public void setShouldShrink(boolean shouldShrink) {
+        this.shouldShrink = shouldShrink;
     }
 }

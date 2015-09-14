@@ -267,11 +267,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
     @Override
     public void sendTablist(ITabList tabList) {
         if(tabListHandler instanceof TabList18){
-            if(tabList.getSize() < 80 || BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList){
+            if(tabList.getSize() < 80 || tabList.shouldShrink()){
                 setTabListHandler(new TabList18v3(this));
             }
         } else if(tabListHandler instanceof TabList18v3) {
-            if(tabList.getSize() >= 80 && !BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoShrinkTabList){
+            if(tabList.getSize() >= 80 && !tabList.shouldShrink()){
                 setTabListHandler(new TabList18(this));
             }
         } else if(tabListHandler instanceof ScoreboardTabList){

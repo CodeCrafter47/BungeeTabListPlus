@@ -81,6 +81,16 @@ public class TabListConfig extends Config {
     public boolean showCorrectPlayerSkins = true;
 
     @Comments({
+            "1.8 ONLY",
+            "When enabled the tablist will adjust it's size to the number of players online/ slots used, instead of using",
+            "the static tab_size set in bungee's config.yml.",
+            "WARNING: This is an experimental feature an will most likely cause bugs",
+            "WARNING: [ALIGN=LEFT] and other formatting tags will not operate correctly",
+            "WARNING: If this is enabled it is STRONGLY recommended to also enable verticalMode"
+    })
+    public boolean autoShrinkTabList = false;
+
+    @Comments({
             "how Players should be grouped",
             "You can use 'SERVER' or 'NONE'"
     })

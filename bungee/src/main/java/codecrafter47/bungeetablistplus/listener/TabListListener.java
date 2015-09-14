@@ -59,7 +59,7 @@ public class TabListListener implements Listener {
                     } else {
                         handler = new ScoreboardTabList(tab);
                     }
-                } else if (ConfigManager.getTabSize() >= 80 && !plugin.getConfigManager().getMainConfig().autoShrinkTabList) {
+                } else if (ConfigManager.getTabSize() >= 80) {
                     handler = new TabList18(tab);
                 } else {
                     handler = new TabList18v3((CustomTabList18) tab);

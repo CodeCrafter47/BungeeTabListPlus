@@ -121,4 +121,14 @@ public class FlippedTabList implements ITabList {
     public ITabList flip() {
         return tabList;
     }
+
+    @Override
+    public boolean shouldShrink() {
+        return tabList.shouldShrink();
+    }
+
+    @Override
+    public void setShouldShrink(boolean shouldShrink) {
+        tabList.setShouldShrink(shouldShrink);
+    }
 }
