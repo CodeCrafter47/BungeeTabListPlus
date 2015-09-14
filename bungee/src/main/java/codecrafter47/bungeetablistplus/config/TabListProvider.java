@@ -86,7 +86,7 @@ public class TabListProvider implements ITabListProvider {
         // remove empty sections
         for (Iterator<Section> iterator = topSections.iterator(); iterator.hasNext(); ) {
             Section topSection = iterator.next();
-            if(topSection.getMinSize() == 0){
+            if(topSection.getMaxSize() == 0){
                 iterator.remove();
             }
         }
