@@ -21,101 +21,107 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
+import lombok.SneakyThrows;
+
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.function.ToIntFunction;
 
 public class TablistLayoutManager<Section extends LayoutSection> {
 
+    @SneakyThrows
     public Layout<Section> calculateLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) {
+        try {
+            int topMax = calculateSizeTop(topSections, context, LayoutSection::getMaxSize);
+            int topMin = calculateSizeTop(topSections, context, LayoutSection::getMinSize);
 
-        int topMax = calculateSizeTop(topSections, context, LayoutSection::getMaxSize);
-        int topMin = calculateSizeTop(topSections, context, LayoutSection::getMinSize);
+            int bottomMax = calculateSizeBottom(bottomSections, context, LayoutSection::getMaxSize);
+            int bottomMin = calculateSizeBottom(bottomSections, context, LayoutSection::getMinSize);
 
-        int bottomMax = calculateSizeBottom(bottomSections, context, LayoutSection::getMaxSize);
-        int bottomMin = calculateSizeBottom(bottomSections, context, LayoutSection::getMinSize);
+            // determine how much space top and bottom sections get
+            int bottomSize = bottomMin;
+            {
+                int left = context.getTabSize() - topMin - bottomMin;
 
-        // determine how much space top and bottom sections get
-        int bottomSize = bottomMin;
-        {
-            int left = context.getTabSize() - topMin - bottomMin;
+                if (left > 0) {
+                    int top_diff = topMax - topMin;
+                    int bot_diff = bottomMax - bottomMin;
+                    int avrg = left / 2;
 
-            if (left > 0) {
-                int top_diff = topMax - topMin;
-                int bot_diff = bottomMax - bottomMin;
-                int avrg = left / 2;
+                    if (top_diff + bot_diff < left) {
+                        bottomSize = bottomMax;
+                    } else if (top_diff < avrg) {
+                        bottomSize += left - top_diff;
+                    } else if (bot_diff < avrg) {
+                        bottomSize += bot_diff;
+                    } else {
+                        bottomSize += avrg;
+                    }
+                } else if (left < 0) {
+                    // TODO
+                    throw new IllegalStateException("Too much content for tab list");
+                }
+            }
 
-                if (top_diff + bot_diff < left) {
-                    bottomSize = bottomMax;
-                } else if (top_diff < avrg) {
-                    bottomSize += left - top_diff;
-                } else if (bot_diff < avrg) {
-                    bottomSize += bot_diff;
+            Layout<Section> layout = new Layout<>(context.getRows(), context.getColumns());
+
+            // calc bottom sections
+            int pos = context.getTabSize();
+            int availableAdditionalSpace = bottomSize - bottomMin;
+            for (int i = bottomSections.size() - 1; i >= 0; i--) {
+                Section section = bottomSections.get(i);
+                int additionalSpace = 0;
+                if (!section.isSizeConstant() && availableAdditionalSpace > 0) {
+                    additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (bottomMax - bottomMin);
+                }
+                int size = section.getMinSize() + additionalSpace;
+                OptionalInt startColumn = section.getStartColumn();
+                if (startColumn.isPresent()) {
+                    size += calculateSpace(startColumn.getAsInt(), pos - size, context);
+                }
+                availableAdditionalSpace -= (size - section.getMinSize());
+                pos -= size;
+                size = section.getEffectiveSize(size);
+                layout.placeSection(section, pos, size);
+            }
+
+            // fix topSize
+            int topSize = pos;
+            int bottomStart = pos;
+            pos = 0;
+            availableAdditionalSpace = topSize - topMin;
+            // calc top sections
+            for (int i = 0; i < topSections.size(); i++) {
+                Section section = topSections.get(i);
+                int additionalSpace = 0;
+                if (!section.isSizeConstant() && availableAdditionalSpace > 0 && topMax - topMin > 0) {
+                    additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (topMax - topMin);
+                }
+                int size = section.getMinSize() + additionalSpace;
+                if (i + 1 < topSections.size()) {
+                    OptionalInt nextStartColumn = topSections.get(i + 1).getStartColumn();
+                    if (nextStartColumn.isPresent()) {
+                        size += calculateSpace(pos + size, nextStartColumn.getAsInt(), context);
+                    }
                 } else {
-                    bottomSize += avrg;
+                    size += calculateSpace(pos + size, bottomStart, context);
                 }
-            } else if(left < 0) {
-                // TODO
-                throw new IllegalStateException("Too much content for tab list");
-            }
-        }
-
-        Layout<Section> layout = new Layout<>(context.getRows(), context.getColumns());
-
-        // calc bottom sections
-        int pos = context.getTabSize();
-        int availableAdditionalSpace = bottomSize - bottomMin;
-        for (int i = bottomSections.size() - 1; i >= 0; i--) {
-            Section section = bottomSections.get(i);
-            int additionalSpace = 0;
-            if(!section.isSizeConstant() && availableAdditionalSpace > 0) {
-                additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (bottomMax - bottomMin);
-            }
-            int size = section.getMinSize() + additionalSpace;
-            OptionalInt startColumn = section.getStartColumn();
-            if(startColumn.isPresent()){
-                size += calculateSpace(startColumn.getAsInt(), pos - size, context);
-            }
-            availableAdditionalSpace -= (size - section.getMinSize());
-            pos -= size;
-            size = section.getEffectiveSize(size);
-            layout.placeSection(section, pos, size);
-        }
-
-        // fix topSize
-        int topSize = pos;
-        int bottomStart = pos;
-        pos = 0;
-        availableAdditionalSpace = topSize - topMin;
-        // calc top sections
-        for (int i = 0; i < topSections.size(); i++) {
-            Section section = topSections.get(i);
-            int additionalSpace = 0;
-            if (!section.isSizeConstant() && availableAdditionalSpace > 0 && topMax - topMin > 0) {
-                additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (topMax - topMin);
-            }
-            int size = section.getMinSize() + additionalSpace;
-            if(i + 1 < topSections.size()) {
-                OptionalInt nextStartColumn = topSections.get(i + 1).getStartColumn();
-                if (nextStartColumn.isPresent()) {
-                    size += calculateSpace(pos + size, nextStartColumn.getAsInt(), context);
+                size = section.getEffectiveSize(size);
+                int space = 0;
+                OptionalInt startColumn = section.getStartColumn();
+                if (startColumn.isPresent()) {
+                    space = calculateSpace(pos, startColumn.getAsInt(), context);
                 }
-            } else {
-                size += calculateSpace(pos + size, bottomStart, context);
+                pos += space;
+                availableAdditionalSpace -= space;
+                layout.placeSection(section, pos, size);
+                pos += size;
+                availableAdditionalSpace -= size - section.getMinSize();
             }
-            size = section.getEffectiveSize(size);
-            int space = 0;
-            OptionalInt startColumn = section.getStartColumn();
-            if(startColumn.isPresent()){
-                space = calculateSpace(pos, startColumn.getAsInt(), context);
-            }
-            pos += space;
-            availableAdditionalSpace -= space;
-            layout.placeSection(section, pos, size);
-            pos += size;
-            availableAdditionalSpace -= size - section.getMinSize();
+            return layout;
+        } catch (Throwable th){
+            throw new Exception("Failed to calculate Layout for topSections=" + topSections.toString() + ", botSections=" + bottomSections.toString(), th);
         }
-        return layout;
     }
 
     int calculateSizeBottom(List<Section> bottomSections, TabListContext context, ToIntFunction<Section> getSize) {

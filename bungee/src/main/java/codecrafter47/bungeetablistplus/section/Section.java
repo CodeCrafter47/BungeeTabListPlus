@@ -32,4 +32,9 @@ public abstract class Section implements LayoutSection {
                                   int size);
 
     public abstract void precalculate(TabListContext context);
+
+    @Override
+    public String toString() {
+        return "Section(minSize=" + getMinSize() + " ," + "maxSize=" + getMaxSize() + ", startColumn=" + getStartColumn() + ", constantSize=" + isSizeConstant() + ")";
+    }
 }
