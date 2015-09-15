@@ -53,7 +53,7 @@ public class TabListManager implements Listener {
         plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
     }
 
-    // returns true on succes
+    // returns true on success
     public boolean loadTabLists() {
         try {
             if (!plugin.getConfigManager().defaultTabList.showTo.
@@ -89,7 +89,7 @@ public class TabListManager implements Listener {
                 return tabList;
             }
         }
-        if (defaultTab.appliesTo(player)) {
+        if (defaultTab != null && defaultTab.appliesTo(player)) {
             return defaultTab;
         }
         return null;
