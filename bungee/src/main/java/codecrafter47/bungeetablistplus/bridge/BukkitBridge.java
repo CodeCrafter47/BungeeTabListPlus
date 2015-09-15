@@ -99,9 +99,10 @@ public class BukkitBridge implements Listener {
                                             getName() + " send an unknown packet! Is everything up-to-date?");
                             break;
                     }
+                } catch (StreamCorruptedException ex) {
+                    plugin.getLogger().log(Level.WARNING, "BungeeTabListPlus_BukkitBridge.jar on server {0} needs to be updated", ((Server) event.getSender()).getInfo());
                 } catch (IOException | ClassNotFoundException ex) {
-                    plugin.getLogger().log(Level.SEVERE,
-                            "Exception while parsing data from Bukkit", ex);
+                    plugin.getLogger().log(Level.SEVERE, "Exception while parsing data from Bukkit", ex);
                 }
             }
         }
