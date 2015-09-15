@@ -109,7 +109,7 @@ public class FillPlayersSection extends Section {
 
     @Override
     public int getMinSize() {
-        return 0;
+        return getEffectiveSize(0);
     }
 
     @Override
