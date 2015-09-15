@@ -73,7 +73,7 @@ public class BukkitBridge implements Listener {
                 plugin.getDataFolder().mkdir();
             }
             File file = new File(plugin.getDataFolder(), "config.yml");
-            config.load(file);
+            config.init(file);
             config.save(file);
         } catch (InvalidConfigurationException e) {
             plugin.getLogger().log(Level.WARNING, "Failed to load config.yml", e);
