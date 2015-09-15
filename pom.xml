@@ -24,6 +24,10 @@
         <maven.compiler.source>1.7</maven.compiler.source>
     </properties>
 
+    <scm>
+        <developerConnection>scm:git:https://github.com/CodeCrafter47/BungeeTabListPlus</developerConnection>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>deployment</id>
