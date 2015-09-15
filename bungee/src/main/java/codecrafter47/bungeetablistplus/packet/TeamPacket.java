@@ -56,11 +56,16 @@ public class TeamPacket extends Team {
             if (handler instanceof DownstreamBridge) {
                 getPlayerField(DownstreamBridge.class);
                 if (playerField != null) {
-                    try {
-                        playerField.setAccessible(true);
-                        player = (ProxiedPlayer) playerField.get(handler);
-                    } catch (IllegalAccessException ex) {
-                        BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
+                    for (int i = 0; i < 5; i++) {
+                        try {
+                            playerField.setAccessible(true);
+                            player = (ProxiedPlayer) playerField.get(handler);
+                            break;
+                        } catch (IllegalAccessException ex) {
+                            if (i == 4) {
+                                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
+                            }
+                        }
                     }
                     if (player != null) {
                         Object tabList = BungeeTabListPlus.getTabList(player);
@@ -72,7 +77,7 @@ public class TeamPacket extends Team {
                     BungeeTabListPlus.getInstance().getLogger().severe("Could not get player for " + handler);
                 }
             }
-        } catch (Throwable th){
+        } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }
         try {
@@ -81,17 +86,17 @@ public class TeamPacket extends Team {
             BungeeTabListPlus.getInstance().reportError(th);
         }
         try {
-            if(modified){
-                if(player != null){
+            if (modified) {
+                if (player != null) {
                     player.unsafe().sendPacket(this);
                     throw CancelSendSignal.INSTANCE;
                 } else {
                     BungeeTabListPlus.getInstance().getLogger().severe("Packet " + this + " has been modified but player is null");
                 }
             }
-        } catch (CancelSendSignal e){
+        } catch (CancelSendSignal e) {
             throw e;
-        } catch (Throwable th){
+        } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }
     }
