@@ -91,7 +91,7 @@ public class TablistLayoutManager<Section extends LayoutSection> {
         for (int i = 0; i < topSections.size(); i++) {
             Section section = topSections.get(i);
             int additionalSpace = 0;
-            if (!section.isSizeConstant() && availableAdditionalSpace > 0) {
+            if (!section.isSizeConstant() && availableAdditionalSpace > 0 && topMax - topMin > 0) {
                 additionalSpace = availableAdditionalSpace * (section.getMaxSize() - section.getMinSize()) / (topMax - topMin);
             }
             int size = section.getMinSize() + additionalSpace;
