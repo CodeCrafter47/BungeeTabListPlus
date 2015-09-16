@@ -70,22 +70,37 @@ public class ConfigParser {
             List<String> tags = parseTags(line);
             for (String tag : tags) {
                 if (tag.equals("ALIGN BOTTOM")) {
-                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN BOTTOM] in verticalMode");
-                    bottom = true;
+                    if (config.verticalMode) {
+                        plugin.getLogger().warning("You can not use [ALIGN BOTTOM] in verticalMode");
+                    } else {
+                        bottom = true;
+                    }
                 } else if (tag.equals("ALIGN LEFT")) {
-                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN LEFT] in verticalMode");
-                    startColumn = 0;
+                    if (config.verticalMode) {
+                        plugin.getLogger().warning("You can not use [ALIGN LEFT] in verticalMode");
+                    } else {
+                        startColumn = 0;
+                    }
                 } else if (tag.equals("ALIGN RIGHT")) {
-                    Preconditions.checkArgument(!config.verticalMode, "You can not use [ALIGN RIGHT] in verticalMode");
-                    startColumn = ConfigManager.getCols() - 1;
+                    if (config.verticalMode) {
+                        plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
+                    } else {
+                        startColumn = ConfigManager.getCols() - 1;
+                    }
                 } else if (tag.startsWith("PING=")) {
                     ping = Integer.parseInt(tag.substring(5, tag.length()));
                 } else if (tag.startsWith("COLUMN=")) {
-                    Preconditions.checkArgument(!config.verticalMode, "You can not use [COLUMN=?] in verticalMode");
-                    column = Integer.parseInt(tag.substring(7, tag.length()));
+                    if (config.verticalMode) {
+                        plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
+                    } else {
+                        column = Integer.parseInt(tag.substring(7, tag.length()));
+                    }
                 } else if (tag.startsWith("ROW=")) {
-                    Preconditions.checkArgument(config.verticalMode, "You can not use [ROW=?] in horizontalMode");
-                    column = Integer.parseInt(tag.substring(4, tag.length()));
+                    if (!config.verticalMode) {
+                        plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
+                    } else {
+                        column = Integer.parseInt(tag.substring(4, tag.length()));
+                    }
                 } else if (tag.startsWith("SORT=")) {
                     sortrules = Arrays.asList(tag.substring(5, tag.length()).
                             split(","));
