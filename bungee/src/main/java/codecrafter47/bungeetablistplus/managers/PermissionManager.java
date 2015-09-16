@@ -183,7 +183,7 @@ public class PermissionManager {
                     User user = pm.getUser(player.getName());
                     if (user != null) {
                         if (isBungeePerms3()) {
-                            bpprefix = user.getPrefix();
+                            bpprefix = user.buildPrefix();
                         } else {
                             Group mainGroup = pm.getMainGroup(user);
                             if (mainGroup != null) {
@@ -238,6 +238,12 @@ public class PermissionManager {
                     if (user != null) {
                         if (isBungeePerms3()) {
                             display = user.getDisplay();
+                            if(display == null || display.isEmpty()){
+                                Group group = pm.getMainGroup(user);
+                                if (group != null) {
+                                    display = group.getDisplay();
+                                }
+                            }
                         } else {
                             Group group = pm.getMainGroup(user);
                             if (group != null) {
@@ -272,7 +278,7 @@ public class PermissionManager {
                     User user = pm.getUser(player.getName());
                     if (user != null) {
                         if (isBungeePerms3()) {
-                            suffix = user.getSuffix();
+                            suffix = user.buildSuffix();
                         } else {
                             Group group = pm.getMainGroup(user);
                             if (group != null) {
