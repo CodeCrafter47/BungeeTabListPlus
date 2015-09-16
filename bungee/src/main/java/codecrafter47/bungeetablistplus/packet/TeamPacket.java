@@ -63,7 +63,7 @@ public class TeamPacket extends Team {
                             break;
                         } catch (IllegalAccessException ex) {
                             if (i == 4) {
-                                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler for " + handler, ex);
+                                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler", ex);
                             }
                         }
                     }
