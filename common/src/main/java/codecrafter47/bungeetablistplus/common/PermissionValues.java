@@ -34,6 +34,7 @@ public class PermissionValues extends Values {
 
     static {
         registerPermission("bungeetablistplus.admin");
+        registerPermission("bungeetablistplus.hide");
         registerPermission("bungeetablistplus.help");
         registerPermission("bungeetablistplus.seevanished");
     }

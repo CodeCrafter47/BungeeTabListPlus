@@ -118,6 +118,8 @@ public class BungeeTabListPlus {
 
     private ScheduledTask refreshThread = null;
 
+    private final static Collection<String> hiddenPlayers = new HashSet<>();
+
     private BukkitBridge bukkitBridge;
 
     private UpdateChecker updateChecker = null;
@@ -464,11 +466,42 @@ public class BungeeTabListPlus {
      */
     public static boolean isHidden(IPlayer player) {
         final boolean[] hidden = new boolean[1];
+        synchronized (hiddenPlayers) {
+            String name = player.getName();
+            hidden[0] = hiddenPlayers.contains(name);
+        }
         BukkitBridge bukkitBridge = getInstance().bukkitBridge;
         bukkitBridge.getPlayerInformation(player, Values.Player.VanishNoPacket.IsVanished).ifPresent(b -> hidden[0] |= b);
         bukkitBridge.getPlayerInformation(player, Values.Player.SuperVanish.IsVanished).ifPresent(b -> hidden[0] |= b);
         bukkitBridge.getPlayerInformation(player, Values.Player.Essentials.IsVanished).ifPresent(b -> hidden[0] |= b);
         return hidden[0];
+    }
+
+    /**
+     * Hides a player from the tablist
+     *
+     * @param player The player which should be hidden.
+     */
+    public static void hidePlayer(ProxiedPlayer player) {
+        synchronized (hiddenPlayers) {
+            String name = player.getName();
+            if (!hiddenPlayers.contains(name))
+                hiddenPlayers.add(name);
+        }
+    }
+
+    /**
+     * Unhides a previously hidden player from the tablist. Only works if the
+     * playe has been hidden via the hidePlayer method. Not works for players
+     * hidden by VanishNoPacket
+     *
+     * @param player the player on which the operation should be performed
+     */
+    public static void unhidePlayer(ProxiedPlayer player) {
+        synchronized (hiddenPlayers) {
+            String name = player.getName();
+            hiddenPlayers.remove(name);
+        }
     }
 
     public static boolean isHiddenServer(ServerInfo server) {

@@ -48,6 +48,60 @@ public class SuperCommand extends Command {
             } else {
                 sendNoPermission(sender);
             }
+        } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.hide")) {
+                if (sender instanceof ProxiedPlayer) {
+                    ProxiedPlayer player = (ProxiedPlayer) sender;
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                        BungeeTabListPlus.unhidePlayer(player);
+                        sendPlayerUnhide(player);
+                    } else {
+                        BungeeTabListPlus.hidePlayer(player);
+                        sendPlayerHide(player);
+                    }
+                } else {
+                    sendNeedsPlayer(sender);
+                }
+            } else {
+                sendNoPermission(sender);
+            }
+        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                equalsIgnoreCase("on")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.hide")) {
+                if (sender instanceof ProxiedPlayer) {
+                    ProxiedPlayer player = (ProxiedPlayer) sender;
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                        sendAlreadyHidden(player);
+                    } else {
+                        BungeeTabListPlus.hidePlayer(player);
+                        sendPlayerHide(player);
+                    }
+                } else {
+                    sendNeedsPlayer(sender);
+                }
+            } else {
+                sendNoPermission(sender);
+            }
+        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                equalsIgnoreCase("off")) {
+            if (plugin.getPermissionManager().hasPermission(sender,
+                    "bungeetablistplus.hide")) {
+                if (sender instanceof ProxiedPlayer) {
+                    ProxiedPlayer player = (ProxiedPlayer) sender;
+                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                        BungeeTabListPlus.unhidePlayer(player);
+                        sendPlayerUnhide(player);
+                    } else {
+                        sendErrorNotHidden(player);
+                    }
+                } else {
+                    sendNeedsPlayer(sender);
+                }
+            } else {
+                sendNoPermission(sender);
+            }
         } else {
             if (plugin.getPermissionManager().hasPermission(sender,
                     "bungeetablistplus.help") || plugin.getPermissionManager().
@@ -81,6 +135,10 @@ public class SuperCommand extends Command {
                 "/BungeeTabListPlus help").color(ChatColor.AQUA).event(
                 new ClickEvent(Action.SUGGEST_COMMAND,
                         "/BungeeTabListPlus help")).create());
+        target.sendMessage(getPrefix().append("    ").append(
+                "/BungeeTabListPlus hide [on|off]").color(ChatColor.AQUA).event(
+                new ClickEvent(Action.SUGGEST_COMMAND,
+                        "/BungeeTabListPlus hide ")).create());
         target.sendMessage(getPrefix().append("    ").append(
                 "/BungeeTabListPlus reload").color(ChatColor.AQUA).event(
                 new ClickEvent(Action.SUGGEST_COMMAND,
@@ -136,6 +194,66 @@ public class SuperCommand extends Command {
         } else {
             target.sendMessage(getPrefix().append("reload failed").color(
                     ChatColor.RED).create());
+        }
+    }
+
+    private void sendPlayerHide(CommandSender target) {
+        if (plugin.getConfigManager().getMessages() != null) {
+            String message = plugin.getConfigManager().getMessages().successPlayerHide;
+            if (message == null || message.isEmpty()) {
+                return;
+            }
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            target.sendMessage(message);
+        } else {
+            target.sendMessage(getPrefix().append(
+                    "You have been hidden: Your name won't appear on the tablist").
+                    color(ChatColor.GREEN).create());
+        }
+    }
+
+    private void sendPlayerUnhide(CommandSender target) {
+        if (plugin.getConfigManager().getMessages() != null) {
+            String message = plugin.getConfigManager().getMessages().successPlayerUnhide;
+            if (message == null || message.isEmpty()) {
+                return;
+            }
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            target.sendMessage(message);
+        } else {
+            target.sendMessage(getPrefix().append(
+                    "You're not hidden any longer").color(ChatColor.GREEN).
+                    create());
+        }
+    }
+
+    private void sendAlreadyHidden(CommandSender target) {
+        if (plugin.getConfigManager().getMessages() != null) {
+            String message = plugin.getConfigManager().getMessages().errorAlreadyHidden;
+            if (message == null || message.isEmpty()) {
+                return;
+            }
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            target.sendMessage(message);
+        } else {
+            target.sendMessage(getPrefix().append(
+                    "Can't hide: You are already hidden").color(ChatColor.RED).
+                    create());
+        }
+    }
+
+    private void sendErrorNotHidden(CommandSender target) {
+        if (plugin.getConfigManager().getMessages() != null) {
+            String message = plugin.getConfigManager().getMessages().errorNotHidden;
+            if (message == null || message.isEmpty()) {
+                return;
+            }
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            target.sendMessage(message);
+        } else {
+            target.sendMessage(getPrefix().append(
+                    "Can't unhide: You are not hidden").color(ChatColor.RED).
+                    create());
         }
     }
 
