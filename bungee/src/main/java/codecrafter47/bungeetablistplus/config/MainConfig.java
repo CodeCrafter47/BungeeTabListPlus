@@ -20,16 +20,15 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
-import net.cubespace.Yamler.Config.Comment;
-import net.cubespace.Yamler.Config.Comments;
-import net.cubespace.Yamler.Config.Config;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import net.cubespace.Yamler.Config.*;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MainConfig extends Config {
 
@@ -196,6 +195,18 @@ public class MainConfig extends Config {
             "Warning: This is an experimental feature, it may cause unintended behaviour"
     })
     public boolean autoExcludeServers = false;
+
+    @Comments({
+            "Time zone to use for the {time} variable",
+            "Can be full name like \"America/Los_Angeles\"",
+            "or custom id like \"GMT+8\""
+    })
+    @Path("time-zone")
+    public String timezone = TimeZone.getDefault().getID();
+
+    public TimeZone getTimeZone(){
+        return TimeZone.getTimeZone(timezone);
+    }
 
     public MainConfig(Plugin plugin) throws InvalidConfigurationException {
         CONFIG_FILE = new File("plugins" + File.separator + plugin.

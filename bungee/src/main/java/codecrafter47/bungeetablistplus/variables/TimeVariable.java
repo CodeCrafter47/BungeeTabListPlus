@@ -20,6 +20,7 @@
  */
 package codecrafter47.bungeetablistplus.variables;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.Variable;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -32,6 +33,7 @@ public class TimeVariable implements Variable {
 
     public TimeVariable(String format) {
         this.format = new SimpleDateFormat(format);
+        this.format.setTimeZone(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getTimeZone());
     }
 
     @Override

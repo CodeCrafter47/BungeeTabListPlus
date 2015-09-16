@@ -344,6 +344,7 @@ public class BungeeTabListPlus {
     public boolean reload() {
         try {
             config = new ConfigManager(plugin);
+            variables = new VariablesManager();
             TabListManager tabListManager = new TabListManager(this);
             if (!tabListManager.loadTabLists()) {
                 return false;
