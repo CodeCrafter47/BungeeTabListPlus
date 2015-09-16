@@ -88,7 +88,11 @@ public class ConfigParser {
                         startColumn = ConfigManager.getCols() - 1;
                     }
                 } else if (tag.startsWith("PING=")) {
-                    ping = Integer.parseInt(tag.substring(5, tag.length()));
+                    try {
+                        ping = Integer.parseInt(tag.substring(5, tag.length()));
+                    } catch (NumberFormatException ex){
+                        plugin.getLogger().log(Level.WARNING, "When using [PING=?] you are supposed to replace the ? with a valid number", ex);
+                    }
                 } else if (tag.startsWith("COLUMN=")) {
                     if (config.verticalMode) {
                         plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
