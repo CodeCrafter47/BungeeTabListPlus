@@ -182,9 +182,13 @@ public class PermissionManager {
                 if (pm != null) {
                     User user = pm.getUser(player.getName());
                     if (user != null) {
-                        Group mainGroup = pm.getMainGroup(user);
-                        if (mainGroup != null) {
-                            bpprefix = mainGroup.getPrefix();
+                        if (isBungeePerms3()) {
+                            bpprefix = user.getPrefix();
+                        } else {
+                            Group mainGroup = pm.getMainGroup(user);
+                            if (mainGroup != null) {
+                                bpprefix = mainGroup.getPrefix();
+                            }
                         }
                     }
                 }
@@ -232,9 +236,13 @@ public class PermissionManager {
                 if (pm != null) {
                     User user = pm.getUser(player.getName());
                     if (user != null) {
-                        Group group = pm.getMainGroup(user);
-                        if (group != null) {
-                            display = group.getDisplay();
+                        if (isBungeePerms3()) {
+                            display = user.getDisplay();
+                        } else {
+                            Group group = pm.getMainGroup(user);
+                            if (group != null) {
+                                display = group.getDisplay();
+                            }
                         }
                     }
                 }
@@ -263,9 +271,13 @@ public class PermissionManager {
                 if (pm != null) {
                     User user = pm.getUser(player.getName());
                     if (user != null) {
-                        Group group = pm.getMainGroup(user);
-                        if (group != null) {
-                            suffix = group.getSuffix();
+                        if (isBungeePerms3()) {
+                            suffix = user.getSuffix();
+                        } else {
+                            Group group = pm.getMainGroup(user);
+                            if (group != null) {
+                                suffix = group.getSuffix();
+                            }
                         }
                     }
                 }
@@ -312,5 +324,18 @@ public class PermissionManager {
         }
 
         return false;
+    }
+
+    private boolean isBungeePerms3() {
+        return isClassPresent("net.alpenblock.bungeeperms.platform.bungee.BungeePlugin");
+    }
+
+    private boolean isClassPresent(String name) {
+        try {
+            Class.forName(name);
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
     }
 }
