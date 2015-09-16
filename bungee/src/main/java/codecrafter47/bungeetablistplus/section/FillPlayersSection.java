@@ -139,7 +139,7 @@ public class FillPlayersSection extends Section {
             }
         }
         int other_count = players.size() - playersToShow;
-        return playersToShow * config.playerLines.size() + other_count * config.morePlayersLines.size();
+        return playersToShow * config.playerLines.size() + (other_count > 0 ? config.morePlayersLines.size() : 0);
     }
 
     @Override
