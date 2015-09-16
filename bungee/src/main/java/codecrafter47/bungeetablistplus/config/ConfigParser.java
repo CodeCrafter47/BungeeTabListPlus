@@ -157,7 +157,7 @@ public class ConfigParser {
                     }
                 } else {
                     ColumnSplitSection cs;
-                    if (sections.get(sections.size() - 1) instanceof ColumnSplitSection) {
+                    if (!sections.isEmpty() && sections.get(sections.size() - 1) instanceof ColumnSplitSection) {
                         cs = (ColumnSplitSection) sections.get(
                                 sections.size() - 1);
                     } else {
