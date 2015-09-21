@@ -28,11 +28,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 
 public class FakePlayerManager implements IPlayerProvider {
-    private List<IPlayer> online = new ArrayList<>();
+    private List<IPlayer> online = new CopyOnWriteArrayList<>();
     private List<String> offline;
     private final Plugin plugin;
 
@@ -70,7 +71,7 @@ public class FakePlayerManager implements IPlayerProvider {
 
     public void reload() {
         offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers);
-        online = new ArrayList<>();
+        online = new CopyOnWriteArrayList<>();
         for (int i = offline.size(); i > 0; i--) {
             triggerRandomEvent();
         }
