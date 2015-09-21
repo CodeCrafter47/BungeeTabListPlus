@@ -109,7 +109,7 @@ public class BukkitBridge implements Listener {
                                 plugin.getLogger().warning("Proxy requested unknown value \"" + id + "\". Proxy/Bukkit plugin version mismatch?");
                             }
                         } else {
-                            plugin.getLogger().severe("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
+                            plugin.getLogger().warning("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
                         }
                     } catch (IOException ex) {
                         plugin.getLogger().log(Level.SEVERE, "An error occurred while handling an incoming plugin message", ex);
