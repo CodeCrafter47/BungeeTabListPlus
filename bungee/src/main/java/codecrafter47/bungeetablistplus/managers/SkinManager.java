@@ -179,10 +179,10 @@ public class SkinManager {
 
         @Override
         public void run() {
-            String uuid;
-            if (nameOrUUID.length() < 17) {
+            String uuid = null;
+            if (nameOrUUID.length() < 17 && !nameOrUUID.isEmpty()) {
                 uuid = fetchUUID(nameOrUUID);
-            } else {
+            } else if(nameOrUUID.replace("-", "").length() == 32){
                 uuid = nameOrUUID;
             }
 
@@ -202,6 +202,8 @@ public class SkinManager {
                         }
                     }, 5, TimeUnit.MINUTES);
                 }
+            } else {
+                BungeeTabListPlus.getInstance().getLogger().warning("can't fetch skin for '" + nameOrUUID + "', is neither a name nor an uuid");
             }
         }
     }
