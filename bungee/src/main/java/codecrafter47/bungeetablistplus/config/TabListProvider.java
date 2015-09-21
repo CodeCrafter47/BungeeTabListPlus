@@ -21,12 +21,9 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
+import codecrafter47.bungeetablistplus.layout.*;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.layout.Layout;
-import codecrafter47.bungeetablistplus.layout.TabListContextImpl;
-import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.skin.Skin;
@@ -66,7 +63,7 @@ public class TabListProvider implements ITabListProvider {
     }
 
     @Override
-    public void fillTabList(ProxiedPlayer player, ITabList tabList) {
+    public void fillTabList(ProxiedPlayer player, ITabList tabList) throws LayoutException {
         if (config.verticalMode) {
             tabList = tabList.flip();
         }

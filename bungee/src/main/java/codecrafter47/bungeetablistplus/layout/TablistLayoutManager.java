@@ -30,165 +30,17 @@ import java.util.function.ToIntFunction;
 public class TablistLayoutManager<Section extends LayoutSection> {
 
     @SneakyThrows
-    public Layout<Section> calculateLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) {
+    public Layout<Section> calculateLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) throws LayoutException{
         try {
-            return fastLayout(topSections, bottomSections, context);
+            return calculateLayout0(topSections, bottomSections, context);
+        } catch (LayoutException ex) {
+            throw ex;
         } catch (Throwable th) {
             throw new Exception("Failed to calculate Layout for topSections=" + topSections.toString() + ", botSections=" + bottomSections.toString(), th);
         }
     }
 
-    Layout<Section> slowLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) {
-        int topSectionSize[] = new int[topSections.size()];
-        int bottomSectionSize[] = new int[bottomSections.size()];
-
-        for (int i = 0; i < bottomSections.size(); i++) {
-            Section section = bottomSections.get(i);
-            bottomSectionSize[i] = section.getMinSize();
-        }
-
-        int maxUsedSlots = -1;
-        int bestTopSectionSizes[] = null;
-        int bestBottomSectionSizes[] = null;
-
-        boolean repeatOuter;
-        do {
-            for (int i = 0; i < topSections.size(); i++) {
-                Section section = topSections.get(i);
-                topSectionSize[i] = section.getMinSize();
-            }
-            int requiredSizeBottom = 0;
-            for (int i = bottomSections.size() - 1; i >= 0; i--) {
-                Section section = bottomSections.get(i);
-                requiredSizeBottom += section.getEffectiveSize(bottomSectionSize[i]);
-                OptionalInt startColumn = section.getStartColumn();
-                if (startColumn.isPresent()) {
-                    requiredSizeBottom += calculateSpace(startColumn.getAsInt(), context.getColumns() - (requiredSizeBottom % context.getColumns()), context);
-                }
-            }
-
-            boolean repeatInner;
-            do {
-                int requiredSizeIgnoringAlign = 0;
-                for (int i = 0; i < topSections.size(); i++) {
-                    Section section = topSections.get(i);
-                    requiredSizeIgnoringAlign += section.getEffectiveSize(topSectionSize[i]);
-                }
-                for (int i = 0; i < bottomSections.size(); i++) {
-                    Section section = bottomSections.get(i);
-                    requiredSizeIgnoringAlign += section.getEffectiveSize(bottomSectionSize[i]);
-                }
-                if (requiredSizeIgnoringAlign <= context.getTabSize()) {
-                    int requiredSizeTop = 0;
-                    for (int i = 0; i < topSections.size(); i++) {
-                        Section section = topSections.get(i);
-                        OptionalInt startColumn = section.getStartColumn();
-                        if (startColumn.isPresent()) {
-                            requiredSizeTop += calculateSpace(requiredSizeTop, startColumn.getAsInt(), context);
-                        }
-                        requiredSizeTop += section.getEffectiveSize(topSectionSize[i]);
-                    }
-                    int usedSlots = requiredSizeBottom + requiredSizeTop;
-                    if (usedSlots <= context.getTabSize()) {
-                        if (requiredSizeIgnoringAlign > maxUsedSlots) {
-                            maxUsedSlots = requiredSizeIgnoringAlign;
-                            bestTopSectionSizes = new int[topSectionSize.length];
-                            for (int i = 0; i < topSections.size(); i++) {
-                                Section section = topSections.get(i);
-                                bestTopSectionSizes[i] = section.getEffectiveSize(topSectionSize[i]);
-                            }
-                            bestBottomSectionSizes = new int[bottomSectionSize.length];
-                            for (int i = 0; i < bottomSections.size(); i++) {
-                                Section section = bottomSections.get(i);
-                                bestBottomSectionSizes[i] = section.getEffectiveSize(bottomSectionSize[i]);
-                            }
-                        }
-                    }
-                }
-
-                repeatInner = false;
-                int pos = 0;
-                for (int i = 0; i < topSections.size(); i++) {
-                    Section section = topSections.get(i);
-                    if (section.getStartColumn().isPresent()) {
-                        pos = section.getStartColumn().getAsInt();
-                    }
-                    if (topSectionSize[i] < section.getMaxSize()) {
-                        int newSize = topSectionSize[i];
-                        do {
-                            newSize++;
-                            if (i + 1 < bottomSections.size() && bottomSections.get(i + 1).getStartColumn().isPresent()) {
-                                newSize += calculateSpace(pos + newSize, bottomSections.get(i + 1).getStartColumn().getAsInt(), context);
-                            }
-                        } while (section.getEffectiveSize(topSectionSize[i]) == section.getEffectiveSize(newSize));
-                        topSectionSize[i] = newSize;
-                        repeatInner = true;
-                        break;
-                    } else {
-                        topSectionSize[i] = section.getMinSize();
-                        pos += topSectionSize[i];
-                    }
-                }
-            } while (repeatInner);
-
-            repeatOuter = false;
-            OptionalInt pos = OptionalInt.empty();
-            for (int i = 0; i < bottomSections.size(); i++) {
-                Section section = bottomSections.get(i);
-                if (section.getStartColumn().isPresent()) {
-                    pos = section.getStartColumn();
-                }
-                if (bottomSectionSize[i] < section.getMaxSize()) {
-                    int newSize = bottomSectionSize[i];
-                    do {
-                        newSize++;
-                        if (pos.isPresent() && i + 1 < bottomSections.size() && bottomSections.get(i + 1).getStartColumn().isPresent()) {
-                            newSize += calculateSpace(pos.getAsInt() + newSize, bottomSections.get(i + 1).getStartColumn().getAsInt(), context);
-                        }
-                    } while (section.getEffectiveSize(bottomSectionSize[i]) == section.getEffectiveSize(newSize));
-                    bottomSectionSize[i] = newSize;
-                    repeatOuter = true;
-                    break;
-                } else {
-                    bottomSectionSize[i] = section.getMinSize();
-                    if (pos.isPresent()) {
-                        pos = OptionalInt.of(bottomSectionSize[i] + pos.getAsInt());
-                    }
-                }
-            }
-        } while (repeatOuter);
-
-        if (bestTopSectionSizes != null) {
-            Layout<Section> layout = new Layout<>(context.getRows(), context.getColumns());
-            int pos = 0;
-            for (int i = 0; i < topSections.size(); i++) {
-                Section section = topSections.get(i);
-                OptionalInt startColumn = section.getStartColumn();
-                if (startColumn.isPresent()) {
-                    pos += calculateSpace(pos, startColumn.getAsInt(), context);
-                }
-                layout.placeSection(section, pos, bestTopSectionSizes[i]);
-                pos += bestTopSectionSizes[i];
-            }
-
-            pos = context.getTabSize();
-            for (int i = bottomSections.size() - 1; i >= 0; i--) {
-                Section section = bottomSections.get(i);
-                pos -= bestBottomSectionSizes[i];
-                OptionalInt startColumn = section.getStartColumn();
-                if (startColumn.isPresent()) {
-                    pos -= calculateSpace(startColumn.getAsInt(), pos, context);
-                }
-                layout.placeSection(section, pos, bestBottomSectionSizes[i]);
-            }
-
-            return layout;
-        }
-
-        throw new IllegalStateException("Too much content for tablist");
-    }
-
-    Layout<Section> fastLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) {
+    Layout<Section> calculateLayout0(List<Section> topSections, List<Section> bottomSections, TabListContext context) throws LayoutException {
         int topSectionSize[] = new int[topSections.size()];
         for (int i = 0; i < topSections.size(); i++) {
             Section section = topSections.get(i);
@@ -201,8 +53,9 @@ public class TablistLayoutManager<Section extends LayoutSection> {
             bottomSectionSize[i] = section.getMinSize();
         }
 
-        if (calculateSizeTop(topSections, context, Section::getMinSize) + calculateSizeBottom(bottomSections, context, Section::getMinSize) > context.getTabSize()) {
-            throw new IllegalStateException("Too much content for tablist");
+        int minimumSizeNeeded = calculateSizeTop(topSections, context, Section::getMinSize) + calculateSizeBottom(bottomSections, context, Section::getMinSize);
+        if (minimumSizeNeeded > context.getTabSize()) {
+            throw new LayoutException(String.format("Minimum size the given layout would need is %d but tab_size is only %d", minimumSizeNeeded, context.getTabSize()));
         }
 
         boolean repeat;

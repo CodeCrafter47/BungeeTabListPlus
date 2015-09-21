@@ -22,10 +22,13 @@ package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.logging.Level;
 
 /**
  * Implementation of the ResendThread. Updates the tablist for all players after
@@ -108,7 +111,13 @@ class ResendThread implements Runnable {
         }
 
         ITabList tabList = new TabList();
-        tlp.fillTabList(tablistHandler.getPlayer(), tabList);
+        try {
+            tlp.fillTabList(tablistHandler.getPlayer(), tabList);
+        } catch (LayoutException ex){
+            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Error in tablist config", ex);
+        } catch (Throwable th){
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Error while updating tablist", th);
+        }
 
         tablistHandler.sendTablist(tabList);
     }

@@ -21,11 +21,12 @@
 
 package codecrafter47.bungeetablistplus.api;
 
+import codecrafter47.bungeetablistplus.layout.LayoutException;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 
 public interface ITabListProvider {
 
-    void fillTabList(ProxiedPlayer player, ITabList ITabList);
+    void fillTabList(ProxiedPlayer player, ITabList ITabList) throws LayoutException;
 
 }
