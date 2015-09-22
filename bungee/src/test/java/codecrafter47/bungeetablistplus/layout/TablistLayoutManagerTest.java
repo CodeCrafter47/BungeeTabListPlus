@@ -20,6 +20,8 @@
 package codecrafter47.bungeetablistplus.layout;
 
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -169,8 +171,8 @@ public class TablistLayoutManagerTest {
 
         Layout<LayoutSection> layout = layoutManager.calculateLayout(topSections, bottomSections, tabListContext);
 
-        for(int row = 0; row < tabListContext.getRows(); row++){
-            for(int column = 0; column < tabListContext.getColumns(); column++){
+        for (int row = 0; row < tabListContext.getRows(); row++) {
+            for (int column = 0; column < tabListContext.getColumns(); column++) {
                 Optional<Layout<LayoutSection>.SlotData> slotData = layout.getSlotData(row, column);
                 Assert.assertTrue("Slot row=" + row + " column=" + column + " not filled", slotData.isPresent());
                 Layout<LayoutSection>.SlotData data = slotData.get();
@@ -211,8 +213,8 @@ public class TablistLayoutManagerTest {
 
         Layout<LayoutSection> layout = layoutManager.calculateLayout(topSections, bottomSections, tabListContext);
 
-        for(int row = 0; row < tabListContext.getRows(); row++){
-            for(int column = 0; column < tabListContext.getColumns(); column++){
+        for (int row = 0; row < tabListContext.getRows(); row++) {
+            for (int column = 0; column < tabListContext.getColumns(); column++) {
                 Optional<Layout<LayoutSection>.SlotData> slotData = layout.getSlotData(row, column);
                 Assert.assertTrue("Slot row=" + row + " column=" + column + " not filled", slotData.isPresent());
                 Layout<LayoutSection>.SlotData data = slotData.get();
@@ -253,8 +255,8 @@ public class TablistLayoutManagerTest {
 
         Layout<LayoutSection> layout = layoutManager.calculateLayout(topSections, bottomSections, tabListContext);
 
-        for(int row = 0; row < tabListContext.getRows(); row++){
-            for(int column = 0; column < tabListContext.getColumns(); column++){
+        for (int row = 0; row < tabListContext.getRows(); row++) {
+            for (int column = 0; column < tabListContext.getColumns(); column++) {
                 Optional<Layout<LayoutSection>.SlotData> slotData = layout.getSlotData(row, column);
                 Assert.assertTrue("Slot row=" + row + " column=" + column + " not filled", slotData.isPresent());
                 Layout<LayoutSection>.SlotData data = slotData.get();
@@ -293,8 +295,8 @@ public class TablistLayoutManagerTest {
 
         Layout<LayoutSection> layout = layoutManager.calculateLayout(sections, Collections.emptyList(), tabListContext);
 
-        for(int row = 0; row < tabListContext.getRows(); row++){
-            for(int column = 0; column < tabListContext.getColumns(); column++){
+        for (int row = 0; row < tabListContext.getRows(); row++) {
+            for (int column = 0; column < tabListContext.getColumns(); column++) {
                 Optional<Layout<LayoutSection>.SlotData> slotData = layout.getSlotData(row, column);
                 Assert.assertTrue("Slot row=" + row + " column=" + column + " not filled", slotData.isPresent());
                 Layout<LayoutSection>.SlotData data = slotData.get();
@@ -304,8 +306,8 @@ public class TablistLayoutManagerTest {
 
         layout = layoutManager.calculateLayout(Collections.emptyList(), sections, tabListContext);
 
-        for(int row = 0; row < tabListContext.getRows(); row++){
-            for(int column = 0; column < tabListContext.getColumns(); column++){
+        for (int row = 0; row < tabListContext.getRows(); row++) {
+            for (int column = 0; column < tabListContext.getColumns(); column++) {
                 Optional<Layout<LayoutSection>.SlotData> slotData = layout.getSlotData(row, column);
                 Assert.assertTrue("Slot row=" + row + " column=" + column + " not filled", slotData.isPresent());
                 Layout<LayoutSection>.SlotData data = slotData.get();
@@ -314,7 +316,7 @@ public class TablistLayoutManagerTest {
         }
     }
 
-    class MockLayoutSection implements LayoutSection{
+    class MockLayoutSection implements LayoutSection {
         private final int minSize;
         private final int maxSize;
         private final OptionalInt startColumn;
@@ -351,7 +353,7 @@ public class TablistLayoutManagerTest {
         }
     }
 
-    class MockTabListContext implements TabListContext{
+    class MockTabListContext extends TabListContext {
         private final int rows;
         private final int columns;
 
@@ -383,6 +385,21 @@ public class TablistLayoutManagerTest {
         @Override
         public PlayerManager getPlayerManager() {
             return null;
+        }
+
+        @Override
+        public IPlayer getPlayer() {
+            return null;
+        }
+
+        @Override
+        public List<String> getServer() {
+            return null;
+        }
+
+        @Override
+        public int getOtherPlayerCount() {
+            return 0;
         }
     }
 }

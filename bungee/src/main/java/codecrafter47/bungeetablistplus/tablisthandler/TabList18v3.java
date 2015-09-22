@@ -20,11 +20,11 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import gnu.trove.map.TIntObjectMap;
@@ -114,33 +114,37 @@ public class TabList18v3 implements TabListHandler {
             }
 
             for (int i = 0; i < tab_size; i++) {
-                Slot line = tabList.getSlot(i);
-                if (line == null) {
-                    line = new Slot(" ", tabList.getDefaultPing());
-                }
-                String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(playerTabListHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTabListHandler.getPlayer()), context);
-                text = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replaceVariables(playerTabListHandler.getPlayer(), text, context);
-                text = ChatColor.translateAlternateColorCodes('&', text);
-                if (charLimit > 0) {
-                    text = ColorParser.substringIgnoreColors(text, charLimit);
-                    for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
-                        text += ' ';
+                Slot slot = tabList.getSlot(i);
+                String text;
+                int ping;
+                Skin skin;
+                if (slot != null) {
+                    text = slot.getText();
+                    text = ChatColor.translateAlternateColorCodes('&', text);
+                    if (charLimit > 0) {
+                        text = ColorParser.substringIgnoreColors(text, charLimit);
+                        for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
+                            text += ' ';
+                        }
                     }
-                }
-                if (text.endsWith("" + ChatColor.COLOR_CHAR)) {
-                    text = text.substring(0, text.length() - 1);
-                }
-
-                if (line.getSkin() == SkinManager.defaultSkin) {
-                    line.setSkin(tabList.getDefaultSkin());
+                    if (text.endsWith("" + ChatColor.COLOR_CHAR)) {
+                        text = text.substring(0, text.length() - 1);
+                    }
+                    ping = slot.getPing();
+                    skin = slot.getSkin();
+                    if (skin == SkinManager.defaultSkin) {
+                        skin = tabList.getDefaultSkin();
+                    }
+                } else {
+                    text = "";
+                    ping = tabList.getDefaultPing();
+                    skin = tabList.getDefaultSkin();
                 }
 
                 UUID uuid = null;
                 boolean reorder = true;
-                if (line.getSkin().getOwner() != null && list.contains(line.getSkin().getOwner()) && (((UserConnection) playerTabListHandler.getPlayer()).getGamemode() != 3 || !Objects.equals(line.getSkin().getOwner(), playerTabListHandler.getPlayer().getUniqueId()))) {
-                    uuid = line.getSkin().getOwner();
+                if (skin.getOwner() != null && list.contains(skin.getOwner()) && (((UserConnection) playerTabListHandler.getPlayer()).getGamemode() != 3 || !Objects.equals(skin.getOwner(), playerTabListHandler.getPlayer().getUniqueId()))) {
+                    uuid = skin.getOwner();
                     list.remove(uuid);
                 }
                 if (uuid == null && !fakeUUIDs.isEmpty()) {
@@ -175,18 +179,24 @@ public class TabList18v3 implements TabListHandler {
                     sendTeam.put(i, sendUsernames.get(uuid));
                 }
 
-                updateSlot(uuid, text, line.ping, line.getSkin());
+                updateSlot(uuid, text, ping, skin);
             }
 
             // update header/footer
-            if(packetAccess.isTabHeaderFooterSupported()) {
+            if (packetAccess.isTabHeaderFooterSupported()) {
                 String header = tabList.getHeader();
                 if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
                     header = header.substring(0, header.length() - 1);
                 }
+                if (header != null) {
+                    header = ChatColor.translateAlternateColorCodes('&', header);
+                }
                 String footer = tabList.getFooter();
                 if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
                     footer = footer.substring(0, footer.length() - 1);
+                }
+                if (footer != null) {
+                    footer = ChatColor.translateAlternateColorCodes('&', footer);
                 }
                 if (header != null || footer != null) {
                     String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));

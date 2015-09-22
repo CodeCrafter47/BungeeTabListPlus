@@ -16,22 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.variables;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlayerVariable;
-import codecrafter47.bungeetablistplus.player.IPlayer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+package codecrafter47.bungeetablistplus.api;
 
-/**
- * @author Florian Stober
- */
-public class PermPrefix implements PlayerVariable {
+public interface PlaceholderRegistry {
 
-    @Override
-    public String getReplacement(ProxiedPlayer viewer, IPlayer player, String args) {
-        return BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(
-                player);
-    }
-
+    void registerPlaceholder(Placeholder placeholder);
 }

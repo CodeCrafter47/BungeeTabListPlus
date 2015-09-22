@@ -20,9 +20,9 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.md_5.bungee.BungeeCord;
@@ -262,20 +262,20 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     @Override
     public void sendTablist(ITabList tabList, TabListContext context) {
-        if(tabListHandler instanceof TabList18){
-            if(tabList.getSize() < 80 || tabList.shouldShrink()){
+        if (tabListHandler instanceof TabList18) {
+            if (tabList.getSize() < 80 || tabList.shouldShrink()) {
                 setTabListHandler(new TabList18v3(this));
             }
-        } else if(tabListHandler instanceof TabList18v3) {
-            if(tabList.getSize() >= 80 && !tabList.shouldShrink()){
+        } else if (tabListHandler instanceof TabList18v3) {
+            if (tabList.getSize() >= 80 && !tabList.shouldShrink()) {
                 setTabListHandler(new TabList18(this));
             }
-        } else if(tabListHandler instanceof ScoreboardTabList){
-            if(!BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
+        } else if (tabListHandler instanceof ScoreboardTabList) {
+            if (!BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
                 setTabListHandler(new MyTabList(this));
             }
-        } else if(tabListHandler instanceof MyTabList){
-            if(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
+        } else if (tabListHandler instanceof MyTabList) {
+            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
                 setTabListHandler(new ScoreboardTabList(this));
             }
         }
@@ -289,11 +289,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     @Override
     public void setTabListHandler(TabListHandler tabListHandler) {
-        if(this.tabListHandler != null){
+        if (this.tabListHandler != null) {
             this.tabListHandler.unload();
         }
         this.tabListHandler = tabListHandler;
-        if(tabListHandler instanceof TabList18v3){
+        if (tabListHandler instanceof TabList18v3) {
             setAllowTeamPackets(false);
         } else {
             setAllowTeamPackets(true);
@@ -302,6 +302,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     /**
      * listener method to team packets sent to the client
+     *
      * @param packet the packet
      * @return whether the packet has been modified
      */
@@ -312,9 +313,9 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
             if (packet.getMode() == 0 || packet.getMode() == 3) {
                 // add players
                 Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches()).collect(Collectors.toSet());
-                if(!humanPlayers.isEmpty()){
+                if (!humanPlayers.isEmpty()) {
                     teamToPlayerMap.putAll(packet.getName(), humanPlayers);
-                    if(!allowTeamPackets){
+                    if (!allowTeamPackets) {
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
                         packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
@@ -324,11 +325,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
             } else if (packet.getMode() == 4) {
                 // remove players
                 Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches()).collect(Collectors.toSet());
-                if(!humanPlayers.isEmpty()){
+                if (!humanPlayers.isEmpty()) {
                     for (String humanPlayer : humanPlayers) {
                         teamToPlayerMap.remove(packet.getName(), humanPlayer);
                     }
-                    if(!allowTeamPackets){
+                    if (!allowTeamPackets) {
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
                         packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
                         BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
@@ -344,11 +345,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
         return modified;
     }
 
-    public void setAllowTeamPackets(boolean allowTeamPackets){
+    public void setAllowTeamPackets(boolean allowTeamPackets) {
         teamLock.lock();
         try {
-            if(allowTeamPackets != this.allowTeamPackets){
-                if(allowTeamPackets){
+            if (allowTeamPackets != this.allowTeamPackets) {
+                if (allowTeamPackets) {
                     // send all missing players
                     for (Entry<String, Collection<String>> entry : teamToPlayerMap.asMap().entrySet()) {
                         Team team = new Team(entry.getKey());

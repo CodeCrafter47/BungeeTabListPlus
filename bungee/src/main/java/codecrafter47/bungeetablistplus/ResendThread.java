@@ -21,9 +21,9 @@ package codecrafter47.bungeetablistplus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.layout.TabListContextImpl;
+import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -111,13 +111,14 @@ class ResendThread implements Runnable {
         }
         ITabList tabList = new TabList();
 
-        TabListContext context = new TabListContextImpl(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager());
+        TabListContext context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager());
+        context = context.setPlayer(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer()));
 
         try {
             tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
-        } catch (LayoutException ex){
+        } catch (LayoutException ex) {
             BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Error in tablist config", ex);
-        } catch (Throwable th){
+        } catch (Throwable th) {
             BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Error while updating tablist", th);
         }
 

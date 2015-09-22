@@ -18,9 +18,9 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 import java.util.OptionalInt;
 
@@ -64,27 +64,31 @@ public class ColumnSplitSection extends Section {
         return (proposedSize / ConfigManager.getCols()) * ConfigManager.getCols();
     }
 
-    @Override
-    public int calculate(TabListContext context, ITabList ITabList, int pos,
-                         int size) {
-        int sizePerCol = size / ConfigManager.getCols();
-        for (int i = 0; i < pc.length; i++) {
-            if (pc[i] != null) {
-                int span = 1;
-                while (i + span != pc.length && pc[i + span] != null && (i + span < pc.length && pc[i + span - 1].filter.
-                        equals(pc[i + span].filter))) {
-                    span++;
-                }
-                pc[i].calculate(context, ITabList, i, pos / ConfigManager.
-                        getCols(), sizePerCol * span, span);
-                i += span - 1;
-            }
-        }
-        return pos + sizePerCol * ConfigManager.getCols();
-    }
-
     public void addCollumn(int i, PlayerColumn collumn) {
         pc[i] = collumn;
+    }
+
+    @Override
+    public Slot getSlotAt(TabListContext context, int pos, int size) {
+        int column = pos % context.getColumns();
+        int sizePerCol = size / ConfigManager.getCols();
+        int columnPos = (pos + ConfigManager.getCols() - 1) / ConfigManager.getCols();
+        PlayerColumn playerColumn = pc[column];
+        if (playerColumn != null) {
+            int span = 1;
+            while (column + span < pc.length && pc[column + span] != null && pc[column + span - 1].filter.equals(pc[column + span].filter)) {
+                span++;
+            }
+            int pre = 1;
+            while (column - pre >= 0 && pc[column - pre] != null && playerColumn.filter.equals(pc[column - pre].filter)) {
+                pre++;
+            }
+            pre--;
+            span += pre;
+            columnPos = columnPos * span + pre;
+            playerColumn.getSlotAt(context, columnPos, sizePerCol * span);
+        }
+        return null;
     }
 
     @Override

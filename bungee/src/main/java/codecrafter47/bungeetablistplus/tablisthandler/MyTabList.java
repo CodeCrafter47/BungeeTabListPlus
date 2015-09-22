@@ -20,9 +20,9 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ChatColor;
@@ -65,33 +65,31 @@ public class MyTabList implements TabListHandler {
     public void sendTabList(ITabList tabList, TabListContext context) {
         clear();
 
-        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
-                getMainConfig().charLimit;
+        int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
 
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
-            Slot line = tabList.getSlot(i);
-            if (line == null) {
-                line = new Slot("", tabList.getDefaultPing());
+            Slot slot = tabList.getSlot(i);
+            String text;
+            int ping;
+            if (slot != null) {
+                text = slot.getText();
+                text = ChatColor.translateAlternateColorCodes('&', text);
+                if (charLimit > 0) {
+                    text = ColorParser.substringIgnoreColors(text, charLimit);
+                }
+                ping = slot.getPing();
+            } else {
+                text = "";
+                ping = tabList.getDefaultPing();
             }
-            line.text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()), context);
-            line.text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(playerTablistHandler.getPlayer(), line.text, context);
-            line.text = ChatColor.translateAlternateColorCodes('&', line.text);
-            if (charLimit > 0) {
-                line.text = ColorParser.substringIgnoreColors(line.text,
-                        charLimit);
-            }
-            setSlot(i, line, false);
+
+            setSlot(i, text, ping, false);
         }
         update();
     }
 
-    synchronized String setSlot(int n, Slot line, boolean update) {
-        Preconditions.checkArgument(n >= 0 && n < ConfigManager.getTabSize(),
-                "row out of range");
-
-        String text = line.text;
+    synchronized String setSlot(int n, String text, int ping, boolean update) {
+        Preconditions.checkArgument(n >= 0 && n < ConfigManager.getTabSize(), "row out of range");
 
         if (slots[n] != null) {
             sentStuff.remove(slots[n]);
@@ -120,7 +118,7 @@ public class MyTabList implements TabListHandler {
         }
 
         slots[n] = text;
-        slots_ping[n] = line.ping;
+        slots_ping[n] = ping;
         if (update) {
             update();
         }

@@ -17,24 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.variables;
+package codecrafter47.bungeetablistplus.placeholder;
 
-import codecrafter47.bungeetablistplus.api.ServerVariable;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
+import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.List;
-
-public class PerServerRedisPlayers implements ServerVariable {
-
+public class RedisBungeePlaceholders extends PlaceholderProvider {
     @Override
-    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args, TabListContext context) {
-        int sum = 0;
-        for (ServerInfo server : servers) {
-            sum += RedisBungee.getApi().getPlayersOnServer(server.getName()).size();
-        }
-        return Integer.toString(sum);
+    public void setup() {
+        bind("server_rplayer_count").to(context -> {
+            int sum = 0;
+            for (String server : context.getServer()) {
+                sum += RedisBungee.getApi().getPlayersOnServer(server).size();
+            }
+            return Integer.toString(sum);
+        });
     }
 }

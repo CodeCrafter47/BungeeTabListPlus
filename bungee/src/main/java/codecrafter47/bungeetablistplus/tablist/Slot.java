@@ -17,27 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.Skin;
-import lombok.Getter;
-import lombok.Setter;
 
 public class Slot {
+    private final String text;
+    private final int ping;
+    private final Skin skin;
 
-    @Getter
-    @Setter
-    public String text;
-
-    @Getter
-    public int ping;
-
-    @Getter
-    @Setter
-    private Skin skin = SkinManager.defaultSkin;
-
-    public Slot(String text, int ping) {
+    public Slot(String text, int ping, Skin skin) {
         super();
         this.text = text;
         if (ping < 0) {
@@ -53,33 +42,18 @@ public class Slot {
         } else {
             this.ping = 1000;
         }
+        this.skin = skin;
     }
 
-    public void setPing(int ping) {
-        if (ping < 0) {
-            this.ping = -1;
-        } else if (ping < 150) {
-            this.ping = 0;
-        } else if (ping < 300) {
-            this.ping = 150;
-        } else if (ping < 600) {
-            this.ping = 300;
-        } else if (ping < 1000) {
-            this.ping = 600;
-        } else {
-            this.ping = 1000;
-        }
+    public String getText() {
+        return text;
     }
 
-    public Slot(String text) {
-        super();
-        this.text = text;
-        this.ping = 0;
+    public int getPing() {
+        return ping;
     }
 
-    public Slot(Slot s) {
-        this.ping = s.ping;
-        this.skin = s.skin;
-        this.text = s.text;
+    public Skin getSkin() {
+        return skin;
     }
 }

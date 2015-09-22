@@ -19,20 +19,21 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.layout.*;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.layout.Layout;
+import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -47,15 +48,21 @@ public class TabListProvider implements ITabListProvider {
     private final TabListConfig config;
     private final ConfigParser parser;
     private final TablistLayoutManager<Section> layoutManager = new TablistLayoutManager<>();
+    private final boolean showHeaderFooter;
+    private final SlotTemplate header;
+    private final SlotTemplate footer;
 
     public TabListProvider(BungeeTabListPlus plugin, List<Section> top, List<Section> bot,
-                           boolean showEmpty, TabListConfig config, ConfigParser parser) {
+                           boolean showEmpty, TabListConfig config, ConfigParser parser, boolean showHeaderFooter, SlotTemplate header, SlotTemplate footer) {
         this.top = top;
         this.bot = bot;
         showEmptyGroups = showEmpty;
         this.config = config;
         this.parser = parser;
         this.plugin = plugin;
+        this.showHeaderFooter = showHeaderFooter;
+        this.header = header;
+        this.footer = footer;
     }
 
     @Override
@@ -64,7 +71,7 @@ public class TabListProvider implements ITabListProvider {
             tabList = tabList.flip();
         }
 
-        if(config.autoShrinkTabList){
+        if (config.autoShrinkTabList) {
             tabList.setShouldShrink(true);
         }
 
@@ -81,13 +88,13 @@ public class TabListProvider implements ITabListProvider {
         // remove empty sections
         for (Iterator<Section> iterator = topSections.iterator(); iterator.hasNext(); ) {
             Section topSection = iterator.next();
-            if(topSection.getMaxSize() == 0){
+            if (topSection.getMaxSize() == 0) {
                 iterator.remove();
             }
         }
         for (Iterator<Section> iterator = botSections.iterator(); iterator.hasNext(); ) {
             Section botSection = iterator.next();
-            if(botSection.getMaxSize() == 0){
+            if (botSection.getMaxSize() == 0) {
                 iterator.remove();
             }
         }
@@ -95,39 +102,22 @@ public class TabListProvider implements ITabListProvider {
 
         // calc tablist
         Layout<Section> layout = layoutManager.calculateLayout(topSections, botSections, context);
-        for(int i = 0; i < tabList.getSize(); i++){
+        for (int i = 0; i < tabList.getSize(); i++) {
             Optional<Layout<Section>.SlotData> slotData = layout.getSlotData(i);
-            if(slotData.isPresent()){
+            if (slotData.isPresent()) {
                 Layout<Section>.SlotData data = slotData.get();
-                if(data.getSlotIndex() == 0){
-                    data.getSection().calculate(context, tabList, i, data.getSectionSize());
-                }
+                tabList.setSlot(i, data.getSection().getSlotAt(context, data.getSlotIndex(), data.getSectionSize()));
             }
         }
 
         // header + footer
-        if (this.config.shownFooterHeader) {
-            String header = config.header;
-            header = plugin.getVariablesManager().
-                    replacePlayerVariables(player, header, plugin.getBungeePlayerProvider().wrapPlayer(player), context);
-            header = plugin.getVariablesManager().
-                    replaceVariables(player, header, context);
-            header = ChatColor.translateAlternateColorCodes('&', header);
-            header = header.replaceAll("\\{newline\\}", "\n");
-            tabList.setHeader(header);
-            String footer = config.footer;
-            footer = plugin.getVariablesManager().
-                    replacePlayerVariables(player, footer, plugin.getBungeePlayerProvider().wrapPlayer(player), context);
-            footer = plugin.getVariablesManager().
-                    replaceVariables(player, footer, context);
-            footer = ChatColor.translateAlternateColorCodes('&', footer);
-            footer = footer.replaceAll("\\{newline\\}", "\n");
-            tabList.setFooter(footer);
+        if (showHeaderFooter) {
+            tabList.setHeader(header.buildSlot(context).getText());
+            tabList.setFooter(footer.buildSlot(context).getText());
         }
 
         if (BungeeTabListPlus.isVersion18()) {
-            tabList.setDefaultSkin(plugin.
-                    getSkinManager().getSkin(config.defaultSkin));
+            tabList.setDefaultSkin(plugin.getSkinManager().getSkin(config.defaultSkin));
         }
 
         tabList.setDefaultPing(config.defaultPing);
@@ -144,11 +134,10 @@ public class TabListProvider implements ITabListProvider {
             Section section = sectionList.get(i);
             if (section instanceof AutoFillPlayers) {
                 sectionList.remove(i);
-                String prefix = ((AutoFillPlayers) section).prefix;
-                String suffix = ((AutoFillPlayers) section).suffix;
+                SlotTemplate prefix = ((AutoFillPlayers) section).prefix;
+                SlotTemplate suffix = ((AutoFillPlayers) section).suffix;
                 int maxPlayers = ((AutoFillPlayers) section).maxPlayers;
                 List<String> sortRules = ((AutoFillPlayers) section).sortRules;
-                Skin skin = ((AutoFillPlayers) section).skin;
 
                 Map<String, ServerInfo> servers = ProxyServer.getInstance().
                         getServers();
@@ -196,18 +185,12 @@ public class TabListProvider implements ITabListProvider {
                 int j = i;
                 for (String server : list) {
                     if (showEmptyGroups || context.getPlayerManager().
-                            getPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
-                        try {
-                            List<Section> sections = parser.
-                                    parseServerSections(
-                                            prefix, suffix, skin, new ArrayList<>(0),
-                                            server,
-                                            sortRules, maxPlayers);
-                            for (Section s : sections) {
-                                sectionList.add(j++, s);
-                            }
-                        } catch (ParseException ex) {
-                            BungeeTabListPlus.getInstance().reportError(ex);
+                            getPlayerCount(Collections.singletonList(server), player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
+                        List<Section> sections = parser.
+                                parseServerSections(config, prefix, suffix, new ArrayList<>(0), server,
+                                        sortRules, maxPlayers, ((AutoFillPlayers) section).playerLines, ((AutoFillPlayers) section).morePlayerLines);
+                        for (Section s : sections) {
+                            sectionList.add(j++, s);
                         }
                     }
                 }

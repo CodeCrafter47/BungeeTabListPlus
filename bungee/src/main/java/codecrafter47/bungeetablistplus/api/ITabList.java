@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.api;
 
 import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablist.Slot;
 
 public interface ITabList {
     String getHeader();

@@ -16,12 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package codecrafter47.bungeetablistplus.api;
 
-import codecrafter47.bungeetablistplus.player.IPlayer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import codecrafter47.bungeetablistplus.managers.PlaceholderManager;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 
-public interface PlayerVariable {
+import java.util.regex.Matcher;
 
-    String getReplacement(ProxiedPlayer viewer, IPlayer player, String args);
+public abstract class Placeholder {
+    private final String regex;
+
+    public Placeholder(String regex) {
+        this.regex = regex;
+    }
+
+    public abstract SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher);
+
+    public String getRegex() {
+        return regex;
+    }
 }

@@ -18,16 +18,12 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.layout.LayoutSection;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
-/**
- * @author Florian Stober
- */
 public abstract class Section implements LayoutSection {
-    public abstract int calculate(TabListContext context, ITabList ITabList, int pos,
-                                  int size);
+    public abstract Slot getSlotAt(TabListContext context, int pos, int size);
 
     public abstract void precalculate(TabListContext context);
 

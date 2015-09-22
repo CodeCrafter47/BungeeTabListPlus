@@ -16,12 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.api;
 
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+package codecrafter47.bungeetablistplus.tablist;
 
-public interface Variable {
+import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.skin.Skin;
 
-    String getReplacement(ProxiedPlayer viewer, String args, TabListContext context);
+public class SlotBuilder {
+    private StringBuilder textBuilder = new StringBuilder();
+    private int ping = 0;
+    private Skin skin = SkinManager.defaultSkin;
+
+    public SlotBuilder appendText(String text) {
+        textBuilder.append(text);
+        return this;
+    }
+
+    public SlotBuilder setPing(int ping) {
+        this.ping = ping;
+        return this;
+    }
+
+    public SlotBuilder setSkin(Skin skin) {
+        this.skin = skin;
+        return this;
+    }
+
+    public Slot build() {
+        return new Slot(textBuilder.toString(), ping, skin);
+    }
 }

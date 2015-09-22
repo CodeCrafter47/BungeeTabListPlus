@@ -22,14 +22,16 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.data.Values;
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public class PlayerManager {
 
@@ -42,8 +44,7 @@ public class PlayerManager {
         this.players = ImmutableList.copyOf(Iterables.concat(Collections2.transform(playerProviders, IPlayerProvider::getPlayers)));
     }
 
-    public List<IPlayer> getPlayers(Collection<String> filter,
-                                    ProxiedPlayer who, boolean includeSuspectors) {
+    public List<IPlayer> getPlayers(Collection<String> filter, ProxiedPlayer who, boolean includeSpectators) {
         List<IPlayer> list = new ArrayList<>();
         for (IPlayer p : players) {
             boolean areGroupRules = false;
@@ -94,20 +95,20 @@ public class PlayerManager {
                 }
             }
             if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.
-                    isHidden(p, who) && (includeSuspectors || p.getGameMode() != 3)) {
+                    isHidden(p, who) && (includeSpectators || p.getGameMode() != 3)) {
                 list.add(p);
             }
         }
         return list;
     }
 
-    public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSuspectors) {
+    public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSpectators) {
         int num = 0;
         for (IPlayer p : players) {
             Optional<ServerInfo> s = p.getServer();
             if (s.isPresent()) {
                 if (s.get().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
-                        isHidden(p, viewer) && (includeSuspectors || p.getGameMode() != 3)) {
+                        isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
                     num++;
                 }
             }
@@ -115,19 +116,17 @@ public class PlayerManager {
         return num;
     }
 
-    public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSuspectors) {
+    public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSpectators) {
         int num = 0;
         for (IPlayer p : players) {
-            if (!BungeeTabListPlus.isHidden(p, viewer) && (includeSuspectors || p.getGameMode() != 3)) {
+            if (!BungeeTabListPlus.isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
                 num++;
             }
         }
         return num;
     }
 
-    public int getPlayerCount(String args, ProxiedPlayer player, boolean includeSuspectors) {
-        String tmp = args.replaceAll(",", "+");
-        String[] all = tmp.split("\\+");
-        return this.getPlayers(Arrays.asList(all), player, includeSuspectors).size();
+    public int getPlayerCount(Collection<String> filter, ProxiedPlayer player, boolean includeSpectators) {
+        return this.getPlayers(filter, player, includeSpectators).size();
     }
 }

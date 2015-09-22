@@ -18,9 +18,9 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +31,10 @@ import java.util.OptionalInt;
  */
 public class StaticSection extends Section {
 
-    final List<Slot> text;
+    final List<SlotTemplate> text;
     private final OptionalInt vAlign;
 
-    public StaticSection(int vAlign, List<Slot> text) {
+    public StaticSection(int vAlign, List<SlotTemplate> text) {
         this.vAlign = vAlign == -1 ? OptionalInt.empty() : OptionalInt.of(vAlign);
         this.text = text;
     }
@@ -63,17 +63,13 @@ public class StaticSection extends Section {
         return text.size();
     }
 
-    public void add(Slot slot) {
+    public void add(SlotTemplate slot) {
         text.add(slot);
     }
 
     @Override
-    public int calculate(TabListContext context, ITabList ITabList, int pos,
-                         int size) {
-        for (Slot s : text) {
-            ITabList.setSlot(pos++, new Slot(s));
-        }
-        return pos;
+    public Slot getSlotAt(TabListContext context, int pos, int size) {
+        return text.get(pos).buildSlot(context);
     }
 
     @Override

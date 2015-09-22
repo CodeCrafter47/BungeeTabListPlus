@@ -19,8 +19,8 @@
 package codecrafter47.bungeetablistplus.tablist;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public class TabList implements ITabList {
     private String footer;
     @Getter
     @Setter
-    private Skin defaultSkin;
+    private Skin defaultSkin = SkinManager.defaultSkin;
     private int defaultPing;
     private int size;
     private boolean shouldShrink;

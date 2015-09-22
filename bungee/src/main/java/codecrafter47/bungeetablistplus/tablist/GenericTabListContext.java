@@ -1,0 +1,82 @@
+/*
+ * BungeeTabListPlus - a BungeeCord plugin to customize the tablist
+ *
+ * Copyright (C) 2014 - 2015 Florian Stober
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package codecrafter47.bungeetablistplus.tablist;
+
+import codecrafter47.bungeetablistplus.managers.PlayerManager;
+import codecrafter47.bungeetablistplus.player.IPlayer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.List;
+
+public class GenericTabListContext extends TabListContext {
+    private final int rows;
+    private final int columns;
+    private final int size;
+    private final ProxiedPlayer player;
+    private final PlayerManager playerManager;
+
+    public GenericTabListContext(int rows, int columns, ProxiedPlayer player, PlayerManager playerManager) {
+        this.rows = rows;
+        this.columns = columns;
+        this.playerManager = playerManager;
+        this.size = rows * columns;
+        this.player = player;
+    }
+
+    @Override
+    public int getTabSize() {
+        return size;
+    }
+
+    @Override
+    public int getRows() {
+        return rows;
+    }
+
+    @Override
+    public int getColumns() {
+        return columns;
+    }
+
+    @Override
+    public ProxiedPlayer getViewer() {
+        return player;
+    }
+
+    @Override
+    public PlayerManager getPlayerManager() {
+        return playerManager;
+    }
+
+    @Override
+    public IPlayer getPlayer() {
+        throw new IllegalStateException("player not available");
+    }
+
+    @Override
+    public List<String> getServer() {
+        throw new IllegalStateException("server not available");
+    }
+
+    @Override
+    public int getOtherPlayerCount() {
+        throw new IllegalStateException("other_count not available");
+    }
+}

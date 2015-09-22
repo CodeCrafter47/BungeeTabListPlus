@@ -20,9 +20,9 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import net.md_5.bungee.api.ChatColor;
 
@@ -63,22 +63,24 @@ public class ScoreboardTabList implements TabListHandler {
                 getMainConfig().charLimit;
 
         for (int i = 0; i < tabList.getUsedSlots(); i++) {
-            Slot line = tabList.getSlot(i);
-            if (line == null) {
-                line = new Slot("", tabList.getDefaultPing());
-            }
-            String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()), context);
-            text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(playerTablistHandler.getPlayer(), text, context);
-            text = ChatColor.translateAlternateColorCodes('&', text);
-            if (charLimit > 0) {
-                text = ColorParser.substringIgnoreColors(text, charLimit);
+            Slot slot = tabList.getSlot(i);
+            String text;
+            int ping;
+            if (slot != null) {
+                text = slot.getText();
+                text = ChatColor.translateAlternateColorCodes('&', text);
+                if (charLimit > 0) {
+                    text = ColorParser.substringIgnoreColors(text, charLimit);
+                }
+                ping = slot.getPing();
+            } else {
+                text = "";
+                ping = tabList.getDefaultPing();
             }
 
             String old = send[i];
-            if (old == null || !old.equals(text) || line.ping != slots_ping[i]) {
-                updateSlot(i, text, line.ping);
+            if (old == null || !old.equals(text) || ping != slots_ping[i]) {
+                updateSlot(i, text, ping);
             }
         }
     }

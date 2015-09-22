@@ -17,48 +17,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.layout;
+package codecrafter47.bungeetablistplus.tablist;
 
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
+import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class TabListContextImpl implements TabListContext {
-    private final int rows;
-    private final int columns;
-    private final int size;
-    private final ProxiedPlayer player;
-    private final PlayerManager playerManager;
+import java.util.List;
 
-    public TabListContextImpl(int rows, int columns, ProxiedPlayer player, PlayerManager playerManager) {
-        this.rows = rows;
-        this.columns = columns;
-        this.playerManager = playerManager;
-        this.size = rows * columns;
-        this.player = player;
+public class DelegatingTabListContext extends TabListContext {
+    private final TabListContext parent;
+
+    public DelegatingTabListContext(TabListContext parent) {
+        this.parent = parent;
     }
 
     @Override
     public int getTabSize() {
-        return size;
+        return parent.getTabSize();
     }
 
     @Override
     public int getRows() {
-        return rows;
+        return parent.getRows();
     }
 
     @Override
     public int getColumns() {
-        return columns;
+        return parent.getColumns();
     }
 
     @Override
     public ProxiedPlayer getViewer() {
-        return player;
+        return parent.getViewer();
     }
 
     @Override
     public PlayerManager getPlayerManager() {
-        return playerManager;
+        return parent.getPlayerManager();
+    }
+
+    @Override
+    public IPlayer getPlayer() {
+        return parent.getPlayer();
+    }
+
+    @Override
+    public List<String> getServer() {
+        return parent.getServer();
+    }
+
+    @Override
+    public int getOtherPlayerCount() {
+        return parent.getOtherPlayerCount();
     }
 }

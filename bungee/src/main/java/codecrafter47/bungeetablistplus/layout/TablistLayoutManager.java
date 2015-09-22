@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import lombok.SneakyThrows;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.function.ToIntFunction;
 public class TablistLayoutManager<Section extends LayoutSection> {
 
     @SneakyThrows
-    public Layout<Section> calculateLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) throws LayoutException{
+    public Layout<Section> calculateLayout(List<Section> topSections, List<Section> bottomSections, TabListContext context) throws LayoutException {
         try {
             return calculateLayout0(topSections, bottomSections, context);
         } catch (LayoutException ex) {

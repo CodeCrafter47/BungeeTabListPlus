@@ -26,6 +26,7 @@ import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packet.*;
+import codecrafter47.bungeetablistplus.placeholder.*;
 import codecrafter47.bungeetablistplus.player.*;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
@@ -102,9 +103,9 @@ public class BungeeTabListPlus {
     private FakePlayerManager fakePlayerManager;
 
     /**
-     * provides access to the Variable Manager use this to add Variables
+     * provides access to the Placeholder Manager use this to add Placeholders
      */
-    private VariablesManager variables;
+    private PlaceholderManager placeholderManager;
 
     private PermissionManager pm;
 
@@ -189,7 +190,7 @@ public class BungeeTabListPlus {
             config.getMainConfig().useScoreboardToBypass16CharLimit = false;
         }
 
-        if(isVersion18()) {
+        if (isVersion18()) {
             packetAccess = new PacketAccessImpl(getLogger());
             if (!packetAccess.isTabHeaderFooterSupported()) {
                 plugin.getLogger().warning("Your BungeeCord version doesn't support tablist header and footer modification");
@@ -222,16 +223,26 @@ public class BungeeTabListPlus {
             playerProviders.add(bungeePlayerProvider);
         }
 
-        tabLists = new TabListManager(this);
-        if (!tabLists.loadTabLists()) {
-            return;
-        }
-
         plugin.getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
 
         pm = new PermissionManager(this);
-        variables = new VariablesManager();
+        placeholderManager = new PlaceholderManager();
+        placeholderManager.registerPlaceholderProvider(new BasicPlaveholders());
+        placeholderManager.registerPlaceholderProvider(new BukkitPlaceholders());
+        placeholderManager.registerPlaceholderProvider(new ColorPlaceholder());
+        placeholderManager.registerPlaceholderProvider(new ConditionalPlaceholders());
+        placeholderManager.registerPlaceholderProvider(new OnlineStatePlaceholder());
+        placeholderManager.registerPlaceholderProvider(new PlayerCountPlaceholder());
+        if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
+            placeholderManager.registerPlaceholderProvider(new RedisBungeePlaceholders());
+        }
+        placeholderManager.registerPlaceholderProvider(new TimePlaceholders());
+
+        tabLists = new TabListManager(this);
+        if (!tabLists.loadTabLists()) {
+            return;
+        }
 
         if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
             protocolVersionProvider = new ProtocolSupportVersionProvider();
@@ -289,7 +300,7 @@ public class BungeeTabListPlus {
                 }).collect(Collectors.toList());
                 // register team packet
                 int maxProtocolVersion = supportedProtocolVersions.stream().mapToInt(Integer::intValue).max().getAsInt();
-                if(maxProtocolVersion > 47){
+                if (maxProtocolVersion > 47) {
                     // 1.9
                     Class clazz = Protocol.DirectionData.class;
                     Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, int.class, Class.class);
@@ -339,7 +350,7 @@ public class BungeeTabListPlus {
     public boolean reload() {
         try {
             config = new ConfigManager(plugin);
-            variables = new VariablesManager();
+            placeholderManager.reload();
             TabListManager tabListManager = new TabListManager(this);
             if (!tabListManager.loadTabLists()) {
                 return false;
@@ -424,14 +435,8 @@ public class BungeeTabListPlus {
         return config;
     }
 
-    /**
-     * Getter for the VariableManager. The VariableManager can be used to add
-     * custom Variables.
-     *
-     * @return an instance of the VariableManager or null
-     */
-    public VariablesManager getVariablesManager() {
-        return variables;
+    public PlaceholderManager getPlaceholderManager() {
+        return placeholderManager;
     }
 
     /**

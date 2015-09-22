@@ -19,301 +19,258 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.section.*;
-import codecrafter47.bungeetablistplus.skin.LazySkin;
-import codecrafter47.bungeetablistplus.skin.Skin;
-import com.google.common.base.Preconditions;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import net.md_5.bungee.api.ChatColor;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-/**
- * @author Florian Stober
- */
 public class ConfigParser {
 
     private final BungeeTabListPlus plugin;
 
-    private final TabListConfig config;
-    public static final Pattern PATTERN_TAGS = Pattern.compile("^(\\[[^]]*\\])*(?<text>.*)$");
+    private static final Pattern PATTERN_ALIGN_BOTTOM = Pattern.compile("\\[ALIGN BOTTOM\\]");
+    private static final Pattern PATTERN_ALIGN_LEFT = Pattern.compile("\\[ALIGN LEFT\\]");
+    private static final Pattern PATTERN_ALIGN_RIGHT = Pattern.compile("\\[ALIGN RIGHT\\]");
+    private static final Pattern PATTERN_COLUMN = Pattern.compile("\\[COLUMN=(\\d+)\\]");
+    private static final Pattern PATTERN_ROW = Pattern.compile("\\[ROW=(\\d+)\\]");
+    private static final Pattern PATTERN_MAXPLAYERS = Pattern.compile("\\[MAXPLAYERS=(\\d+)\\]");
+    private static final Pattern PATTERN_SORT = Pattern.compile("\\[SORT=([^]]+)\\]");
 
-    public ConfigParser(TabListConfig config, BungeeTabListPlus plugin) {
-        this.config = config;
+    private static final Pattern PATTERN_FILLPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillplayers(?::(?<filter>.*))?\\}(?<suffix>.*)$");
+    private static final Pattern PATTERN_FILLBUKKITPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillbukkitplayers\\}(?<suffix>.*)$");
+
+    public ConfigParser(BungeeTabListPlus plugin) {
         this.plugin = plugin;
     }
 
-    public TabListProvider parse() throws ParseException {
+    public TabListProvider parse(TabListConfig config) {
+        List<SlotTemplate> playerLines = config.playerLines.stream().map(this::parseSlot).collect(Collectors.toList());
+        List<SlotTemplate> morePlayerLines = config.morePlayersLines.stream().map(this::parseSlot).collect(Collectors.toList());
+
+
         List<Section> topSections = new ArrayList<>();
         List<Section> botSections = new ArrayList<>();
-        boolean bottom = false;
+        final boolean[] bottom = {false};
         for (String line : config.tabList) {
             // Its properties
-            int ping = 0;
-            int startColumn = -1;
-            int column = -1;
-            int maxplayers = 1000;
-            Skin skin = SkinManager.defaultSkin;
-            List<String> sortrules = new ArrayList<>();
+            final int[] startColumn = {-1};
+            final int[] column = {-1};
+            final int[] maxplayers = {1000};
+            final List<String> sortrules = new ArrayList<>();
 
             // Parsing tags
-            List<String> tags = parseTags(line);
-            for (String tag : tags) {
-                if (tag.equals("ALIGN BOTTOM")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ALIGN BOTTOM] in verticalMode");
-                    } else {
-                        bottom = true;
-                    }
-                } else if (tag.equals("ALIGN LEFT")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ALIGN LEFT] in verticalMode");
-                    } else {
-                        startColumn = 0;
-                    }
-                } else if (tag.equals("ALIGN RIGHT")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
-                    } else {
-                        startColumn = ConfigManager.getCols() - 1;
-                    }
-                } else if (tag.startsWith("PING=")) {
-                    try {
-                        ping = Integer.parseInt(tag.substring(5, tag.length()));
-                    } catch (NumberFormatException ex){
-                        plugin.getLogger().log(Level.WARNING, "When using [PING=?] you are supposed to replace the ? with a valid number", ex);
-                    }
-                } else if (tag.startsWith("COLUMN=")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
-                    } else {
-                        column = Integer.parseInt(tag.substring(7, tag.length()));
-                    }
-                } else if (tag.startsWith("ROW=")) {
-                    if (!config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
-                    } else {
-                        column = Integer.parseInt(tag.substring(4, tag.length()));
-                    }
-                } else if (tag.startsWith("SORT=")) {
-                    sortrules = Arrays.asList(tag.substring(5, tag.length()).
-                            split(","));
-                    validateSortrules(sortrules);
-                } else if (tag.startsWith("MAXPLAYERS=")) {
-                    maxplayers = Integer.parseInt(tag.
-                            substring(11, tag.length()));
-                } else if (tag.startsWith("SKIN=")) {
-                    skin = new LazySkin(tag.substring(5, tag.length()));
+            line = findTag(line, PATTERN_ALIGN_BOTTOM, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ALIGN BOTTOM] in verticalMode");
                 } else {
-                    plugin.getLogger().log(Level.WARNING,
-                            "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
-                                    config.getFileName()});
+                    bottom[0] = true;
                 }
-            }
+            });
 
-            if (startColumn == -1 && column != -1) {
-                startColumn = column;
+            line = findTag(line, PATTERN_ALIGN_LEFT, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ALIGN LEFT] in verticalMode");
+                } else {
+                    startColumn[0] = 0;
+                }
+            });
+
+            line = findTag(line, PATTERN_ALIGN_RIGHT, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
+                } else {
+                    startColumn[0] = ConfigManager.getCols() - 1;
+                }
+            });
+
+            line = findTag(line, PATTERN_COLUMN, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
+                } else {
+                    column[0] = Integer.parseInt(matcher.group(1));
+                }
+            });
+
+            line = findTag(line, PATTERN_ROW, matcher -> {
+                if (!config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
+                } else {
+                    column[0] = Integer.parseInt(matcher.group(1));
+                }
+            });
+
+            line = findTag(line, PATTERN_SORT, matcher -> {
+                sortrules.addAll(Arrays.asList(matcher.group(1).split(",")));
+                validateSortrules(sortrules);
+            });
+
+            line = findTag(line, PATTERN_MAXPLAYERS, matcher -> {
+                maxplayers[0] = Integer.parseInt(matcher.group(1));
+            });
+
+            if (startColumn[0] == -1 && column[0] != -1) {
+                startColumn[0] = column[0];
             }
 
             // Get current section list
             List<Section> sections;
-            if (!bottom) {
+            if (!bottom[0]) {
                 sections = topSections;
             } else {
                 sections = botSections;
             }
 
-            // Strip Tags
-            String text = stripTags(line);
-
-            // Parsing FillPlayers
-            if (isFillPlayers(line)) {
-                String prefix = text.substring(0, text.indexOf("{fillplayers"));
-                String suffix = text.substring(text.
-                        indexOf('}', prefix.length()), text.length() - 1);
-                String args = text.charAt(prefix.length() + 12) == ':' ? text.
-                        substring(prefix.length() + 13, text.length() - suffix.
-                                length() - 1) : "";
+            Matcher fillplayersMatcher = PATTERN_FILLPLAYERS.matcher(line);
+            Matcher fillbukkitplayersMatcher = PATTERN_FILLBUKKITPLAYERS.matcher(line);
+            if (fillplayersMatcher.matches()) {
+                SlotTemplate prefix = parseSlot(fillplayersMatcher.group("prefix"));
+                SlotTemplate suffix = parseSlot(fillplayersMatcher.group("suffix"));
+                String args = fillplayersMatcher.group("filter");
                 List<String> filter;
-                if (args.length() > 0) {
-                    filter = Arrays.asList(args.split(","));
-                } else {
+                if (args == null || args.isEmpty()) {
                     filter = new ArrayList<>();
+                } else {
+                    filter = Arrays.asList(args.split(","));
                 }
-                if (column == -1) {
-                    if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.
-                            isEmpty()) {
-                        sections.add(new AutoFillPlayers(startColumn, prefix,
-                                suffix, skin, sortrules, maxplayers));
+                if (column[0] == -1) {
+                    if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
+                        sections.add(new AutoFillPlayers(startColumn[0], prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     } else {
-                        sections.add(new FillPlayersSection(startColumn, filter,
-                                config, prefix, suffix, skin, sortrules, maxplayers));
+                        sections.add(new FillPlayersSection(startColumn[0], filter, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     }
                 } else {
                     ColumnSplitSection cs;
                     if (!sections.isEmpty() && sections.get(sections.size() - 1) instanceof ColumnSplitSection) {
-                        cs = (ColumnSplitSection) sections.get(
-                                sections.size() - 1);
+                        cs = (ColumnSplitSection) sections.get(sections.size() - 1);
                     } else {
                         cs = new ColumnSplitSection();
                         sections.add(cs);
                     }
-                    cs.addCollumn(column, new PlayerColumn(filter, config,
-                            prefix, suffix, skin, sortrules, maxplayers));
+                    cs.addCollumn(column[0], new PlayerColumn(filter, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
                 }
-            } else if (isFillBukkitPlayers(line)) {
-                String prefix = text.substring(0, text.indexOf("{fillbukkitplayers"));
-                String suffix = text.substring(text.
-                        indexOf('}', prefix.length()), text.length() - 1);
-                sections.add(new FillBukkitPlayers(startColumn, config, prefix, suffix, skin, sortrules, maxplayers));
-            } // Parsing Normal text
-            else {
+            } else if (fillbukkitplayersMatcher.matches()) {
+                SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));
+                SlotTemplate suffix = parseSlot(fillbukkitplayersMatcher.group("suffix"));
+                sections.add(new FillBukkitPlayers(startColumn[0], prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+            } else {
+                SlotTemplate template = parseSlot(line);
                 StaticSection section;
-                if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof StaticSection && startColumn == -1) {
+                if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof StaticSection && startColumn[0] == -1) {
                     section = (StaticSection) sections.get(sections.size() - 1);
                 } else {
-                    section = new StaticSection(startColumn);
+                    section = new StaticSection(startColumn[0]);
                     sections.add(section);
                 }
-                Slot slot = new Slot(text, ping);
-                slot.setSkin(skin);
-                section.add(slot);
+                section.add(template);
             }
         }
 
-        return new TabListProvider(plugin, topSections, botSections,
-                config.showEmptyGroups, config, this);
+        return new TabListProvider(plugin, topSections, botSections, config.showEmptyGroups, config, this, config.shownFooterHeader, parseSlot(config.header), parseSlot(config.footer));
     }
 
-    public List<Section> parseServerSections(String g_prefix, String g_suffix, Skin g_skin,
-                                             List<String> g_filter, String g_server, List<String> g_sort,
-                                             int maxplayers) throws ParseException {
+    public List<Section> parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, String g_server, List<String> g_sort, int g_maxplayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         List<Section> sections = new ArrayList<>();
         for (String line : config.groupLines) {
             // Its properties
-            int ping = 0;
-            int startColumn = -1;
-            Skin skin = g_skin;
-            List<String> sortrules = new ArrayList<>();
+            final int[] startColumn = {-1};
+            final List<String> sortrules = new ArrayList<>();
+            final int[] maxplayers = {g_maxplayers};
 
             // Parsing tags
-            List<String> tags = parseTags(line);
-            for (String tag : tags) {
-                if (tag.equals("ALIGN LEFT")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ALIGN LEFT] in verticalMode");
-                    } else {
-                        startColumn = 0;
-                    }
-                } else if (tag.equals("ALIGN RIGHT")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
-                    } else {
-                        startColumn = ConfigManager.getCols() - 1;
-                    }
-                } else if (tag.startsWith("PING=")) {
-                    ping = Integer.parseInt(tag.substring(5, tag.length()));
-                } else if (tag.startsWith("SORT=")) {
-                    sortrules = new ArrayList<>(Arrays.asList(tag.substring(5,
-                            tag.length()).split(",")));
-                } else if (tag.startsWith("COLUMN=")) {
-                    if (config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
-                    } else {
-                        startColumn = Integer.parseInt(tag.substring(7, tag.length()));
-                    }
-                } else if (tag.startsWith("ROW=")) {
-                    if (!config.verticalMode) {
-                        plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
-                    } else {
-                        startColumn = Integer.parseInt(tag.substring(4, tag.length()));
-                    }
-                } else if (tag.startsWith("MAXPLAYERS=")) {
-                    maxplayers = Integer.parseInt(tag.
-                            substring(11, tag.length()));
-                } else if (tag.startsWith("SKIN=")) {
-                    skin = new LazySkin(tag.substring(5, tag.length()));
+            line = findTag(line, PATTERN_ALIGN_LEFT, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ALIGN LEFT] in verticalMode");
                 } else {
-                    plugin.getLogger().log(Level.WARNING,
-                            "Unknown Tag \"[{0}]\" in {1}", new Object[]{tag,
-                                    config.getFileName()});
+                    startColumn[0] = 0;
                 }
-            }
+            });
+
+            line = findTag(line, PATTERN_ALIGN_RIGHT, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
+                } else {
+                    startColumn[0] = ConfigManager.getCols() - 1;
+                }
+            });
+
+            line = findTag(line, PATTERN_SORT, matcher -> {
+                sortrules.addAll(Arrays.asList(matcher.group(1).split(",")));
+                validateSortrules(sortrules);
+            });
+
+            line = findTag(line, PATTERN_COLUMN, matcher -> {
+                if (config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
+                } else {
+                    startColumn[0] = Integer.parseInt(matcher.group(1));
+                }
+            });
+
+            line = findTag(line, PATTERN_ROW, matcher -> {
+                if (!config.verticalMode) {
+                    plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
+                } else {
+                    startColumn[0] = Integer.parseInt(matcher.group(1));
+                }
+            });
+
+            line = findTag(line, PATTERN_MAXPLAYERS, matcher -> {
+                maxplayers[0] = Integer.parseInt(matcher.group(1));
+            });
 
             sortrules.addAll(g_sort);
 
-            // Strip Tags
-            String text = stripTags(line);
-            // Parsing FillPlayers
-            if (isFillPlayers(line)) {
-                // TODO autogroup
-                String prefix = g_prefix + text.substring(0, text.indexOf(
-                        "{fillplayers"));
-                String suffix = text.substring(text.
-                        indexOf('}', prefix.length()), text.length() - 1) + g_suffix;
-                String args = text.charAt(prefix.length() + 12) == ':' ? text.
-                        substring(prefix.length() + 13, text.length() - suffix.
-                                length() - 1) : "";
-                List<String> filter = new ArrayList<>(Arrays.asList(args.split(
-                        ",")));
+            Matcher fillplayersMatcher = PATTERN_FILLPLAYERS.matcher(line);
+            if (fillplayersMatcher.matches()) {
+                SlotTemplate prefix = SlotTemplate.of(g_prefix, parseSlot(fillplayersMatcher.group("prefix")));
+                SlotTemplate suffix = SlotTemplate.of(parseSlot(fillplayersMatcher.group("suffix")), g_suffix);
+                String args = fillplayersMatcher.group("filter");
+                List<String> filter;
+                if (args == null || args.isEmpty()) {
+                    filter = new ArrayList<>();
+                } else {
+                    filter = Arrays.asList(args.split(","));
+                }
                 checkServer(filter);
                 filter.addAll(g_filter);
                 filter.addAll(Arrays.asList(g_server.split(",")));
-                sections.add(new FillPlayersSection(startColumn, filter, config,
-                        prefix, suffix, skin, sortrules, maxplayers));
-            } // Parsing Normal text
-            else {
+                sections.add(new FillPlayersSection(startColumn[0], filter,
+                        prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+            } else {
                 ServerSection section;
-                if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof ServerSection && startColumn == -1) {
+                if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof ServerSection && startColumn[0] == -1) {
                     section = (ServerSection) sections.get(sections.size() - 1);
                 } else {
-                    section = new ServerSection(startColumn, Arrays.asList(g_server.split(",")));
+                    section = new ServerSection(startColumn[0], Arrays.asList(g_server.split(",")));
                     sections.add(section);
                 }
-                Slot slot = new Slot(g_prefix + text + g_suffix, ping);
-                slot.setSkin(skin);
-                section.add(slot);
+                section.add(SlotTemplate.of(g_prefix, parseSlot(line), g_suffix));
             }
         }
         return sections;
     }
 
-    private List<String> parseTags(String line) throws ParseException {
-        // TODO this can be optimized
-        int i = 0;
-        List<String> tags = new ArrayList<>();
-        while (i < line.length() && line.charAt(i) == '[') {
-            int end = line.indexOf(']', i);
-            if (end == -1) {
-                throw new ParseException("Missing ']'", i);
-            }
-            tags.add(line.substring(i + 1, end));
-            i = end + 1;
+    private SlotTemplate parseSlot(String line) {
+        return plugin.getPlaceholderManager().parseSlot(line);
+    }
+
+    private String findTag(String text, Pattern pattern, Consumer<Matcher> onFound) {
+        StringBuffer sb = new StringBuffer();
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            onFound.accept(matcher);
+            matcher.appendReplacement(sb, "");
         }
-        return tags;
-    }
-
-    private String stripTags(String line) throws ParseException {
-        // TODO this can be optimized
-        Matcher matcher = PATTERN_TAGS.matcher(line);
-        matcher.matches();
-        return matcher.group("text");
-    }
-
-    private boolean isFillPlayers(String s) {
-        return s.matches("^.*\\{fillplayers(:.*)?\\}.*$");
-    }
-
-    private boolean isFillBukkitPlayers(String s) {
-        return s.matches("^.*\\{fillbukkitplayers\\}.*$");
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     private void validateSortrules(List<String> sortrules) {

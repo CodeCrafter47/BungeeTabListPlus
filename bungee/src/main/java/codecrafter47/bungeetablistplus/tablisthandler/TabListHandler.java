@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 public interface TabListHandler {
 

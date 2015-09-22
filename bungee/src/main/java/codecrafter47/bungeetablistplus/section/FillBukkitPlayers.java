@@ -19,10 +19,9 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.config.TabListConfig;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -34,9 +33,9 @@ import java.util.List;
  */
 public class FillBukkitPlayers extends FillPlayersSection {
 
-    public FillBukkitPlayers(int startColumn, TabListConfig config, String prefix, String suffix, Skin skin,
-                             List<String> sortrules, int maxPlayers) {
-        super(startColumn, null, config, prefix, suffix, skin, sortrules, maxPlayers);
+    public FillBukkitPlayers(int startColumn, SlotTemplate prefix, SlotTemplate suffix,
+                             List<String> sortrules, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+        super(startColumn, null, prefix, suffix, sortrules, maxPlayers, playerLines, morePlayerLines);
     }
 
     @Override

@@ -20,12 +20,12 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.ChatColor;
@@ -65,30 +65,33 @@ public class TabList18 implements TabListHandler {
                 getMainConfig().charLimit;
 
         for (int i = 0; i < tabList.getColumns() * tabList.getRows(); i++) {
-            Slot line = tabList.getSlot((i % tabList.getRows()) * tabList.
-                    getColumns() + (i / tabList.getRows()));
-            if (line == null) {
-                line = new Slot(" ", tabList.getDefaultPing());
-            }
-            String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()), context);
-            text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(playerTablistHandler.getPlayer(), text, context);
-            text = ChatColor.translateAlternateColorCodes('&', text);
-            if (charLimit > 0) {
-                text = ColorParser.substringIgnoreColors(text, charLimit);
-                for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
-                    text += ' ';
+            Slot slot = tabList.getSlot((i % tabList.getRows()) * tabList.getColumns() + (i / tabList.getRows()));
+            String text;
+            int ping;
+            Skin skin;
+            if (slot != null) {
+                text = slot.getText();
+                text = ChatColor.translateAlternateColorCodes('&', text);
+                if (charLimit > 0) {
+                    text = ColorParser.substringIgnoreColors(text, charLimit);
+                    for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
+                        text += ' ';
+                    }
                 }
+                if (text.endsWith("" + ChatColor.COLOR_CHAR)) {
+                    text = text.substring(0, text.length() - 1);
+                }
+                ping = slot.getPing();
+                skin = slot.getSkin();
+                if (skin == SkinManager.defaultSkin) {
+                    skin = tabList.getDefaultSkin();
+                }
+            } else {
+                text = "";
+                ping = tabList.getDefaultPing();
+                skin = tabList.getDefaultSkin();
             }
-            if (text.endsWith("" + ChatColor.COLOR_CHAR)) {
-                text = text.substring(0, text.length() - 1);
-            }
-
-            if (line.getSkin() == SkinManager.defaultSkin) {
-                line.setSkin(tabList.getDefaultSkin());
-            }
-            updateSlot(i, text, line.ping, line.getSkin());
+            updateSlot(i, text, ping, skin);
         }
 
         // update header/footer
@@ -97,9 +100,15 @@ public class TabList18 implements TabListHandler {
             if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
                 header = header.substring(0, header.length() - 1);
             }
+            if (header != null) {
+                header = ChatColor.translateAlternateColorCodes('&', header);
+            }
             String footer = tabList.getFooter();
             if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
                 footer = footer.substring(0, footer.length() - 1);
+            }
+            if (footer != null) {
+                footer = ChatColor.translateAlternateColorCodes('&', footer);
             }
             if (header != null || footer != null) {
                 String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));

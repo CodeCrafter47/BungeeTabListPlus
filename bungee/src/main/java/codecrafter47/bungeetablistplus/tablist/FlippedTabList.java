@@ -20,7 +20,6 @@
 package codecrafter47.bungeetablistplus.tablist;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
 import codecrafter47.bungeetablistplus.skin.Skin;
 
 public class FlippedTabList implements ITabList {

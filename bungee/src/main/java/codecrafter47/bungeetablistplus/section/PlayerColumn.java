@@ -19,43 +19,36 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.Slot;
-import codecrafter47.bungeetablistplus.config.TabListConfig;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.sorting.AdminFirst;
 import codecrafter47.bungeetablistplus.sorting.Alphabet;
 import codecrafter47.bungeetablistplus.sorting.ISortingRule;
 import codecrafter47.bungeetablistplus.sorting.YouFirst;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 import java.util.*;
 
-/**
- * @author Florian Stober
- */
 public class PlayerColumn {
 
     final Collection<String> filter;
-    private final TabListConfig config;
-    private final String prefix;
-    private final String suffix;
-    private final Skin skin;
+    private final SlotTemplate prefix;
+    private final SlotTemplate suffix;
     private List<IPlayer> players;
     private final List<String> sort;
     private final int maxPlayers;
+    private final List<SlotTemplate> playerLines;
+    private final List<SlotTemplate> morePlayerLines;
 
-    public PlayerColumn(List<String> filter, TabListConfig config, String prefix,
-                        String suffix, Skin skin, List<String> sortrules, int maxPlayers) {
+    public PlayerColumn(List<String> filter, SlotTemplate prefix, SlotTemplate suffix, List<String> sortrules, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         this.filter = filter;
-        this.config = config;
         this.prefix = prefix;
         this.suffix = suffix;
         this.sort = sortrules;
-        this.skin = skin;
         this.maxPlayers = maxPlayers;
+        this.playerLines = playerLines;
+        this.morePlayerLines = morePlayerLines;
     }
 
     public void precalculate(TabListContext context) {
@@ -100,59 +93,34 @@ public class PlayerColumn {
         if (m > maxPlayers) {
             m = maxPlayers;
         }
-        return m * config.playerLines.size();
+        return m * playerLines.size();
     }
 
-    public void calculate(TabListContext context, ITabList ITabList, int column,
-                          int row, int size, int span) {
+    public Slot getSlotAt(TabListContext context, int pos, int size) {
         int playersToShow = players.size();
         if (playersToShow > maxPlayers) {
             playersToShow = maxPlayers;
         }
-        if (playersToShow * config.playerLines.size() > size) {
-            playersToShow = (size - config.morePlayersLines.size()) / config.playerLines.
-                    size();
+        if (playersToShow * playerLines.size() > size) {
+            playersToShow = (size - morePlayerLines.size()) / playerLines.size();
             if (playersToShow < 0) {
                 playersToShow = 0;
             }
         }
         int other_count = players.size() - playersToShow;
 
-        int p = row;
-        int c = 0;
-        for (int i = 0; i < playersToShow; i++) {
-            for (String line : config.playerLines) {
-                line = prefix + line + suffix;
-                line = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(context.getViewer(), line, players.get(i), context);
-                ITabList.setSlot(p, column + c, new Slot(line,
-                        BungeeTabListPlus.getInstance().getConfigManager().
-                                getMainConfig().sendPing ? players.get(i).getPing() : 0));
-                if (skin != SkinManager.defaultSkin)
-                    ITabList.getSlot(p, column + c).setSkin(skin);
-                else if (config.showCorrectPlayerSkins)
-                    ITabList.getSlot(p, column + c).setSkin(players.get(i).getSkin());
-                c++;
-                if (c >= span) {
-                    c = 0;
-                    p++;
-                }
-            }
-        }
-
-        if (other_count > 0) {
-            for (String line : config.morePlayersLines) {
-                line = prefix + line + suffix;
-                line = line.replace("{other_count}", "" + other_count);
-                ITabList.setSlot(p, column + c, new Slot(line, config.defaultPing));
-                if (skin != SkinManager.defaultSkin)
-                    ITabList.getSlot(p, column + c).setSkin(skin);
-                c++;
-                if (c >= span) {
-                    c = 0;
-                    p++;
-                }
-            }
+        if (pos < playersToShow * playerLines.size()) {
+            int playerIndex = pos / playerLines.size();
+            int playerLinesIndex = pos % playerLines.size();
+            IPlayer player = players.get(playerIndex);
+            return SlotTemplate.of(SlotTemplate.skin(player.getSkin()), SlotTemplate.ping(player.getPing()),
+                    prefix, playerLines.get(playerLinesIndex), suffix)
+                    .buildSlot(context.setPlayer(player));
+        } else if (other_count > 0) {
+            int morePlayerLinesIndex = pos - playersToShow * playerLines.size();
+            return SlotTemplate.of(prefix, morePlayerLines.get(morePlayerLinesIndex), suffix).buildSlot(context.setOtherCount(other_count));
+        } else {
+            return null;
         }
     }
 }

@@ -18,34 +18,35 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.layout.TabListContext;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 import java.util.List;
 import java.util.OptionalInt;
 
 public class AutoFillPlayers extends Section {
 
-    public final String prefix;
-    public final String suffix;
+    public final SlotTemplate prefix;
+    public final SlotTemplate suffix;
     public final int startColumn;
     public final int maxPlayers;
     public final List<String> sortRules;
-    public final Skin skin;
+    public final List<SlotTemplate> playerLines;
+    public final List<SlotTemplate> morePlayerLines;
 
-    public AutoFillPlayers(int startColumn, String prefix, String suffix, Skin skin,
-                           List<String> sortRules, int maxPlayers) {
+    public AutoFillPlayers(int startColumn, SlotTemplate prefix, SlotTemplate suffix, List<String> sortRules, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         this.prefix = prefix;
         this.suffix = suffix;
         this.startColumn = startColumn;
         this.sortRules = sortRules;
         this.maxPlayers = maxPlayers;
-        this.skin = skin;
+        this.playerLines = playerLines;
+        this.morePlayerLines = morePlayerLines;
     }
 
     @Override
-    public int calculate(TabListContext player, ITabList ITabList, int pos, int size) {
+    public Slot getSlotAt(TabListContext context, int pos, int size) {
         throw new UnsupportedOperationException("Not supported");
     }
 

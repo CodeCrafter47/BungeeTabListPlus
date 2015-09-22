@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.api;
 
 import codecrafter47.bungeetablistplus.layout.LayoutException;
-import codecrafter47.bungeetablistplus.layout.TabListContext;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 
