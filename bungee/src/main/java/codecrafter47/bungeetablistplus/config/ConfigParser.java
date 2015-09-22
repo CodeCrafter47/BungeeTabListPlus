@@ -96,6 +96,11 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
                 } else {
                     column[0] = Integer.parseInt(matcher.group(1));
+                    if(column[0] > ConfigManager.getCols()){
+                        plugin.getLogger().warning(String.format("You used [COLUMN=%d] but the tablist only has %d columns. Setting column to %d",
+                                column[0], ConfigManager.getCols(), ConfigManager.getCols() - 1));
+                        column[0] = ConfigManager.getCols() - 1;
+                    }
                 }
             });
 
@@ -104,6 +109,11 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
                 } else {
                     column[0] = Integer.parseInt(matcher.group(1));
+                    if(column[0] > ConfigManager.getRows()){
+                        plugin.getLogger().warning(String.format("You used [ROW=%d] but the tablist only has %d rows. Setting row to %d",
+                                column[0], ConfigManager.getRows(), ConfigManager.getRows() - 1));
+                        column[0] = ConfigManager.getRows() - 1;
+                    }
                 }
             });
 
@@ -211,6 +221,11 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
                 } else {
                     startColumn[0] = Integer.parseInt(matcher.group(1));
+                    if(startColumn[0] > ConfigManager.getCols()){
+                        plugin.getLogger().warning(String.format("You used [COLUMN=%d] but the tablist only has %dcolumns. Setting columns to %d",
+                                startColumn[0], ConfigManager.getCols(), ConfigManager.getCols() - 1));
+                        startColumn[0] = ConfigManager.getCols() - 1;
+                    }
                 }
             });
 
@@ -219,6 +234,11 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
                 } else {
                     startColumn[0] = Integer.parseInt(matcher.group(1));
+                    if(startColumn[0] > ConfigManager.getRows()){
+                        plugin.getLogger().warning(String.format("You used [ROW=%d] but the tablist only has %d rows. Setting row to %d",
+                                startColumn[0], ConfigManager.getRows(), ConfigManager.getRows() - 1));
+                        startColumn[0] = ConfigManager.getRows() - 1;
+                    }
                 }
             });
 
