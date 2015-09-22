@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class SkinManager {
             }
             return null;
         } catch (Throwable e) {
-            if (e instanceof ConnectException) {
+            if (e instanceof ConnectException || e instanceof UnknownHostException) {
                 // generic connection error, retry in 30 seconds
                 plugin.getLogger().warning("An error occurred while connecting to mojang servers: " + e.getMessage() + ". Will retry in 30 Seconds");
                 plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
@@ -133,7 +134,7 @@ public class SkinManager {
                         get(0).signature});
             }
         } catch (Throwable e) {
-            if (e instanceof ConnectException) {
+            if (e instanceof ConnectException || e instanceof UnknownHostException) {
                 // generic connection error
                 plugin.getLogger().warning("An error occurred while connecting to mojang servers(" + e.getMessage() + "). Couldn't fetch skin for " + uuid + ". Will retry in 5 minutes.");
             } else if (e instanceof IOException && e.getMessage().contains("429")) {
