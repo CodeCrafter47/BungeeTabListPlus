@@ -23,6 +23,7 @@ package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -30,7 +31,7 @@ import java.util.List;
 
 public class ServerPrefixVariable implements ServerVariable {
     @Override
-    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args, TabListContext context) {
         if (args != null) {
             return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(args);
         }

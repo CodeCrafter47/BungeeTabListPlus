@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.Variable;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -35,7 +36,7 @@ public class ColorVariable implements Variable {
             ChatColor.RED, ChatColor.LIGHT_PURPLE, ChatColor.DARK_PURPLE};
 
     @Override
-    public String getReplacement(ProxiedPlayer viewer, String args) {
+    public String getReplacement(ProxiedPlayer viewer, String args, TabListContext context) {
         long time = System.currentTimeMillis() / 1000;
         ChatColor all[];
         if (args != null) {

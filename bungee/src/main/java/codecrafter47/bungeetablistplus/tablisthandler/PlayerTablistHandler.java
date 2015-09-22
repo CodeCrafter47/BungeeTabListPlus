@@ -21,6 +21,7 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -31,7 +32,7 @@ import java.util.List;
  */
 public interface PlayerTablistHandler {
 
-    void sendTablist(ITabList tabList);
+    void sendTablist(ITabList tabList, TabListContext context);
 
     boolean isExcluded();
 

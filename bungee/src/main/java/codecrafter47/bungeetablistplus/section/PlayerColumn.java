@@ -61,8 +61,7 @@ public class PlayerColumn {
     }
 
     public void precalculate(TabListContext context) {
-        this.players = BungeeTabListPlus.getInstance().getPlayerManager().
-                getPlayers(filter, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+        this.players = context.getPlayerManager().getPlayers(filter, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {
@@ -127,7 +126,7 @@ public class PlayerColumn {
             for (String line : config.playerLines) {
                 line = prefix + line + suffix;
                 line = BungeeTabListPlus.getInstance().getVariablesManager().
-                        replacePlayerVariables(context.getViewer(), line, players.get(i));
+                        replacePlayerVariables(context.getViewer(), line, players.get(i), context);
                 ITabList.setSlot(p, column + c, new Slot(line,
                         BungeeTabListPlus.getInstance().getConfigManager().
                                 getMainConfig().sendPing ? players.get(i).getPing() : 0));

@@ -21,6 +21,7 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
+import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class TabListContextImpl implements TabListContext {
@@ -28,10 +29,12 @@ public class TabListContextImpl implements TabListContext {
     private final int columns;
     private final int size;
     private final ProxiedPlayer player;
+    private final PlayerManager playerManager;
 
-    public TabListContextImpl(int rows, int columns, ProxiedPlayer player) {
+    public TabListContextImpl(int rows, int columns, ProxiedPlayer player, PlayerManager playerManager) {
         this.rows = rows;
         this.columns = columns;
+        this.playerManager = playerManager;
         this.size = rows * columns;
         this.player = player;
     }
@@ -54,5 +57,10 @@ public class TabListContextImpl implements TabListContext {
     @Override
     public ProxiedPlayer getViewer() {
         return player;
+    }
+
+    @Override
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 }

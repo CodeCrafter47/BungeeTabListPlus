@@ -22,18 +22,18 @@
 package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.api.ServerVariable;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by florian on 29.12.14.
  */
 public class InsertIfServersDifferent implements ServerVariable {
     @Override
-    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args, TabListContext context) {
         if (viewer.getServer() != null && !servers.contains(viewer.getServer().getInfo())) return args;
         return "";
     }

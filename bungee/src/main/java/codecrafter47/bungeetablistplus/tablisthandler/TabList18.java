@@ -23,6 +23,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
@@ -31,10 +32,7 @@ import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 
 import java.util.UUID;
 
@@ -62,7 +60,7 @@ public class TabList18 implements TabListHandler {
     }
 
     @Override
-    public void sendTabList(ITabList tabList) {
+    public void sendTabList(ITabList tabList, TabListContext context) {
         resize(tabList.getColumns() * tabList.getRows());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
@@ -75,9 +73,9 @@ public class TabList18 implements TabListHandler {
                 line = new Slot(" ", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()));
+                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()), context);
             text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(playerTablistHandler.getPlayer(), text);
+                    replaceVariables(playerTablistHandler.getPlayer(), text, context);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);

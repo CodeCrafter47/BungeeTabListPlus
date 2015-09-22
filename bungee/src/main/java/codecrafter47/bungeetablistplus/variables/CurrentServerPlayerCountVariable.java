@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ServerVariable;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
@@ -33,8 +34,8 @@ import java.util.List;
 public class CurrentServerPlayerCountVariable implements ServerVariable {
 
     @Override
-    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args) {
-        return "" + BungeeTabListPlus.getInstance().getPlayerManager().
+    public String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args, TabListContext context) {
+        return "" + context.getPlayerManager().
                 getPlayerCount(Joiner.on(',').join(Collections2.transform(servers, new Function<ServerInfo, Object>() {
                     @Override
                     public Object apply(ServerInfo input) {

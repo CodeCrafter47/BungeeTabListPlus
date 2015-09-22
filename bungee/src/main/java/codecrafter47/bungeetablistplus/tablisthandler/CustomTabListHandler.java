@@ -3,6 +3,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.ChatColor;
@@ -106,7 +107,7 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
     }
 
     @Override
-    public void sendTablist(ITabList tabList) {
+    public void sendTablist(ITabList tabList, TabListContext context) {
         if(tabListHandler instanceof ScoreboardTabList){
             if(!BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit){
                 setTabListHandler(new MyTabList(this));
@@ -116,7 +117,7 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
                 setTabListHandler(new ScoreboardTabList(this));
             }
         }
-        tabListHandler.sendTabList(tabList);
+        tabListHandler.sendTabList(tabList, context);
     }
 
     @Override

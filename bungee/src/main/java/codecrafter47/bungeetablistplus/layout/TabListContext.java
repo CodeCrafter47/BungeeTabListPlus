@@ -21,6 +21,7 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
+import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public interface TabListContext {
@@ -32,4 +33,6 @@ public interface TabListContext {
     int getColumns();
 
     ProxiedPlayer getViewer();
+
+    PlayerManager getPlayerManager();
 }

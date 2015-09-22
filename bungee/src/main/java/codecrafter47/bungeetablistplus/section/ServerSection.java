@@ -53,7 +53,7 @@ public class ServerSection extends StaticSection {
                 public ServerInfo apply(String input) {
                     return BungeeTabListPlus.getInstance().getProxy().getServerInfo(input);
                 }
-            }));
+            }), context);
             ITabList.setSlot(pos++, s2);
         }
         return pos;

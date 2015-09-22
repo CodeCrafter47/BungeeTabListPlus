@@ -36,8 +36,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.text.ParseException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Florian Stober
@@ -63,7 +61,7 @@ public class TabListProvider implements ITabListProvider {
     }
 
     @Override
-    public void fillTabList(ProxiedPlayer player, ITabList tabList) throws LayoutException {
+    public void fillTabList(ProxiedPlayer player, ITabList tabList, TabListContext context) throws LayoutException {
         if (config.verticalMode) {
             tabList = tabList.flip();
         }
@@ -75,10 +73,8 @@ public class TabListProvider implements ITabListProvider {
         List<Section> topSections = new ArrayList<>(top);
         List<Section> botSections = new ArrayList<>(bot);
 
-        parseAutoFillplayers(player, topSections);
-        parseAutoFillplayers(player, botSections);
-
-        TabListContext context = new TabListContextImpl(tabList.getRows(), tabList.getColumns(), player);
+        parseAutoFillplayers(player, topSections, context);
+        parseAutoFillplayers(player, botSections, context);
 
         // precalculate all sections
         precalculateSections(context, topSections);
@@ -115,17 +111,17 @@ public class TabListProvider implements ITabListProvider {
         if (this.config.shownFooterHeader) {
             String header = config.header;
             header = plugin.getVariablesManager().
-                    replacePlayerVariables(player, header, plugin.getBungeePlayerProvider().wrapPlayer(player));
+                    replacePlayerVariables(player, header, plugin.getBungeePlayerProvider().wrapPlayer(player), context);
             header = plugin.getVariablesManager().
-                    replaceVariables(player, header);
+                    replaceVariables(player, header, context);
             header = ChatColor.translateAlternateColorCodes('&', header);
             header = header.replaceAll("\\{newline\\}", "\n");
             tabList.setHeader(header);
             String footer = config.footer;
             footer = plugin.getVariablesManager().
-                    replacePlayerVariables(player, footer, plugin.getBungeePlayerProvider().wrapPlayer(player));
+                    replacePlayerVariables(player, footer, plugin.getBungeePlayerProvider().wrapPlayer(player), context);
             footer = plugin.getVariablesManager().
-                    replaceVariables(player, footer);
+                    replaceVariables(player, footer, context);
             footer = ChatColor.translateAlternateColorCodes('&', footer);
             footer = footer.replaceAll("\\{newline\\}", "\n");
             tabList.setFooter(footer);
@@ -145,7 +141,7 @@ public class TabListProvider implements ITabListProvider {
         }
     }
 
-    private void parseAutoFillplayers(final ProxiedPlayer player, List<Section> sectionList) {
+    private void parseAutoFillplayers(final ProxiedPlayer player, List<Section> sectionList, TabListContext context) {
         for (int i = 0; i < sectionList.size(); i++) {
             Section section = sectionList.get(i);
             if (section instanceof AutoFillPlayers) {
@@ -185,9 +181,9 @@ public class TabListProvider implements ITabListProvider {
                 Collections.sort(list, new Comparator<String>() {
                     @Override
                     public int compare(String s1, String s2) {
-                        int p1 = plugin.
+                        int p1 = context.
                                 getPlayerManager().getServerPlayerCount(s1, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
-                        int p2 = plugin.
+                        int p2 = context.
                                 getPlayerManager().getServerPlayerCount(s2, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
                         if (p1 < p2) {
                             return 1;
@@ -201,7 +197,7 @@ public class TabListProvider implements ITabListProvider {
 
                 int j = i;
                 for (String server : list) {
-                    if (showEmptyGroups || plugin.getPlayerManager().
+                    if (showEmptyGroups || context.getPlayerManager().
                             getPlayerCount(server, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
                         try {
                             List<Section> sections = parser.

@@ -66,7 +66,7 @@ public class FillPlayersSection extends Section {
 
     @Override
     public void precalculate(TabListContext context) {
-        players = getPlayers(context.getViewer());
+        players = getPlayers(context.getViewer(), context);
 
         final List<ISortingRule> srules = new ArrayList<>();
         for (String rule : sort) {
@@ -102,8 +102,8 @@ public class FillPlayersSection extends Section {
         });
     }
 
-    protected List<IPlayer> getPlayers(ProxiedPlayer player) {
-        return BungeeTabListPlus.getInstance().getPlayerManager().getPlayers(
+    protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
+        return context.getPlayerManager().getPlayers(
                 filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
     }
 
@@ -173,7 +173,7 @@ public class FillPlayersSection extends Section {
         for (; i < pos + config.playerLines.size(); i++) {
             String line = prefix + config.playerLines.get(i - pos) + suffix;
             line = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(context.getViewer(), line, player);
+                    replacePlayerVariables(context.getViewer(), line, player, context);
             ITabList.setSlot(i, new Slot(line, BungeeTabListPlus.getInstance().
                     getConfigManager().getMainConfig().sendPing ? player.
                     getPing() : 0));

@@ -73,6 +73,7 @@ public class BungeeTabListPlus {
     private static BungeeTabListPlus INSTANCE;
     @Getter
     private final Plugin plugin;
+    private Collection<IPlayerProvider> playerProviders;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -94,8 +95,6 @@ public class BungeeTabListPlus {
     public static BungeeTabListPlus getInstance() {
         return INSTANCE;
     }
-
-    private PlayerManager players;
 
     /**
      * provides access to the configuration
@@ -214,7 +213,7 @@ public class BungeeTabListPlus {
 
         fakePlayerManager = new FakePlayerManager(plugin);
 
-        Collection<IPlayerProvider> playerProviders = new ArrayList<>();
+        playerProviders = new ArrayList<>();
 
         playerProviders.add(fakePlayerManager);
 
@@ -224,8 +223,6 @@ public class BungeeTabListPlus {
         } else {
             playerProviders.add(bungeePlayerProvider);
         }
-
-        players = new PlayerManager(this, playerProviders);
 
         tabLists = new TabListManager(this);
         if (!tabLists.loadTabLists()) {
@@ -395,8 +392,8 @@ public class BungeeTabListPlus {
      *
      * @return an instance of the PlayerManager or null
      */
-    public PlayerManager getPlayerManager() {
-        return this.players;
+    public PlayerManager constructPlayerManager() {
+        return new PlayerManager(this, playerProviders);
     }
 
     public SkinManager getSkinManager() {
@@ -573,5 +570,20 @@ public class BungeeTabListPlus {
 
     public ProxyServer getProxy() {
         return plugin.getProxy();
+    }
+
+    public boolean isServer(String s) {
+        for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
+            if (s.equalsIgnoreCase(server.getName())) {
+                return true;
+            }
+            int i = s.indexOf('#');
+            if (i > 1) {
+                if (s.substring(0, i).equalsIgnoreCase(server.getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

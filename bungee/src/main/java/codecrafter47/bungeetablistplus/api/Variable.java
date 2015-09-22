@@ -20,9 +20,10 @@
  */
 package codecrafter47.bungeetablistplus.api;
 
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public interface Variable {
 
-    String getReplacement(ProxiedPlayer viewer, String args);
+    String getReplacement(ProxiedPlayer viewer, String args, TabListContext context);
 }

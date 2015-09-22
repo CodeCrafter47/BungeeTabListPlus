@@ -22,14 +22,13 @@ package codecrafter47.bungeetablistplus.variables;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.Variable;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class PlayerCountVariable implements Variable {
 
     @Override
-    public String getReplacement(ProxiedPlayer viewer, String args) {
-        // TODO this shouldn't be a player variable
-        return "" + BungeeTabListPlus.getInstance().getPlayerManager().
-                getGlobalPlayerCount(viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+    public String getReplacement(ProxiedPlayer viewer, String args, TabListContext context) {
+        return "" + context.getPlayerManager().getGlobalPlayerCount(viewer, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
     }
 }

@@ -131,7 +131,7 @@ public class TabListManager implements Listener {
             if (s[1].contains(",")) {
                 invalidShowTo(config);
             }
-            if (plugin.getPlayerManager().isServer(s[1])) {
+            if (plugin.isServer(s[1])) {
                 return;
             } else {
 
@@ -141,7 +141,7 @@ public class TabListManager implements Listener {
 
         if (s[0].equalsIgnoreCase("servers")) {
             for (String sv : s[1].split(",")) {
-                if (!plugin.getPlayerManager().isServer(sv)) {
+                if (!plugin.isServer(sv)) {
 
                     invalidShowTo(config);
                 }

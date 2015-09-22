@@ -23,6 +23,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.Slot;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import net.md_5.bungee.api.ChatColor;
@@ -57,7 +58,7 @@ public class ScoreboardTabList implements TabListHandler {
     }
 
     @Override
-    public void sendTabList(ITabList tabList) {
+    public void sendTabList(ITabList tabList, TabListContext context) {
         resize(tabList.getUsedSlots());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
@@ -69,9 +70,9 @@ public class ScoreboardTabList implements TabListHandler {
                 line = new Slot("", tabList.getDefaultPing());
             }
             String text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()));
+                    replacePlayerVariables(playerTablistHandler.getPlayer(), line.text, BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(playerTablistHandler.getPlayer()), context);
             text = BungeeTabListPlus.getInstance().getVariablesManager().
-                    replaceVariables(playerTablistHandler.getPlayer(), text);
+                    replaceVariables(playerTablistHandler.getPlayer(), text, context);
             text = ChatColor.translateAlternateColorCodes('&', text);
             if (charLimit > 0) {
                 text = ColorParser.substringIgnoreColors(text, charLimit);

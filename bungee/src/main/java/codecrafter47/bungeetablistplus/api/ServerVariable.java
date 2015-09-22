@@ -20,6 +20,7 @@
  */
 package codecrafter47.bungeetablistplus.api;
 
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -27,5 +28,5 @@ import java.util.List;
 
 public interface ServerVariable {
 
-    String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args);
+    String getReplacement(ProxiedPlayer viewer, List<ServerInfo> servers, String args, TabListContext context);
 }

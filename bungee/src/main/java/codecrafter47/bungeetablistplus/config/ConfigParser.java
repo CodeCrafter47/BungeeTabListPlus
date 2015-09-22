@@ -335,7 +335,7 @@ public class ConfigParser {
 
     private void checkServer(List<String> filter) {
         for (String s : filter) {
-            if (plugin.getPlayerManager().isServer(s)) {
+            if (plugin.isServer(s)) {
                 plugin.getLogger().warning(
                         ChatColor.RED + "You shouldn't use {fillplayers:<server>} in groupLines");
             }

@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
@@ -42,7 +43,7 @@ public class FillBukkitPlayers extends FillPlayersSection {
 
     @Override
     @SneakyThrows
-    protected List<IPlayer> getPlayers(ProxiedPlayer player) {
+    protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
         PlayerTablistHandler tabList = (PlayerTablistHandler) BungeeTabListPlus.getTabList(player);
         return tabList.getPlayers();
     }

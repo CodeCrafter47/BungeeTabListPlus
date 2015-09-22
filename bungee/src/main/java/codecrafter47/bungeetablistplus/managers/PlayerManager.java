@@ -26,8 +26,8 @@ import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.data.Values;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -37,37 +37,16 @@ public class PlayerManager {
 
     private final BungeeTabListPlus plugin;
 
-    private final Collection<IPlayerProvider> playerProviders;
+    private final Collection<IPlayer> players;
 
     public PlayerManager(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders) {
         this.plugin = plugin;
-        this.playerProviders = playerProviders;
-    }
-
-    public boolean isServer(String s) {
-        for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
-            if (s.equalsIgnoreCase(server.getName())) {
-                return true;
-            }
-            int i = s.indexOf('#');
-            if (i > 1) {
-                if (s.substring(0, i).equalsIgnoreCase(server.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        this.players = ImmutableList.copyOf(Iterables.concat(Collections2.transform(playerProviders, IPlayerProvider::getPlayers)));
     }
 
     public List<IPlayer> getPlayers(Collection<String> filter,
                                     ProxiedPlayer who, boolean includeSuspectors) {
         List<IPlayer> list = new ArrayList<>();
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Iterable<? extends IPlayer>>() {
-            @Override
-            public Iterable<? extends IPlayer> apply(IPlayerProvider iPlayerProvider) {
-                return iPlayerProvider.getPlayers();
-            }
-        }));
         for (IPlayer p : players) {
             boolean areGroupRules = false;
             boolean areServerRules = false;
@@ -87,7 +66,7 @@ public class PlayerManager {
                                 fitServerRules = true;
                             }
                         }
-                    } else if (isServer(rule)) {
+                    } else if (plugin.isServer(rule)) {
                         areServerRules = true;
                         if (server.isPresent()) {
                             if (server.get().getName().equalsIgnoreCase(rule)) {
@@ -126,12 +105,6 @@ public class PlayerManager {
 
     public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSuspectors) {
         int num = 0;
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Collection<? extends IPlayer>>() {
-            @Override
-            public Collection<? extends IPlayer> apply(IPlayerProvider iPlayerProvider) {
-                return iPlayerProvider.getPlayers();
-            }
-        }));
         for (IPlayer p : players) {
             Optional<ServerInfo> s = p.getServer();
             if (s.isPresent()) {
@@ -146,12 +119,6 @@ public class PlayerManager {
 
     public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSuspectors) {
         int num = 0;
-        Iterable<IPlayer> players = Iterables.concat(Collections2.transform(playerProviders, new Function<IPlayerProvider, Collection<? extends IPlayer>>() {
-            @Override
-            public Collection<? extends IPlayer> apply(IPlayerProvider iPlayerProvider) {
-                return iPlayerProvider.getPlayers();
-            }
-        }));
         for (IPlayer p : players) {
             if (!BungeeTabListPlus.isHidden(p, viewer) && (includeSuspectors || p.getGameMode() != 3)) {
                 num++;

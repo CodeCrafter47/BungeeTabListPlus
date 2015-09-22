@@ -20,10 +20,11 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
 
 public interface TabListHandler {
 
-    void sendTabList(ITabList tabList);
+    void sendTabList(ITabList tabList, TabListContext context);
 
     void unload();
 }

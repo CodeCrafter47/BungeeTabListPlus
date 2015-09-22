@@ -23,6 +23,8 @@ package codecrafter47.bungeetablistplus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.layout.TabListContext;
+import codecrafter47.bungeetablistplus.layout.TabListContextImpl;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import net.md_5.bungee.api.ProxyServer;
@@ -109,17 +111,19 @@ class ResendThread implements Runnable {
             tablistHandler.unload();
             return;
         }
-
         ITabList tabList = new TabList();
+
+        TabListContext context = new TabListContextImpl(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager());
+
         try {
-            tlp.fillTabList(tablistHandler.getPlayer(), tabList);
+            tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
         } catch (LayoutException ex){
             BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Error in tablist config", ex);
         } catch (Throwable th){
             BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Error while updating tablist", th);
         }
 
-        tablistHandler.sendTablist(tabList);
+        tablistHandler.sendTablist(tabList, context);
     }
 
 }
