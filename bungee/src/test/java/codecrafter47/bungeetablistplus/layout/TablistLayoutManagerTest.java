@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
+import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -376,6 +377,11 @@ public class TablistLayoutManagerTest {
 
         @Override
         public ProxiedPlayer getViewer() {
+            return null;
+        }
+
+        @Override
+        public PlayerManager getPlayerManager() {
             return null;
         }
     }
