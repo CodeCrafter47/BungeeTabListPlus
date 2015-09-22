@@ -80,22 +80,21 @@ public class TeamPacket extends Team {
         }
         try {
             super.handle(handler);
-        } catch (Throwable th) {
-            BungeeTabListPlus.getInstance().reportError(th);
-        }
-        try {
-            if (modified) {
-                if (player != null) {
-                    player.unsafe().sendPacket(this);
-                    throw CancelSendSignal.INSTANCE;
-                } else {
-                    BungeeTabListPlus.getInstance().getLogger().severe("Packet " + this + " has been modified but player is null");
+        } finally {
+            try {
+                if (modified) {
+                    if (player != null) {
+                        player.unsafe().sendPacket(this);
+                        throw CancelSendSignal.INSTANCE;
+                    } else {
+                        BungeeTabListPlus.getInstance().getLogger().severe("Packet " + this + " has been modified but player is null");
+                    }
                 }
+            } catch (CancelSendSignal e) {
+                throw e;
+            } catch (Throwable th) {
+                BungeeTabListPlus.getInstance().reportError(th);
             }
-        } catch (CancelSendSignal e) {
-            throw e;
-        } catch (Throwable th) {
-            BungeeTabListPlus.getInstance().reportError(th);
         }
     }
 
