@@ -1,7 +1,7 @@
 /*
- * BungeeTabListPlus - a bungeecord plugin to customize the tablist
+ * BungeeTabListPlus - a BungeeCord plugin to customize the tablist
  *
- * Copyright (C) 2014 Florian Stober
+ * Copyright (C) 2014 - 2015 Florian Stober
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
