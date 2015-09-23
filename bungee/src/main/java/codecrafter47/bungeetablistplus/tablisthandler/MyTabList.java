@@ -88,7 +88,7 @@ public class MyTabList implements TabListHandler {
         update();
     }
 
-    synchronized String setSlot(int n, String text, int ping, boolean update) {
+    private String setSlot(int n, String text, int ping, boolean update) {
         Preconditions.checkArgument(n >= 0 && n < ConfigManager.getTabSize(), "row out of range");
 
         if (slots[n] != null) {
@@ -144,7 +144,7 @@ public class MyTabList implements TabListHandler {
                 "List already contains all variants of string '" + s + "'");
     }
 
-    synchronized void clear() {
+    private void clear() {
         sentStuff.clear();
         for (int i = 0; i <= rowLim; i++) {
             slots[i] = null;
@@ -152,7 +152,7 @@ public class MyTabList implements TabListHandler {
     }
 
     @Override
-    public synchronized void unload() {
+    public void unload() {
         for (int i = 0; i < ConfigManager.getTabSize(); i++) {
             if (sent[i] != null) {
                 BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
@@ -163,7 +163,7 @@ public class MyTabList implements TabListHandler {
         sentStuff.clear();
     }
 
-    synchronized void update() {
+    private void update() {
         boolean remove = false;
         for (int i = 0; i <= rowLim; i++) {
             if (sent[i] != null) {
