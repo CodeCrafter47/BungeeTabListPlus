@@ -44,7 +44,7 @@ public class ConfigManager {
     }
 
     private void loadConfig(Plugin plugin) throws IOException {
-        setMainConfig(new MainConfig(plugin));
+        setMainConfig(new MainConfig());
         File file = new File(plugin.getDataFolder(), "config.yml");
         if(file.exists()){
             config.read(file);

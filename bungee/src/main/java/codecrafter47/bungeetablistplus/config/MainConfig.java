@@ -19,14 +19,13 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.common.Configuration;
-import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.*;
 
 public class MainConfig extends Configuration {
 
 
-    public double tablistUpdateIntervall = 1;
+    public double tablistUpdateInterval = 1;
 
     public boolean updateOnPlayerJoinLeave = true;
 
@@ -37,8 +36,6 @@ public class MainConfig extends Configuration {
     public int charLimit = -1;
 
     public String permissionSource = "AUTO";
-
-    public boolean sendPing = true;
 
     public boolean showPlayersInGamemode3 = true;
 
@@ -108,7 +105,7 @@ public class MainConfig extends Configuration {
         return TimeZone.getTimeZone(timezone);
     }
 
-    public MainConfig(Plugin plugin) {
+    public MainConfig() {
         setHeader("This is the Config File of BungeeTabListPlus",
                 "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki");
     }
@@ -124,9 +121,9 @@ public class MainConfig extends Configuration {
     @SuppressWarnings("unchecked")
     protected void read(Map<Object, Object> map) {
         if (map.containsKey("tablistUpdateInterval")) {
-            tablistUpdateIntervall = ((Number) map.get("tablistUpdateInterval")).doubleValue();
+            tablistUpdateInterval = ((Number) map.get("tablistUpdateInterval")).doubleValue();
         } else if (map.containsKey("tablistUpdateIntervall")) {
-            tablistUpdateIntervall = ((Number) map.get("tablistUpdateIntervall")).doubleValue();
+            tablistUpdateInterval = ((Number) map.get("tablistUpdateIntervall")).doubleValue();
         }
 
         if (map.containsKey("updateOnPlayerJoinLeave")) {
@@ -147,10 +144,6 @@ public class MainConfig extends Configuration {
 
         if (map.containsKey("permissionSource")) {
             permissionSource = map.get("permissionSource").toString();
-        }
-
-        if (map.containsKey("sendPing")) {
-            sendPing = (boolean) map.get("sendPing");
         }
 
         if (map.containsKey("showPlayersInGamemode3")) {
@@ -226,7 +219,7 @@ public class MainConfig extends Configuration {
     protected void write() {
         writeComments("time in seconds after which the tabList will be resend to all players",
                 "set this to -1 to disable scheduled update of the tabList");
-        write("tablistUpdateInterval", tablistUpdateIntervall);
+        write("tablistUpdateInterval", tablistUpdateInterval);
 
         writeComment("whether tabList should be resend if a player joins or leaves the server");
         write("updateOnPlayerJoinLeave", updateOnPlayerJoinLeave);
@@ -250,10 +243,6 @@ public class MainConfig extends Configuration {
                 "BUNGEEPERMS - take information from BungeePerms",
                 "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee");
         write("permissionSource", permissionSource);
-
-        writeComments("whether ping is sent to clients",
-                "setting this to false can help you reducing network traffic");
-        write("sendPing", sendPing);
 
         writeComment("whether to show players in spectator mode");
         write("showPlayersInGamemode3", showPlayersInGamemode3);

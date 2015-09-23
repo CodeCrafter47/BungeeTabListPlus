@@ -253,7 +253,7 @@ public class BungeeTabListPlus {
                 listener);
 
         ResendThread resendThread = new ResendThread(resendQueue,
-                config.getMainConfig().tablistUpdateIntervall);
+                config.getMainConfig().tablistUpdateInterval);
         plugin.getProxy().getScheduler().schedule(plugin, resendThread, 1,
                 TimeUnit.SECONDS);
         startRefreshThread();
@@ -321,7 +321,7 @@ public class BungeeTabListPlus {
     }
 
     private void startRefreshThread() {
-        if (config.getMainConfig().tablistUpdateIntervall > 0) {
+        if (config.getMainConfig().tablistUpdateInterval > 0) {
             try {
                 refreshThread = ProxyServer.getInstance().getScheduler().
                         schedule(
@@ -333,7 +333,7 @@ public class BungeeTabListPlus {
                                         startRefreshThread();
                                     }
                                 },
-                                (long) (config.getMainConfig().tablistUpdateIntervall * 1000),
+                                (long) (config.getMainConfig().tablistUpdateInterval * 1000),
                                 TimeUnit.MILLISECONDS);
             } catch (RejectedExecutionException ex) {
                 // this occurs on proxy shutdown -> we can safely ignore it

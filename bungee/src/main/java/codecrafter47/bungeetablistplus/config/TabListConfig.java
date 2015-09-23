@@ -40,8 +40,6 @@ public class TabListConfig extends Configuration {
 
     public int defaultPing = 0;
 
-    public boolean showCorrectPlayerSkins = true;
-
     public boolean autoShrinkTabList = false;
 
     public String groupPlayers = "SERVER";
@@ -207,10 +205,6 @@ public class TabListConfig extends Configuration {
             defaultPing = ((Number) map.get("defaultPing")).intValue();
         }
 
-        if (map.containsKey("showCorrectPlayerSkins")) {
-            showCorrectPlayerSkins = (boolean) map.get("showCorrectPlayerSkins");
-        }
-
         if (map.containsKey("autoShrinkTabList")) {
             autoShrinkTabList = (boolean) map.get("autoShrinkTabList");
         }
@@ -275,9 +269,6 @@ public class TabListConfig extends Configuration {
         writeComments("ping value tu use for non-player slots, ",
                 "used if no other value is specified using [PING=?]");
         write("defaultPing", defaultPing);
-
-        writeComment("if true player skin is shown beneath name, otherwise default skin");
-        write("showCorrectPlayerSkins", showCorrectPlayerSkins);
 
         writeComments("1.8 ONLY",
                 "When enabled the tablist will adjust it's size to the number of players online/ slots used, instead of using",
