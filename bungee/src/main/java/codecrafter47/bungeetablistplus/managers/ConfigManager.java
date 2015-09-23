@@ -22,12 +22,12 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.config.Messages;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,38 +39,54 @@ public class ConfigManager {
     TabListConfig defaultTabList;
     final List<TabListConfig> tabLists = new ArrayList<>();
 
-    public ConfigManager(Plugin bungeeTabListPlus) throws
-            InvalidConfigurationException {
+    public ConfigManager(Plugin bungeeTabListPlus) throws IOException {
         loadConfig(bungeeTabListPlus);
     }
 
-    private void loadConfig(Plugin plugin) throws
-            InvalidConfigurationException {
+    private void loadConfig(Plugin plugin) throws IOException {
         setMainConfig(new MainConfig(plugin));
+        File file = new File(plugin.getDataFolder(), "config.yml");
+        if(file.exists()){
+            config.read(file);
+        }
+        config.write(file);
         validateConfig();
         File messageFile = new File(plugin.getDataFolder(), "messages.yml");
         if (messageFile.exists()) {
-            messages = new Messages(plugin);
+            messages = new Messages();
+            messages.read(messageFile);
         }
 
         try {
-            Thread.currentThread().getContextClassLoader().loadClass(
-                    "net.md_5.bungee.api.chat.ComponentBuilder");
-        } catch (Exception ex) {
+            Class.forName("net.md_5.bungee.api.chat.ComponentBuilder");
+        } catch (Exception ignored) {
             if (messages == null) {
-                messages = new Messages(plugin);
+                messages = new Messages();
+                messages.read(messageFile);
+                messages.write(messageFile);
             }
         }
         // Load default TabList
-        defaultTabList = new TabListConfig(plugin, "default.yml");
+        defaultTabList = new TabListConfig("default.yml");
+        File tabListDir = new File(plugin.getDataFolder(), "tabLists");
+        if(!tabListDir.exists()){
+            tabListDir.mkdir();
+        }
+        file = new File(tabListDir, "default.yml");
+        defaultTabList.read(file);
+        defaultTabList.write(file);
         // Load other TabLists
         for (String s : new File("plugins" + File.separator
                 + plugin.getDescription().getName() + File.separator
                 + "tabLists").list()) {
             if (s.endsWith(".yml") && !s.equals("default.yml")) {
                 try {
-                    tabLists.add(new TabListConfig(plugin, s));
-                } catch (InvalidConfigurationException ex) {
+                    file = new File(tabListDir, s);
+                    TabListConfig listConfig = new TabListConfig(s);
+                    listConfig.read(file);
+                    listConfig.write(file);
+                    this.tabLists.add(listConfig);
+                } catch (IOException ex) {
                     plugin.getLogger().log(Level.WARNING, "Unable to load " + s, ex);
                 }
             }

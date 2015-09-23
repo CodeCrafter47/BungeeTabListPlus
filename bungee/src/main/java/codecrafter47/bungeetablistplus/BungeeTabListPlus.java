@@ -36,7 +36,6 @@ import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import codecrafter47.data.Values;
 import codecrafter47.util.bungee.PingTask;
 import lombok.Getter;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -151,7 +150,7 @@ public class BungeeTabListPlus {
         INSTANCE = this;
         try {
             config = new ConfigManager(plugin);
-        } catch (InvalidConfigurationException ex) {
+        } catch (IOException ex) {
             plugin.getLogger().warning("Unable to load Config");
             plugin.getLogger().log(Level.WARNING, null, ex);
             plugin.getLogger().warning("Disabling Plugin");
@@ -358,7 +357,7 @@ public class BungeeTabListPlus {
             tabLists = tabListManager;
             fakePlayerManager.reload();
             resendTabLists();
-        } catch (InvalidConfigurationException ex) {
+        } catch (IOException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
         }
         if (refreshThread == null) {

@@ -18,27 +18,63 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
-import net.cubespace.Yamler.Config.Config;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
-import net.md_5.bungee.api.plugin.Plugin;
+import codecrafter47.bungeetablistplus.common.Configuration;
 
-import java.io.File;
+import java.util.Map;
 
-public class Messages extends Config {
+public class Messages extends Configuration {
 
-    public final String errorNoPermission = "&cYou don't have permission to do that";
-    public final String errorNeedsPlayer = "&cThis command must be executed as Player";
-    public final String errorAlreadyHidden = "&cYou are already hidden";
-    public final String errorNotHidden = "&cCan't unhide, you're not hidden";
-    public final String successReloadComplete = "&aReloaded BungeeTabListPlus successfully";
-    public final String successPlayerHide = "&aYou have been hidden: Your name wont appear on the tablist";
-    public final String successPlayerUnhide = "&aYou're not hidden any longer";
+    public String errorNoPermission = "&cYou don't have permission to do that";
+    public String errorNeedsPlayer = "&cThis command must be executed as Player";
+    public String errorAlreadyHidden = "&cYou are already hidden";
+    public String errorNotHidden = "&cCan't unhide, you're not hidden";
+    public String successReloadComplete = "&aReloaded BungeeTabListPlus successfully";
+    public String successPlayerHide = "&aYou have been hidden: Your name wont appear on the tablist";
+    public String successPlayerUnhide = "&aYou're not hidden any longer";
 
-    public Messages(Plugin plugin) throws InvalidConfigurationException {
-        CONFIG_FILE = new File("plugins" + File.separator + plugin.
-                getDescription().getName(), "messages.yml");
-        CONFIG_HEADER = new String[]{"You can change messages here"};
+    public Messages() {
+        setHeader("You can change messages here");
+    }
 
-        this.init();
+    @Override
+    protected void read(Map<Object, Object> map) {
+        if (map.containsKey("errorNoPermission")) {
+            errorNoPermission = map.get("errorNoPermission").toString();
+        }
+
+        if (map.containsKey("errorNeedsPlayer")) {
+            errorNeedsPlayer = map.get("errorNeedsPlayer").toString();
+        }
+
+        if (map.containsKey("errorAlreadyHidden")) {
+            errorAlreadyHidden = map.get("errorAlreadyHidden").toString();
+        }
+
+        if (map.containsKey("errorNotHidden")) {
+            errorNotHidden = map.get("errorNotHidden").toString();
+        }
+
+        if (map.containsKey("successReloadComplete")) {
+            successReloadComplete = map.get("successReloadComplete").toString();
+        }
+
+        if (map.containsKey("successPlayerHide")) {
+            successPlayerHide = map.get("successPlayerHide").toString();
+        }
+
+        if (map.containsKey("successPlayerUnhide")) {
+            successPlayerUnhide = map.get("successPlayerUnhide").toString();
+        }
+    }
+
+    @Override
+    protected void write() {
+        write("errorNoPermission", errorNoPermission);
+        write("errorNeedsPlayer", errorNeedsPlayer);
+        write("errorAlreadyHidden", errorAlreadyHidden);
+        write("errorNotHidden", errorNotHidden);
+        write("successReloadComplete", successReloadComplete);
+        write("successPlayerHide", successPlayerHide);
+        write("successPlayerUnhide", successPlayerUnhide);
     }
 }

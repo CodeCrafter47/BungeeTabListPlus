@@ -47,11 +47,6 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.cubespace.Yamler</pattern>
-                                    <shadedPattern>codecrafter47.bungeetablistplus.libs.net.cubespace.Yamler
-                                    </shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>codecrafter47.util</pattern>
                                     <shadedPattern>codecrafter47.bungeetablistplus.util</shadedPattern>
                                 </relocation>

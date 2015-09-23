@@ -73,7 +73,7 @@ public class TabListManager implements Listener {
                 validateShowTo(c);
                 tabLists.add(new ConfigParser(plugin).parse(c));
             } catch (Throwable ex) {
-                plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getFileName(), ex);
+                plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getName(), ex);
             }
         }
         return true;
@@ -164,7 +164,7 @@ public class TabListManager implements Listener {
         plugin.getLogger().log(
                 Level.WARNING, "{0}{1}: showTo is partly or completely invalid",
                 new Object[]{ChatColor.RED,
-                        config.getFileName()});
+                        config.getName()});
     }
 
     public static void setCustomTabList(ProxiedPlayer player, ITabListProvider tabList) {

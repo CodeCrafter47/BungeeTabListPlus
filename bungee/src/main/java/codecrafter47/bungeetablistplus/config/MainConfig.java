@@ -18,90 +18,36 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
-import net.cubespace.Yamler.Config.*;
+import codecrafter47.bungeetablistplus.common.Configuration;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.io.File;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
-public class MainConfig extends Config {
+public class MainConfig extends Configuration {
 
-    @Comments({
-            "time in seconds after which the tabList will be resend to all players",
-            "set this to -1 to disable scheduled update of the tabList"
-    })
+
     public double tablistUpdateIntervall = 1;
 
-    @Comments({
-            "whether tabList should be resend if a player joins or leaves the server"
-    })
     public boolean updateOnPlayerJoinLeave = true;
 
-    @Comments({
-            "whether tablist should be resend if a player switches the server"
-    })
     public boolean updateOnServerChange = true;
 
-    @Comments({
-            "whether to use scoreboard functions to bypass the 16 character limit",
-            "does NOT conflict if other scoreboard plugins"
-    })
     public boolean useScoreboardToBypass16CharLimit = true;
 
-    @Comments({
-            "You can limit the number of characters per slot here",
-            "Color codes do not count as a character; -1 means unlimited"
-    })
     public int charLimit = -1;
 
-    @Comments({
-            "Decide from where BungeeTabListPlus takes informations like permissions,",
-            "prefix, suffix and group.",
-            "Possible values:",
-            "AUTO        - take best source",
-            "BUKKIT      - take informations from bukkit/vault",
-            "BUNGEEPERMS - take informations from bungeeperms",
-            "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
-    })
     public String permissionSource = "AUTO";
 
-    @Comments({
-            "whether ping is sent to clients",
-            "setting this to false can help you reducing network traffic"
-    })
     public boolean sendPing = true;
 
-    @Comments({
-            "whether to show players in suspector mode"
-    })
     public boolean showPlayersInGamemode3 = true;
 
-    @Comments({
-            "if enabled the plugin checks for new versions automatically.",
-            "Use /BTLP to see whether a new version is available",
-            "this does NOT automatically install an update"
-    })
     public boolean checkForUpdates = true;
 
-    @Comments({
-            "this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available"
-    })
     public boolean notifyAdminsIfUpdateAvailable = true;
 
-    @Comments({
-            "If this is set to true and the plugin encounters an issue a bugreport is sent automatically",
-            "Bug reports do not contain any sensitive or identifying information",
-            "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log"
-    })
     public boolean automaticallySendBugReports = true;
 
-    @Comments({
-            "server Alias fo the {server} Variable"
-    })
     public HashMap<String, String> serverAlias = new HashMap<>();
 
     {
@@ -110,9 +56,6 @@ public class MainConfig extends Config {
         serverAlias.put("server3", "PvP");
     }
 
-    @Comments({
-            "Alias fo the {world} Variable. Match 'server:world' to an alias"
-    })
     public HashMap<String, String> worldAlias = new HashMap<>();
 
     {
@@ -121,10 +64,6 @@ public class MainConfig extends Config {
         worldAlias.put("server3:world", "PvP");
     }
 
-    @Comments({
-            "list servers you wish to create custom prefixes for.",
-            "to use the custom prefixes use the new {serverPrefix} variable"
-    })
     public HashMap<String, String> serverPrefixes = new HashMap<>();
 
     {
@@ -132,10 +71,6 @@ public class MainConfig extends Config {
         serverPrefixes.put("SkyBlock", "&8(&dS&8) ");
     }
 
-    @Comments({
-            "the prefixes used for the {prefix} variable, based upon permission groups",
-            "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
-    })
     public HashMap<String, String> prefixes = new HashMap<>();
 
     {
@@ -143,29 +78,14 @@ public class MainConfig extends Config {
         prefixes.put("admin", "&c[A] ");
     }
 
-    @Comments({
-            "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
-            "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
-            "setting this to -1 disables this feature"
-    })
     public int pingDelay = -1;
 
-    @Comment(
-            "replacement for the {onlineState} variable if the server is online")
     public String online_text = "&2 ON";
 
-    @Comment(
-            "replacement for the {onlineState} variable if the server is offline")
     public String offline_text = "&c OFF";
 
-    @Comments({
-            "those fakeplayers will randomly appear on the tablist. If you don't put any names there then no fakeplayers will appear"
-    })
     public List<String> fakePlayers = new ArrayList<>();
 
-    @Comments({
-            "servers which you wish to show their own tabList (The one provided by bukkit)"
-    })
     public List<String> excludeServers = new ArrayList<>();
 
     {
@@ -173,12 +93,6 @@ public class MainConfig extends Config {
         excludeServers.add("server7");
     }
 
-    @Comments({
-            "servers which you wish to hide from the global tabList",
-            "Note that this is different from excludeServers above: this hides all players on the hidden servers from appearing",
-            "on the tablist, whereas excluded servers' players are still on the BungeeTabListPlus tablist, but they do not see",
-            "the global tab list"
-    })
     public List<String> hiddenServers = new ArrayList<>();
 
     {
@@ -186,35 +100,17 @@ public class MainConfig extends Config {
         hiddenServers.add("server9");
     }
 
-    @Comments({
-            "Detects which servers are using a bukkit-side tabList-plugin",
-            "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
-            "This is disabled by default because it could be accidentially triggered by other plugins (Essentials nicknames etc.)",
-            "Warning: This is an experimental feature, it may cause unintended behaviour"
-    })
     public boolean autoExcludeServers = false;
 
-    @Comments({
-            "Time zone to use for the {time} variable",
-            "Can be full name like \"America/Los_Angeles\"",
-            "or custom id like \"GMT+8\""
-    })
-    @Path("time-zone")
     public String timezone = TimeZone.getDefault().getID();
 
-    public TimeZone getTimeZone(){
+    public TimeZone getTimeZone() {
         return TimeZone.getTimeZone(timezone);
     }
 
-    public MainConfig(Plugin plugin) throws InvalidConfigurationException {
-        CONFIG_FILE = new File("plugins" + File.separator + plugin.
-                getDescription().getName(), "config.yml");
-        CONFIG_HEADER = new String[]{
-                "This is the Config File of BungeeTabListPlus",
-                "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"};
-
-        init();
-        save();
+    public MainConfig(Plugin plugin) {
+        setHeader("This is the Config File of BungeeTabListPlus",
+                "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki");
     }
 
     public String getServerAlias(String name) {
@@ -222,5 +118,205 @@ public class MainConfig extends Config {
             return serverAlias.get(name);
         }
         return name;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void read(Map<Object, Object> map) {
+        if (map.containsKey("tablistUpdateInterval")) {
+            tablistUpdateIntervall = ((Number) map.get("tablistUpdateInterval")).doubleValue();
+        } else if (map.containsKey("tablistUpdateIntervall")) {
+            tablistUpdateIntervall = ((Number) map.get("tablistUpdateIntervall")).doubleValue();
+        }
+
+        if (map.containsKey("updateOnPlayerJoinLeave")) {
+            updateOnPlayerJoinLeave = (boolean) map.get("updateOnPlayerJoinLeave");
+        }
+
+        if (map.containsKey("updateOnServerChange")) {
+            updateOnServerChange = (boolean) map.get("updateOnServerChange");
+        }
+
+        if (map.containsKey("useScoreboardToBypass16CharLimit")) {
+            useScoreboardToBypass16CharLimit = (boolean) map.get("useScoreboardToBypass16CharLimit");
+        }
+
+        if (map.containsKey("charLimit")) {
+            charLimit = ((Number) map.get("charLimit")).intValue();
+        }
+
+        if (map.containsKey("permissionSource")) {
+            permissionSource = map.get("permissionSource").toString();
+        }
+
+        if (map.containsKey("sendPing")) {
+            sendPing = (boolean) map.get("sendPing");
+        }
+
+        if (map.containsKey("showPlayersInGamemode3")) {
+            showPlayersInGamemode3 = (boolean) map.get("showPlayersInGamemode3");
+        }
+
+        if (map.containsKey("checkForUpdates")) {
+            checkForUpdates = (boolean) map.get("checkForUpdates");
+        }
+
+        if (map.containsKey("notifyAdminsIfUpdateAvailable")) {
+            notifyAdminsIfUpdateAvailable = (boolean) map.get("notifyAdminsIfUpdateAvailable");
+        }
+
+        if (map.containsKey("automaticallySendBugReports")) {
+            automaticallySendBugReports = (boolean) map.get("automaticallySendBugReports");
+        }
+
+        if (map.containsKey("serverAlias")) {
+            serverAlias = (HashMap<String, String>) map.get("serverAlias");
+        }
+
+        if (map.containsKey("worldAlias")) {
+            worldAlias = (HashMap<String, String>) map.get("worldAlias");
+        }
+
+        if (map.containsKey("serverPrefixes")) {
+            serverPrefixes = (HashMap<String, String>) map.get("serverPrefixes");
+        }
+
+        if (map.containsKey("prefixes")) {
+            prefixes = (HashMap<String, String>) map.get("prefixes");
+        }
+
+        if (map.containsKey("pingDelay")) {
+            pingDelay = ((Number) map.get("pingDelay")).intValue();
+        }
+
+        if (map.containsKey("online-text")) {
+            online_text = map.get("online-text").toString();
+        } else if (map.containsKey("online")) {
+            online_text = ((Map<Object, Object>) map.get("online")).get("text").toString();
+        }
+
+        if (map.containsKey("offline-text")) {
+            offline_text = map.get("offline-text").toString();
+        } else if (map.containsKey("offline")) {
+            offline_text = ((Map<Object, Object>) map.get("offline")).get("text").toString();
+        }
+
+        if (map.containsKey("fakePlayers")) {
+            fakePlayers = (List<String>) map.get("fakePlayers");
+        }
+
+        if (map.containsKey("excludeServers")) {
+            excludeServers = (List<String>) map.get("excludeServers");
+        }
+
+        if (map.containsKey("hiddenServers")) {
+            hiddenServers = (List<String>) map.get("hiddenServers");
+        }
+
+        if (map.containsKey("autoExcludeServers")) {
+            autoExcludeServers = (boolean) map.get("autoExcludeServers");
+        }
+
+        if (map.containsKey("time-zone")) {
+            timezone = map.get("time-zone").toString();
+        }
+    }
+
+    @Override
+    protected void write() {
+        writeComments("time in seconds after which the tabList will be resend to all players",
+                "set this to -1 to disable scheduled update of the tabList");
+        write("tablistUpdateInterval", tablistUpdateIntervall);
+
+        writeComment("whether tabList should be resend if a player joins or leaves the server");
+        write("updateOnPlayerJoinLeave", updateOnPlayerJoinLeave);
+
+        writeComment("whether tablist should be resend if a player switches the server");
+        write("updateOnServerChange", updateOnServerChange);
+
+        writeComments("whether to use scoreboard functions to bypass the 16 character limit",
+                "does NOT conflict if other scoreboard plugins");
+        write("useScoreboardToBypass16CharLimit", useScoreboardToBypass16CharLimit);
+
+        writeComments("You can limit the number of characters per slot here",
+                "Color codes do not count as a character; -1 means unlimited");
+        write("charLimit", charLimit);
+
+        writeComments("Decide from where BungeeTabListPlus takes information like permissions,",
+                "prefix, suffix and group.",
+                "Possible values:",
+                "AUTO        - take best source",
+                "BUKKIT      - take information from Bukkit/Vault",
+                "BUNGEEPERMS - take information from BungeePerms",
+                "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee");
+        write("permissionSource", permissionSource);
+
+        writeComments("whether ping is sent to clients",
+                "setting this to false can help you reducing network traffic");
+        write("sendPing", sendPing);
+
+        writeComment("whether to show players in spectator mode");
+        write("showPlayersInGamemode3", showPlayersInGamemode3);
+
+        writeComments("if enabled the plugin checks for new versions automatically.",
+                "Use /BTLP to see whether a new version is available",
+                "this does NOT automatically install an update");
+        write("checkForUpdates", checkForUpdates);
+
+        writeComment("this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available");
+        write("notifyAdminsIfUpdateAvailable", notifyAdminsIfUpdateAvailable);
+
+        writeComments("If this is set to true and the plugin encounters an issue a bug report is sent automatically",
+                "Bug reports do not contain any sensitive or identifying information",
+                "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log");
+        write("automaticallySendBugReports", automaticallySendBugReports);
+
+        writeComment("server Alias fo the {server} Variable");
+        write("serverAlias", serverAlias);
+
+        writeComment("Alias fo the {world} Variable. Match 'server:world' to an alias");
+        write("worldAlias", worldAlias);
+
+        writeComments("list servers you wish to create custom prefixes for.",
+                "to use the custom prefixes use the {serverPrefix} variable");
+        write("serverPrefixes", serverPrefixes);
+
+        writeComments("the prefixes used for the {prefix} variable, based upon permission groups",
+                "IMPORTANT: these prefixes won't be used by default. see the wiki for details");
+        write("prefixes", prefixes);
+
+        writeComments("Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
+                "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
+                "setting this to -1 disables this feature");
+        write("pingDelay", pingDelay);
+
+        writeComment("replacement for the {onlineState} variable if the server is online");
+        write("online-text", online_text);
+
+        writeComment("replacement for the {onlineState} variable if the server is offline");
+        write("offline-text", offline_text);
+
+        writeComment("those fakeplayers will randomly appear on the tablist. If you don't put any names there then no fakeplayers will appear");
+        write("fakePlayers", fakePlayers);
+
+        writeComment("servers which you wish to show their own tabList (The one provided by bukkit)");
+        write("excludeServers", excludeServers);
+
+        writeComments("servers which you wish to hide from the global tabList",
+                "Note that this is different from excludeServers above: this hides all players on the hidden servers from appearing",
+                "on the tablist, whereas excluded servers' players are still on the BungeeTabListPlus tablist, but they do not see",
+                "the global tab list");
+        write("hiddenServers", hiddenServers);
+
+        writeComments("Detects which servers are using a bukkit-side tabList-plugin",
+                "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
+                "This is disabled by default because it could be accidentially triggered by other plugins (Essentials nicknames etc.)",
+                "Warning: This is an experimental feature, it may cause unintended behaviour");
+        write("autoExcludeServers", autoExcludeServers);
+
+        writeComments("Time zone to use for the {time} variable",
+                "Can be full name like \"America/Los_Angeles\"",
+                "or custom id like \"GMT+8\"");
+        write("time-zone", timezone);
     }
 }
