@@ -227,7 +227,7 @@ public class BungeeTabListPlus {
 
         pm = new PermissionManager(this);
         placeholderManager = new PlaceholderManager();
-        placeholderManager.registerPlaceholderProvider(new BasicPlaveholders());
+        placeholderManager.registerPlaceholderProvider(new BasicPlaceholders());
         placeholderManager.registerPlaceholderProvider(new BukkitPlaceholders());
         placeholderManager.registerPlaceholderProvider(new ColorPlaceholder());
         placeholderManager.registerPlaceholderProvider(new ConditionalPlaceholders());

@@ -29,7 +29,7 @@ import codecrafter47.data.Values;
 
 import java.util.Optional;
 
-public class BasicPlaveholders extends PlaceholderProvider {
+public class BasicPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         bindRegex("\\[PING=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
