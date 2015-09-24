@@ -77,10 +77,7 @@ public class TabListProvider implements ITabListProvider {
 
         List<Section> topSections = topSectionsProvider.stream().flatMap(f -> f.apply(context).stream()).collect(Collectors.toCollection(ArrayList::new));
         List<Section> botSections = botSectionsProvider.stream().flatMap(f -> f.apply(context).stream()).collect(Collectors.toCollection(ArrayList::new));
-/* TODO
-        parseAutoFillplayers(player, topSections, context);
-        parseAutoFillplayers(player, botSections, context);
-*/
+
         // precalculate all sections
         precalculateSections(context, topSections);
         precalculateSections(context, botSections);
@@ -128,16 +125,6 @@ public class TabListProvider implements ITabListProvider {
             section.precalculate(context);
         }
     }
-/* TODO
-    private void parseAutoFillplayers(final ProxiedPlayer player, List<Section> sectionList, TabListContext context) {
-        for (int i = 0; i < sectionList.size(); i++) {
-            Section section = sectionList.get(i);
-            if (section instanceof AutoFillPlayers) {
-                sectionList.remove(i);
-
-            }
-        }
-    }*/
 
     public boolean appliesTo(ProxiedPlayer player) {
         return config.appliesTo(player);
