@@ -102,7 +102,7 @@ public class TabList18v3 implements TabListHandler {
 
             sendUsernames.clear();
             for (UUID uuid : list) {
-                sendUsernames.put(uuid, playerTabListHandler.uuids.get(uuid).getUsername());
+                sendUsernames.put(uuid, playerTabListHandler.uuids.get(uuid));
             }
 
             List<UUID> fakeUUIDs = new ArrayList<>();

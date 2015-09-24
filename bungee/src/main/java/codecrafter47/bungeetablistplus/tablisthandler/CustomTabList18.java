@@ -31,8 +31,6 @@ import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.PlayerListItem.Action;
-import net.md_5.bungee.protocol.packet.PlayerListItem.Item;
 import net.md_5.bungee.protocol.packet.Team;
 import net.md_5.bungee.tab.TabList;
 
@@ -51,7 +49,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
     boolean isExcluded = false;
 
     final Collection<String> usernames = new HashSet<>();
-    final Map<UUID, Item> uuids = new HashMap<>();
+    final Map<UUID, String> uuids = new HashMap<>();
     private final Map<String, FakePlayer> bukkitplayers = new ConcurrentHashMap<>();
     private final Multimap<String, String> teamToPlayerMap = MultimapBuilder.hashKeys().arrayListValues().build();
     private final ReentrantLock teamLock = new ReentrantLock();
@@ -80,8 +78,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
             PlayerListItem.Item[] items = new PlayerListItem.Item[uuids.size() + usernames.
                     size()];
             int i = 0;
-            for (Entry<UUID, Item> entry : uuids.entrySet()) {
-                items[i++] = entry.getValue();
+            for (Entry<UUID, String> entry : uuids.entrySet()) {
+                PlayerListItem.Item item = new PlayerListItem.Item();
+                item.setUuid(entry.getKey());
+                item.setUsername(entry.getValue());
+                items[i++] = item;
             }
             for (String username : usernames) {
                 PlayerListItem.Item item = items[i++] = new PlayerListItem.Item();
@@ -125,11 +126,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
                         if (!usernames.contains(s)) {
                             PlayerListItem pli = new PlayerListItem();
                             pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-                            Item item = new Item();
+                            PlayerListItem.Item item = new PlayerListItem.Item();
                             item.setPing(0);
                             item.setUsername(s);
                             item.setProperties(new String[0][0]);
-                            pli.setItems(new Item[]{item});
+                            pli.setItems(new PlayerListItem.Item[]{item});
                             getPlayer().unsafe().sendPacket(pli);
                             usernames.add(s);
                         }
@@ -144,15 +145,11 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
     public void onUpdate(PlayerListItem pli) {
         pli = CustomTabList18.rewrite(pli);
 
-        // TODO fillbukkitplayers
-        for (Item i : pli.getItems()) {
+        for (PlayerListItem.Item i : pli.getItems()) {
             synchronized (bukkitplayers) {
                 String name = i.getUsername();
                 if (name == null && i.getUuid() != null) {
-                    Item item = uuids.get(i.getUuid());
-                    if (item != null) {
-                        name = item.getUsername();
-                    }
+                    name = uuids.get(i.getUuid());
                 }
                 if (name != null) {
                     switch (pli.getAction()) {
@@ -193,7 +190,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
         if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
                 contains(getPlayer().getServer().getInfo().getName()) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
-            if ((pli.getAction() == Action.ADD_PLAYER) || (pli.getAction() == Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
+            if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
                 // Pass the Packet to the client
                 player.unsafe().sendPacket(pli);
                 // update list on the client
@@ -201,22 +198,19 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
             }
             // save which packets are send to the client
             synchronized (usernames) {
-                for (Item item : pli.getItems()) {
+                for (PlayerListItem.Item item : pli.getItems()) {
                     if (pli.getAction() == PlayerListItem.Action.ADD_PLAYER) {
                         if (item.getUuid() != null) {
-                            uuids.put(item.getUuid(), item);
+                            uuids.put(item.getUuid(), item.getUsername());
                         } else {
                             usernames.add(item.getUsername());
                         }
-                    } else if (pli.getAction() == Action.REMOVE_PLAYER) {
+                    } else if (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) {
                         if (item.getUuid() != null) {
                             uuids.remove(item.getUuid());
                         } else {
                             usernames.remove(item.getUsername());
                         }
-                    } else if (pli.getAction() == Action.UPDATE_GAMEMODE && item.getUuid().equals(getPlayer().getUniqueId())) {
-                        Item item1 = uuids.get(item.getUuid());
-                        if (item1 != null) item1.setGamemode(item.getGamemode());
                     }
                 }
             }
