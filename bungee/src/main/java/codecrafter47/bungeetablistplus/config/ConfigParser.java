@@ -22,12 +22,16 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -56,8 +60,8 @@ public class ConfigParser {
         List<SlotTemplate> morePlayerLines = config.morePlayersLines.stream().map(this::parseSlot).collect(Collectors.toList());
 
 
-        List<Section> topSections = new ArrayList<>();
-        List<Section> botSections = new ArrayList<>();
+        List<Function<TabListContext, List<Section>>> topSectionProviders = new ArrayList<>();
+        List<Function<TabListContext, List<Section>>> botSectionProviders = new ArrayList<>();
         final boolean[] bottom = {false};
         for (String line : config.tabList) {
             // Its properties
@@ -96,7 +100,7 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
                 } else {
                     column[0] = Integer.parseInt(matcher.group(1));
-                    if(column[0] > ConfigManager.getCols()){
+                    if (column[0] > ConfigManager.getCols()) {
                         plugin.getLogger().warning(String.format("You used [COLUMN=%d] but the tablist only has %d columns. Setting column to %d",
                                 column[0], ConfigManager.getCols(), ConfigManager.getCols() - 1));
                         column[0] = ConfigManager.getCols() - 1;
@@ -109,7 +113,7 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
                 } else {
                     column[0] = Integer.parseInt(matcher.group(1));
-                    if(column[0] > ConfigManager.getRows()){
+                    if (column[0] > ConfigManager.getRows()) {
                         plugin.getLogger().warning(String.format("You used [ROW=%d] but the tablist only has %d rows. Setting row to %d",
                                 column[0], ConfigManager.getRows(), ConfigManager.getRows() - 1));
                         column[0] = ConfigManager.getRows() - 1;
@@ -131,11 +135,11 @@ public class ConfigParser {
             }
 
             // Get current section list
-            List<Section> sections;
+            List<Function<TabListContext, List<Section>>> sections;
             if (!bottom[0]) {
-                sections = topSections;
+                sections = topSectionProviders;
             } else {
-                sections = botSections;
+                sections = botSectionProviders;
             }
 
             Matcher fillplayersMatcher = PATTERN_FILLPLAYERS.matcher(line);
@@ -152,7 +156,7 @@ public class ConfigParser {
                 }
                 if (column[0] == -1) {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
-                        sections.add(new AutoFillPlayers(startColumn[0], prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+                        sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     } else {
                         sections.add(new FillPlayersSection(startColumn[0], filter, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     }
@@ -183,16 +187,42 @@ public class ConfigParser {
             }
         }
 
-        return new TabListProvider(plugin, topSections, botSections, config.showEmptyGroups, config, this, config.shownFooterHeader, parseSlot(config.header), parseSlot(config.footer));
+        return new TabListProvider(plugin, topSectionProviders, botSectionProviders, config.showEmptyGroups, config, this, config.shownFooterHeader, parseSlot(config.header), parseSlot(config.footer));
     }
 
-    public List<Section> parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, String g_server, List<String> g_sort, int g_maxplayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        List<Section> sections = new ArrayList<>();
+    public AutoFillPlayers parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, List<String> g_sort, int g_maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+        Map<String, ServerInfo> servers = ProxyServer.getInstance().getServers();
+
+        Set<String> serverSet = new HashSet<>(servers.keySet());
+        HashMultimap<String, String> aliasToServerMap = HashMultimap.create();
+        for (Map.Entry<String, String> entry : BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.entrySet()) {
+            if (ProxyServer.getInstance().getServerInfo(entry.getKey()) == null) {
+                BungeeTabListPlus.getInstance().getLogger().warning("Configuration Error: Server \"" + entry.getKey() + "\" used in the alias map does not exist.");
+                continue;
+            }
+            aliasToServerMap.put(entry.getValue(), entry.getKey());
+        }
+
+        List<String> list = new ArrayList<>();
+        while (!serverSet.isEmpty()) {
+            String server = serverSet.iterator().next();
+            String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.get(server);
+            if (alias != null) {
+                Set<String> strings = aliasToServerMap.get(alias);
+                serverSet.removeAll(strings);
+                list.add(Joiner.on(',').join(strings));
+            } else {
+                serverSet.remove(server);
+                list.add(server);
+            }
+        }
+
+        List<Function<List<String>, Section>> sections = new ArrayList<>();
         for (String line : config.groupLines) {
             // Its properties
             final int[] startColumn = {-1};
             final List<String> sortrules = new ArrayList<>();
-            final int[] maxplayers = {g_maxplayers};
+            final int[] maxplayers = {g_maxPlayers};
 
             // Parsing tags
             line = findTag(line, PATTERN_ALIGN_LEFT, matcher -> {
@@ -221,7 +251,7 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
                 } else {
                     startColumn[0] = Integer.parseInt(matcher.group(1));
-                    if(startColumn[0] > ConfigManager.getCols()){
+                    if (startColumn[0] > ConfigManager.getCols()) {
                         plugin.getLogger().warning(String.format("You used [COLUMN=%d] but the tablist only has %dcolumns. Setting columns to %d",
                                 startColumn[0], ConfigManager.getCols(), ConfigManager.getCols() - 1));
                         startColumn[0] = ConfigManager.getCols() - 1;
@@ -234,7 +264,7 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
                 } else {
                     startColumn[0] = Integer.parseInt(matcher.group(1));
-                    if(startColumn[0] > ConfigManager.getRows()){
+                    if (startColumn[0] > ConfigManager.getRows()) {
                         plugin.getLogger().warning(String.format("You used [ROW=%d] but the tablist only has %d rows. Setting row to %d",
                                 startColumn[0], ConfigManager.getRows(), ConfigManager.getRows() - 1));
                         startColumn[0] = ConfigManager.getRows() - 1;
@@ -257,25 +287,27 @@ public class ConfigParser {
                 if (args == null || args.isEmpty()) {
                     filter = new ArrayList<>();
                 } else {
-                    filter = Arrays.asList(args.split(","));
+                    filter = new ArrayList<>(Arrays.asList(args.split(",")));
                 }
                 checkServer(filter);
                 filter.addAll(g_filter);
-                filter.addAll(Arrays.asList(g_server.split(",")));
-                sections.add(new FillPlayersSection(startColumn[0], filter,
-                        prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+                sections.add(groupFilters -> {
+                    List<String> finalFilters = new ArrayList<>();
+                    finalFilters.addAll(filter);
+                    finalFilters.addAll(groupFilters);
+                    return new FillPlayersSection(startColumn[0], finalFilters, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines);
+                });
             } else {
-                ServerSection section;
-                if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof ServerSection && startColumn[0] == -1) {
-                    section = (ServerSection) sections.get(sections.size() - 1);
-                } else {
-                    section = new ServerSection(startColumn[0], Arrays.asList(g_server.split(",")));
-                    sections.add(section);
-                }
-                section.add(SlotTemplate.of(g_prefix, parseSlot(line), g_suffix));
+                SlotTemplate slotTemplate = SlotTemplate.of(g_prefix, parseSlot(line), g_suffix);
+                sections.add(filter -> {
+                    ServerSection serverSection = new ServerSection(startColumn[0], filter);
+                    serverSection.add(slotTemplate);
+                    return serverSection;
+                });
             }
         }
-        return sections;
+
+        return new AutoFillPlayers(list, sections, config.showEmptyGroups);
     }
 
     private SlotTemplate parseSlot(String line) {

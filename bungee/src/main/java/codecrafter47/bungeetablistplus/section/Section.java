@@ -22,7 +22,11 @@ import codecrafter47.bungeetablistplus.layout.LayoutSection;
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
-public abstract class Section implements LayoutSection {
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+
+public abstract class Section implements LayoutSection, Function<TabListContext, List<Section>> {
     public abstract Slot getSlotAt(TabListContext context, int pos, int size);
 
     public abstract void precalculate(TabListContext context);
@@ -30,5 +34,10 @@ public abstract class Section implements LayoutSection {
     @Override
     public String toString() {
         return "Section(minSize=" + getMinSize() + " ," + "maxSize=" + getMaxSize() + ", startColumn=" + getStartColumn() + ", constantSize=" + isSizeConstant() + ")";
+    }
+
+    @Override
+    public List<Section> apply(TabListContext context) {
+        return Collections.singletonList(this);
     }
 }

@@ -24,17 +24,17 @@ import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.layout.Layout;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
-import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
-import com.google.common.base.Joiner;
-import com.google.common.collect.HashMultimap;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Florian Stober
@@ -42,8 +42,8 @@ import java.util.*;
 public class TabListProvider implements ITabListProvider {
 
     private final BungeeTabListPlus plugin;
-    private final List<Section> top;
-    private final List<Section> bot;
+    private final List<Function<TabListContext, List<Section>>> topSectionsProvider;
+    private final List<Function<TabListContext, List<Section>>> botSectionsProvider;
     private final boolean showEmptyGroups;
     private final TabListConfig config;
     private final ConfigParser parser;
@@ -52,10 +52,10 @@ public class TabListProvider implements ITabListProvider {
     private final SlotTemplate header;
     private final SlotTemplate footer;
 
-    public TabListProvider(BungeeTabListPlus plugin, List<Section> top, List<Section> bot,
+    public TabListProvider(BungeeTabListPlus plugin, List<Function<TabListContext, List<Section>>> top, List<Function<TabListContext, List<Section>>> bot,
                            boolean showEmpty, TabListConfig config, ConfigParser parser, boolean showHeaderFooter, SlotTemplate header, SlotTemplate footer) {
-        this.top = top;
-        this.bot = bot;
+        this.topSectionsProvider = top;
+        this.botSectionsProvider = bot;
         showEmptyGroups = showEmpty;
         this.config = config;
         this.parser = parser;
@@ -75,12 +75,12 @@ public class TabListProvider implements ITabListProvider {
             tabList.setShouldShrink(true);
         }
 
-        List<Section> topSections = new ArrayList<>(top);
-        List<Section> botSections = new ArrayList<>(bot);
-
+        List<Section> topSections = topSectionsProvider.stream().flatMap(f -> f.apply(context).stream()).collect(Collectors.toCollection(ArrayList::new));
+        List<Section> botSections = botSectionsProvider.stream().flatMap(f -> f.apply(context).stream()).collect(Collectors.toCollection(ArrayList::new));
+/* TODO
         parseAutoFillplayers(player, topSections, context);
         parseAutoFillplayers(player, botSections, context);
-
+*/
         // precalculate all sections
         precalculateSections(context, topSections);
         precalculateSections(context, botSections);
@@ -128,75 +128,16 @@ public class TabListProvider implements ITabListProvider {
             section.precalculate(context);
         }
     }
-
+/* TODO
     private void parseAutoFillplayers(final ProxiedPlayer player, List<Section> sectionList, TabListContext context) {
         for (int i = 0; i < sectionList.size(); i++) {
             Section section = sectionList.get(i);
             if (section instanceof AutoFillPlayers) {
                 sectionList.remove(i);
-                SlotTemplate prefix = ((AutoFillPlayers) section).prefix;
-                SlotTemplate suffix = ((AutoFillPlayers) section).suffix;
-                int maxPlayers = ((AutoFillPlayers) section).maxPlayers;
-                List<String> sortRules = ((AutoFillPlayers) section).sortRules;
 
-                Map<String, ServerInfo> servers = ProxyServer.getInstance().
-                        getServers();
-
-                Set<String> serverSet = new HashSet<>(servers.keySet());
-                HashMultimap<String, String> aliasToServerMap = HashMultimap.create();
-                for (Map.Entry<String, String> entry : BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.entrySet()) {
-                    if (ProxyServer.getInstance().getServerInfo(entry.getKey()) == null) {
-                        BungeeTabListPlus.getInstance().getLogger().warning("Configuration Error: Server \"" + entry.getKey() + "\" used in the alias map does not exist.");
-                        continue;
-                    }
-                    aliasToServerMap.put(entry.getValue(), entry.getKey());
-                }
-                List<String> list = new ArrayList<>();
-                while (!serverSet.isEmpty()) {
-                    String server = serverSet.iterator().next();
-                    String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.get(server);
-                    if (alias != null) {
-                        Set<String> strings = aliasToServerMap.get(alias);
-                        serverSet.removeAll(strings);
-                        list.add(Joiner.on(',').join(strings));
-                    } else {
-                        serverSet.remove(server);
-                        list.add(server);
-                    }
-                }
-
-                Collections.sort(list, new Comparator<String>() {
-                    @Override
-                    public int compare(String s1, String s2) {
-                        int p1 = context.
-                                getPlayerManager().getServerPlayerCount(s1, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
-                        int p2 = context.
-                                getPlayerManager().getServerPlayerCount(s2, player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3);
-                        if (p1 < p2) {
-                            return 1;
-                        }
-                        if (p1 > p2) {
-                            return -1;
-                        }
-                        return s1.compareTo(s2);
-                    }
-                });
-
-                int j = i;
-                for (String server : list) {
-                    if (showEmptyGroups || context.getPlayerManager().
-                            getPlayerCount(Collections.singletonList(server), player, plugin.getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
-                        List<Section> sections = parser.
-                                parseServerSections(config, prefix, suffix, new ArrayList<>(0), server,
-                                        sortRules, maxPlayers, ((AutoFillPlayers) section).playerLines, ((AutoFillPlayers) section).morePlayerLines);
-                        for (Section s : sections) {
-                            sectionList.add(j++, s);
-                        }
-                    }
-                }
             }
         }
-    }
+    }*/
 
     public boolean appliesTo(ProxiedPlayer player) {
         return config.appliesTo(player);

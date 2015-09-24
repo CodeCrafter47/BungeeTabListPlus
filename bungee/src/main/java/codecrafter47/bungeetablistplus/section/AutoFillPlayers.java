@@ -18,65 +18,53 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.OptionalInt;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class AutoFillPlayers extends Section {
+public class AutoFillPlayers implements Function<TabListContext, List<Section>> {
 
-    public final SlotTemplate prefix;
-    public final SlotTemplate suffix;
-    public final int startColumn;
-    public final int maxPlayers;
-    public final List<String> sortRules;
-    public final List<SlotTemplate> playerLines;
-    public final List<SlotTemplate> morePlayerLines;
+    public final List<String> groups;
+    private List<Function<List<String>, Section>> sections;
+    private final boolean showEmptyGroups;
 
-    public AutoFillPlayers(int startColumn, SlotTemplate prefix, SlotTemplate suffix, List<String> sortRules, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.startColumn = startColumn;
-        this.sortRules = sortRules;
-        this.maxPlayers = maxPlayers;
-        this.playerLines = playerLines;
-        this.morePlayerLines = morePlayerLines;
+    public AutoFillPlayers(List<String> list, List<Function<List<String>, Section>> sections, boolean showEmptyGroups) {
+        this.groups = list;
+        this.sections = sections;
+        this.showEmptyGroups = showEmptyGroups;
     }
 
     @Override
-    public Slot getSlotAt(TabListContext context, int pos, int size) {
-        throw new UnsupportedOperationException("Not supported");
-    }
+    public List<Section> apply(TabListContext context) {
+        // sort groups, most populated first
+        Collections.sort(groups, (s1, s2) -> {
+            int p1 = context.
+                    getPlayerManager().getServerPlayerCount(s1, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+            int p2 = context.
+                    getPlayerManager().getServerPlayerCount(s2, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+            if (p1 < p2) {
+                return 1;
+            }
+            if (p1 > p2) {
+                return -1;
+            }
+            return s1.compareTo(s2);
+        });
 
-    @Override
-    public void precalculate(TabListContext context) {
-        throw new UnsupportedOperationException("Not supported");
-    }
+        List<Section> sections = new ArrayList<>();
+        for (String server : groups) {
+            List<String> filter = Arrays.asList(server.split(","));
+            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(filter, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
+                sections.addAll(this.sections.stream().map(section -> section.apply(filter)).collect(Collectors.toList()));
+            }
+        }
 
-    @Override
-    public int getMinSize() {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
-    @Override
-    public int getMaxSize() {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
-    @Override
-    public boolean isSizeConstant() {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
-    @Override
-    public int getEffectiveSize(int proposedSize) {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
-    @Override
-    public OptionalInt getStartColumn() {
-        throw new UnsupportedOperationException("Not supported");
+        return sections;
     }
 }
