@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class SkinManager {
 
@@ -53,6 +54,8 @@ public class SkinManager {
     public static final Skin defaultSkin = new PlayerSkin(UUID.randomUUID(), null);
 
     private final Set<String> fetchingSkins = Sets.newConcurrentHashSet();
+
+    private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
 
     public SkinManager(Plugin plugin) {
         this.plugin = plugin;
@@ -179,7 +182,7 @@ public class SkinManager {
         @Override
         public void run() {
             String uuid = null;
-            if (nameOrUUID.length() < 17 && !nameOrUUID.isEmpty()) {
+            if (PATTERN_VALID_USERNAME.matcher(nameOrUUID).matches()) {
                 uuid = fetchUUID(nameOrUUID);
             } else if(nameOrUUID.replace("-", "").length() == 32){
                 uuid = nameOrUUID;
