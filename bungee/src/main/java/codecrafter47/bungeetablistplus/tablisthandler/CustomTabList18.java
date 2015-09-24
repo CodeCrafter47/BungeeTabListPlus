@@ -68,50 +68,54 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     @Override
     public void onServerChange() {
-        // remove all those names from the clients tab, he's on another server now
-        synchronized (bukkitplayers) {
-            bukkitplayers.clear();
-        }
-        synchronized (usernames) {
-            PlayerListItem packet = new PlayerListItem();
-            packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
-            PlayerListItem.Item[] items = new PlayerListItem.Item[uuids.size() + usernames.
-                    size()];
-            int i = 0;
-            for (Entry<UUID, String> entry : uuids.entrySet()) {
-                PlayerListItem.Item item = new PlayerListItem.Item();
-                item.setUuid(entry.getKey());
-                item.setUsername(entry.getValue());
-                items[i++] = item;
-            }
-            for (String username : usernames) {
-                PlayerListItem.Item item = items[i++] = new PlayerListItem.Item();
-                item.setUsername(username);
-                item.setDisplayName(username);
-            }
-            packet.setItems(items);
-            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47) {
-                player.unsafe().sendPacket(packet);
-            } else {
-                // Split up the packet
-                for (PlayerListItem.Item item : packet.getItems()) {
-                    PlayerListItem p2 = new PlayerListItem();
-                    p2.setAction(packet.getAction());
-                    p2.setItems(new PlayerListItem.Item[]{
-                            item
-                    });
-                    player.unsafe().sendPacket(p2);
-                }
-            }
-            uuids.clear();
-            usernames.clear();
-        }
-        isExcluded = false;
-        teamLock.lock();
         try {
-            teamToPlayerMap.clear();
-        } finally {
-            teamLock.unlock();
+            // remove all those names from the clients tab, he's on another server now
+            synchronized (bukkitplayers) {
+                bukkitplayers.clear();
+            }
+            synchronized (usernames) {
+                PlayerListItem packet = new PlayerListItem();
+                packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+                PlayerListItem.Item[] items = new PlayerListItem.Item[uuids.size() + usernames.
+                        size()];
+                int i = 0;
+                for (Entry<UUID, String> entry : uuids.entrySet()) {
+                    PlayerListItem.Item item = new PlayerListItem.Item();
+                    item.setUuid(entry.getKey());
+                    item.setUsername(entry.getValue());
+                    items[i++] = item;
+                }
+                for (String username : usernames) {
+                    PlayerListItem.Item item = items[i++] = new PlayerListItem.Item();
+                    item.setUsername(username);
+                    item.setDisplayName(username);
+                }
+                packet.setItems(items);
+                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47) {
+                    player.unsafe().sendPacket(packet);
+                } else {
+                    // Split up the packet
+                    for (PlayerListItem.Item item : packet.getItems()) {
+                        PlayerListItem p2 = new PlayerListItem();
+                        p2.setAction(packet.getAction());
+                        p2.setItems(new PlayerListItem.Item[]{
+                                item
+                        });
+                        player.unsafe().sendPacket(p2);
+                    }
+                }
+                uuids.clear();
+                usernames.clear();
+            }
+            isExcluded = false;
+            teamLock.lock();
+            try {
+                teamToPlayerMap.clear();
+            } finally {
+                teamLock.unlock();
+            }
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
         }
     }
 
@@ -143,77 +147,81 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     @Override
     public void onUpdate(PlayerListItem pli) {
-        pli = CustomTabList18.rewrite(pli);
+        try {
+            pli = CustomTabList18.rewrite(pli);
 
-        for (PlayerListItem.Item i : pli.getItems()) {
-            synchronized (bukkitplayers) {
-                String name = i.getUsername();
-                if (name == null && i.getUuid() != null) {
-                    name = uuids.get(i.getUuid());
-                }
-                if (name != null) {
-                    switch (pli.getAction()) {
-                        case ADD_PLAYER:
-                            FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null);
-                            player.setPing(i.getPing());
-                            player.setGamemode(i.getGamemode());
-                            if (i.getUuid() != null && i.getProperties() != null) {
-                                for (String[] strings : i.getProperties()) {
-                                    if (strings.length == 3 && strings[0].equals("textures")) {
-                                        player.setSkin(new PlayerSkin(i.getUuid(), strings));
+            for (PlayerListItem.Item i : pli.getItems()) {
+                synchronized (bukkitplayers) {
+                    String name = i.getUsername();
+                    if (name == null && i.getUuid() != null) {
+                        name = uuids.get(i.getUuid());
+                    }
+                    if (name != null) {
+                        switch (pli.getAction()) {
+                            case ADD_PLAYER:
+                                FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null);
+                                player.setPing(i.getPing());
+                                player.setGamemode(i.getGamemode());
+                                if (i.getUuid() != null && i.getProperties() != null) {
+                                    for (String[] strings : i.getProperties()) {
+                                        if (strings.length == 3 && strings[0].equals("textures")) {
+                                            player.setSkin(new PlayerSkin(i.getUuid(), strings));
+                                        }
                                     }
                                 }
-                            }
-                            bukkitplayers.put(name, player);
-                            break;
-                        case UPDATE_GAMEMODE:
-                            bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
-                                fakePlayer.setGamemode(i.getGamemode());
-                                return fakePlayer;
-                            });
-                            break;
-                        case UPDATE_LATENCY:
-                            bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
-                                fakePlayer.setPing(i.getPing());
-                                return fakePlayer;
-                            });
-                            break;
-                        case UPDATE_DISPLAY_NAME:
-                            break;
-                        case REMOVE_PLAYER:
-                            bukkitplayers.remove(name);
-                            break;
+                                bukkitplayers.put(name, player);
+                                break;
+                            case UPDATE_GAMEMODE:
+                                bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
+                                    fakePlayer.setGamemode(i.getGamemode());
+                                    return fakePlayer;
+                                });
+                                break;
+                            case UPDATE_LATENCY:
+                                bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
+                                    fakePlayer.setPing(i.getPing());
+                                    return fakePlayer;
+                                });
+                                break;
+                            case UPDATE_DISPLAY_NAME:
+                                break;
+                            case REMOVE_PLAYER:
+                                bukkitplayers.remove(name);
+                                break;
+                        }
                     }
                 }
             }
-        }
 
-        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
-                contains(getPlayer().getServer().getInfo().getName()) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
-            if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
-                // Pass the Packet to the client
-                player.unsafe().sendPacket(pli);
-                // update list on the client
-                BungeeTabListPlus.getInstance().sendImmediate(player);
-            }
-            // save which packets are send to the client
-            synchronized (usernames) {
-                for (PlayerListItem.Item item : pli.getItems()) {
-                    if (pli.getAction() == PlayerListItem.Action.ADD_PLAYER) {
-                        if (item.getUuid() != null) {
-                            uuids.put(item.getUuid(), item.getUsername());
-                        } else {
-                            usernames.add(item.getUsername());
-                        }
-                    } else if (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) {
-                        if (item.getUuid() != null) {
-                            uuids.remove(item.getUuid());
-                        } else {
-                            usernames.remove(item.getUsername());
+            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
+                    contains(getPlayer().getServer().getInfo().getName()) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
+                if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
+                    // Pass the Packet to the client
+                    player.unsafe().sendPacket(pli);
+                    // update list on the client
+                    BungeeTabListPlus.getInstance().sendImmediate(player);
+                }
+                // save which packets are send to the client
+                synchronized (usernames) {
+                    for (PlayerListItem.Item item : pli.getItems()) {
+                        if (pli.getAction() == PlayerListItem.Action.ADD_PLAYER) {
+                            if (item.getUuid() != null) {
+                                uuids.put(item.getUuid(), item.getUsername());
+                            } else {
+                                usernames.add(item.getUsername());
+                            }
+                        } else if (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) {
+                            if (item.getUuid() != null) {
+                                uuids.remove(item.getUuid());
+                            } else {
+                                usernames.remove(item.getUsername());
+                            }
                         }
                     }
                 }
             }
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
         }
     }
 

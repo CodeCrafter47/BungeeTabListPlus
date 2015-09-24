@@ -57,53 +57,62 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
 
     @Override
     public void onServerChange() {
-        // remove all those names from the clients tab, he's on another server now
-        synchronized (usernames) {
-            for (String username : usernames) {
-                BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
-                        getPlayer().unsafe(), username);
+        try {
+            // remove all those names from the clients tab, he's on another server now
+            synchronized (usernames) {
+                for (String username : usernames) {
+                    BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
+                            getPlayer().unsafe(), username);
+                }
+                usernames.clear();
             }
-            usernames.clear();
+            synchronized (bukkitplayers) {
+                bukkitplayers.clear();
+            }
+            isExcluded = false;
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
         }
-        synchronized (bukkitplayers) {
-            bukkitplayers.clear();
-        }
-        isExcluded = false;
     }
 
     @Override
     public boolean onListUpdate(String name, boolean online, int ping) {
-        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoExcludeServers && !ChatColor.
-                stripColor(name).equals(name)) {
-            exclude();
-        }
-
-        synchronized (bukkitplayers) {
-            if (online) {
-                if (!bukkitplayers.contains(name)) {
-                    bukkitplayers.add(name);
-                }
-            } else {
-                bukkitplayers.remove(name);
+        try {
+            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().autoExcludeServers && !ChatColor.
+                    stripColor(name).equals(name)) {
+                exclude();
             }
-        }
 
-        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
-                contains(getPlayer().getServer().getInfo().getName()) || isExcluded) {
-            // save which packets are send to the client
-            synchronized (usernames) {
+            synchronized (bukkitplayers) {
                 if (online) {
-                    if (!usernames.contains(name)) {
-                        usernames.add(name);
+                    if (!bukkitplayers.contains(name)) {
+                        bukkitplayers.add(name);
                     }
                 } else {
-                    usernames.remove(name);
+                    bukkitplayers.remove(name);
                 }
             }
-            // Pass the Packet to the client
-            return true;
-        } else {
-            // Don't pass the packet to the client, he will see the tabList provided by this plugin
+
+            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
+                    contains(getPlayer().getServer().getInfo().getName()) || isExcluded) {
+                // save which packets are send to the client
+                synchronized (usernames) {
+                    if (online) {
+                        if (!usernames.contains(name)) {
+                            usernames.add(name);
+                        }
+                    } else {
+                        usernames.remove(name);
+                    }
+                }
+                // Pass the Packet to the client
+                return true;
+            } else {
+                // Don't pass the packet to the client, he will see the tabList provided by this plugin
+                return false;
+            }
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
             return false;
         }
     }
