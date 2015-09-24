@@ -23,7 +23,6 @@ import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -293,7 +292,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
     }
 
     @Override
-    public void sendTablist(ITabList tabList, TabListContext context) {
+    public void sendTablist(ITabList tabList) {
         if (tabListHandler instanceof TabList18) {
             if (tabList.getSize() < 80 || tabList.shouldShrink()) {
                 setTabListHandler(new TabList18v3(this));
@@ -311,7 +310,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
                 setTabListHandler(new ScoreboardTabList(this));
             }
         }
-        tabListHandler.sendTabList(tabList, context);
+        tabListHandler.sendTabList(tabList);
     }
 
     @Override

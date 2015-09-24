@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import gnu.trove.map.TIntObjectMap;
@@ -68,7 +67,7 @@ public class TabList18v3 implements TabListHandler {
     }
 
     @Override
-    public void sendTabList(ITabList tabList, TabListContext context) {
+    public void sendTabList(ITabList tabList) {
         synchronized (playerTabListHandler.usernames) {
             tabList = tabList.flip();
 

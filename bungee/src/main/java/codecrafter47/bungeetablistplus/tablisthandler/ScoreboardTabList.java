@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import net.md_5.bungee.api.ChatColor;
 
@@ -56,7 +55,7 @@ public class ScoreboardTabList implements TabListHandler {
     }
 
     @Override
-    public void sendTabList(ITabList tabList, TabListContext context) {
+    public void sendTabList(ITabList tabList) {
         resize(tabList.getUsedSlots());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().

@@ -22,7 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabListProvider;
 import codecrafter47.bungeetablistplus.config.ConfigParser;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
-import codecrafter47.bungeetablistplus.config.TabListProvider;
+import codecrafter47.bungeetablistplus.error.ErrorTabListProvider;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -41,8 +41,8 @@ import static net.md_5.bungee.event.EventPriority.HIGHEST;
 public class TabListManager implements Listener {
 
     private final BungeeTabListPlus plugin;
-    private TabListProvider defaultTab;
-    private final List<TabListProvider> tabLists = new ArrayList<>();
+    private ITabListProvider defaultTab;
+    private final List<ITabListProvider> tabLists = new ArrayList<>();
 
     private static final Map<ProxiedPlayer, ITabListProvider> customTabLists = new HashMap<>();
 
@@ -59,14 +59,19 @@ public class TabListManager implements Listener {
                 plugin.getLogger().warning(
                         "The default tabList is configured not to be shown by default");
                 plugin.getLogger().warning(
-                        "This is not recommended and you should not do this if you're not knowing exaclty what you are doing");
+                        "This is not recommended and you should not do this if you're not knowing exactly what you are doing");
             }
             validateShowTo(plugin.getConfigManager().defaultTabList);
             defaultTab = new ConfigParser(plugin).parse(plugin.getConfigManager().defaultTabList);
         } catch (Throwable ex) {
             plugin.getLogger().log(Level.SEVERE, "Could not load default tabList", ex);
-            plugin.getLogger().log(Level.WARNING, "Disabling plugin");
-            return false;
+            try {
+                defaultTab = new ErrorTabListProvider("Could not load default tabList", ex, plugin.getConfigManager().defaultTabList::appliesTo);
+            } catch (Throwable th) {
+                plugin.getLogger().log(Level.SEVERE, "Disabling plugin", th);
+                return false;
+
+            }
         }
         for (TabListConfig c : plugin.getConfigManager().tabLists) {
             try {
@@ -74,6 +79,11 @@ public class TabListManager implements Listener {
                 tabLists.add(new ConfigParser(plugin).parse(c));
             } catch (Throwable ex) {
                 plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getName(), ex);
+                try {
+                    tabLists.add(new ErrorTabListProvider("Could not load tabList " + c.getName(), ex, c::appliesTo));
+                } catch (Throwable th) {
+                    plugin.getLogger().log(Level.SEVERE, "Failed to construct error tablist", th);
+                }
             }
         }
         return true;
@@ -81,7 +91,7 @@ public class TabListManager implements Listener {
 
     public ITabListProvider getTabListForPlayer(ProxiedPlayer player) {
         if (customTabLists.get(player) != null) return customTabLists.get(player);
-        for (TabListProvider tabList : tabLists) {
+        for (ITabListProvider tabList : tabLists) {
             if (tabList.appliesTo(player)) {
                 return tabList;
             }

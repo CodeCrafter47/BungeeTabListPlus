@@ -25,7 +25,6 @@ import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.ChatColor;
@@ -58,7 +57,7 @@ public class TabList18 implements TabListHandler {
     }
 
     @Override
-    public void sendTabList(ITabList tabList, TabListContext context) {
+    public void sendTabList(ITabList tabList) {
         resize(tabList.getColumns() * tabList.getRows());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().

@@ -28,4 +28,5 @@ public interface ITabListProvider {
 
     void fillTabList(ProxiedPlayer player, ITabList ITabList, TabListContext context) throws LayoutException;
 
+    boolean appliesTo(ProxiedPlayer player);
 }
