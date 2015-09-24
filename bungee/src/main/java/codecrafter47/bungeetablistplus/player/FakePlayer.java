@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -30,13 +31,20 @@ import java.util.UUID;
 public class FakePlayer implements IPlayer {
     String name;
     ServerInfo server;
+    private int ping;
+    private int gamemode;
+    private PlayerSkin skin;
 
     public FakePlayer(String name, ServerInfo server) {
+        this();
         this.name = name;
         this.server = server;
     }
 
     public FakePlayer() {
+        ping = 0;
+        gamemode = 0;
+        skin = null;
     }
 
     @Override
@@ -56,18 +64,28 @@ public class FakePlayer implements IPlayer {
 
     @Override
     public int getPing() {
-        // yeah... faked players have always good ping
-        return 0;
+        return ping;
     }
 
     @Override
     public Skin getSkin() {
-        return BungeeTabListPlus.getInstance().getSkinManager().getSkin(name);
+        return skin != null ? skin : BungeeTabListPlus.getInstance().getSkinManager().getSkin(name);
     }
 
     @Override
     public int getGameMode() {
-        // fake players are always in survival mode
-        return 0;
+        return gamemode;
+    }
+
+    public void setPing(int ping) {
+        this.ping = ping;
+    }
+
+    public void setGamemode(int gamemode) {
+        this.gamemode = gamemode;
+    }
+
+    public void setSkin(PlayerSkin skin) {
+        this.skin = skin;
     }
 }

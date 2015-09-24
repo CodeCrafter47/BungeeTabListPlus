@@ -22,7 +22,9 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ITabList;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.md_5.bungee.BungeeCord;
@@ -37,6 +39,7 @@ import net.md_5.bungee.tab.TabList;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,7 +53,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     final Collection<String> usernames = new HashSet<>();
     final Map<UUID, Item> uuids = new HashMap<>();
-    private final List<String> bukkitplayers = new ArrayList<>(100);
+    private final Map<String, FakePlayer> bukkitplayers = new ConcurrentHashMap<>();
     private final Multimap<String, String> teamToPlayerMap = MultimapBuilder.hashKeys().arrayListValues().build();
     private final ReentrantLock teamLock = new ReentrantLock();
     private boolean allowTeamPackets = true;
@@ -119,7 +122,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
         if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47) {
             synchronized (bukkitplayers) {
                 synchronized (usernames) {
-                    for (String s : bukkitplayers) {
+                    for (String s : bukkitplayers.keySet()) {
                         if (!usernames.contains(s)) {
                             PlayerListItem pli = new PlayerListItem();
                             pli.setAction(PlayerListItem.Action.ADD_PLAYER);
@@ -146,12 +149,37 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
         for (Item i : pli.getItems()) {
             synchronized (bukkitplayers) {
                 String name = i.getUsername();
-                if (pli.getAction() == Action.ADD_PLAYER) {
-                    if (!bukkitplayers.contains(name)) {
-                        bukkitplayers.add(name);
-                    }
-                } else if (pli.getAction() == Action.REMOVE_PLAYER) {
-                    bukkitplayers.remove(name);
+                switch (pli.getAction()) {
+                    case ADD_PLAYER:
+                        FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null);
+                        player.setPing(i.getPing());
+                        player.setGamemode(i.getGamemode());
+                        if (i.getUuid() != null && i.getProperties() != null) {
+                            for (String[] strings : i.getProperties()) {
+                                if (strings.length == 3 && strings[0].equals("textures")) {
+                                    player.setSkin(new PlayerSkin(i.getUuid(), strings));
+                                }
+                            }
+                        }
+                        bukkitplayers.put(name, player);
+                        break;
+                    case UPDATE_GAMEMODE:
+                        bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
+                            fakePlayer.setGamemode(i.getGamemode());
+                            return fakePlayer;
+                        });
+                        break;
+                    case UPDATE_LATENCY:
+                        bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
+                            fakePlayer.setPing(i.getPing());
+                            return fakePlayer;
+                        });
+                        break;
+                    case UPDATE_DISPLAY_NAME:
+                        break;
+                    case REMOVE_PLAYER:
+                        bukkitplayers.remove(name);
+                        break;
                 }
             }
         }
@@ -214,11 +242,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
 
     @Override
     public List<IPlayer> getPlayers() {
-        List<IPlayer> bukkitPlayers = new ArrayList<>();
-        for (String s : bukkitplayers) {
-            bukkitPlayers.add(new FakePlayer(s, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null));
-        }
-        return bukkitPlayers;
+        return ImmutableList.copyOf(bukkitplayers.values());
     }
 
     /**
