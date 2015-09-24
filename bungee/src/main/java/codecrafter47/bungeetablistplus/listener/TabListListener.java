@@ -22,9 +22,9 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.tablisthandler.*;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.ProxyReloadEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -98,5 +98,10 @@ public class TabListListener implements Listener {
                     getPlayer().getName() + ", this server uses " + plugin.getPlugin().
                     getDescription().getName() + ", one of you incredible good plugins");
         }
+    }
+
+    @EventHandler
+    public void onReload(ProxyReloadEvent event) {
+        plugin.reload();
     }
 }
