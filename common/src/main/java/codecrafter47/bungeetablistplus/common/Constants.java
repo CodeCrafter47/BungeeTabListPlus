@@ -29,6 +29,14 @@ public class Constants {
 
     public final static String subchannelRequestServerVariable = "reqS";
 
+    public final static String subchannelRequestResetPlayerVariables = "rstP";
+
+    public final static String subchannelRequestResetServerVariables = "rstS";
+
+    public final static String subchannelPlayerHash = "hashP";
+
+    public final static String subchannelServerHash = "hashS";
+
     public final static String subchannelUpdateServer = "updateS";
 
     public final static String subchannelUpdatePlayer = "updateP";

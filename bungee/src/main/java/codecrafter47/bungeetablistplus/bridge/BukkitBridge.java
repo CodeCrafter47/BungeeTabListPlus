@@ -28,6 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -35,6 +36,7 @@ import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.protocol.packet.PluginMessage;
 
 import java.io.*;
 import java.util.Map;
@@ -90,6 +92,16 @@ public class BukkitBridge implements Listener {
                             break;
                         case Constants.subchannelUpdatePlayer:
                             updateData(in, getPlayerDataCache(player.getUniqueId()));
+                            break;
+                        case Constants.subchannelPlayerHash:
+                            if (getPlayerDataCache(player.getUniqueId()).getMap().hashCode() != in.readInt()) {
+                                requestReset(player);
+                            }
+                            break;
+                        case Constants.subchannelServerHash:
+                            if (getServerDataCache(server.getInfo().getName()).getMap().hashCode() != in.readInt()) {
+                                requestReset(server);
+                            }
                             break;
                         default:
                             plugin.getLogger().log(Level.SEVERE,
@@ -147,6 +159,30 @@ public class BukkitBridge implements Listener {
             }
         }
         return value;
+    }
+
+    private void requestReset(ProxiedPlayer player) {
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(os);
+            out.writeUTF(Constants.subchannelRequestResetPlayerVariables);
+            out.close();
+            player.sendData(Constants.channel, os.toByteArray());
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+        }
+    }
+
+    private void requestReset(Server server) {
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(os);
+            out.writeUTF(Constants.subchannelRequestResetServerVariables);
+            out.close();
+            server.sendData(Constants.channel, os.toByteArray());
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+        }
     }
 
     public <T> Optional<T> getPlayerInformation(IPlayer player, Value<T> key) {

@@ -36,7 +36,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
@@ -67,7 +66,7 @@ public class BukkitBridge implements Listener {
 
     public void onEnable() {
         try {
-            if(!plugin.getDataFolder().exists()){
+            if (!plugin.getDataFolder().exists()) {
                 plugin.getDataFolder().mkdir();
             }
             File file = new File(plugin.getDataFolder(), "config.yml");
@@ -77,7 +76,7 @@ public class BukkitBridge implements Listener {
             plugin.getLogger().log(Level.WARNING, "Failed to load config.yml", e);
             config.automaticallySendBugReports = false;
         }
-        if(config.automaticallySendBugReports){
+        if (config.automaticallySendBugReports) {
             BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, plugin.getDescription().getName(), plugin.getDescription().getVersion(), command -> Bukkit.getScheduler().runTaskAsynchronously(plugin, command));
             bugReportingService.registerLogger(plugin.getLogger());
         }
@@ -106,6 +105,10 @@ public class BukkitBridge implements Listener {
                             } else {
                                 plugin.getLogger().warning("Proxy requested unknown value \"" + id + "\". Proxy/Bukkit plugin version mismatch?");
                             }
+                        } else if (subchannel.equals(Constants.subchannelRequestResetPlayerVariables)) {
+                            getPlayerDataUpdateTask(player).reset();
+                        } else if (subchannel.equals(Constants.subchannelRequestResetServerVariables)) {
+                            serverDataUpdateTask.reset();
                         } else {
                             plugin.getLogger().warning("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
                         }
@@ -179,9 +182,23 @@ public class BukkitBridge implements Listener {
         }
     }
 
+    protected void sendHash(String subchannel, int hash, Player player) {
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(os);
+            out.writeUTF(subchannel);
+            out.writeInt(hash);
+            out.close();
+            player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, null, ex);
+        }
+    }
+
     public abstract class DataUpdateTask<B, V extends DataAggregator<B>> extends BukkitRunnable {
         Map<Value<?>, Object> sentData = new ConcurrentHashMap<>();
         List<Value<?>> requestedData = new CopyOnWriteArrayList<>();
+        boolean requestedReset = true;
 
         protected final void update(Player player, V dataAggregator, B boundType, String subchannel) {
             Map<Value<?>, Object> newData = new ConcurrentHashMap<>();
@@ -197,7 +214,7 @@ public class BukkitBridge implements Listener {
                 }
             }
             for (Map.Entry<Value<?>, Object> entry : newData.entrySet()) {
-                if (!sentData.containsKey(entry.getKey())) {
+                if (requestedReset || !sentData.containsKey(entry.getKey())) {
                     delta.put(entry.getKey().getId(), entry.getValue());
                 }
             }
@@ -206,12 +223,20 @@ public class BukkitBridge implements Listener {
                 sendInformation(subchannel, delta, player);
             }
             sentData = newData;
+
+            if (requestedReset){
+                requestedReset = false;
+            }
         }
 
         public void requestValue(Value<?> value) {
             if (!requestedData.contains(value)) {
                 requestedData.add(value);
             }
+        }
+
+        public void reset() {
+            requestedReset = true;
         }
     }
 
@@ -221,6 +246,7 @@ public class BukkitBridge implements Listener {
         public void run() {
             plugin.getServer().getOnlinePlayers().stream().findAny().ifPresent(player -> {
                 update(player, serverDataAggregator, plugin.getServer(), Constants.subchannelUpdateServer);
+                sendHash(Constants.subchannelServerHash, sentData.hashCode(), player);
             });
         }
 
@@ -236,6 +262,7 @@ public class BukkitBridge implements Listener {
         @Override
         public void run() {
             update(player, playerDataAggregator, player, Constants.subchannelUpdatePlayer);
+            sendHash(Constants.subchannelPlayerHash, sentData.hashCode(), player);
         }
     }
 }
