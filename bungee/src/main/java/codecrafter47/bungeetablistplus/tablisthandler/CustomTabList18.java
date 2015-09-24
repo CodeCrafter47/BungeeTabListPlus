@@ -149,37 +149,45 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
         for (Item i : pli.getItems()) {
             synchronized (bukkitplayers) {
                 String name = i.getUsername();
-                switch (pli.getAction()) {
-                    case ADD_PLAYER:
-                        FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null);
-                        player.setPing(i.getPing());
-                        player.setGamemode(i.getGamemode());
-                        if (i.getUuid() != null && i.getProperties() != null) {
-                            for (String[] strings : i.getProperties()) {
-                                if (strings.length == 3 && strings[0].equals("textures")) {
-                                    player.setSkin(new PlayerSkin(i.getUuid(), strings));
+                if (name == null && i.getUuid() != null) {
+                    Item item = uuids.get(i.getUuid());
+                    if (item != null) {
+                        name = item.getUsername();
+                    }
+                }
+                if (name != null) {
+                    switch (pli.getAction()) {
+                        case ADD_PLAYER:
+                            FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null);
+                            player.setPing(i.getPing());
+                            player.setGamemode(i.getGamemode());
+                            if (i.getUuid() != null && i.getProperties() != null) {
+                                for (String[] strings : i.getProperties()) {
+                                    if (strings.length == 3 && strings[0].equals("textures")) {
+                                        player.setSkin(new PlayerSkin(i.getUuid(), strings));
+                                    }
                                 }
                             }
-                        }
-                        bukkitplayers.put(name, player);
-                        break;
-                    case UPDATE_GAMEMODE:
-                        bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
-                            fakePlayer.setGamemode(i.getGamemode());
-                            return fakePlayer;
-                        });
-                        break;
-                    case UPDATE_LATENCY:
-                        bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
-                            fakePlayer.setPing(i.getPing());
-                            return fakePlayer;
-                        });
-                        break;
-                    case UPDATE_DISPLAY_NAME:
-                        break;
-                    case REMOVE_PLAYER:
-                        bukkitplayers.remove(name);
-                        break;
+                            bukkitplayers.put(name, player);
+                            break;
+                        case UPDATE_GAMEMODE:
+                            bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
+                                fakePlayer.setGamemode(i.getGamemode());
+                                return fakePlayer;
+                            });
+                            break;
+                        case UPDATE_LATENCY:
+                            bukkitplayers.computeIfPresent(name, (s, fakePlayer) -> {
+                                fakePlayer.setPing(i.getPing());
+                                return fakePlayer;
+                            });
+                            break;
+                        case UPDATE_DISPLAY_NAME:
+                            break;
+                        case REMOVE_PLAYER:
+                            bukkitplayers.remove(name);
+                            break;
+                    }
                 }
             }
         }
