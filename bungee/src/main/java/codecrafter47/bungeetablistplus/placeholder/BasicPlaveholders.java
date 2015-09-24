@@ -32,7 +32,14 @@ import java.util.Optional;
 public class BasicPlaveholders extends PlaceholderProvider {
     @Override
     public void setup() {
-        bindRegex("\\[PING=(-?\\d+)\\]").to((placeholderManager, matcher) -> SlotTemplate.ping(Integer.valueOf(matcher.group(1))));
+        bindRegex("\\[PING=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
+            SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager().parseSlot(matcher.group(1));
+
+            @Override
+            public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                return builder.setPing(Integer.valueOf(args.buildSlot(context).getText()));
+            }
+        });
         bindRegex("\\[SKIN=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
             SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager().parseSlot(matcher.group(1));
 
