@@ -26,7 +26,6 @@ import codecrafter47.data.Value;
 import codecrafter47.data.Values;
 import codecrafter47.data.bukkit.PlayerDataAggregator;
 import codecrafter47.data.bukkit.ServerDataAggregator;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -71,9 +70,10 @@ public class BukkitBridge implements Listener {
                 plugin.getDataFolder().mkdir();
             }
             File file = new File(plugin.getDataFolder(), "config.yml");
-            config.init(file);
-            config.save(file);
-        } catch (InvalidConfigurationException e) {
+            config.read(file);
+            config.setHeader(plugin.getDescription().getName() + " " + plugin.getDescription().getVersion());
+            config.write(file);
+        } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Failed to load config.yml", e);
             config.automaticallySendBugReports = false;
         }
@@ -152,7 +152,7 @@ public class BukkitBridge implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event){
+    public void onPlayerJoin(PlayerJoinEvent event) {
         getPlayerDataUpdateTask(event.getPlayer());
     }
 
@@ -233,7 +233,7 @@ public class BukkitBridge implements Listener {
             }
             sentData = newData;
 
-            if (requestedReset){
+            if (requestedReset) {
                 requestedReset = false;
             }
         }

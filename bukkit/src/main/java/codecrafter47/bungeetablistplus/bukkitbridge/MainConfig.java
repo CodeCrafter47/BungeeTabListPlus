@@ -19,15 +19,24 @@
 
 package codecrafter47.bungeetablistplus.bukkitbridge;
 
-import net.cubespace.Yamler.Config.Comments;
-import net.cubespace.Yamler.Config.Config;
+import codecrafter47.bungeetablistplus.common.Configuration;
 
-public class MainConfig extends Config {
+import java.util.Map;
 
-    @Comments({
-            "If this is set to true and the plugin encounters an issue a bugreport is sent automatically",
-            "Bug reports do not contain any sensitive or identifying information",
-            "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log"
-    })
+public class MainConfig extends Configuration {
+
     public boolean automaticallySendBugReports = true;
+
+    @Override
+    protected void read(Map<Object, Object> map) {
+        automaticallySendBugReports = (boolean) map.getOrDefault("automaticallySendBugReports", true);
+    }
+
+    @Override
+    protected void write() {
+        writeComments("If this is set to true and the plugin encounters an issue a bugreport is sent automatically",
+                "Bug reports do not contain any sensitive or identifying information",
+                "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log");
+        write("automaticallySendBugReports", automaticallySendBugReports);
+    }
 }
