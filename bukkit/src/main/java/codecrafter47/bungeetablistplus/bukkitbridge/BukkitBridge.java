@@ -32,6 +32,7 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
@@ -123,6 +124,9 @@ public class BukkitBridge implements Listener {
         // start generalInformation update task
         this.serverDataUpdateTask = new ServerDataUpdateTask();
         this.serverDataUpdateTask.runTaskTimerAsynchronously(plugin, 0, 20);
+
+        // start update tasks for players already on the server
+        plugin.getServer().getOnlinePlayers().forEach(this::getPlayerDataUpdateTask);
     }
 
     private void updateDataHooks() {
@@ -145,6 +149,11 @@ public class BukkitBridge implements Listener {
             playerInformationUpdaters.put(player.getUniqueId(), playerDataUpdateTask);
         }
         return playerInformationUpdaters.get(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event){
+        getPlayerDataUpdateTask(event.getPlayer());
     }
 
     @EventHandler
