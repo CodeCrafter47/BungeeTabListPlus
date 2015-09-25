@@ -135,8 +135,22 @@ public class BungeeTabListPlus {
     @Getter
     private BungeePlayerProvider bungeePlayerProvider = new BungeePlayerProvider();
 
-    public PingTask getServerState(String o) {
-        return serverState.get(o);
+    public PingTask getServerState(String serverName) {
+        if (serverState.containsKey(serverName)) {
+            return serverState.get(serverName);
+        }
+        ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
+        if (serverInfo != null) {
+            // start server ping tasks
+            int delay = config.getMainConfig().pingDelay;
+            if (delay <= 0 || delay > 10) {
+                delay = 10;
+            }
+            PingTask task = new PingTask(serverInfo);
+            serverState.put(serverName, task);
+            plugin.getProxy().getScheduler().schedule(plugin, task, delay, delay, TimeUnit.SECONDS);
+        }
+        return serverState.get(serverName);
     }
 
     @Getter
@@ -195,17 +209,6 @@ public class BungeeTabListPlus {
             }
 
             skins = new SkinManager(plugin);
-        }
-
-        // start server ping tasks
-        if (config.getMainConfig().pingDelay > 0) {
-            for (ServerInfo server : plugin.getProxy().getServers().values()) {
-                PingTask task = new PingTask(server);
-                serverState.put(server.getName(), task);
-                plugin.getProxy().getScheduler().schedule(plugin, task, config.
-                                getMainConfig().pingDelay,
-                        config.getMainConfig().pingDelay, TimeUnit.SECONDS);
-            }
         }
 
         fakePlayerManager = new FakePlayerManager(plugin);
