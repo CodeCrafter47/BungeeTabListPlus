@@ -469,6 +469,13 @@ public class BungeeTabListPlus {
             String name = player.getName();
             hidden[0] = hiddenPlayers.contains(name);
         }
+        List<String> permanentlyHiddenPlayers = getInstance().getConfigManager().getMainConfig().hiddenPlayers;
+        if (permanentlyHiddenPlayers.contains(player.getName())) {
+            hidden[0] = true;
+        }
+        if (permanentlyHiddenPlayers.contains(player.getUniqueID().toString())) {
+            hidden[0] = true;
+        }
         BukkitBridge bukkitBridge = getInstance().bukkitBridge;
         bukkitBridge.getPlayerInformation(player, Values.Player.VanishNoPacket.IsVanished).ifPresent(b -> hidden[0] |= b);
         bukkitBridge.getPlayerInformation(player, Values.Player.SuperVanish.IsVanished).ifPresent(b -> hidden[0] |= b);

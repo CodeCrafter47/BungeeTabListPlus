@@ -97,6 +97,8 @@ public class MainConfig extends Configuration {
         hiddenServers.add("server9");
     }
 
+    public List<String> hiddenPlayers = new ArrayList<>();
+
     public boolean autoExcludeServers = false;
 
     public String timezone = TimeZone.getDefault().getID();
@@ -213,6 +215,8 @@ public class MainConfig extends Configuration {
         if (map.containsKey("time-zone")) {
             timezone = map.get("time-zone").toString();
         }
+
+        hiddenPlayers = (List<String>) map.getOrDefault("hiddenPlayers", new ArrayList<>());
     }
 
     @Override
@@ -296,6 +300,11 @@ public class MainConfig extends Configuration {
                 "on the tablist, whereas excluded servers' players are still on the BungeeTabListPlus tablist, but they do not see",
                 "the global tab list");
         write("hiddenServers", hiddenServers);
+
+        writeComments("players which are permanently hidden from the tab list",
+                "you can either put your username or your uuid (with dashes) here",
+                "don't use this. you have absolutely no reason to hide from anyone. on your own server.");
+        write("hiddenPlayers", hiddenPlayers);
 
         writeComments("Detects which servers are using a bukkit-side tabList-plugin",
                 "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
