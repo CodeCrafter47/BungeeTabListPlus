@@ -28,6 +28,7 @@ import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import com.google.common.collect.Sets;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -36,15 +37,14 @@ import net.md_5.bungee.event.EventHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PlaceholderAPIHook implements Listener {
     private final BungeeTabListPlus bungeeTabListPlus;
-    private final Set<String> registeredPlaceholders = new HashSet<>();
-    private final Set<String> placeholdersToCheck = new HashSet<>();
+    private final Set<String> registeredPlaceholders = Sets.newConcurrentHashSet();
+    private final Set<String> placeholdersToCheck = Sets.newConcurrentHashSet();
 
     private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("%((\\p{Alnum}|_|.|-|@|-)+)%");
 
@@ -77,18 +77,20 @@ public class PlaceholderAPIHook implements Listener {
     }
 
     public void onPlaceholderConfirmed(String placeholder) {
-        registeredPlaceholders.add(placeholder);
-        bungeeTabListPlus.registerPlaceholderProvider(new PlaceholderProvider() {
-            @Override
-            public void setup() {
-                bindRegex(Pattern.quote(placeholder)).to((placeholderManager, matcher) -> new SlotTemplate() {
-                    @Override
-                    public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
-                        return builder.appendText(bungeeTabListPlus.getBridge().get(context.getPlayer(), new PlaceholderAPIDataKey(placeholder)).orElse(""));
-                    }
-                });
-            }
-        });
+        if (!registeredPlaceholders.contains(placeholder)) {
+            registeredPlaceholders.add(placeholder);
+            bungeeTabListPlus.registerPlaceholderProvider(new PlaceholderProvider() {
+                @Override
+                public void setup() {
+                    bindRegex(Pattern.quote(placeholder)).to((placeholderManager, matcher) -> new SlotTemplate() {
+                        @Override
+                        public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                            return builder.appendText(bungeeTabListPlus.getBridge().get(context.getPlayer(), new PlaceholderAPIDataKey(placeholder)).orElse(""));
+                        }
+                    });
+                }
+            });
+        }
     }
 
     public void onLoad() {
