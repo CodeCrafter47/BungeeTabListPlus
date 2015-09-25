@@ -42,6 +42,7 @@ public class BukkitPlaceholders extends PlaceholderProvider {
             if (alias != null) return alias;
             return world.get();
         });
+        addBukkitBridgePlaceholder("team", Values.Player.Minecraft.Team);
         addBukkitBridgePlaceholder("balance", Values.Player.Vault.Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
         addBukkitBridgePlaceholder("factionName", Values.Player.Factions.FactionName);
         addBukkitBridgePlaceholder("onlineFactionMembers", Values.Player.Factions.OnlineFactionMembers, num -> num.orElse(-1).toString());
