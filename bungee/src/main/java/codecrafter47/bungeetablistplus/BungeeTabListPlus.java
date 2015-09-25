@@ -18,7 +18,9 @@
  */
 package codecrafter47.bungeetablistplus;
 
+import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
@@ -134,6 +136,9 @@ public class BungeeTabListPlus {
 
     @Getter
     private BungeePlayerProvider bungeePlayerProvider = new BungeePlayerProvider();
+
+    @Getter
+    private PlaceholderAPIHook placeholderAPIHook;
 
     public PingTask getServerState(String serverName) {
         if (serverState.containsKey(serverName)) {
@@ -328,6 +333,9 @@ public class BungeeTabListPlus {
                 reload();
             }
         }, 1, 1, TimeUnit.MINUTES);
+
+        placeholderAPIHook = new PlaceholderAPIHook(this);
+        placeholderAPIHook.onLoad();
     }
 
     private Double requestedUpdateInterval = null;
@@ -371,18 +379,29 @@ public class BungeeTabListPlus {
             requestedUpdateInterval = null;
             config = new ConfigManager(plugin);
             placeholderManager.reload();
-            TabListManager tabListManager = new TabListManager(this);
-            if (!tabListManager.loadTabLists()) {
-                return false;
-            }
-            tabLists = tabListManager;
+            if (reloadTablists()) return false;
             fakePlayerManager.reload();
             resendTabLists();
             restartRefreshThread();
+            placeholderAPIHook.onLoad();
         } catch (IOException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
         }
         return true;
+    }
+
+    private boolean reloadTablists() {
+        TabListManager tabListManager = new TabListManager(this);
+        if (!tabListManager.loadTabLists()) {
+            return true;
+        }
+        tabLists = tabListManager;
+        return false;
+    }
+
+    public void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
+        getPlaceholderManager().registerPlaceholderProvider(placeholderProvider);
+        reloadTablists();
     }
 
     /**

@@ -18,12 +18,14 @@
  */
 package codecrafter47.bungeetablistplus.bukkitbridge;
 
+import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
-import codecrafter47.bungeetablistplus.data.DataAggregator;
+import codecrafter47.bungeetablistplus.data.CompoundDataAccessor;
+import codecrafter47.bungeetablistplus.data.DataAccessor;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAggregator;
-import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAggregator;
+import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccessor;
+import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccessor;
 import com.google.common.collect.ImmutableSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -53,10 +55,12 @@ public class BukkitBridge implements Listener {
 
     private final Map<UUID, PlayerDataUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
 
-    private PlayerDataAggregator playerDataAggregator;
-    private ServerDataAggregator serverDataAggregator;
+    private DataAccessor<Player> playerDataAccessor;
+    private DataAccessor<Server> serverDataAccessor;
 
     private MainConfig config = new MainConfig();
+
+    private PlaceholderAPIHook placeholderAPIHook = null;
 
     public BukkitBridge(Plugin plugin) {
         this.plugin = plugin;
@@ -99,6 +103,25 @@ public class BukkitBridge implements Listener {
                             getPlayerDataUpdateTask(player).reset();
                         } else if (subchannel.equals(Constants.subchannelRequestResetServerVariables)) {
                             serverDataUpdateTask.reset();
+                        } else if (subchannel.equals(Constants.subchannelPlaceholder)) {
+                            String placeholder = in.readUTF();
+                            PlaceholderAPIHook hook = this.placeholderAPIHook;
+                            if (hook != null) {
+                                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                                    try {
+                                        if (hook.isPlaceholder(player, placeholder)) {
+                                            ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                            ObjectOutputStream out = new ObjectOutputStream(os);
+                                            out.writeUTF(subchannel);
+                                            out.writeUTF(placeholder);
+                                            out.close();
+                                            player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
+                                        }
+                                    } catch (Throwable ex) {
+                                        plugin.getLogger().log(Level.SEVERE, "something funny happened", ex);
+                                    }
+                                });
+                            }
                         } else {
                             plugin.getLogger().warning("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
                         }
@@ -119,8 +142,18 @@ public class BukkitBridge implements Listener {
     }
 
     private void updateDataHooks() {
-        playerDataAggregator = new PlayerDataAggregator(plugin);
-        serverDataAggregator = new ServerDataAggregator(plugin);
+        if (plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            placeholderAPIHook = new PlaceholderAPIHook(plugin);
+        } else {
+            placeholderAPIHook = null;
+        }
+
+        if (placeholderAPIHook != null) {
+            playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), placeholderAPIHook.getDataAccessor());
+        } else {
+            playerDataAccessor = new PlayerDataAccessor(plugin);
+        }
+        serverDataAccessor = new ServerDataAccessor(plugin);
     }
 
     private PlayerDataUpdateTask getPlayerDataUpdateTask(Player player) {
@@ -185,15 +218,15 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    public abstract class DataUpdateTask<B, V extends DataAggregator<B>> extends BukkitRunnable {
+    public abstract class DataUpdateTask<B> extends BukkitRunnable {
         Map<DataKey<?>, Object> sentData = new ConcurrentHashMap<>();
         ImmutableSet<DataKey<?>> requestedData = ImmutableSet.of();
         boolean requestedReset = true;
 
-        protected final void update(Player player, V dataAggregator, B boundType, String subchannel) {
+        protected final void update(Player player, DataAccessor<B> dataAccessor, B boundType, String subchannel) {
             Map<DataKey<?>, Object> newData = new ConcurrentHashMap<>();
             requestedData.parallelStream().forEach(value -> {
-                dataAggregator.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
+                dataAccessor.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
             });
             Map<DataKey<?>, Object> delta = new HashMap<>();
             for (Map.Entry<DataKey<?>, Object> entry : sentData.entrySet()) {
@@ -230,19 +263,19 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    public class ServerDataUpdateTask extends DataUpdateTask<Server, ServerDataAggregator> {
+    public class ServerDataUpdateTask extends DataUpdateTask<Server> {
 
         @Override
         public void run() {
             plugin.getServer().getOnlinePlayers().stream().findAny().ifPresent(player -> {
-                update(player, serverDataAggregator, plugin.getServer(), Constants.subchannelUpdateServer);
+                update(player, serverDataAccessor, plugin.getServer(), Constants.subchannelUpdateServer);
                 sendHash(Constants.subchannelServerHash, sentData.hashCode(), player);
             });
         }
 
     }
 
-    public class PlayerDataUpdateTask extends DataUpdateTask<Player, PlayerDataAggregator> {
+    public class PlayerDataUpdateTask extends DataUpdateTask<Player> {
         private final Player player;
 
         public PlayerDataUpdateTask(Player player) {
@@ -251,7 +284,7 @@ public class BukkitBridge implements Listener {
 
         @Override
         public void run() {
-            update(player, playerDataAggregator, player, Constants.subchannelUpdatePlayer);
+            update(player, playerDataAccessor, player, Constants.subchannelUpdatePlayer);
             sendHash(Constants.subchannelPlayerHash, sentData.hashCode(), player);
         }
     }

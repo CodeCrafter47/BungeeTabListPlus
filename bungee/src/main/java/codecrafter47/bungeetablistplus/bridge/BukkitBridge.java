@@ -97,6 +97,9 @@ public class BukkitBridge implements Listener {
                                 requestReset(server);
                             }
                             break;
+                        case Constants.subchannelPlaceholder:
+                            plugin.getPlaceholderAPIHook().onPlaceholderConfirmed(in.readUTF());
+                            break;
                         default:
                             plugin.getLogger().log(Level.SEVERE,
                                     "BukkitBridge on server " + server.getInfo().

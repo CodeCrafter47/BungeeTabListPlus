@@ -38,8 +38,8 @@ public class ConfigManager {
 
     private MainConfig config;
     private Messages messages;
-    TabListConfig defaultTabList;
-    final List<TabListConfig> tabLists = new ArrayList<>();
+    public TabListConfig defaultTabList;
+    public final List<TabListConfig> tabLists = new ArrayList<>();
 
     public ConfigManager(Plugin plugin) throws IOException {
         loadConfig(plugin);

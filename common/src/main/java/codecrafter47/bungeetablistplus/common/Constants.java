@@ -41,4 +41,6 @@ public class Constants {
 
     public final static String subchannelUpdatePlayer = "updateP";
 
+    public final static String subchannelPlaceholder = "placeholder";
+
 }

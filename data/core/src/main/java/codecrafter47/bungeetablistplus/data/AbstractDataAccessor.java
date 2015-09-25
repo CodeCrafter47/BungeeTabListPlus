@@ -28,12 +28,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public abstract class DataAggregator<B> {
+public abstract class AbstractDataAccessor<B> implements DataAccessor<B> {
     protected final Logger logger;
     private final Map<DataKey<?>, Function<B, ?>> providersByDataKey = new HashMap<>();
     private final Map<Class, BiFunction<B, DataKey<?>, ?>> providersByDataKeyClass = new HashMap<>();
 
-    public DataAggregator(Logger logger) {
+    public AbstractDataAccessor(Logger logger) {
         this.logger = logger;
     }
 
@@ -46,6 +46,7 @@ public abstract class DataAggregator<B> {
         providersByDataKeyClass.put(clazz, (BiFunction<B, DataKey<?>, ?>) (Object) provider);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <V> Optional<V> getValue(DataKey<V> key, B context) {
         try {
