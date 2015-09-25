@@ -125,7 +125,7 @@ public class ConfigManager {
     }
 
     public static int getRows() {
-        return getTabSize() / getCols();
+        return getCols() == 0 ? 0 : getTabSize() / getCols();
     }
 
     private void validateConfig() {
