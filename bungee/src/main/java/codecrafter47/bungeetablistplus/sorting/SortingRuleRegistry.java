@@ -19,9 +19,7 @@
 
 package codecrafter47.bungeetablistplus.sorting;
 
-import codecrafter47.bungeetablistplus.sorting.rules.AdminFirst;
-import codecrafter47.bungeetablistplus.sorting.rules.Alphabet;
-import codecrafter47.bungeetablistplus.sorting.rules.YouFirst;
+import codecrafter47.bungeetablistplus.sorting.rules.*;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Optional;
@@ -39,9 +37,11 @@ public class SortingRuleRegistry {
             .put("alphabetic", new Alphabet())
             .put("alphabetical", new Alphabet())
             .put("alphabetically", new Alphabet())
+            .put("teamfirst", new TeamFirst())
+            .put("teams", new TeamsAlphabetically())
             .build();
 
     public static Optional<SortingRule> getRule(String name) {
-        return Optional.ofNullable(map.get(name));
+        return Optional.ofNullable(map.get(name.toLowerCase()));
     }
 }
