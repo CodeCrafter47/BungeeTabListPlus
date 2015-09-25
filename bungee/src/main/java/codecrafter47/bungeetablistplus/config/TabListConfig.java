@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.Configuration;
+import com.google.common.collect.Lists;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
@@ -30,9 +31,33 @@ public class TabListConfig extends Configuration {
 
     public String showTo = "all";
 
-    public String header = "&bWelcome &6{player}";
+    public List<String> header = Lists.newArrayList(
+            "",
+            "&bW",
+            "&bWe",
+            "&bWel",
+            "&bWelc",
+            "&bWelco",
+            "&bWelcom",
+            "&bWelcome",
+            "&bWelcome",
+            "&bWelcome",
+            "&bWelcome",
+            "",
+            "&6{player}",
+            "&6{player}",
+            "&6{player}",
+            "&6{player}",
+            "&6{player}",
+            "&6{player}",
+            "&6{player}",
+            "&6{player}");
 
-    public String footer = "&4play.minecraft.example.com";
+    public double headerCycleInterval = 0.25;
+
+    public List<String> footer = Lists.newArrayList("&4play.minecraft.example.com");
+
+    public double footerCycleInterval = 0.5;
 
     public boolean shownFooterHeader = true;
 
@@ -186,12 +211,26 @@ public class TabListConfig extends Configuration {
         }
 
         if (map.containsKey("header")) {
-            header = map.get("header").toString();
+            Object header = map.get("header");
+            if (header instanceof List) {
+                this.header = (List<String>) header;
+            } else {
+                this.header = Lists.newArrayList(header.toString());
+            }
         }
 
+        headerCycleInterval = ((Number) map.getOrDefault("headerAnimationUpdateInterval", headerCycleInterval)).doubleValue();
+
         if (map.containsKey("footer")) {
-            footer = map.get("footer").toString();
+            Object footer = map.get("footer");
+            if (footer instanceof List) {
+                this.footer = (List<String>) footer;
+            } else {
+                this.footer = Lists.newArrayList(footer.toString());
+            }
         }
+
+        footerCycleInterval = ((Number) map.getOrDefault("footerAnimationUpdateInterval", footerCycleInterval)).doubleValue();
 
         if (map.containsKey("shownFooterHeader")) {
             shownFooterHeader = (boolean) map.get("shownFooterHeader");
@@ -253,11 +292,21 @@ public class TabListConfig extends Configuration {
                 "'all' for all players");
         write("showTo", showTo);
 
-        writeComment("This text will be shown above the tablist");
+        writeComments("This text will be shown above the tablist",
+                "Add multiple lines to create an animation");
         write("header", header);
 
-        writeComment("This text will be shown below the tablist");
+        writeComments("Interval (in seconds) at which the header animation is updated",
+                "Use this to configure the speed to the animation");
+        write("headerAnimationUpdateInterval", headerCycleInterval);
+
+        writeComments("This text will be shown below the tablist",
+                "Add multiple lines to create an animation");
         write("footer", footer);
+
+        writeComments("Interval (in seconds) at which the footer animation is updated",
+                "Use this to configure the speed to the animation");
+        write("footerAnimationUpdateInterval", footerCycleInterval);
 
         writeComment("whether to shown header/footer or not. You should set this to false if you wan to use a bukkit/spigot side plugin for that.");
         write("shownFooterHeader", shownFooterHeader);

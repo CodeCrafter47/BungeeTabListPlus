@@ -44,21 +44,17 @@ public class TabListProvider implements ITabListProvider {
     private final BungeeTabListPlus plugin;
     private final List<Function<TabListContext, List<Section>>> topSectionsProvider;
     private final List<Function<TabListContext, List<Section>>> botSectionsProvider;
-    private final boolean showEmptyGroups;
     private final TabListConfig config;
-    private final ConfigParser parser;
     private final TablistLayoutManager<Section> layoutManager = new TablistLayoutManager<>();
     private final boolean showHeaderFooter;
     private final SlotTemplate header;
     private final SlotTemplate footer;
 
     public TabListProvider(BungeeTabListPlus plugin, List<Function<TabListContext, List<Section>>> top, List<Function<TabListContext, List<Section>>> bot,
-                           boolean showEmpty, TabListConfig config, ConfigParser parser, boolean showHeaderFooter, SlotTemplate header, SlotTemplate footer) {
+                           TabListConfig config, boolean showHeaderFooter, SlotTemplate header, SlotTemplate footer) {
         this.topSectionsProvider = top;
         this.botSectionsProvider = bot;
-        showEmptyGroups = showEmpty;
         this.config = config;
-        this.parser = parser;
         this.plugin = plugin;
         this.showHeaderFooter = showHeaderFooter;
         this.header = header;

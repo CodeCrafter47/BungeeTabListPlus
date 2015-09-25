@@ -46,7 +46,7 @@ public class ConfigManager {
     private void loadConfig(Plugin plugin) throws IOException {
         setMainConfig(new MainConfig());
         File file = new File(plugin.getDataFolder(), "config.yml");
-        if(file.exists()){
+        if (file.exists()) {
             config.read(file);
         }
         config.write(file);
@@ -69,11 +69,13 @@ public class ConfigManager {
         // Load default TabList
         defaultTabList = new TabListConfig("default.yml");
         File tabListDir = new File(plugin.getDataFolder(), "tabLists");
-        if(!tabListDir.exists()){
+        if (!tabListDir.exists()) {
             tabListDir.mkdir();
         }
         file = new File(tabListDir, "default.yml");
-        defaultTabList.read(file);
+        if (file.exists()) {
+            defaultTabList.read(file);
+        }
         defaultTabList.write(file);
         // Load other TabLists
         for (String s : new File("plugins" + File.separator

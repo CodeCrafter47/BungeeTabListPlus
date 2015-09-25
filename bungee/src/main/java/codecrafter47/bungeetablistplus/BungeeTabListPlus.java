@@ -320,8 +320,14 @@ public class BungeeTabListPlus {
         }
     }
 
+    private Double requestedUpdateInterval = null;
+
     private void startRefreshThread() {
-        if (config.getMainConfig().tablistUpdateInterval > 0) {
+        double updateInterval = config.getMainConfig().tablistUpdateInterval;
+        if (requestedUpdateInterval != null && (requestedUpdateInterval < updateInterval || updateInterval <= 0)) {
+            updateInterval = requestedUpdateInterval;
+        }
+        if (updateInterval > 0) {
             try {
                 refreshThread = ProxyServer.getInstance().getScheduler().
                         schedule(
@@ -333,13 +339,22 @@ public class BungeeTabListPlus {
                                         startRefreshThread();
                                     }
                                 },
-                                (long) (config.getMainConfig().tablistUpdateInterval * 1000),
+                                (long) (updateInterval * 1000),
                                 TimeUnit.MILLISECONDS);
             } catch (RejectedExecutionException ex) {
                 // this occurs on proxy shutdown -> we can safely ignore it
             }
         } else {
             refreshThread = null;
+        }
+    }
+
+    public void requireUpdateInterval(double updateInterval) {
+        if (requestedUpdateInterval == null || updateInterval < requestedUpdateInterval) {
+            requestedUpdateInterval = updateInterval;
+            if (refreshThread == null) {
+                startRefreshThread();
+            }
         }
     }
 

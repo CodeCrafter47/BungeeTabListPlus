@@ -54,6 +54,10 @@ public abstract class SlotTemplate {
         return new SlotTemplateCompound(templates);
     }
 
+    public static SlotTemplate animate(List<SlotTemplate> templates, double interval) {
+        return new SlotTemplateAnimated(templates, interval);
+    }
+
     public static SlotTemplateBuilder builder() {
         return new SlotTemplateBuilder();
     }
@@ -104,6 +108,22 @@ public abstract class SlotTemplate {
         @Override
         public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
             return builder.setSkin(skin);
+        }
+    }
+
+    private static class SlotTemplateAnimated extends SlotTemplate {
+        private final List<SlotTemplate> templates;
+        private final long intervalMillis;
+
+        private SlotTemplateAnimated(List<SlotTemplate> templates, double interval) {
+            this.templates = templates;
+            this.intervalMillis = (long) (interval * 1000);
+        }
+
+        @Override
+        public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+            int index = (int) ((System.currentTimeMillis() / intervalMillis) % templates.size());
+            return templates.get(index).buildSlot(builder, context);
         }
     }
 

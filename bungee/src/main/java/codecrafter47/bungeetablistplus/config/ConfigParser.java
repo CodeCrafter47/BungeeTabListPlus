@@ -187,7 +187,18 @@ public class ConfigParser {
             }
         }
 
-        return new TabListProvider(plugin, topSectionProviders, botSectionProviders, config.showEmptyGroups, config, this, config.shownFooterHeader, parseSlot(config.header), parseSlot(config.footer));
+        if (config.header.size() > 1) {
+            plugin.requireUpdateInterval(config.headerCycleInterval);
+        }
+
+        if (config.footer.size() > 1) {
+            plugin.requireUpdateInterval(config.footerCycleInterval);
+        }
+
+        SlotTemplate header = SlotTemplate.animate(config.header.stream().map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
+        SlotTemplate footer = SlotTemplate.animate(config.footer.stream().map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
+
+        return new TabListProvider(plugin, topSectionProviders, botSectionProviders, config, config.shownFooterHeader, header, footer);
     }
 
     public AutoFillPlayers parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, List<String> g_sort, int g_maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
