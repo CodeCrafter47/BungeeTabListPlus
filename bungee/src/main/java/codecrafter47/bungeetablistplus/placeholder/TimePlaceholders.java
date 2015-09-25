@@ -28,31 +28,31 @@ public class TimePlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         SimpleDateFormat format_time = getFormat("HH:mm:ss");
-        bind("time").withArgs().to((context, args) -> {
+        bind("time").setRequiredUpdateInterval(1.0).withArgs().to((context, args) -> {
             SimpleDateFormat format = args != null && !args.isEmpty() ? new SimpleDateFormat(args) : format_time;
             return format.format(System.currentTimeMillis());
         });
 
-        addTimePlaceholder("date", "dd.MM.yyyy");
-        addTimePlaceholder("second", "ss");
-        addTimePlaceholder("seconds", "ss");
-        addTimePlaceholder("sec", "ss");
-        addTimePlaceholder("minute", "mm");
-        addTimePlaceholder("minutes", "mm");
-        addTimePlaceholder("min", "mm");
-        addTimePlaceholder("hour", "HH");
-        addTimePlaceholder("hours", "HH");
-        addTimePlaceholder("day", "dd");
-        addTimePlaceholder("days", "dd");
-        addTimePlaceholder("month", "MM");
-        addTimePlaceholder("months", "MM");
-        addTimePlaceholder("year", "yyyy");
-        addTimePlaceholder("years", "yyyy");
+        addTimePlaceholder("date", "dd.MM.yyyy", 300);
+        addTimePlaceholder("second", "ss", 1);
+        addTimePlaceholder("seconds", "ss", 1);
+        addTimePlaceholder("sec", "ss", 1);
+        addTimePlaceholder("minute", "mm", 60);
+        addTimePlaceholder("minutes", "mm", 60);
+        addTimePlaceholder("min", "mm", 60);
+        addTimePlaceholder("hour", "HH", 300);
+        addTimePlaceholder("hours", "HH", 300);
+        addTimePlaceholder("day", "dd", 300);
+        addTimePlaceholder("days", "dd", 300);
+        addTimePlaceholder("month", "MM", 300);
+        addTimePlaceholder("months", "MM", 300);
+        addTimePlaceholder("year", "yyyy", 300);
+        addTimePlaceholder("years", "yyyy", 300);
     }
 
-    private void addTimePlaceholder(String name, String pattern) {
+    private void addTimePlaceholder(String name, String pattern, double requiredUpdateInterval) {
         SimpleDateFormat format = getFormat(pattern);
-        bind(name).to(context -> format.format(System.currentTimeMillis()));
+        bind(name).setRequiredUpdateInterval(requiredUpdateInterval).to(context -> format.format(System.currentTimeMillis()));
     }
 
     private SimpleDateFormat getFormat(String pattern) {

@@ -30,7 +30,7 @@ public class ColorPlaceholder extends PlaceholderProvider {
 
     @Override
     public void setup() {
-        bind("color").withArgs().to((context, args) -> {
+        bind("color").setRequiredUpdateInterval(1.0).withArgs().to((context, args) -> {
             long time = System.currentTimeMillis() / 1000;
             ChatColor all[];
             if (args != null) {
