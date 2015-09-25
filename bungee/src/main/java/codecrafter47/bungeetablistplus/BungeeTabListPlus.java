@@ -318,6 +318,16 @@ public class BungeeTabListPlus {
                 getLogger().log(Level.SEVERE, "Failed to hook team packet", ex);
             }
         }
+
+        int serversHash[] = {getProxy().getServers().hashCode()};
+        getProxy().getScheduler().schedule(plugin, () -> {
+            int hash = getProxy().getServers().hashCode();
+            if (hash != serversHash[0]) {
+                serversHash[0] = hash;
+                getLogger().info("Network topology change detected. Reloading plugin.");
+                reload();
+            }
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     private Double requestedUpdateInterval = null;
