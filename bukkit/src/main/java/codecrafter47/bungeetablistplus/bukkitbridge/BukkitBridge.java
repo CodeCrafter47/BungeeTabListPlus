@@ -26,6 +26,7 @@ import codecrafter47.data.Value;
 import codecrafter47.data.Values;
 import codecrafter47.data.bukkit.PlayerDataAggregator;
 import codecrafter47.data.bukkit.ServerDataAggregator;
+import com.google.common.collect.ImmutableSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -39,14 +40,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
-/**
- * @author Florian Stober
- */
 public class BukkitBridge implements Listener {
 
     private final Plugin plugin;
@@ -206,7 +206,7 @@ public class BukkitBridge implements Listener {
 
     public abstract class DataUpdateTask<B, V extends DataAggregator<B>> extends BukkitRunnable {
         Map<Value<?>, Object> sentData = new ConcurrentHashMap<>();
-        List<Value<?>> requestedData = new CopyOnWriteArrayList<>();
+        ImmutableSet<Value<?>> requestedData = ImmutableSet.of();
         boolean requestedReset = true;
 
         protected final void update(Player player, V dataAggregator, B boundType, String subchannel) {
@@ -240,7 +240,7 @@ public class BukkitBridge implements Listener {
 
         public void requestValue(Value<?> value) {
             if (!requestedData.contains(value)) {
-                requestedData.add(value);
+                requestedData = ImmutableSet.<Value<?>>builder().addAll(requestedData).add(value).build();
             }
         }
 
