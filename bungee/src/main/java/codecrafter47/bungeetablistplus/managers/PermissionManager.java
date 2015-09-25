@@ -19,11 +19,10 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.common.PermissionValues;
+import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.data.Value;
-import codecrafter47.data.Values;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.PermissionsManager;
@@ -82,7 +81,7 @@ public class PermissionManager {
         }
 
         // Vault
-        Optional<String> vgroup = plugin.getBridge().getPlayerInformation(player, Values.Player.Vault.PermissionGroup);
+        Optional<String> vgroup = plugin.getBridge().get(player, DataKeys.Vault_PermissionGroup);
 
         // BungeeCord
         String bgroup = null;
@@ -200,7 +199,7 @@ public class PermissionManager {
         String bprefix = plugin.getConfigManager().getMainConfig().prefixes.get(
                 getMainGroup(player));
 
-        Optional<String> vprefix = plugin.getBridge().getPlayerInformation(player, Values.Player.Vault.Prefix);
+        Optional<String> vprefix = plugin.getBridge().get(player, DataKeys.Vault_Prefix);
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
@@ -236,7 +235,7 @@ public class PermissionManager {
                     if (user != null) {
                         if (isBungeePerms3()) {
                             display = user.getDisplay();
-                            if(display == null || display.isEmpty()){
+                            if (display == null || display.isEmpty()) {
                                 Group group = pm.getMainGroup(user);
                                 if (group != null) {
                                     display = group.getDisplay();
@@ -292,7 +291,7 @@ public class PermissionManager {
             }
         }
 
-        Optional<String> vsuffix = plugin.getBridge().getPlayerInformation(player, Values.Player.Vault.Suffix);
+        Optional<String> vsuffix = plugin.getBridge().get(player, DataKeys.Vault_Suffix);
 
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
@@ -318,11 +317,9 @@ public class PermissionManager {
         }
 
         try {
-            Value<Boolean> value = PermissionValues.getValueForPermission(permission);
-            if (value != null) {
-                Optional<Boolean> has = plugin.getBridge().getPlayerInformation(plugin.getBungeePlayerProvider().wrapPlayer((ProxiedPlayer) sender), value);
-                if (has.isPresent()) return has.get();
-            }
+            DataKey<Boolean> dataKey = DataKeys.permission(permission);
+            Optional<Boolean> has = plugin.getBridge().get(plugin.getBungeePlayerProvider().wrapPlayer((ProxiedPlayer) sender), dataKey);
+            if (has.isPresent()) return has.get();
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }

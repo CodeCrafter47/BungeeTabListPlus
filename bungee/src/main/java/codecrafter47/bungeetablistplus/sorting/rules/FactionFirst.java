@@ -21,10 +21,10 @@ package codecrafter47.bungeetablistplus.sorting.rules;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.sorting.SortingRule;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
-import codecrafter47.data.Values;
 
 import java.util.Optional;
 
@@ -33,10 +33,10 @@ public class FactionFirst implements SortingRule {
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         IPlayer viewer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer());
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> faction = bridge.getPlayerInformation(viewer, Values.Player.Factions.FactionName);
+        Optional<String> faction = bridge.get(viewer, DataKeys.Factions_FactionName);
         if (faction.isPresent()) {
-            Optional<String> faction1 = bridge.getPlayerInformation(player1, Values.Player.Factions.FactionName);
-            Optional<String> faction2 = bridge.getPlayerInformation(player2, Values.Player.Factions.FactionName);
+            Optional<String> faction1 = bridge.get(player1, DataKeys.Factions_FactionName);
+            Optional<String> faction2 = bridge.get(player2, DataKeys.Factions_FactionName);
             if (!faction1.equals(faction2)) {
                 if (faction1.equals(faction)) return -1;
                 if (faction2.equals(faction)) return 1;

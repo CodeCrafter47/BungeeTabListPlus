@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packet.*;
@@ -34,7 +35,6 @@ import codecrafter47.bungeetablistplus.util.PingTask;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
-import codecrafter47.data.Values;
 import lombok.Getter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -487,9 +487,9 @@ public class BungeeTabListPlus {
             hidden[0] = true;
         }
         BukkitBridge bukkitBridge = getInstance().bukkitBridge;
-        bukkitBridge.getPlayerInformation(player, Values.Player.VanishNoPacket.IsVanished).ifPresent(b -> hidden[0] |= b);
-        bukkitBridge.getPlayerInformation(player, Values.Player.SuperVanish.IsVanished).ifPresent(b -> hidden[0] |= b);
-        bukkitBridge.getPlayerInformation(player, Values.Player.Essentials.IsVanished).ifPresent(b -> hidden[0] |= b);
+        bukkitBridge.get(player, DataKeys.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
+        bukkitBridge.get(player, DataKeys.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
+        bukkitBridge.get(player, DataKeys.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
         return hidden[0];
     }
 

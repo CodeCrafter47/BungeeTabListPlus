@@ -20,12 +20,10 @@ package codecrafter47.bungeetablistplus.bukkitbridge;
 
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
-import codecrafter47.bungeetablistplus.common.PermissionValues;
-import codecrafter47.data.DataAggregator;
-import codecrafter47.data.Value;
-import codecrafter47.data.Values;
-import codecrafter47.data.bukkit.PlayerDataAggregator;
-import codecrafter47.data.bukkit.ServerDataAggregator;
+import codecrafter47.bungeetablistplus.data.DataAggregator;
+import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAggregator;
+import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAggregator;
 import com.google.common.collect.ImmutableSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -86,26 +84,15 @@ public class BukkitBridge implements Listener {
         plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin,
                 Constants.channel, (string, player, bytes) -> {
                     try {
-                        DataInputStream in = new DataInputStream(
-                                new ByteArrayInputStream(bytes));
+                        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
 
                         String subchannel = in.readUTF();
                         if (subchannel.equals(Constants.subchannelRequestPlayerVariable)) {
-                            String id = in.readUTF();
-                            Value<Object> value = Values.getValue(id);
-                            if (value != null) {
-                                getPlayerDataUpdateTask(player).requestValue(value);
-                            } else {
-                                plugin.getLogger().warning("Proxy requested unknown value \"" + id + "\". Proxy/Bukkit plugin version mismatch?");
-                            }
+                            DataKey<Object> dataKey = (DataKey<Object>) in.readObject();
+                            getPlayerDataUpdateTask(player).requestValue(dataKey);
                         } else if (subchannel.equals(Constants.subchannelRequestServerVariable)) {
-                            String id = in.readUTF();
-                            Value<Object> value = Values.getValue(id);
-                            if (value != null) {
-                                this.serverDataUpdateTask.requestValue(value);
-                            } else {
-                                plugin.getLogger().warning("Proxy requested unknown value \"" + id + "\". Proxy/Bukkit plugin version mismatch?");
-                            }
+                            DataKey<Object> dataKey = (DataKey<Object>) in.readObject();
+                            this.serverDataUpdateTask.requestValue(dataKey);
                         } else if (subchannel.equals(Constants.subchannelRequestResetPlayerVariables)) {
                             getPlayerDataUpdateTask(player).reset();
                         } else if (subchannel.equals(Constants.subchannelRequestResetServerVariables)) {
@@ -113,7 +100,7 @@ public class BukkitBridge implements Listener {
                         } else {
                             plugin.getLogger().warning("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
                         }
-                    } catch (IOException ex) {
+                    } catch (IOException | ClassNotFoundException ex) {
                         plugin.getLogger().log(Level.SEVERE, "An error occurred while handling an incoming plugin message", ex);
                     }
                 });
@@ -130,15 +117,7 @@ public class BukkitBridge implements Listener {
     }
 
     private void updateDataHooks() {
-        playerDataAggregator = new PlayerDataAggregator(plugin) {
-            @Override
-            protected void init() {
-                super.init();
-                for (String permission : PermissionValues.getRegisteredPermissions()) {
-                    bind(PermissionValues.getValueForPermission(permission), player -> player.hasPermission(permission));
-                }
-            }
-        };
+        playerDataAggregator = new PlayerDataAggregator(plugin);
         serverDataAggregator = new ServerDataAggregator(plugin);
     }
 
@@ -178,7 +157,7 @@ public class BukkitBridge implements Listener {
         updateDataHooks();
     }
 
-    protected void sendInformation(String subchannel, Map<String, Object> delta, Player player) {
+    protected void sendInformation(String subchannel, Map<DataKey<?>, Object> delta, Player player) {
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(os);
@@ -205,26 +184,26 @@ public class BukkitBridge implements Listener {
     }
 
     public abstract class DataUpdateTask<B, V extends DataAggregator<B>> extends BukkitRunnable {
-        Map<Value<?>, Object> sentData = new ConcurrentHashMap<>();
-        ImmutableSet<Value<?>> requestedData = ImmutableSet.of();
+        Map<DataKey<?>, Object> sentData = new ConcurrentHashMap<>();
+        ImmutableSet<DataKey<?>> requestedData = ImmutableSet.of();
         boolean requestedReset = true;
 
         protected final void update(Player player, V dataAggregator, B boundType, String subchannel) {
-            Map<Value<?>, Object> newData = new ConcurrentHashMap<>();
+            Map<DataKey<?>, Object> newData = new ConcurrentHashMap<>();
             requestedData.parallelStream().forEach(value -> {
                 dataAggregator.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
             });
-            Map<String, Object> delta = new HashMap<>();
-            for (Map.Entry<Value<?>, Object> entry : sentData.entrySet()) {
+            Map<DataKey<?>, Object> delta = new HashMap<>();
+            for (Map.Entry<DataKey<?>, Object> entry : sentData.entrySet()) {
                 if (!newData.containsKey(entry.getKey())) {
-                    delta.put(entry.getKey().getId(), null);
+                    delta.put(entry.getKey(), null);
                 } else if (!Objects.equals(newData.get(entry.getKey()), entry.getValue())) {
-                    delta.put(entry.getKey().getId(), newData.get(entry.getKey()));
+                    delta.put(entry.getKey(), newData.get(entry.getKey()));
                 }
             }
-            for (Map.Entry<Value<?>, Object> entry : newData.entrySet()) {
+            for (Map.Entry<DataKey<?>, Object> entry : newData.entrySet()) {
                 if (requestedReset || !sentData.containsKey(entry.getKey())) {
-                    delta.put(entry.getKey().getId(), entry.getValue());
+                    delta.put(entry.getKey(), entry.getValue());
                 }
             }
 
@@ -238,9 +217,9 @@ public class BukkitBridge implements Listener {
             }
         }
 
-        public void requestValue(Value<?> value) {
-            if (!requestedData.contains(value)) {
-                requestedData = ImmutableSet.<Value<?>>builder().addAll(requestedData).add(value).build();
+        public void requestValue(DataKey<?> dataKey) {
+            if (!requestedData.contains(dataKey)) {
+                requestedData = ImmutableSet.<DataKey<?>>builder().addAll(requestedData).add(dataKey).build();
             }
         }
 

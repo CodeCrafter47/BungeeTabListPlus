@@ -21,9 +21,9 @@ package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
-import codecrafter47.data.Value;
-import codecrafter47.data.Values;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -32,7 +32,7 @@ public class BukkitPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         bind("world").to(context -> {
-            Optional<String> world = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(context.getPlayer(), Values.Player.Bukkit.World);
+            Optional<String> world = BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), DataKeys.World);
             if (!world.isPresent()) {
                 return "";
             }
@@ -42,35 +42,35 @@ public class BukkitPlaceholders extends PlaceholderProvider {
             if (alias != null) return alias;
             return world.get();
         });
-        addBukkitBridgePlaceholder("team", Values.Player.Minecraft.Team);
-        addBukkitBridgePlaceholder("balance", Values.Player.Vault.Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
-        addBukkitBridgePlaceholder("factionName", Values.Player.Factions.FactionName);
-        addBukkitBridgePlaceholder("onlineFactionMembers", Values.Player.Factions.OnlineFactionMembers, num -> num.orElse(-1).toString());
-        addBukkitBridgePlaceholder("factionsWhere", Values.Player.Factions.FactionsWhere);
-        addBukkitBridgePlaceholder("factionPower", Values.Player.Factions.FactionPower);
-        addBukkitBridgePlaceholder("factionsPlayerPower", Values.Player.Factions.PlayerPower);
-        addBukkitBridgePlaceholder("factionMembers", Values.Player.Factions.FactionMembers);
-        addBukkitBridgePlaceholder("factionRank", Values.Player.Factions.FactionsRank);
-        addBukkitBridgePlaceholder("SimpleClans_ClanName", Values.Player.SimpleClans.ClanName);
-        addBukkitBridgePlaceholder("SimpleClans_ClanMembers", Values.Player.SimpleClans.ClanMembers);
-        addBukkitBridgePlaceholder("SimpleClans_OnlineClanMembers", Values.Player.SimpleClans.OnlineClanMembers);
-        addBukkitBridgePlaceholder("SimpleClans_ClanTag", Values.Player.SimpleClans.ClanTag);
-        addBukkitBridgePlaceholder("SimpleClans_ClanTagLabel", Values.Player.SimpleClans.ClanTagLabel);
-        addBukkitBridgePlaceholder("SimpleClans_ClanColorTag", Values.Player.SimpleClans.ClanColorTag);
-        addBukkitBridgePlaceholder("health", Values.Player.Minecraft.Health, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
-        addBukkitBridgePlaceholder("maxHealth", Values.Player.Minecraft.MaxHealth, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
-        addBukkitBridgePlaceholder("posX", Values.Player.Minecraft.PosX, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
-        addBukkitBridgePlaceholder("posY", Values.Player.Minecraft.PosY, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
-        addBukkitBridgePlaceholder("posZ", Values.Player.Minecraft.PosZ, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
-        addBukkitBridgePlaceholder("XP", Values.Player.Minecraft.XP, xp -> xp.map(f -> String.format("%1.2f", f)).orElse(""));
-        addBukkitBridgePlaceholder("totalXP", Values.Player.Minecraft.TotalXP);
-        addBukkitBridgePlaceholder("level", Values.Player.Minecraft.Level, level -> level.orElse(-1).toString());
-        addBukkitBridgePlaceholder("playerPoints", Values.Player.PlayerPoints.Points);
-        addBukkitBridgeServerPlaceholder("currency", Values.Server.Vault.CurrencyNameSingular);
-        addBukkitBridgeServerPlaceholder("currencyPl", Values.Server.Vault.CurrencyNamePlural);
-        addBukkitBridgeServerPlaceholder("tps", Values.Server.TPS, tps -> tps.map(d -> String.format("%1.1f", d)).orElse(""));
+        addBukkitBridgePlaceholder("team", DataKeys.Team);
+        addBukkitBridgePlaceholder("balance", DataKeys.Vault_Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
+        addBukkitBridgePlaceholder("factionName", DataKeys.Factions_FactionName);
+        addBukkitBridgePlaceholder("onlineFactionMembers", DataKeys.Factions_OnlineFactionMembers, num -> num.orElse(-1).toString());
+        addBukkitBridgePlaceholder("factionsWhere", DataKeys.Factions_FactionsWhere);
+        addBukkitBridgePlaceholder("factionPower", DataKeys.Factions_FactionPower);
+        addBukkitBridgePlaceholder("factionsPlayerPower", DataKeys.Factions_PlayerPower);
+        addBukkitBridgePlaceholder("factionMembers", DataKeys.Factions_FactionMembers);
+        addBukkitBridgePlaceholder("factionRank", DataKeys.Factions_FactionsRank);
+        addBukkitBridgePlaceholder("SimpleClans_ClanName", DataKeys.SimpleClans_ClanName);
+        addBukkitBridgePlaceholder("SimpleClans_ClanMembers", DataKeys.SimpleClans_ClanMembers);
+        addBukkitBridgePlaceholder("SimpleClans_OnlineClanMembers", DataKeys.SimpleClans_OnlineClanMembers);
+        addBukkitBridgePlaceholder("SimpleClans_ClanTag", DataKeys.SimpleClans_ClanTag);
+        addBukkitBridgePlaceholder("SimpleClans_ClanTagLabel", DataKeys.SimpleClans_ClanTagLabel);
+        addBukkitBridgePlaceholder("SimpleClans_ClanColorTag", DataKeys.SimpleClans_ClanColorTag);
+        addBukkitBridgePlaceholder("health", DataKeys.Health, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
+        addBukkitBridgePlaceholder("maxHealth", DataKeys.MaxHealth, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
+        addBukkitBridgePlaceholder("posX", DataKeys.PosX, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
+        addBukkitBridgePlaceholder("posY", DataKeys.PosY, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
+        addBukkitBridgePlaceholder("posZ", DataKeys.PosZ, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
+        addBukkitBridgePlaceholder("XP", DataKeys.XP, xp -> xp.map(f -> String.format("%1.2f", f)).orElse(""));
+        addBukkitBridgePlaceholder("totalXP", DataKeys.TotalXP);
+        addBukkitBridgePlaceholder("level", DataKeys.Level, level -> level.orElse(-1).toString());
+        addBukkitBridgePlaceholder("playerPoints", DataKeys.PlayerPoints_Points);
+        addBukkitBridgeServerPlaceholder("currency", DataKeys.Vault_CurrencyNameSingular);
+        addBukkitBridgeServerPlaceholder("currencyPl", DataKeys.Vault_CurrencyNamePlural);
+        addBukkitBridgeServerPlaceholder("tps", DataKeys.TPS, tps -> tps.map(d -> String.format("%1.1f", d)).orElse(""));
         bind("tabName").to(context -> {
-            Optional<String> tabName = BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(context.getPlayer(), Values.Player.Bukkit.PlayerListName);
+            Optional<String> tabName = BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), DataKeys.PlayerListName);
             if (tabName.isPresent()) {
                 return tabName.get();
             }
@@ -80,19 +80,19 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         });
     }
 
-    public <T> void addBukkitBridgePlaceholder(String name, Value<T> value) {
-        addBukkitBridgePlaceholder(name, value, t -> t.map(Object::toString).orElse(""));
+    public <T> void addBukkitBridgePlaceholder(String name, DataKey<T> dataKey) {
+        addBukkitBridgePlaceholder(name, dataKey, t -> t.map(Object::toString).orElse(""));
     }
 
-    public <T> void addBukkitBridgePlaceholder(String name, Value<T> value, Function<Optional<T>, String> toString) {
-        bind(name).to(context -> toString.apply(BungeeTabListPlus.getInstance().getBridge().getPlayerInformation(context.getPlayer(), value)));
+    public <T> void addBukkitBridgePlaceholder(String name, DataKey<T> dataKey, Function<Optional<T>, String> toString) {
+        bind(name).to(context -> toString.apply(BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), dataKey)));
     }
 
-    public <T> void addBukkitBridgeServerPlaceholder(String name, Value<T> value) {
-        addBukkitBridgeServerPlaceholder(name, value, t -> t.map(Object::toString).orElse(""));
+    public <T> void addBukkitBridgeServerPlaceholder(String name, DataKey<T> dataKey) {
+        addBukkitBridgeServerPlaceholder(name, dataKey, t -> t.map(Object::toString).orElse(""));
     }
 
-    public <T> void addBukkitBridgeServerPlaceholder(String name, Value<T> value, Function<Optional<T>, String> toString) {
-        bind(name).to(context -> context.getServer().map(s -> toString.apply(BungeeTabListPlus.getInstance().getBridge().getServerInformation(s, value))).orElse(""));
+    public <T> void addBukkitBridgeServerPlaceholder(String name, DataKey<T> dataKey, Function<Optional<T>, String> toString) {
+        bind(name).to(context -> context.getServer().map(s -> toString.apply(BungeeTabListPlus.getInstance().getBridge().get(s, dataKey))).orElse(""));
     }
 }

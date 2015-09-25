@@ -21,10 +21,10 @@ package codecrafter47.bungeetablistplus.sorting.rules;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.sorting.SortingRule;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
-import codecrafter47.data.Values;
 
 import java.util.Optional;
 
@@ -33,10 +33,10 @@ public class TeamFirst implements SortingRule {
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         IPlayer viewer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer());
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> team = bridge.getPlayerInformation(viewer, Values.Player.Minecraft.Team);
+        Optional<String> team = bridge.get(viewer, DataKeys.Team);
         if (team.isPresent()) {
-            Optional<String> team1 = bridge.getPlayerInformation(player1, Values.Player.Minecraft.Team);
-            Optional<String> team2 = bridge.getPlayerInformation(player2, Values.Player.Minecraft.Team);
+            Optional<String> team1 = bridge.get(player1, DataKeys.Team);
+            Optional<String> team2 = bridge.get(player2, DataKeys.Team);
             if (!team1.equals(team2)) {
                 if (team1.equals(team)) return -1;
                 if (team2.equals(team)) return 1;

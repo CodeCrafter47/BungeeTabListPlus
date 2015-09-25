@@ -19,9 +19,9 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
-import codecrafter47.data.Values;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -75,7 +75,7 @@ public class PlayerManager {
                             if (s.length == 2) {
                                 if (server.get().getName().
                                         equalsIgnoreCase(s[0])) {
-                                    Optional<String> world = plugin.getBridge().getPlayerInformation(p, Values.Player.Bukkit.World);
+                                    Optional<String> world = plugin.getBridge().get(p, DataKeys.World);
                                     if (world.isPresent()) {
                                         if (world.get().equalsIgnoreCase(s[1])) {
                                             fitServerRules = true;
