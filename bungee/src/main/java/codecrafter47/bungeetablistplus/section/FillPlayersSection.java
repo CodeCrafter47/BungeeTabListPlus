@@ -20,16 +20,15 @@ package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.bungeetablistplus.sorting.AdminFirst;
-import codecrafter47.bungeetablistplus.sorting.Alphabet;
-import codecrafter47.bungeetablistplus.sorting.ISortingRule;
-import codecrafter47.bungeetablistplus.sorting.YouFirst;
+import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.OptionalInt;
 
 /**
  * @author Florian Stober
@@ -41,58 +40,26 @@ public class FillPlayersSection extends Section {
     private final SlotTemplate prefix;
     private final SlotTemplate suffix;
     private List<IPlayer> players;
-    private final List<String> sort;
+    private final PlayerSorter sorter;
     private final int maxPlayers;
     private final List<SlotTemplate> playerLines;
     private final List<SlotTemplate> morePlayerLines;
 
-    public FillPlayersSection(int vAlign, Collection<String> filter, SlotTemplate prefix, SlotTemplate suffix, List<String> sortrules, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+    public FillPlayersSection(int vAlign, Collection<String> filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         this.playerLines = playerLines;
         this.morePlayerLines = morePlayerLines;
         this.vAlign = vAlign == -1 ? OptionalInt.empty() : OptionalInt.of(vAlign);
         this.filter = filter;
         this.prefix = prefix;
         this.suffix = suffix;
-        this.sort = sortrules;
+        this.sorter = sorter;
         this.maxPlayers = maxPlayers;
     }
 
     @Override
     public void precalculate(TabListContext context) {
         players = getPlayers(context.getViewer(), context);
-
-        final List<ISortingRule> srules = new ArrayList<>();
-        for (String rule : sort) {
-            if (rule.equalsIgnoreCase("you") || rule.
-                    equalsIgnoreCase("youfirst")) {
-                srules.add(new YouFirst(context.getViewer()));
-            } else if (rule.equalsIgnoreCase("admin") || rule.equalsIgnoreCase(
-                    "adminfirst")) {
-                srules.add(new AdminFirst());
-            } else if (rule.equalsIgnoreCase("alpha") || rule.equalsIgnoreCase(
-                    "alphabet") || rule.equalsIgnoreCase("alphabetic") || rule.
-                    equalsIgnoreCase("alphabetical") || rule.equalsIgnoreCase(
-                    "alphabetically")) {
-                srules.add(new Alphabet());
-            }
-        }
-
-        Collections.sort(players, new Comparator<IPlayer>() {
-
-            @Override
-            public int compare(IPlayer p1, IPlayer p2) {
-                for (ISortingRule rule : srules) {
-                    int i = rule.compare(p1, p2);
-                    if (i != 0) {
-                        return i;
-                    }
-                }
-                if (players.indexOf(p2) > players.indexOf(p1)) {
-                    return -1;
-                }
-                return 1;
-            }
-        });
+        sorter.sort(context, players);
     }
 
     protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {

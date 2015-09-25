@@ -22,6 +22,9 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.*;
+import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.sorting.SortingRule;
+import codecrafter47.bungeetablistplus.sorting.SortingRuleRegistry;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import com.google.common.collect.HashMultimap;
@@ -123,7 +126,6 @@ public class ConfigParser {
 
             line = findTag(line, PATTERN_SORT, matcher -> {
                 sortrules.addAll(Arrays.asList(matcher.group(1).split(",")));
-                validateSortrules(sortrules);
             });
 
             line = findTag(line, PATTERN_MAXPLAYERS, matcher -> {
@@ -133,6 +135,8 @@ public class ConfigParser {
             if (startColumn[0] == -1 && column[0] != -1) {
                 startColumn[0] = column[0];
             }
+
+            PlayerSorter sorter = parseSortrules(sortrules);
 
             // Get current section list
             List<Function<TabListContext, List<Section>>> sections;
@@ -158,7 +162,7 @@ public class ConfigParser {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
                         sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     } else {
-                        sections.add(new FillPlayersSection(startColumn[0], filter, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+                        sections.add(new FillPlayersSection(startColumn[0], filter, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
                     }
                 } else {
                     ColumnSplitSection cs;
@@ -168,7 +172,7 @@ public class ConfigParser {
                         cs = new ColumnSplitSection();
                         sections.add(cs);
                     }
-                    cs.addCollumn(column[0], new PlayerColumn(filter, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+                    cs.addCollumn(column[0], new PlayerColumn(filter, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
                 }
             } else if (fillbukkitplayersMatcher.matches()) {
                 SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));
@@ -254,7 +258,6 @@ public class ConfigParser {
 
             line = findTag(line, PATTERN_SORT, matcher -> {
                 sortrules.addAll(Arrays.asList(matcher.group(1).split(",")));
-                validateSortrules(sortrules);
             });
 
             line = findTag(line, PATTERN_COLUMN, matcher -> {
@@ -288,6 +291,7 @@ public class ConfigParser {
             });
 
             sortrules.addAll(g_sort);
+            PlayerSorter sorter = parseSortrules(sortrules);
 
             Matcher fillplayersMatcher = PATTERN_FILLPLAYERS.matcher(line);
             if (fillplayersMatcher.matches()) {
@@ -306,7 +310,7 @@ public class ConfigParser {
                     List<String> finalFilters = new ArrayList<>();
                     finalFilters.addAll(filter);
                     finalFilters.addAll(group.getServerNames());
-                    return new FillPlayersSection(startColumn[0], finalFilters, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines);
+                    return new FillPlayersSection(startColumn[0], finalFilters, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines);
                 });
             } else {
                 SlotTemplate slotTemplate = SlotTemplate.of(g_prefix, parseSlot(line), g_suffix);
@@ -336,19 +340,17 @@ public class ConfigParser {
         return sb.toString();
     }
 
-    private void validateSortrules(List<String> sortrules) {
-        for (String rule : sortrules) {
-            if (!(rule.equalsIgnoreCase("you") || rule.equalsIgnoreCase(
-                    "youfirst") || rule.equalsIgnoreCase("admin") || rule.
-                    equalsIgnoreCase("adminfirst") || rule.equalsIgnoreCase(
-                    "alpha") || rule.equalsIgnoreCase("alphabet") || rule.
-                    equalsIgnoreCase("alphabetic") || rule.equalsIgnoreCase(
-                    "alphabetical") || rule.equalsIgnoreCase(
-                    "alphabetically"))) {
-                plugin.getLogger().warning(
-                        ChatColor.RED + "Can't sort players using rule '" + rule + "': Unknown rule");
+    private PlayerSorter parseSortrules(List<String> ruleNames) {
+        List<SortingRule> rules = new ArrayList<>();
+        for (String name : ruleNames) {
+            Optional<SortingRule> rule = SortingRuleRegistry.getRule(name);
+            if (rule.isPresent()) {
+                rules.add(rule.get());
+            } else {
+                plugin.getLogger().warning("Can't sort players using rule '" + rule + "': Unknown rule");
             }
         }
+        return new PlayerSorter(rules);
     }
 
     private void checkServer(List<String> filter) {

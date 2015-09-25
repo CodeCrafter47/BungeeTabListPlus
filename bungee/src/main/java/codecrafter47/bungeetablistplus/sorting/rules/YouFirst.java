@@ -16,21 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.sorting;
+package codecrafter47.bungeetablistplus.sorting.rules;
 
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.sorting.SortingRule;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
-/**
- * @author Florian Stober
- */
-public interface ISortingRule {
+import java.util.Objects;
 
-    /**
-     * return 1: player1 before player2 return 0: invoke next sorting rule
-     * return -1: player2 before player1
-     *
-     * @param player1
-     * @param player2
-     */
-    int compare(IPlayer player1, IPlayer player2);
+public class YouFirst implements SortingRule {
+
+    @Override
+    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
+        if (Objects.equals(player1.getName(), context.getViewer().getName())) {
+            return -1;
+        }
+        if (Objects.equals(player2.getName(), context.getViewer().getName())) {
+            return 1;
+        }
+        return 0;
+    }
+
 }

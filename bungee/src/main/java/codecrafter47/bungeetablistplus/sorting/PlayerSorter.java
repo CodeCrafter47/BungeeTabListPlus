@@ -16,20 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package codecrafter47.bungeetablistplus.sorting;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
-/**
- * @author Florian Stober
- */
-public class AdminFirst implements ISortingRule {
+import java.util.Collections;
+import java.util.List;
 
-    @Override
-    public int compare(IPlayer player1, IPlayer player2) {
-        return BungeeTabListPlus.getInstance().getPermissionManager().
-                comparePlayers(player1, player2);
+public class PlayerSorter {
+    private final List<SortingRule> rules;
+
+    public PlayerSorter(List<SortingRule> rules) {
+        this.rules = rules;
     }
 
+    public void sort(TabListContext context, List<IPlayer> players) {
+        Collections.sort(players, (p1, p2) -> {
+            for (SortingRule rule : rules) {
+                int i = rule.compare(context, p1, p2);
+                if (i != 0) {
+                    return i;
+                }
+            }
+            if (players.indexOf(p2) > players.indexOf(p1)) {
+                return -1;
+            }
+            return 1;
+        });
+    }
 }
