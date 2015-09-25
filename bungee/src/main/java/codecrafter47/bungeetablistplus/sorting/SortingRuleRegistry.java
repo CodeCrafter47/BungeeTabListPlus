@@ -39,6 +39,8 @@ public class SortingRuleRegistry {
             .put("alphabetically", new Alphabet())
             .put("teamfirst", new TeamFirst())
             .put("teams", new TeamsAlphabetically())
+            .put("factionfirst", new FactionFirst())
+            .put("factions", new FactionsAlphabetically())
             .build();
 
     public static Optional<SortingRule> getRule(String name) {
