@@ -19,10 +19,8 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
-import codecrafter47.bungeetablistplus.managers.PlayerManager;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -353,53 +351,9 @@ public class TablistLayoutManagerTest {
         }
     }
 
-    class MockTabListContext extends TabListContext {
-        private final int rows;
-        private final int columns;
-
+    class MockTabListContext extends GenericTabListContext {
         MockTabListContext(int rows, int columns) {
-            this.rows = rows;
-            this.columns = columns;
-        }
-
-        @Override
-        public int getTabSize() {
-            return rows * columns;
-        }
-
-        @Override
-        public int getRows() {
-            return rows;
-        }
-
-        @Override
-        public int getColumns() {
-            return columns;
-        }
-
-        @Override
-        public ProxiedPlayer getViewer() {
-            return null;
-        }
-
-        @Override
-        public PlayerManager getPlayerManager() {
-            return null;
-        }
-
-        @Override
-        public IPlayer getPlayer() {
-            return null;
-        }
-
-        @Override
-        public List<String> getServer() {
-            return null;
-        }
-
-        @Override
-        public int getOtherPlayerCount() {
-            return 0;
+            super(rows, columns, null, null);
         }
     }
 }

@@ -21,11 +21,13 @@ package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.data.Values;
+import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Optional;
 
@@ -58,7 +60,7 @@ public class BasicPlaceholders extends PlaceholderProvider {
             return context.getPlayer().getName();
         });
         bind("rawname").to(context -> context.getPlayer().getName());
-        bind("server").to(context -> BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getServerAlias(context.getServer().get(0)));
+        bind("server").to(context -> context.getServerGroup().map(ServerGroup::getName).orElse(""));
         bind("permprefix").alias("prefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context.getPlayer()));
         bind("prefixColor").to(context -> {
             String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context.getPlayer());
@@ -72,12 +74,12 @@ public class BasicPlaceholders extends PlaceholderProvider {
         bind("ping").to(context -> String.format("%d", context.getPlayer().getPing()));
         bind("group").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(context.getPlayer()));
         bind("uuid").to(context -> context.getPlayer().getUniqueID().toString());
-        bind("internalServerName").to(context -> context.getServer().get(0));
+        bind("internalServerName").to(context -> context.getServer().map(ServerInfo::getName).orElse(""));
         bind("serverPrefix").withArgs().to((context, args) -> {
             if (args != null && !args.isEmpty()) {
                 return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(args);
             } else {
-                return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(context.getServer().get(0));
+                return context.getServer().map(s -> BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(s.getName())).orElse("");
             }
         });
         bind("other_count").to(context -> String.format("%d", context.getOtherPlayerCount()));

@@ -18,25 +18,20 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
+import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
-import java.util.List;
-
-/**
- * @author Florian Stober
- */
 public class ServerSection extends StaticSection {
+    private final ServerGroup serverGroup;
 
-    private final List<String> server;
-
-    public ServerSection(int vAlign, List<String> server) {
+    public ServerSection(int vAlign, ServerGroup serverGroup) {
         super(vAlign);
-        this.server = server;
+        this.serverGroup = serverGroup;
     }
 
     @Override
     public Slot getSlotAt(TabListContext context, int pos, int size) {
-        return super.getSlotAt(context.setServer(server), pos, size);
+        return super.getSlotAt(context.setServerGroup(serverGroup), pos, size);
     }
 }

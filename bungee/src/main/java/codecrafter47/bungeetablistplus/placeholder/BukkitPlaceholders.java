@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.data.Value;
 import codecrafter47.data.Values;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -93,6 +92,6 @@ public class BukkitPlaceholders extends PlaceholderProvider {
     }
 
     public <T> void addBukkitBridgeServerPlaceholder(String name, Value<T> value, Function<Optional<T>, String> toString) {
-        bind(name).to(context -> toString.apply(BungeeTabListPlus.getInstance().getBridge().getServerInformation(ProxyServer.getInstance().getServerInfo(context.getServer().get(0)), value)));
+        bind(name).to(context -> context.getServer().map(s -> toString.apply(BungeeTabListPlus.getInstance().getBridge().getServerInformation(s, value))).orElse(""));
     }
 }

@@ -19,11 +19,11 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
-import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -214,21 +214,21 @@ public class ConfigParser {
             aliasToServerMap.put(entry.getValue(), entry.getKey());
         }
 
-        List<String> list = new ArrayList<>();
+        List<ServerGroup> list = new ArrayList<>();
         while (!serverSet.isEmpty()) {
             String server = serverSet.iterator().next();
             String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.get(server);
             if (alias != null) {
                 Set<String> strings = aliasToServerMap.get(alias);
                 serverSet.removeAll(strings);
-                list.add(Joiner.on(',').join(strings));
+                list.add(ServerGroup.of(serverSet, alias));
             } else {
                 serverSet.remove(server);
-                list.add(server);
+                list.add(ServerGroup.of(server));
             }
         }
 
-        List<Function<List<String>, Section>> sections = new ArrayList<>();
+        List<Function<ServerGroup, Section>> sections = new ArrayList<>();
         for (String line : config.groupLines) {
             // Its properties
             final int[] startColumn = {-1};
@@ -302,16 +302,16 @@ public class ConfigParser {
                 }
                 checkServer(filter);
                 filter.addAll(g_filter);
-                sections.add(groupFilters -> {
+                sections.add(group -> {
                     List<String> finalFilters = new ArrayList<>();
                     finalFilters.addAll(filter);
-                    finalFilters.addAll(groupFilters);
+                    finalFilters.addAll(group.getServerNames());
                     return new FillPlayersSection(startColumn[0], finalFilters, prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines);
                 });
             } else {
                 SlotTemplate slotTemplate = SlotTemplate.of(g_prefix, parseSlot(line), g_suffix);
-                sections.add(filter -> {
-                    ServerSection serverSection = new ServerSection(startColumn[0], filter);
+                sections.add(group -> {
+                    ServerSection serverSection = new ServerSection(startColumn[0], group);
                     serverSection.add(slotTemplate);
                     return serverSection;
                 });

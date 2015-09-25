@@ -19,10 +19,10 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
 
 public class AutoFillPlayers implements Function<TabListContext, List<Section>> {
 
-    public final List<String> groups;
-    private List<Function<List<String>, Section>> sections;
+    public final List<ServerGroup> groups;
+    private final List<Function<ServerGroup, Section>> sections;
     private final boolean showEmptyGroups;
 
-    public AutoFillPlayers(List<String> list, List<Function<List<String>, Section>> sections, boolean showEmptyGroups) {
-        this.groups = list;
+    public AutoFillPlayers(List<ServerGroup> groups, List<Function<ServerGroup, Section>> sections, boolean showEmptyGroups) {
+        this.groups = groups;
         this.sections = sections;
         this.showEmptyGroups = showEmptyGroups;
     }
@@ -44,24 +44,21 @@ public class AutoFillPlayers implements Function<TabListContext, List<Section>> 
     public List<Section> apply(TabListContext context) {
         // sort groups, most populated first
         Collections.sort(groups, (s1, s2) -> {
-            int p1 = context.
-                    getPlayerManager().getServerPlayerCount(s1, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
-            int p2 = context.
-                    getPlayerManager().getServerPlayerCount(s2, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+            int p1 = context.getPlayerManager().getPlayerCount(s1.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+            int p2 = context.getPlayerManager().getPlayerCount(s2.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
             if (p1 < p2) {
                 return 1;
             }
             if (p1 > p2) {
                 return -1;
             }
-            return s1.compareTo(s2);
+            return s1.getName().compareTo(s2.getName());
         });
 
         List<Section> sections = new ArrayList<>();
-        for (String server : groups) {
-            List<String> filter = Arrays.asList(server.split(","));
-            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(filter, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
-                sections.addAll(this.sections.stream().map(section -> section.apply(filter)).collect(Collectors.toList()));
+        for (ServerGroup serverGroup : groups) {
+            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(serverGroup.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
+                sections.addAll(this.sections.stream().map(section -> section.apply(serverGroup)).collect(Collectors.toList()));
             }
         }
 

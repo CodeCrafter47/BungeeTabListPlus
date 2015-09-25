@@ -19,11 +19,13 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
+import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.List;
+import java.util.Optional;
 
 public class GenericTabListContext extends TabListContext {
     private final int rows;
@@ -71,8 +73,13 @@ public class GenericTabListContext extends TabListContext {
     }
 
     @Override
-    public List<String> getServer() {
-        throw new IllegalStateException("server not available");
+    public Optional<ServerInfo> getServer() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ServerGroup> getServerGroup() {
+        return Optional.empty();
     }
 
     @Override

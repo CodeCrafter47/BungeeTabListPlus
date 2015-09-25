@@ -19,18 +19,16 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
+import codecrafter47.bungeetablistplus.api.ServerGroup;
 import codecrafter47.bungeetablistplus.managers.PlayerManager;
 import codecrafter47.bungeetablistplus.player.IPlayer;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 public abstract class TabListContext {
-
-    private List<String> server;
 
     public abstract int getTabSize();
 
@@ -44,7 +42,9 @@ public abstract class TabListContext {
 
     public abstract IPlayer getPlayer();
 
-    public abstract List<String> getServer();
+    public abstract Optional<ServerInfo> getServer();
+
+    public abstract Optional<ServerGroup> getServerGroup();
 
     public abstract int getOtherPlayerCount();
 
@@ -56,9 +56,13 @@ public abstract class TabListContext {
             }
 
             @Override
-            public List<String> getServer() {
-                Optional<ServerInfo> server = player.getServer();
-                return server.map(ServerInfo::getName).map(Collections::singletonList).orElse(Collections.emptyList());
+            public Optional<ServerInfo> getServer() {
+                return player.getServer();
+            }
+
+            @Override
+            public Optional<ServerGroup> getServerGroup() {
+                return player.getServer().map(ServerInfo::getName).map(ServerGroup::of);
             }
         };
     }
@@ -72,12 +76,26 @@ public abstract class TabListContext {
         };
     }
 
-    public TabListContext setServer(List<String> server) {
-        return new DelegatingTabListContext(this) {
-            @Override
-            public List<String> getServer() {
-                return server;
-            }
-        };
+    public TabListContext setServerGroup(ServerGroup serverGroup) {
+        if (serverGroup.getServerNames().size() == 1) {
+            return new DelegatingTabListContext(this) {
+                @Override
+                public Optional<ServerGroup> getServerGroup() {
+                    return Optional.of(serverGroup);
+                }
+
+                @Override
+                public Optional<ServerInfo> getServer() {
+                    return Optional.ofNullable(ProxyServer.getInstance().getServerInfo(serverGroup.getServerNames().iterator().next()));
+                }
+            };
+        } else {
+            return new DelegatingTabListContext(this) {
+                @Override
+                public Optional<ServerGroup> getServerGroup() {
+                    return Optional.of(serverGroup);
+                }
+            };
+        }
     }
 }

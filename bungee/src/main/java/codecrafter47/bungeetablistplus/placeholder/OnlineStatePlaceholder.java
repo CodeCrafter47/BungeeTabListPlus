@@ -27,12 +27,8 @@ import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.util.bungee.PingTask;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
-
-import java.util.Collections;
-import java.util.List;
 
 public class OnlineStatePlaceholder extends PlaceholderProvider {
     @Override
@@ -40,26 +36,28 @@ public class OnlineStatePlaceholder extends PlaceholderProvider {
         Supplier<SlotTemplate> onlineText = Suppliers.memoize(() -> getPlaceholderManager().parseSlot(getMainConfig().online_text));
         Supplier<SlotTemplate> offlineText = Suppliers.memoize(() -> getPlaceholderManager().parseSlot(getMainConfig().offline_text));
         bind("onlineState").withArgs().toTemplate((context, args) -> {
-            List<ServerInfo> servers = Lists.transform(context.getServer(), server -> ProxyServer.getInstance().getServerInfo(server));
+            String serverName = context.getServer().map(ServerInfo::getName).orElse(null);
             if (args != null) {
                 ServerInfo server = ProxyServer.getInstance().getServerInfo(args);
                 if (server == null) {
                     BungeeTabListPlus.getInstance().getPlugin().getLogger().warning("Server " + args + " does not exist.");
                     return SlotTemplate.text("&c[ERR: \"" + args + "\" not a server]");
                 } else {
-                    servers = Collections.singletonList(server);
+                    serverName = args;
                 }
             }
-            PingTask ping = BungeeTabListPlus.getInstance().getServerState(
-                    servers.get(0).getName());
-            if (ping == null) {
-                // TODO autostart ping task
-                String errorText = "&cPlease set pingDelay in config.yml > 0";
-                BungeeTabListPlus.getInstance().getPlugin().getLogger().warning(errorText);
-                return SlotTemplate.text(errorText);
-            } else {
-                return ping.isOnline() ? onlineText.get() : offlineText.get();
+            if (serverName != null) {
+                PingTask ping = BungeeTabListPlus.getInstance().getServerState(serverName);
+                if (ping == null) {
+                    // TODO autostart ping task
+                    String errorText = "&cPlease set pingDelay in config.yml > 0";
+                    BungeeTabListPlus.getInstance().getPlugin().getLogger().warning(errorText);
+                    return SlotTemplate.text(errorText);
+                } else {
+                    return ping.isOnline() ? onlineText.get() : offlineText.get();
+                }
             }
+            return SlotTemplate.empty();
         });
     }
 
