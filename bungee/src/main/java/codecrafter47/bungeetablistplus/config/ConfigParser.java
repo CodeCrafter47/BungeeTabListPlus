@@ -177,7 +177,7 @@ public class ConfigParser {
             } else if (fillbukkitplayersMatcher.matches()) {
                 SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));
                 SlotTemplate suffix = parseSlot(fillbukkitplayersMatcher.group("suffix"));
-                sections.add(new FillBukkitPlayers(startColumn[0], prefix, suffix, sortrules, maxplayers[0], playerLines, morePlayerLines));
+                sections.add(new FillBukkitPlayers(startColumn[0], prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
             } else {
                 SlotTemplate template = parseSlot(line);
                 StaticSection section;
