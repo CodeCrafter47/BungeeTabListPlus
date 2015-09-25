@@ -24,7 +24,7 @@ import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.managers.PlaceholderManager;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.util.bungee.PingTask;
+import codecrafter47.bungeetablistplus.util.PingTask;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.md_5.bungee.api.ProxyServer;
@@ -49,7 +49,6 @@ public class OnlineStatePlaceholder extends PlaceholderProvider {
             if (serverName != null) {
                 PingTask ping = BungeeTabListPlus.getInstance().getServerState(serverName);
                 if (ping == null) {
-                    // TODO autostart ping task
                     String errorText = "&cPlease set pingDelay in config.yml > 0";
                     BungeeTabListPlus.getInstance().getPlugin().getLogger().warning(errorText);
                     return SlotTemplate.text(errorText);
