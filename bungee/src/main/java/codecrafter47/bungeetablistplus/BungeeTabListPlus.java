@@ -72,6 +72,7 @@ public class BungeeTabListPlus {
     @Getter
     private final Plugin plugin;
     private Collection<IPlayerProvider> playerProviders;
+    private ResendThread resendThread;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -110,8 +111,6 @@ public class BungeeTabListPlus {
 
     private TabListManager tabLists;
     private final TabListListener listener = new TabListListener(this);
-
-    private final SendingQueue resendQueue = new SendingQueue();
 
     private ScheduledTask refreshThread = null;
 
@@ -252,11 +251,9 @@ public class BungeeTabListPlus {
         ProxyServer.getInstance().getPluginManager().registerListener(plugin,
                 listener);
 
-        ResendThread resendThread = new ResendThread(resendQueue,
-                config.getMainConfig().tablistUpdateInterval);
-        plugin.getProxy().getScheduler().schedule(plugin, resendThread, 1,
-                TimeUnit.SECONDS);
-        startRefreshThread();
+        resendThread = new ResendThread();
+        plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
+        restartRefreshThread();
 
         // register commands and update Notifier
         try {
@@ -322,7 +319,10 @@ public class BungeeTabListPlus {
 
     private Double requestedUpdateInterval = null;
 
-    private void startRefreshThread() {
+    private void restartRefreshThread() {
+        if (refreshThread != null) {
+            refreshThread.cancel();
+        }
         double updateInterval = config.getMainConfig().tablistUpdateInterval;
         if (requestedUpdateInterval != null && (requestedUpdateInterval < updateInterval || updateInterval <= 0)) {
             updateInterval = requestedUpdateInterval;
@@ -331,17 +331,11 @@ public class BungeeTabListPlus {
             try {
                 refreshThread = ProxyServer.getInstance().getScheduler().
                         schedule(
-                                plugin, new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        resendTabLists();
-                                        startRefreshThread();
-                                    }
-                                },
+                                plugin, this::resendTabLists,
+                                (long) (updateInterval * 1000),
                                 (long) (updateInterval * 1000),
                                 TimeUnit.MILLISECONDS);
-            } catch (RejectedExecutionException ex) {
+            } catch (RejectedExecutionException ignored) {
                 // this occurs on proxy shutdown -> we can safely ignore it
             }
         } else {
@@ -352,9 +346,7 @@ public class BungeeTabListPlus {
     public void requireUpdateInterval(double updateInterval) {
         if (requestedUpdateInterval == null || updateInterval < requestedUpdateInterval) {
             requestedUpdateInterval = updateInterval;
-            if (refreshThread == null) {
-                startRefreshThread();
-            }
+            restartRefreshThread();
         }
     }
 
@@ -363,6 +355,7 @@ public class BungeeTabListPlus {
      */
     public boolean reload() {
         try {
+            requestedUpdateInterval = null;
             config = new ConfigManager(plugin);
             placeholderManager.reload();
             TabListManager tabListManager = new TabListManager(this);
@@ -372,11 +365,9 @@ public class BungeeTabListPlus {
             tabLists = tabListManager;
             fakePlayerManager.reload();
             resendTabLists();
+            restartRefreshThread();
         } catch (IOException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
-        }
-        if (refreshThread == null) {
-            startRefreshThread();
         }
         return true;
     }
@@ -386,28 +377,18 @@ public class BungeeTabListPlus {
      */
     public void resendTabLists() {
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-            resendQueue.addPlayer(player);
+            resendThread.add(player);
         }
     }
 
-    /**
-     * updates the tablist for one player; the player is put at top of the
-     * resend-queue
-     *
-     * @param player the player whos tablist should be updated
-     */
+
     public void sendImmediate(ProxiedPlayer player) {
-        resendQueue.addFrontPlayer(player);
+        resendThread.add(player);
     }
 
-    /**
-     * updates the tablist for one player; the player is put at the end of the
-     * resend-queue
-     *
-     * @param player the player whos tablist should be updated
-     */
+
     public void sendLater(ProxiedPlayer player) {
-        resendQueue.addPlayer(player);
+        plugin.getProxy().getScheduler().schedule(plugin, () -> resendThread.add(player), 1, TimeUnit.SECONDS);
     }
 
     /**

@@ -26,67 +26,46 @@ import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import codecrafter47.bungeetablistplus.tablist.TabList;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
-import net.md_5.bungee.api.ProxyServer;
+import com.google.common.collect.Sets;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
-/**
- * Implementation of the ResendThread. Updates the tablist for all players after
- * the given interval
- *
- * @author Florian Stober
- */
 class ResendThread implements Runnable {
 
-    private final SendingQueue resendQueue;
-    private double updateIntervall;
+    private final BlockingQueue<ProxiedPlayer> queue = new LinkedBlockingQueue<>();
+    private final Set<ProxiedPlayer> set = Sets.newConcurrentHashSet();
 
-    /**
-     * @param queue
-     * @param updateIntervall
-     */
-    public ResendThread(SendingQueue queue, double updateIntervall) {
-        this.resendQueue = queue;
-        this.updateIntervall = updateIntervall;
-        if (this.updateIntervall <= 0) {
-            this.updateIntervall = 5;
+    public void add(ProxiedPlayer player) {
+        if (!set.contains(player)) {
+            set.add(player);
+            queue.add(player);
         }
     }
 
-    /**
-     *
-     */
     @Override
     public void run() {
         while (true) {
             try {
-                ProxiedPlayer player = resendQueue.getNext();
-                if (player != null) {
-                    Object tabList = BungeeTabListPlus.getTabList(player);
-                    if (tabList instanceof PlayerTablistHandler) {
-                        if (player.getServer() != null) {
-                            PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
-                            update(tablistHandler);
-                        } else {
-                            BungeeTabListPlus.getInstance().sendLater(player);
-                        }
+                if (queue.isEmpty()) {
+                    set.clear();
+                }
+                ProxiedPlayer player = queue.take();
+                set.remove(player);
+                Object tabList = BungeeTabListPlus.getTabList(player);
+                if (tabList instanceof PlayerTablistHandler) {
+                    if (player.getServer() != null) {
+                        PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
+                        update(tablistHandler);
+                    } else {
+                        BungeeTabListPlus.getInstance().sendLater(player);
                     }
                 }
-
-                int sleep = (int) (updateIntervall * 1000 / (ProxyServer.
-                        getInstance().getOnlineCount() + 1) / 2);
-                if (sleep < 1) {
-                    sleep = 1;
-                }
-                if (sleep > 10) {
-                    sleep = 10;
-                }
-                try {
-                    Thread.sleep(sleep);
-                } catch (InterruptedException ex) {
-                    // don't care
-                }
+            } catch (InterruptedException ex) {
+                break;
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
             }
