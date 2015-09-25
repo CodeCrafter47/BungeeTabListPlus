@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.config.Messages;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class ConfigManager {
 
@@ -39,8 +41,9 @@ public class ConfigManager {
     TabListConfig defaultTabList;
     final List<TabListConfig> tabLists = new ArrayList<>();
 
-    public ConfigManager(Plugin bungeeTabListPlus) throws IOException {
-        loadConfig(bungeeTabListPlus);
+    public ConfigManager(Plugin plugin) throws IOException {
+        loadConfig(plugin);
+        checkForInconsistentTabListSize(plugin);
     }
 
     private void loadConfig(Plugin plugin) throws IOException {
@@ -92,6 +95,12 @@ public class ConfigManager {
                     plugin.getLogger().log(Level.WARNING, "Unable to load " + s, ex);
                 }
             }
+        }
+    }
+
+    private void checkForInconsistentTabListSize(Plugin plugin) {
+        if (plugin.getProxy().getConfig().getListeners().stream().map(ListenerInfo::getTabListSize).collect(Collectors.toSet()).size() > 1) {
+            plugin.getLogger().warning("Inconsistent tab list size detected. Please make sure to set tab_size to the same value for all listeners.");
         }
     }
 
