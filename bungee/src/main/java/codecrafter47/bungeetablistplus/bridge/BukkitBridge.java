@@ -19,6 +19,8 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
@@ -36,12 +38,11 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 public class BukkitBridge implements Listener {
@@ -50,9 +51,37 @@ public class BukkitBridge implements Listener {
     private final Map<String, DataCache> serverInformation = new ConcurrentHashMap<>();
     private final Cache<UUID, DataCache> playerInformation = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
 
+    private final Set<String> registeredThirdPartyVariables = new HashSet<>();
+    private final ReentrantLock thirdPartyVariablesLock = new ReentrantLock();
+
     public BukkitBridge(BungeeTabListPlus plugin) {
         this.plugin = plugin;
         plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
+        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::checkForThirdPartyVariables, 2, 2, TimeUnit.SECONDS);
+    }
+
+    private void checkForThirdPartyVariables() {
+        for (ServerInfo serverInfo : plugin.getProxy().getServers().values()) {
+            get(serverInfo, BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES).ifPresent(variables -> {
+                thirdPartyVariablesLock.lock();
+                try {
+                    for (String variable : variables) {
+                        if (!registeredThirdPartyVariables.contains(variable)) {
+                            plugin.registerPlaceholderProvider(new PlaceholderProvider() {
+                                @Override
+                                public void setup() {
+                                    bind(variable).to(context -> plugin.getBridge().get(context.getPlayer(), BTLPDataKeys.createThirdPartyVariableDataKey(variable)).orElse(""));
+                                }
+                            });
+                            registeredThirdPartyVariables.add(variable);
+                        }
+                    }
+
+                } finally {
+                    thirdPartyVariablesLock.unlock();
+                }
+            });
+        }
     }
 
     private DataCache getServerDataCache(String serverName) {
@@ -145,7 +174,7 @@ public class BukkitBridge implements Listener {
                 out.writeUTF(Constants.subchannelRequestServerVariable);
                 out.writeObject(key);
                 out.close();
-                server.sendData(Constants.channel, os.toByteArray());
+                server.sendData(Constants.channel, os.toByteArray(), false);
             } catch (IOException ex) {
                 plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
             }

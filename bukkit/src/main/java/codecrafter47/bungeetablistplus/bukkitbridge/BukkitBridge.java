@@ -18,15 +18,23 @@
  */
 package codecrafter47.bungeetablistplus.bukkitbridge;
 
+import codecrafter47.bungeetablistplus.api.bukkit.BungeeTabListPlusBukkitAPI;
+import codecrafter47.bungeetablistplus.api.bukkit.Variable;
 import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAPIHook;
+import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.data.AbstractDataAccessor;
 import codecrafter47.bungeetablistplus.data.CompoundDataAccessor;
 import codecrafter47.bungeetablistplus.data.DataAccessor;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccessor;
 import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccessor;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -40,15 +48,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 
-public class BukkitBridge implements Listener {
-
+public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener {
     private final Plugin plugin;
 
     private ServerDataUpdateTask serverDataUpdateTask = null;
@@ -62,11 +69,23 @@ public class BukkitBridge implements Listener {
 
     private PlaceholderAPIHook placeholderAPIHook = null;
 
+    private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
+    private final Map<String, Variable> variablesByName = new HashMap<>();
+    private final Multimap<Plugin, Variable> variablesByPlugin = HashMultimap.create();
+
     public BukkitBridge(Plugin plugin) {
         this.plugin = plugin;
     }
 
     public void onEnable() {
+        try {
+            Field field = BungeeTabListPlusBukkitAPI.class.getDeclaredField("instance");
+            field.setAccessible(true);
+            field.set(null, this);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
+        }
+
         try {
             if (!plugin.getDataFolder().exists()) {
                 plugin.getDataFolder().mkdir();
@@ -149,11 +168,11 @@ public class BukkitBridge implements Listener {
         }
 
         if (placeholderAPIHook != null) {
-            playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), placeholderAPIHook.getDataAccessor());
+            playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), new ThirdPartyVariablesAccessor(), placeholderAPIHook.getDataAccessor());
         } else {
-            playerDataAccessor = new PlayerDataAccessor(plugin);
+            playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), new ThirdPartyVariablesAccessor());
         }
-        serverDataAccessor = new ServerDataAccessor(plugin);
+        serverDataAccessor = CompoundDataAccessor.of(new ServerDataAccessor(plugin), new ThirdPartyServerVariablesAccessor());
     }
 
     private PlayerDataUpdateTask getPlayerDataUpdateTask(Player player) {
@@ -215,6 +234,90 @@ public class BukkitBridge implements Listener {
             player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    protected void registerVariable0(Plugin plugin, Variable variable) {
+        Preconditions.checkNotNull(plugin, "plugin");
+        Preconditions.checkNotNull(variable, "variable");
+        apiLock.writeLock().lock();
+        try {
+            Preconditions.checkArgument(!variablesByName.containsKey(variable.getName()), "variable already registered");
+            variablesByName.put(variable.getName(), variable);
+            variablesByPlugin.put(plugin, variable);
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    protected void unregisterVariable0(Variable variable) {
+        Preconditions.checkNotNull(variable, "variable");
+        apiLock.writeLock().lock();
+        try {
+            Preconditions.checkArgument(variablesByName.remove(variable.getName(), variable), "variable not registered");
+            for (Iterator<Variable> iterator = variablesByPlugin.values().iterator(); iterator.hasNext(); ) {
+                if (iterator.next().equals(variable)) {
+                    iterator.remove();
+                }
+            }
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    protected void unregisterVariables0(Plugin plugin) {
+        Preconditions.checkNotNull(plugin, "plugin");
+        apiLock.writeLock().lock();
+        try {
+            for (Variable variable : variablesByPlugin.removeAll(plugin)) {
+                variablesByName.remove(variable.getName());
+            }
+
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    private class ThirdPartyVariablesAccessor extends AbstractDataAccessor<Player> {
+        public ThirdPartyVariablesAccessor() {
+            super(plugin.getLogger());
+            bind(BTLPDataKeys.ThirdPartyVariableDataKey.class, this::resolveVariable);
+        }
+
+        private String resolveVariable(Player player, BTLPDataKeys.ThirdPartyVariableDataKey key) {
+            apiLock.readLock().lock();
+            try {
+                Variable variable = variablesByName.get(key.getName());
+                if (variable != null) {
+                    String replacement = null;
+                    try {
+                        replacement = variable.getReplacement(player);
+                    } catch (Throwable th) {
+                        plugin.getLogger().log(Level.WARNING, "An exception occurred while resolving a variable provided by a third party plugin", th);
+                    }
+                    return replacement;
+                }
+                return null;
+            } finally {
+                apiLock.readLock().unlock();
+            }
+        }
+    }
+
+    private class ThirdPartyServerVariablesAccessor extends AbstractDataAccessor<Server> {
+        public ThirdPartyServerVariablesAccessor() {
+            super(plugin.getLogger());
+            bind(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
+                apiLock.readLock().lock();
+                try {
+                    return ImmutableList.copyOf(variablesByName.keySet());
+                } finally {
+                    apiLock.readLock().unlock();
+                }
+            });
         }
     }
 

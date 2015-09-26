@@ -17,6 +17,7 @@
         <module>network</module>
         <module>legacy</module>
         <module>data</module>
+        <module>api-bukkit</module>
     </modules>
 
     <properties>
