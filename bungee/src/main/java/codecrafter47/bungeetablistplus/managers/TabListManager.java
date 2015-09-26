@@ -66,7 +66,7 @@ public class TabListManager implements Listener {
         } catch (Throwable ex) {
             plugin.getLogger().log(Level.SEVERE, "Could not load default tabList", ex);
             try {
-                defaultTab = new ErrorTabListProvider("Could not load default tabList", ex, plugin.getConfigManager().defaultTabList::appliesTo);
+                defaultTab = new ErrorTabListProvider("Could not load default tabList", ex, plugin.getConfigManager().defaultTabList::appliesTo, plugin.getConfigManager().defaultTabList.priority);
             } catch (Throwable th) {
                 plugin.getLogger().log(Level.SEVERE, "Disabling plugin", th);
                 return false;
@@ -80,7 +80,7 @@ public class TabListManager implements Listener {
             } catch (Throwable ex) {
                 plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getName(), ex);
                 try {
-                    tabLists.add(new ErrorTabListProvider("Could not load tabList " + c.getName(), ex, c::appliesTo));
+                    tabLists.add(new ErrorTabListProvider("Could not load tabList " + c.getName(), ex, c::appliesTo, c.priority));
                 } catch (Throwable th) {
                     plugin.getLogger().log(Level.SEVERE, "Failed to construct error tablist", th);
                 }
@@ -91,10 +91,18 @@ public class TabListManager implements Listener {
 
     public ITabListProvider getTabListForPlayer(ProxiedPlayer player) {
         if (customTabLists.get(player) != null) return customTabLists.get(player);
+        ITabListProvider provider = null;
+        int priority = Integer.MIN_VALUE;
         for (ITabListProvider tabList : tabLists) {
             if (tabList.appliesTo(player)) {
-                return tabList;
+                if (tabList.getPriority() > priority) {
+                    priority = tabList.getPriority();
+                    provider = tabList;
+                }
             }
+        }
+        if (provider != null) {
+            return provider;
         }
         if (defaultTab != null && defaultTab.appliesTo(player)) {
             return defaultTab;

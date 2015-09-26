@@ -40,15 +40,17 @@ public class ErrorTabListProvider implements ITabListProvider {
     private final String message;
     private final Throwable throwable;
     private final Predicate<ProxiedPlayer> appliesTo;
+    private final int priority;
 
     public ErrorTabListProvider(String message, Throwable throwable) {
-        this(message, throwable, player -> true);
+        this(message, throwable, player -> true, 0);
     }
 
-    public ErrorTabListProvider(String message, Throwable throwable, Predicate<ProxiedPlayer> appliesTo) {
+    public ErrorTabListProvider(String message, Throwable throwable, Predicate<ProxiedPlayer> appliesTo, int priority) {
         this.message = message;
         this.throwable = throwable;
         this.appliesTo = appliesTo;
+        this.priority = priority;
     }
 
     @Override
@@ -95,5 +97,10 @@ public class ErrorTabListProvider implements ITabListProvider {
     @Override
     public boolean appliesTo(ProxiedPlayer player) {
         return appliesTo.test(player);
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 }

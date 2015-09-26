@@ -126,4 +126,9 @@ public class TabListProvider implements ITabListProvider {
     public boolean appliesTo(ProxiedPlayer player) {
         return config.appliesTo(player);
     }
+
+    @Override
+    public int getPriority() {
+        return config.priority;
+    }
 }

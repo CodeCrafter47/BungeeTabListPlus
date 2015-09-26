@@ -31,6 +31,8 @@ public class TabListConfig extends Configuration {
 
     public String showTo = "all";
 
+    public int priority = 1;
+
     public List<String> header = Lists.newArrayList(
             "",
             "&bW",
@@ -210,6 +212,8 @@ public class TabListConfig extends Configuration {
             showTo = map.get("showTo").toString();
         }
 
+        priority = ((Number) map.getOrDefault("priority", priority)).intValue();
+
         if (map.containsKey("header")) {
             Object header = map.get("header");
             if (header instanceof List) {
@@ -291,6 +295,10 @@ public class TabListConfig extends Configuration {
                 "'1.8' for all players with client version 1.8 or above",
                 "'all' for all players");
         write("showTo", showTo);
+
+        writeComments("If multiple tab list are available for a player the plugin",
+                "chooses the tab list with the highest priority");
+        write("priority", priority);
 
         writeComments("This text will be shown above the tablist",
                 "Add multiple lines to create an animation");
