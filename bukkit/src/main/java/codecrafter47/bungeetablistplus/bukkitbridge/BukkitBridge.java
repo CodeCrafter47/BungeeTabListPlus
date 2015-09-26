@@ -24,12 +24,12 @@ import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAP
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
-import codecrafter47.bungeetablistplus.data.AbstractDataAccessor;
-import codecrafter47.bungeetablistplus.data.CompoundDataAccessor;
-import codecrafter47.bungeetablistplus.data.DataAccessor;
+import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
+import codecrafter47.bungeetablistplus.data.DataAccess;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccessor;
-import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccessor;
+import codecrafter47.bungeetablistplus.data.JoinedDataAccess;
+import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccess;
+import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccess;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -62,8 +62,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
 
     private final Map<UUID, PlayerDataUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
 
-    private DataAccessor<Player> playerDataAccessor;
-    private DataAccessor<Server> serverDataAccessor;
+    private DataAccess<Player> playerDataAccess;
+    private DataAccess<Server> serverDataAccess;
 
     private MainConfig config = new MainConfig();
 
@@ -168,11 +168,11 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         }
 
         if (placeholderAPIHook != null) {
-            playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), new ThirdPartyVariablesAccessor(), placeholderAPIHook.getDataAccessor());
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess(), placeholderAPIHook.getDataAccessor());
         } else {
-            playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), new ThirdPartyVariablesAccessor());
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess());
         }
-        serverDataAccessor = CompoundDataAccessor.of(new ServerDataAccessor(plugin), new BTLPServerDataKeyAccessor());
+        serverDataAccess = JoinedDataAccess.of(new ServerDataAccess(plugin), new BTLPServerDataKeyAccess());
     }
 
     private PlayerDataUpdateTask getPlayerDataUpdateTask(Player player) {
@@ -281,8 +281,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         }
     }
 
-    private class ThirdPartyVariablesAccessor extends AbstractDataAccessor<Player> {
-        public ThirdPartyVariablesAccessor() {
+    private class ThirdPartyVariablesAccess extends AbstractDataAccess<Player> {
+        public ThirdPartyVariablesAccess() {
             super(plugin.getLogger());
             bind(BTLPDataKeys.ThirdPartyVariableDataKey.class, this::resolveVariable);
         }
@@ -307,8 +307,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         }
     }
 
-    private class BTLPServerDataKeyAccessor extends AbstractDataAccessor<Server> {
-        public BTLPServerDataKeyAccessor() {
+    private class BTLPServerDataKeyAccess extends AbstractDataAccess<Server> {
+        public BTLPServerDataKeyAccess() {
             super(plugin.getLogger());
             bind(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
                 apiLock.readLock().lock();
@@ -327,10 +327,10 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         ImmutableSet<DataKey<?>> requestedData = ImmutableSet.of();
         boolean requestedReset = true;
 
-        protected final void update(Player player, DataAccessor<B> dataAccessor, B boundType, String subchannel) {
+        protected final void update(Player player, DataAccess<B> dataAccess, B boundType, String subchannel) {
             Map<DataKey<?>, Object> newData = new ConcurrentHashMap<>();
             requestedData.parallelStream().forEach(value -> {
-                dataAccessor.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
+                dataAccess.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
             });
             Map<DataKey<?>, Object> delta = new HashMap<>();
             for (Map.Entry<DataKey<?>, Object> entry : sentData.entrySet()) {
@@ -372,7 +372,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         @Override
         public void run() {
             plugin.getServer().getOnlinePlayers().stream().findAny().ifPresent(player -> {
-                update(player, serverDataAccessor, plugin.getServer(), Constants.subchannelUpdateServer);
+                update(player, serverDataAccess, plugin.getServer(), Constants.subchannelUpdateServer);
                 sendHash(Constants.subchannelServerHash, sentData.hashCode(), player);
             });
         }
@@ -388,7 +388,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
 
         @Override
         public void run() {
-            update(player, playerDataAccessor, player, Constants.subchannelUpdatePlayer);
+            update(player, playerDataAccess, player, Constants.subchannelUpdatePlayer);
             sendHash(Constants.subchannelPlayerHash, sentData.hashCode(), player);
         }
     }

@@ -19,7 +19,7 @@
 
 package codecrafter47.bungeetablistplus.data.bukkit;
 
-import codecrafter47.bungeetablistplus.data.AbstractDataAccessor;
+import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.data.PermissionDataKey;
 import codecrafter47.bungeetablistplus.data.essentials.EssentialsIsVanishedProvider;
@@ -39,10 +39,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 
-public class PlayerDataAccessor extends AbstractDataAccessor<Player> {
+public class PlayerDataAccess extends AbstractDataAccess<Player> {
     private final Plugin plugin;
 
-    public PlayerDataAccessor(Plugin plugin) {
+    public PlayerDataAccess(Plugin plugin) {
         super(plugin.getLogger());
         this.plugin = plugin;
         init();

@@ -28,12 +28,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public abstract class AbstractDataAccessor<B> implements DataAccessor<B> {
+public abstract class AbstractDataAccess<B> implements DataAccess<B> {
     protected final Logger logger;
     private final Map<DataKey<?>, Function<B, ?>> providersByDataKey = new HashMap<>();
     private final Map<Class, BiFunction<B, DataKey<?>, ?>> providersByDataKeyClass = new HashMap<>();
 
-    public AbstractDataAccessor(Logger logger) {
+    public AbstractDataAccess(Logger logger) {
         this.logger = logger;
     }
 

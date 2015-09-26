@@ -17,25 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi;
+package codecrafter47.bungeetablistplus.data;
 
-import codecrafter47.bungeetablistplus.data.DataAccess;
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 
-public class PlaceholderAPIHook {
-    private final Plugin plugin;
+public class JoinedDataAccess<B> implements DataAccess<B> {
+    private final Collection<DataAccess<B>> accessors;
 
-    public PlaceholderAPIHook(Plugin plugin) {
-        this.plugin = plugin;
+    public static <B> JoinedDataAccess<B> of(DataAccess<B>... accessors) {
+        return new JoinedDataAccess<>(Arrays.asList(accessors));
     }
 
-    public DataAccess<Player> getDataAccessor() {
-        return new PlaceholderAPIDataAccess(plugin.getLogger());
+    public JoinedDataAccess(Collection<DataAccess<B>> accessors) {
+        this.accessors = accessors;
     }
 
-    public boolean isPlaceholder(Player player, String placeholder) {
-        return !PlaceholderAPI.setPlaceholders(player, placeholder).equals(placeholder);
+    @Override
+    public <V> Optional<V> getValue(DataKey<V> key, B context) {
+        for (DataAccess<B> accessor : accessors) {
+            Optional<V> value = accessor.getValue(key, context);
+            if (value.isPresent()) return value;
+        }
+        return Optional.empty();
     }
 }

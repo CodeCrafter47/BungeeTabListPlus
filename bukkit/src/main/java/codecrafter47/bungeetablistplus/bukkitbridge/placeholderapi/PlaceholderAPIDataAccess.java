@@ -17,11 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.data;
+package codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi;
 
-import java.util.Optional;
+import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
+import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
 
-public interface DataAccessor<B> {
-    @SuppressWarnings("unchecked")
-    <V> Optional<V> getValue(DataKey<V> key, B context);
+import java.util.logging.Logger;
+
+public class PlaceholderAPIDataAccess extends AbstractDataAccess<Player> {
+
+    public PlaceholderAPIDataAccess(Logger logger) {
+        super(logger);
+        bind(BTLPDataKeys.PlaceholderAPIDataKey.class, (player, key) -> {
+            return PlaceholderAPI.setPlaceholders(player, key.getPlaceholder());
+        });
+    }
 }
