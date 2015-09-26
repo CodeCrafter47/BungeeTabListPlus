@@ -24,10 +24,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.util.function.Function;
-
-public class VaultPrefixProvider implements Function<Player, String> {
-    public String apply(Player player) {
+public class VaultPrefixProvider extends VaultDataProvider<Player, String> {
+    public String apply0(Player player) {
         RegisteredServiceProvider<Chat> rsp = Bukkit.getServicesManager().getRegistration(Chat.class);
         if (rsp != null) {
             Chat chat = rsp.getProvider();

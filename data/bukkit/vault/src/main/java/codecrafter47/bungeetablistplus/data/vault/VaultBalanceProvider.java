@@ -26,17 +26,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 import java.util.logging.Level;
 
-public class VaultBalanceProvider implements Function<Player, Double> {
+public class VaultBalanceProvider extends VaultDataProvider<Player, Double> {
     private final Plugin plugin;
 
     public VaultBalanceProvider(Plugin plugin) {
         this.plugin = plugin;
     }
 
-    public Double apply(Player player) {
+    public Double apply0(Player player) {
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
         if (rsp != null) {
             Economy economy = rsp.getProvider();

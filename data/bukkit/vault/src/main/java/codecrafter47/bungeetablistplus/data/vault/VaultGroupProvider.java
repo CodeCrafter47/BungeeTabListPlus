@@ -24,10 +24,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.util.function.Function;
-
-public class VaultGroupProvider implements Function<Player, String> {
-    public String apply(Player player) {
+public class VaultGroupProvider extends VaultDataProvider<Player, String> {
+    public String apply0(Player player) {
         RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
         if (rsp != null) {
             Permission permission = rsp.getProvider();
