@@ -29,15 +29,13 @@ import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import com.google.common.collect.Sets;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,27 +48,27 @@ public class PlaceholderAPIHook implements Listener {
 
     public PlaceholderAPIHook(BungeeTabListPlus bungeeTabListPlus) {
         this.bungeeTabListPlus = bungeeTabListPlus;
-        bungeeTabListPlus.getPlugin().getProxy().getPluginManager().registerListener(bungeeTabListPlus.getPlugin(), this);
+        bungeeTabListPlus.getPlugin().getProxy().getScheduler().schedule(bungeeTabListPlus.getPlugin(), this::askServersForPlaceholders, 2, 2, TimeUnit.SECONDS);
     }
 
-    @EventHandler
-    public void onServerConnected(ServerConnectedEvent event) {
-        Server server = event.getServer();
-        askForPlaceholders(server);
+    public void askServersForPlaceholders() {
+        bungeeTabListPlus.getProxy().getServers().values().forEach(this::askForPlaceholders);
     }
 
-    public void askForPlaceholders(Server server) {
-        for (String placeholder : placeholdersToCheck) {
-            if (!registeredPlaceholders.contains(placeholder)) {
-                try {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    ObjectOutputStream out = new ObjectOutputStream(os);
-                    out.writeUTF(Constants.subchannelPlaceholder);
-                    out.writeUTF(placeholder);
-                    out.close();
-                    server.sendData(Constants.channel, os.toByteArray());
-                } catch (Throwable th) {
-                    bungeeTabListPlus.reportError(th);
+    public void askForPlaceholders(ServerInfo server) {
+        if (bungeeTabListPlus.getBridge().get(server, BTLPDataKeys.PLACEHOLDERAPI_PRESENT).orElse(false)) {
+            for (String placeholder : placeholdersToCheck) {
+                if (!registeredPlaceholders.contains(placeholder)) {
+                    try {
+                        ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        ObjectOutputStream out = new ObjectOutputStream(os);
+                        out.writeUTF(Constants.subchannelPlaceholder);
+                        out.writeUTF(placeholder);
+                        out.close();
+                        server.sendData(Constants.channel, os.toByteArray(), false);
+                    } catch (Throwable th) {
+                        bungeeTabListPlus.reportError(th);
+                    }
                 }
             }
         }
@@ -101,13 +99,6 @@ public class PlaceholderAPIHook implements Listener {
                 searchTabList(tabList);
             }
         }
-        for (ProxiedPlayer player : bungeeTabListPlus.getProxy().getPlayers()) {
-            Server server = player.getServer();
-            if (server != null) {
-                askForPlaceholders(server);
-            }
-        }
-
     }
 
     private void searchTabList(TabListConfig config) {

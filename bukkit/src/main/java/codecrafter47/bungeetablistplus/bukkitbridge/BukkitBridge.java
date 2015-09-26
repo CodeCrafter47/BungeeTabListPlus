@@ -172,7 +172,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         } else {
             playerDataAccessor = CompoundDataAccessor.of(new PlayerDataAccessor(plugin), new ThirdPartyVariablesAccessor());
         }
-        serverDataAccessor = CompoundDataAccessor.of(new ServerDataAccessor(plugin), new ThirdPartyServerVariablesAccessor());
+        serverDataAccessor = CompoundDataAccessor.of(new ServerDataAccessor(plugin), new BTLPServerDataKeyAccessor());
     }
 
     private PlayerDataUpdateTask getPlayerDataUpdateTask(Player player) {
@@ -307,8 +307,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         }
     }
 
-    private class ThirdPartyServerVariablesAccessor extends AbstractDataAccessor<Server> {
-        public ThirdPartyServerVariablesAccessor() {
+    private class BTLPServerDataKeyAccessor extends AbstractDataAccessor<Server> {
+        public BTLPServerDataKeyAccessor() {
             super(plugin.getLogger());
             bind(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
                 apiLock.readLock().lock();
@@ -318,6 +318,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
                     apiLock.readLock().unlock();
                 }
             });
+            bind(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> placeholderAPIHook != null);
         }
     }
 

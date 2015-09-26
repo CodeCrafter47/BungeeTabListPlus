@@ -33,6 +33,7 @@ public final class BTLPDataKeys {
     }
 
     public final static DataKey<List<String>> REGISTERED_THIRD_PARTY_VARIABLES = DataKey.builder().server().id("thirdparty-variables").build();
+    public final static DataKey<Boolean> PLACEHOLDERAPI_PRESENT = DataKey.builder().server().id("placeholderapi-present").build();
 
     public static class PlaceholderAPIDataKey extends DataKey<String> {
         private final String placeholder;
