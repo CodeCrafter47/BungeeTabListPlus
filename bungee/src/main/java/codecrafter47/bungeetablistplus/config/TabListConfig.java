@@ -150,14 +150,14 @@ public class TabListConfig extends Configuration {
         }
 
         if (s[0].equalsIgnoreCase("player")) {
-            if (s[1].equalsIgnoreCase(player.getName())) {
+            if (s[1].equalsIgnoreCase(player.getName()) || s[1].equalsIgnoreCase(player.getUniqueId().toString())) {
                 return true;
             }
         }
 
         if (s[0].equalsIgnoreCase("players")) {
             for (String p : s[1].split(",")) {
-                if (p.equalsIgnoreCase(player.getName())) {
+                if (p.equalsIgnoreCase(player.getName()) || p.equalsIgnoreCase(player.getUniqueId().toString())) {
                     return true;
                 }
             }
