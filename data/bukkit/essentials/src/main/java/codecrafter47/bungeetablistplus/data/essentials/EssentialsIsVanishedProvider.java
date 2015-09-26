@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.data.essentials;
 
 import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -30,6 +31,9 @@ public class EssentialsIsVanishedProvider implements Function<Player, Boolean> {
     public Boolean apply(Player player) {
         Essentials essentials = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         if (essentials == null) return null;
-        return essentials.getUser(player).isVanished();
+        if (!essentials.isEnabled()) return null;
+        User user = essentials.getUser(player);
+        if (user == null) return null;
+        return user.isVanished();
     }
 }
