@@ -19,8 +19,8 @@
 
 package codecrafter47.bungeetablistplus.placeholder;
 
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
-import codecrafter47.bungeetablistplus.api.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 
 import java.util.Optional;

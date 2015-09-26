@@ -19,10 +19,11 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.config.ConfigParser;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
-import codecrafter47.bungeetablistplus.error.ErrorTabListProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.IConfigTabListProvider;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -41,10 +42,10 @@ import static net.md_5.bungee.event.EventPriority.HIGHEST;
 public class TabListManager implements Listener {
 
     private final BungeeTabListPlus plugin;
-    private ITabListProvider defaultTab;
-    private final List<ITabListProvider> tabLists = new ArrayList<>();
+    private IConfigTabListProvider defaultTab;
+    private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
 
-    private static final Map<ProxiedPlayer, ITabListProvider> customTabLists = new HashMap<>();
+    private final Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
 
     public TabListManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;
@@ -89,11 +90,11 @@ public class TabListManager implements Listener {
         return true;
     }
 
-    public ITabListProvider getTabListForPlayer(ProxiedPlayer player) {
+    public TabListProvider getTabListForPlayer(ProxiedPlayer player) {
         if (customTabLists.get(player) != null) return customTabLists.get(player);
-        ITabListProvider provider = null;
+        TabListProvider provider = null;
         int priority = Integer.MIN_VALUE;
-        for (ITabListProvider tabList : tabLists) {
+        for (IConfigTabListProvider tabList : tabLists) {
             if (tabList.appliesTo(player)) {
                 if (tabList.getPriority() > priority) {
                     priority = tabList.getPriority();
@@ -125,7 +126,7 @@ public class TabListManager implements Listener {
             return;
         }
 
-        String s[] = showTo.split(":");
+        String[] s = showTo.split(":");
 
         if (s.length != 2) {
             invalidShowTo(config);
@@ -185,11 +186,11 @@ public class TabListManager implements Listener {
                         config.getName()});
     }
 
-    public static void setCustomTabList(ProxiedPlayer player, ITabListProvider tabList) {
+    public void setCustomTabList(ProxiedPlayer player, TabListProvider tabList) {
         customTabLists.put(player, tabList);
     }
 
-    public static void removeCustomTabList(ProxiedPlayer player) {
+    public void removeCustomTabList(ProxiedPlayer player) {
         customTabLists.remove(player);
     }
 

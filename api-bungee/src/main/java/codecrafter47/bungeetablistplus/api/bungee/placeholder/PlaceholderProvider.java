@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.api.bungee.placeholder;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.managers.PlaceholderManager;
-import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
@@ -34,6 +33,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
+/**
+ * A PlaceholderProvider provides multiple placeholders
+ */
 public abstract class PlaceholderProvider {
     private PlaceholderRegistry registry = null;
 
@@ -105,7 +107,7 @@ public abstract class PlaceholderProvider {
             registry.registerPlaceholder(new Placeholder(String.format("\\{(?:%s)\\}", Joiner.on('|').join(names))) {
                 @Override
                 public SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher) {
-                    requiredUpdateInterval.ifPresent(interval -> BungeeTabListPlus.getInstance().requireUpdateInterval(interval));
+                    requiredUpdateInterval.ifPresent(BungeeTabListPlusAPI::requireTabListUpdateInterval);
 
                     return new SlotTemplate() {
                         @Override
@@ -127,7 +129,7 @@ public abstract class PlaceholderProvider {
             registry.registerPlaceholder(new Placeholder(String.format("\\{(?:%s)\\}", Joiner.on('|').join(names))) {
                 @Override
                 public SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher) {
-                    requiredUpdateInterval.ifPresent(interval -> BungeeTabListPlus.getInstance().requireUpdateInterval(interval));
+                    requiredUpdateInterval.ifPresent(BungeeTabListPlusAPI::requireTabListUpdateInterval);
 
                     return new SlotTemplate() {
                         @Override
@@ -200,7 +202,7 @@ public abstract class PlaceholderProvider {
             registry.registerPlaceholder(new Placeholder(String.format("\\{(?:%s)(?::((?:(?:[^{}]*)\\{(?:[^{}]*)\\})*(?:[^{}]*)))?\\}", Joiner.on('|').join(names))) {
                 @Override
                 public SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher) {
-                    requiredUpdateInterval.ifPresent(interval -> BungeeTabListPlus.getInstance().requireUpdateInterval(interval));
+                    requiredUpdateInterval.ifPresent(BungeeTabListPlusAPI::requireTabListUpdateInterval);
 
                     String group = matcher.group(1);
                     return new SlotTemplate() {
@@ -225,7 +227,7 @@ public abstract class PlaceholderProvider {
             registry.registerPlaceholder(new Placeholder(String.format("\\{(?:%s)(?::((?:(?:[^{}]*)\\{(?:[^{}]*)\\})*(?:[^{}]*)))?\\}", Joiner.on('|').join(names))) {
                 @Override
                 public SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher) {
-                    requiredUpdateInterval.ifPresent(interval -> BungeeTabListPlus.getInstance().requireUpdateInterval(interval));
+                    requiredUpdateInterval.ifPresent(BungeeTabListPlusAPI::requireTabListUpdateInterval);
 
                     String group = matcher.group(1);
                     return new SlotTemplate() {
@@ -260,7 +262,7 @@ public abstract class PlaceholderProvider {
             registry.registerPlaceholder(new Placeholder(String.format("\\{(?:%s)(?::((?:(?:[^{}]*)\\{(?:[^{}]*)\\})*(?:[^{}]*)))?\\}", Joiner.on('|').join(names))) {
                 @Override
                 public SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher) {
-                    requiredUpdateInterval.ifPresent(interval -> BungeeTabListPlus.getInstance().requireUpdateInterval(interval));
+                    requiredUpdateInterval.ifPresent(BungeeTabListPlusAPI::requireTabListUpdateInterval);
 
                     String group = matcher.group(1);
                     return new SlotTemplate() {
@@ -276,4 +278,8 @@ public abstract class PlaceholderProvider {
         }
     }
 
+    public interface PlaceholderRegistry {
+
+        void registerPlaceholder(Placeholder placeholder);
+    }
 }

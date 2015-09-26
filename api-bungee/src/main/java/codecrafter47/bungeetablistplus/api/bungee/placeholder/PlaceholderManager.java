@@ -17,32 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.tablist;
+package codecrafter47.bungeetablistplus.api.bungee.placeholder;
 
-import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 
-public class SlotBuilder {
-    private StringBuilder textBuilder = new StringBuilder();
-    private int ping = 0;
-    private Skin skin = SkinManager.defaultSkin;
+/**
+ * The PlaceholderManager
+ */
+public interface PlaceholderManager {
+    /**
+     * Parse a string to a SlotTemplate
+     * Parses all placeholders in the string
+     *
+     * @param text the string
+     * @return the created SlotTemplate
+     */
+    SlotTemplate parseSlot(String text);
 
-    public SlotBuilder appendText(String text) {
-        textBuilder.append(text);
-        return this;
-    }
-
-    public SlotBuilder setPing(int ping) {
-        this.ping = ping;
-        return this;
-    }
-
-    public SlotBuilder setSkin(Skin skin) {
-        this.skin = skin;
-        return this;
-    }
-
-    public Slot build() {
-        return new Slot(textBuilder.toString(), ping, skin);
-    }
+    /**
+     * Registers a PlaceholderProvider
+     * <p>
+     * A PlaceholderProvider can add multiple placeholders
+     *
+     * @param placeholderProvider the PlaceholderProvider
+     */
+    void registerPlaceholderProvider(PlaceholderProvider placeholderProvider);
 }

@@ -145,7 +145,7 @@ public class TabListConfig extends Configuration {
             return BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47;
         }
 
-        String s[] = showTo.split(":");
+        String[] s = showTo.split(":");
 
         if (s.length != 2) {
             return false;

@@ -19,8 +19,8 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ServerGroup;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 
 import java.util.ArrayList;
 import java.util.Collections;

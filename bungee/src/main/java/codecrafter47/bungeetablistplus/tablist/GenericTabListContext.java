@@ -19,15 +19,15 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.ServerGroup;
-import codecrafter47.bungeetablistplus.managers.PlayerManager;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Optional;
 
-public class GenericTabListContext extends TabListContext {
+public class GenericTabListContext extends AbstractTabListContext {
     private final int rows;
     private final int columns;
     private final int size;

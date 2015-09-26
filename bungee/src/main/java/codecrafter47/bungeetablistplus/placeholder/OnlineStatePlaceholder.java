@@ -20,10 +20,10 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderManager;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.config.MainConfig;
-import codecrafter47.bungeetablistplus.managers.PlaceholderManager;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.util.PingTask;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -65,6 +65,6 @@ public class OnlineStatePlaceholder extends PlaceholderProvider {
     }
 
     private PlaceholderManager getPlaceholderManager() {
-        return BungeeTabListPlus.getInstance().getPlaceholderManager();
+        return BungeeTabListPlus.getInstance().getPlaceholderManager0();
     }
 }

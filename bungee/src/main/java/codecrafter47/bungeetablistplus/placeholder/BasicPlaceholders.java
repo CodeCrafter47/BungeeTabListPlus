@@ -20,13 +20,13 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
-import codecrafter47.bungeetablistplus.api.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
-import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Optional;
@@ -35,7 +35,7 @@ public class BasicPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         bindRegex("\\[PING=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
-            SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager().parseSlot(matcher.group(1));
+            SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(matcher.group(1));
 
             @Override
             public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
@@ -43,7 +43,7 @@ public class BasicPlaceholders extends PlaceholderProvider {
             }
         });
         bindRegex("\\[SKIN=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
-            SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager().parseSlot(matcher.group(1));
+            SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(matcher.group(1));
 
             @Override
             public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {

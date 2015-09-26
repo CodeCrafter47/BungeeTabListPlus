@@ -18,6 +18,7 @@
         <module>legacy</module>
         <module>data</module>
         <module>api-bukkit</module>
+        <module>api-bungee</module>
     </modules>
 
     <properties>

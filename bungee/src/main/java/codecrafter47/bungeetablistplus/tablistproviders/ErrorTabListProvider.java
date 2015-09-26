@@ -17,15 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.error;
+package codecrafter47.bungeetablistplus.tablistproviders;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -36,7 +34,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.function.Predicate;
 
-public class ErrorTabListProvider implements ITabListProvider {
+public class ErrorTabListProvider implements IConfigTabListProvider {
     private final String message;
     private final Throwable throwable;
     private final Predicate<ProxiedPlayer> appliesTo;
@@ -54,12 +52,12 @@ public class ErrorTabListProvider implements ITabListProvider {
     }
 
     @Override
-    public void fillTabList(ProxiedPlayer player, ITabList tabList, TabListContext context) throws LayoutException {
+    public void fillTabList(ProxiedPlayer player, TabList tabList, TabListContext context) {
         constructErrorTabList(player, tabList, message, throwable);
     }
 
     @SneakyThrows
-    public static void constructErrorTabList(ProxiedPlayer player, ITabList tabList, String message, Throwable throwable) {
+    public static void constructErrorTabList(ProxiedPlayer player, TabList tabList, String message, Throwable throwable) {
         boolean is18 = BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47;
 
         if (is18) {

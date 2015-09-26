@@ -20,14 +20,14 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import com.google.common.collect.Sets;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Listener;
@@ -77,7 +77,7 @@ public class PlaceholderAPIHook implements Listener {
     public void onPlaceholderConfirmed(String placeholder) {
         if (!registeredPlaceholders.contains(placeholder)) {
             registeredPlaceholders.add(placeholder);
-            bungeeTabListPlus.registerPlaceholderProvider(new PlaceholderProvider() {
+            bungeeTabListPlus.registerPlaceholderProvider0(new PlaceholderProvider() {
                 @Override
                 public void setup() {
                     bindRegex(Pattern.quote(placeholder)).to((placeholderManager, matcher) -> new SlotTemplate() {

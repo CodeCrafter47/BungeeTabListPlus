@@ -18,8 +18,8 @@
  */
 package codecrafter47.bungeetablistplus.tablisthandler;
 
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface PlayerTablistHandler {
 
-    void sendTablist(ITabList tabList);
+    void sendTablist(TabList tabList);
 
     boolean isExcluded();
 

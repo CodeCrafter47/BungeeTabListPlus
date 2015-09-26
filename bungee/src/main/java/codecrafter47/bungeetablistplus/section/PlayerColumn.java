@@ -19,11 +19,11 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 import java.util.Collection;
 import java.util.List;

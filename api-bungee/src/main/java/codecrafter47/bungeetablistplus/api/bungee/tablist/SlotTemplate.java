@@ -17,15 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.tablist;
+package codecrafter47.bungeetablistplus.api.bungee.tablist;
 
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Template for creating a Slot
+ */
 public abstract class SlotTemplate {
     private static SlotTemplate emptyTemplate = new SlotTemplate() {
         @Override
@@ -34,42 +37,98 @@ public abstract class SlotTemplate {
         }
     };
 
+    /**
+     * Creates a SlotTemplate that sets the ping of the Slot to the give value
+     *
+     * @param ping the ping
+     * @return the created SlotTemplate
+     */
     public static SlotTemplate ping(int ping) {
         return new SlotTemplatePing(ping);
     }
 
+    /**
+     * Creates a SlotTemplate that appends the given text to the Slot
+     *
+     * @param text the text
+     * @return the created SlotTemplate
+     */
     public static SlotTemplate text(String text) {
         return new SlotTemplateText(text);
     }
 
+    /**
+     * Creates a SlotTemplate that sets the skin of the Slot
+     * @param skin the Skin
+     * @return the created SlotTemplate
+     */
     public static SlotTemplate skin(Skin skin) {
         return new SlotTemplateSkin(skin);
     }
 
+    /**
+     * Creates a SlotTemplate by combining all given SlotTemplates
+     * @param templates the SlotTemplates to combine
+     * @return the combines SlotTemplate
+     */
     public static SlotTemplate of(SlotTemplate... templates) {
         return of(Arrays.asList(templates));
     }
 
+    /**
+     * Creates a SlotTemplate by combining all given SlotTemplates
+     * @param templates the SlotTemplates to combine
+     * @return the combines SlotTemplate
+     */
     public static SlotTemplate of(Iterable<SlotTemplate> templates) {
         return new SlotTemplateCompound(templates);
     }
 
+    /**
+     * Creates an animated SlotTemplate
+     *
+     * The animation is done by cycling through the given templates at
+     * the given interval
+     *
+     * @param templates the templates
+     * @param interval the interval
+     * @return the created SlotTemplate
+     */
     public static SlotTemplate animate(List<SlotTemplate> templates, double interval) {
         return new SlotTemplateAnimated(templates, interval);
     }
 
+    /**
+     * Creates a new SlotTemplateBuilder
+     * @return the new SlotTemplateBuilder
+     */
     public static SlotTemplateBuilder builder() {
         return new SlotTemplateBuilder();
     }
 
+    /**
+     * Get an empty SlotTemplate
+     * @return an empty SlotTemplate
+     */
     public static SlotTemplate empty() {
         return emptyTemplate;
     }
 
+    /**
+     * Build a Slot using the given TabListContext
+     * @param context the TabListContext
+     * @return the created Slot
+     */
     public Slot buildSlot(TabListContext context) {
         return buildSlot(new SlotBuilder(), context).build();
     }
 
+    /**
+     * Build a Slot using the given TabListContext
+     * @param builder the builder which should be used
+     * @param context the TabListContext
+     * @return the builder
+     */
     public abstract SlotBuilder buildSlot(SlotBuilder builder, TabListContext context);
 
     private static class SlotTemplateText extends SlotTemplate {
@@ -143,6 +202,9 @@ public abstract class SlotTemplate {
         }
     }
 
+    /**
+     * Utility class to simplify the creation of an SlotTemplate
+     */
     public static class SlotTemplateBuilder {
         private final List<SlotTemplate> templates;
 
@@ -150,23 +212,50 @@ public abstract class SlotTemplate {
             templates = new ArrayList<>();
         }
 
+        /**
+         * Appends a SlotTemplate
+         * @param template the SlotTemplate
+         * @return itself
+         */
         public SlotTemplateBuilder append(SlotTemplate template) {
             templates.add(template);
             return this;
         }
 
+        /**
+         * Appends text to the SlotTemplate
+         * @param text the text
+         * @return itself
+         */
         public SlotTemplateBuilder append(String text) {
             return append(new SlotTemplateText(text));
         }
 
+        /**
+         * Set the ping
+         * @param ping the ping
+         * @return itself
+         */
         public SlotTemplateBuilder setPing(int ping) {
             return append(new SlotTemplatePing(ping));
         }
 
+        /**
+         * Set the Skin
+         * @param skin the skin
+         * @return itself
+         */
         public SlotTemplateBuilder setSkin(Skin skin) {
             return append(new SlotTemplateSkin(skin));
         }
 
+        /**
+         * Builds a SlotTemplate from this SlotTemplateBuilder
+         *
+         * The SlotTemplateBuilder shouldn't be used anymore after invoking this method
+         *
+         * @return the created SlotTemplate
+         */
         public SlotTemplate build() {
             return new SlotTemplateCompound(ImmutableList.copyOf(templates));
         }

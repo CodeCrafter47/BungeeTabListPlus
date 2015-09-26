@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
  * Base class for creating custom Variables.
  * <p>
  * To create a custom Variable you need to create a subclass of this class
- * and register an instance of it with BungeeTabListPlusBukkitAPI#registerVariable
+ * and register an instance of it with {@link BungeeTabListPlusBukkitAPI#registerVariable}
  */
 public abstract class Variable {
     private final String name;

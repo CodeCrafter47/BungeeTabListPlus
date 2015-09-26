@@ -20,9 +20,9 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
-import codecrafter47.bungeetablistplus.player.IPlayer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.tab.TabListAdapter;
@@ -133,7 +133,7 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
     }
 
     @Override
-    public void sendTablist(ITabList tabList) {
+    public void sendTablist(TabList tabList) {
         if (tabListHandler instanceof ScoreboardTabList) {
             if (!BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
                 setTabListHandler(new MyTabList(this));

@@ -17,18 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.api.bungee;
 
-import codecrafter47.bungeetablistplus.layout.LayoutException;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import java.util.Collection;
 
+/**
+ * A group of servers
+ */
+public interface ServerGroup {
+    /**
+     * The names of the servers which are part of this group
+     *
+     * @return the names of the servers as defined in BungeeCords config.yml
+     */
+    Collection<String> getServerNames();
 
-public interface ITabListProvider {
-
-    void fillTabList(ProxiedPlayer player, ITabList ITabList, TabListContext context) throws LayoutException;
-
-    boolean appliesTo(ProxiedPlayer player);
-
-    int getPriority();
+    /**
+     * Get the name of this group. The name returned by this method is the
+     * name that should be shown to the users
+     *
+     * @return the name of this group
+     */
+    String getName();
 }

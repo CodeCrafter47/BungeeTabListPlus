@@ -19,7 +19,7 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import lombok.SneakyThrows;
 
 import java.util.List;
@@ -40,13 +40,13 @@ public class TablistLayoutManager<Section extends LayoutSection> {
     }
 
     Layout<Section> calculateLayout0(List<Section> topSections, List<Section> bottomSections, TabListContext context) throws LayoutException {
-        int topSectionSize[] = new int[topSections.size()];
+        int[] topSectionSize = new int[topSections.size()];
         for (int i = 0; i < topSections.size(); i++) {
             Section section = topSections.get(i);
             topSectionSize[i] = section.getMinSize();
         }
 
-        int bottomSectionSize[] = new int[bottomSections.size()];
+        int[] bottomSectionSize = new int[bottomSections.size()];
         for (int i = 0; i < bottomSections.size(); i++) {
             Section section = bottomSections.get(i);
             bottomSectionSize[i] = section.getMinSize();
@@ -63,7 +63,7 @@ public class TablistLayoutManager<Section extends LayoutSection> {
 
             for (int topOrBottom = 0; topOrBottom < 2; topOrBottom++) {
                 List<Section> sectionList;
-                int sectionSizes[];
+                int[] sectionSizes;
                 if (topOrBottom == 0) {
                     // top
                     sectionList = topSections;

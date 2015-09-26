@@ -19,15 +19,16 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.ServerGroup;
-import codecrafter47.bungeetablistplus.managers.PlayerManager;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Optional;
 
-public class DelegatingTabListContext extends TabListContext {
+public class DelegatingTabListContext extends AbstractTabListContext {
     private final TabListContext parent;
 
     public DelegatingTabListContext(TabListContext parent) {

@@ -18,14 +18,13 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
-import codecrafter47.bungeetablistplus.error.ErrorTabListProvider;
-import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
+import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
-import codecrafter47.bungeetablistplus.tablist.TabList;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import com.google.common.collect.Sets;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -84,34 +83,29 @@ class ResendThread implements Runnable {
                 }
             }
 
-            ITabListProvider tlp = BungeeTabListPlus.getInstance().
+            TabListProvider tlp = BungeeTabListPlus.getInstance().
                     getTabListManager().getTabListForPlayer(tablistHandler.getPlayer());
             if (tlp == null) {
                 tablistHandler.exclude();
                 tablistHandler.unload();
                 return;
             }
-            ITabList tabList = new TabList();
+            TabList tabList = new GenericTabList();
 
             TabListContext context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager());
             context = context.setPlayer(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer()));
 
-            try {
-                tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
-            } catch (LayoutException ex) {
-                BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Error in tablist config", ex);
-                ErrorTabListProvider.constructErrorTabList(tablistHandler.getPlayer(), tabList, "Error in tablist config", ex);
-            }
+            tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
 
             tablistHandler.sendTablist(tabList);
         } catch (Throwable th) {
             try {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Error while updating tablist", th);
-                ITabList tabList;
+                TabList tabList;
                 if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {
-                    tabList = new TabList(20, 4);
+                    tabList = new GenericTabList(20, 4);
                 } else {
-                    tabList = new TabList();
+                    tabList = new GenericTabList();
                 }
 
                 ErrorTabListProvider.constructErrorTabList(tablistHandler.getPlayer(), tabList, "Error while updating tablist", th);

@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.ArrayList;

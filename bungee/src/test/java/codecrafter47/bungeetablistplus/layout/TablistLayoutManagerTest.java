@@ -19,8 +19,8 @@
 
 package codecrafter47.bungeetablistplus.layout;
 
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 import org.junit.Assert;
 import org.junit.Test;
 

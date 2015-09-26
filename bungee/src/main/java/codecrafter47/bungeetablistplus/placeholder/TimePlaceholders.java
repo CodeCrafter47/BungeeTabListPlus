@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 
 import java.text.SimpleDateFormat;
 

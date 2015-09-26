@@ -20,14 +20,14 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.skin.Skin;
-
-import java.util.Optional;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class RedisPlayer implements IPlayer {

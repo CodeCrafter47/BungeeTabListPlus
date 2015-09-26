@@ -20,9 +20,9 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
-import codecrafter47.bungeetablistplus.api.ServerGroup;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 
 import java.util.Optional;
 

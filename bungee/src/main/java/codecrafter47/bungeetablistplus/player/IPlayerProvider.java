@@ -19,6 +19,8 @@
 
 package codecrafter47.bungeetablistplus.player;
 
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+
 import java.util.Collection;
 
 public interface IPlayerProvider {

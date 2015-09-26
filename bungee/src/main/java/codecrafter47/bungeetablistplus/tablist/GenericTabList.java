@@ -18,17 +18,18 @@
  */
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.skin.Skin;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * @author Florian Stober
  */
-public class TabList implements ITabList {
+public class GenericTabList implements TabList {
 
     private final int rows;
     private final int columns;
@@ -64,7 +65,7 @@ public class TabList implements ITabList {
         this.footer = footer;
     }
 
-    public TabList(int rows, int columns) {
+    public GenericTabList(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
         this.usedSlots = 0;
@@ -76,7 +77,7 @@ public class TabList implements ITabList {
         shouldShrink = false;
     }
 
-    public TabList() {
+    public GenericTabList() {
         this(ConfigManager.getRows(), ConfigManager.getCols());
     }
 
@@ -143,7 +144,7 @@ public class TabList implements ITabList {
     }
 
     @Override
-    public ITabList flip() {
+    public TabList flip() {
         return new FlippedTabList(this);
     }
 

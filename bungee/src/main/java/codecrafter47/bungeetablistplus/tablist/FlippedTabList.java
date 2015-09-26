@@ -19,14 +19,15 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 
-public class FlippedTabList implements ITabList {
+public class FlippedTabList implements TabList {
 
-    TabList tabList;
+    GenericTabList tabList;
 
-    public FlippedTabList(TabList tabList) {
+    public FlippedTabList(GenericTabList tabList) {
         this.tabList = tabList;
     }
 
@@ -115,7 +116,7 @@ public class FlippedTabList implements ITabList {
     }
 
     @Override
-    public ITabList flip() {
+    public TabList flip() {
         return tabList;
     }
 

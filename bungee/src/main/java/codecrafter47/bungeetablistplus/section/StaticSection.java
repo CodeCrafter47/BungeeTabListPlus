@@ -18,9 +18,9 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 
 import java.util.ArrayList;
 import java.util.List;

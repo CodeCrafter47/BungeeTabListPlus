@@ -19,9 +19,9 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import net.md_5.bungee.api.ChatColor;
 
@@ -48,14 +48,14 @@ public class ScoreboardTabList implements TabListHandler {
 
     private int sendSlots = 0;
 
-    private final String send[] = new String[ConfigManager.getTabSize()];
+    private final String[] send = new String[ConfigManager.getTabSize()];
 
     public ScoreboardTabList(PlayerTablistHandler playerTablistHandler) {
         this.playerTablistHandler = playerTablistHandler;
     }
 
     @Override
-    public void sendTabList(ITabList tabList) {
+    public void sendTabList(TabList tabList) {
         resize(tabList.getUsedSlots());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
@@ -127,7 +127,7 @@ public class ScoreboardTabList implements TabListHandler {
         }
         send[row] = text;
         slots_ping[row] = ping;
-        String split[] = splitText(text);
+        String[] split = splitText(text);
         BungeeTabListPlus.getInstance().getLegacyPacketAccess().updateTeam(
                 playerTablistHandler.getPlayer().unsafe(), getSlotID(row), split[0], /*split[1]*/ "", split[1]);
     }
@@ -138,7 +138,7 @@ public class ScoreboardTabList implements TabListHandler {
     }
 
     private String[] splitText(String s) {
-        String ret[] = new String[3];
+        String[] ret = new String[3];
         int left = s.length();
         if (left <= 16) {
             ret[0] = s;

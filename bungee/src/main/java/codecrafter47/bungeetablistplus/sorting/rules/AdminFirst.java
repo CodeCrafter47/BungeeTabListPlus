@@ -19,9 +19,9 @@
 package codecrafter47.bungeetablistplus.sorting.rules;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.sorting.SortingRule;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
 
 public class AdminFirst implements SortingRule {
 

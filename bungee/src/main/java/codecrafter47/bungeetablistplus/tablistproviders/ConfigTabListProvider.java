@@ -16,17 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.config;
+
+package codecrafter47.bungeetablistplus.tablistproviders;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.api.ITabListProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.layout.Layout;
-import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
 import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
@@ -36,33 +37,31 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * @author Florian Stober
- */
-public class TabListProvider implements ITabListProvider {
 
-    private final BungeeTabListPlus plugin;
-    private final List<Function<TabListContext, List<Section>>> topSectionsProvider;
-    private final List<Function<TabListContext, List<Section>>> botSectionsProvider;
-    private final TabListConfig config;
+public class ConfigTabListProvider implements IConfigTabListProvider {
+
+    protected final BungeeTabListPlus plugin;
+    protected final List<Function<TabListContext, List<Section>>> topSectionsProvider;
+    protected final List<Function<TabListContext, List<Section>>> botSectionsProvider;
+    protected final TabListConfig config;
+    protected final boolean showHeaderFooter;
+    protected final SlotTemplate header;
+    protected final SlotTemplate footer;
     private final TablistLayoutManager<Section> layoutManager = new TablistLayoutManager<>();
-    private final boolean showHeaderFooter;
-    private final SlotTemplate header;
-    private final SlotTemplate footer;
 
-    public TabListProvider(BungeeTabListPlus plugin, List<Function<TabListContext, List<Section>>> top, List<Function<TabListContext, List<Section>>> bot,
-                           TabListConfig config, boolean showHeaderFooter, SlotTemplate header, SlotTemplate footer) {
+    public ConfigTabListProvider(List<Function<TabListContext, List<Section>>> top, BungeeTabListPlus plugin, TabListConfig config, boolean showHeaderFooter, List<Function<TabListContext, List<Section>>> bot, SlotTemplate header, SlotTemplate footer) {
         this.topSectionsProvider = top;
-        this.botSectionsProvider = bot;
-        this.config = config;
         this.plugin = plugin;
+        this.config = config;
         this.showHeaderFooter = showHeaderFooter;
+        this.botSectionsProvider = bot;
         this.header = header;
         this.footer = footer;
     }
 
     @Override
-    public void fillTabList(ProxiedPlayer player, ITabList tabList, TabListContext context) throws LayoutException {
+    @SneakyThrows
+    public void fillTabList(ProxiedPlayer player, TabList tabList, TabListContext context) {
         if (config.verticalMode) {
             tabList = tabList.flip();
         }

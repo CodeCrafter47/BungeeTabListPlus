@@ -18,10 +18,13 @@
  */
 package codecrafter47.bungeetablistplus.managers;
 
-import codecrafter47.bungeetablistplus.api.Placeholder;
-import codecrafter47.bungeetablistplus.api.PlaceholderRegistry;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.Placeholder;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderManager;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -30,10 +33,11 @@ import lombok.SneakyThrows;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class PlaceholderManager {
+public final class PlaceholderManagerImpl implements PlaceholderManager {
 
     private final List<Placeholder> placeholders = new ArrayList<>();
 
@@ -42,6 +46,7 @@ public final class PlaceholderManager {
 
     private final List<PlaceholderProvider> placeholderProviderList = new ArrayList<>();
 
+    @Override
     public SlotTemplate parseSlot(String text) {
         Preconditions.checkNotNull(text, "text");
         if (needsUpdate) {
@@ -80,13 +85,21 @@ public final class PlaceholderManager {
         return templateBuilder.build();
     }
 
+    @Override
+    public void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
+        BungeeTabListPlus.getInstance().registerPlaceholderProvider0(placeholderProvider);
+    }
+
     @SneakyThrows
     private void update() {
         placeholders.clear();
         for (PlaceholderProvider placeholderProvider : placeholderProviderList) {
+            boolean isExternal = !placeholderProvider.getClass().getClassLoader().equals(PlaceholderManagerImpl.class.getClassLoader());
             Field registry = PlaceholderProvider.class.getDeclaredField("registry");
             registry.setAccessible(true);
-            registry.set(placeholderProvider, (PlaceholderRegistry) placeholders::add);
+            registry.set(placeholderProvider, isExternal
+                    ? (PlaceholderProvider.PlaceholderRegistry) placeholder -> placeholders.add(new ExceptionSafePlaceholder(placeholder))
+                    : (PlaceholderProvider.PlaceholderRegistry) placeholders::add);
             placeholderProvider.setup();
         }
         pattern_all = Pattern.compile("(?ims)" + Joiner.on('|').join(Iterables.transform(placeholders, v -> "(?:" + v.getRegex() + ")")));
@@ -97,8 +110,46 @@ public final class PlaceholderManager {
         needsUpdate = true;
     }
 
-    public void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
+    public void internalRegisterPlaceholderProvider(PlaceholderProvider placeholderProvider) {
         placeholderProviderList.add(placeholderProvider);
         needsUpdate = true;
     }
+
+    private static class ExceptionSafePlaceholder extends Placeholder {
+        private final Placeholder delegate;
+
+        public ExceptionSafePlaceholder(Placeholder delegate) {
+            super(delegate.getRegex());
+            this.delegate = delegate;
+        }
+
+        @Override
+        public SlotTemplate getReplacement(PlaceholderManager placeholderManager, Matcher matcher) {
+            try {
+                return new ExceptionSafeSlotTemplate(delegate.getReplacement(placeholderManager, matcher));
+            } catch (Throwable th) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "An error occurred while resolving an external placeholder.", th);
+                return SlotTemplate.empty();
+            }
+        }
+
+        private static class ExceptionSafeSlotTemplate extends SlotTemplate {
+            private final SlotTemplate delegate;
+
+            private ExceptionSafeSlotTemplate(SlotTemplate delegate) {
+                this.delegate = delegate;
+            }
+
+            @Override
+            public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                try {
+                    return delegate.buildSlot(builder, context);
+                } catch (Throwable th) {
+                    BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "An error occurred while replacing an external placeholder.", th);
+                    return builder;
+                }
+            }
+        }
+    }
+
 }

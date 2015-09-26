@@ -19,8 +19,9 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -33,17 +34,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class PlayerManager {
+public class PlayerManagerImpl implements PlayerManager {
 
     private final BungeeTabListPlus plugin;
 
     private final Collection<IPlayer> players;
 
-    public PlayerManager(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders) {
+    public PlayerManagerImpl(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders) {
         this.plugin = plugin;
         this.players = ImmutableList.copyOf(Iterables.concat(Collections2.transform(playerProviders, IPlayerProvider::getPlayers)));
     }
 
+    @Override
     public List<IPlayer> getPlayers(Collection<String> filter, ProxiedPlayer who, boolean includeSpectators) {
         List<IPlayer> list = new ArrayList<>();
         for (IPlayer p : players) {
@@ -102,6 +104,7 @@ public class PlayerManager {
         return list;
     }
 
+    @Override
     public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSpectators) {
         int num = 0;
         for (IPlayer p : players) {
@@ -116,6 +119,7 @@ public class PlayerManager {
         return num;
     }
 
+    @Override
     public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSpectators) {
         int num = 0;
         for (IPlayer p : players) {
@@ -126,6 +130,7 @@ public class PlayerManager {
         return num;
     }
 
+    @Override
     public int getPlayerCount(Collection<String> filter, ProxiedPlayer player, boolean includeSpectators) {
         return this.getPlayers(filter, player, includeSpectators).size();
     }

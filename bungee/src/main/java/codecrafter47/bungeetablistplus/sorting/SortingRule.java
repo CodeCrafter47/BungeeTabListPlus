@@ -18,8 +18,8 @@
  */
 package codecrafter47.bungeetablistplus.sorting;
 
-import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 
 public interface SortingRule {
 

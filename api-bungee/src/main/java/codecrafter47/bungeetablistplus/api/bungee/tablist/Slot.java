@@ -17,15 +17,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.tablist;
+package codecrafter47.bungeetablistplus.api.bungee.tablist;
 
-import codecrafter47.bungeetablistplus.skin.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
 
-public class Slot {
+/**
+ * Represents a the contents of a slot in the tab list.
+ * Slot objects are immutable.
+ */
+public final class Slot {
     private final String text;
     private final int ping;
     private final Skin skin;
 
+    /**
+     * Create a Slot with the given text, ping = 0 and a random Alex/ Steve skin
+     *
+     * @param text the text
+     */
+    public Slot(String text) {
+        this(text, 0);
+    }
+
+    /**
+     * Create a Slot with the given text and ping, and a random Alex/ Steve skin
+     *
+     * @param text the text
+     * @param ping the ping
+     */
+    public Slot(String text, int ping) {
+        this(text, ping, BungeeTabListPlusAPI.getDefaultSkin());
+    }
+
+    /**
+     * Create a Slot with the given text, ping and skin
+     *
+     * @param text the text
+     * @param ping the ping
+     * @param skin the skin
+     */
     public Slot(String text, int ping, Skin skin) {
         super();
         this.text = text;
@@ -45,14 +76,30 @@ public class Slot {
         this.skin = skin;
     }
 
+    /**
+     * The text this slot should be filled with
+     *
+     * @return the text
+     */
     public String getText() {
         return text;
     }
 
+    /**
+     * The ping of this slot.
+     * This method can return a value different from the one this slot has been constructed with
+     * if the new value results in the same ping bar image on the client
+     *
+     * @return the ping of this slot
+     */
     public int getPing() {
         return ping;
     }
 
+    /**
+     * The skin this slot should have
+     * @return the skin
+     */
     public Skin getSkin() {
         return skin;
     }

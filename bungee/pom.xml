@@ -95,6 +95,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>codecrafter47.bungeetablistplus</groupId>
+            <artifactId>bungeetablistplus-api-bungee</artifactId>
+            <version>2.1.6-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>protocolsupport</groupId>
             <artifactId>ProtocolSupportBungee</artifactId>
             <version>1.2</version>

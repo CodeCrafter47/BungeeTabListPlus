@@ -32,8 +32,8 @@ public class Layout<S> {
     final List<Integer> effectiveSectionSizes;
     final int rows;
     final int columns;
-    final int effectiveSection[];
-    final int slotIndex[];
+    final int[] effectiveSection;
+    final int[] slotIndex;
     private final int tabSize;
 
     public Layout(int rows, int columns) {

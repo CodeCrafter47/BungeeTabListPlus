@@ -17,36 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.tablist;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class ServerGroup {
+public class GenericServerGroup implements ServerGroup {
     private final ImmutableList<String> serverNames;
     private final String name;
 
-    public ServerGroup(Collection<String> servers, String name) {
+    public GenericServerGroup(Collection<String> servers, String name) {
         this.serverNames = ImmutableList.copyOf(servers);
         this.name = name;
     }
 
     public static ServerGroup of(String serverName) {
-        return new ServerGroup(Collections.singleton(serverName), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getServerAlias(serverName));
+        return new GenericServerGroup(Collections.singleton(serverName), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getServerAlias(serverName));
     }
 
 
     public static ServerGroup of(Collection<String> server, String name) {
-        return new ServerGroup(server, name);
+        return new GenericServerGroup(server, name);
     }
 
+    @Override
     public Collection<String> getServerNames() {
         return serverNames;
     }
 
+    @Override
     public String getName() {
         return name;
     }

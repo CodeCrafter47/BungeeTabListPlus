@@ -20,11 +20,11 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import net.md_5.bungee.api.ChatColor;
 
 public class ColorPlaceholder extends PlaceholderProvider {
-    private static final ChatColor colors[] = new ChatColor[]{ChatColor.BLUE,
+    private static final ChatColor[] colors = {ChatColor.BLUE,
             ChatColor.AQUA, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.GOLD,
             ChatColor.RED, ChatColor.LIGHT_PURPLE, ChatColor.DARK_PURPLE};
 
@@ -32,10 +32,10 @@ public class ColorPlaceholder extends PlaceholderProvider {
     public void setup() {
         bind("color").setRequiredUpdateInterval(1.0).withArgs().to((context, args) -> {
             long time = System.currentTimeMillis() / 1000;
-            ChatColor all[];
+            ChatColor[] all;
             if (args != null) {
                 // parse color args
-                String array[] = args.split(",");
+                String[] array = args.split(",");
                 all = new ChatColor[array.length];
                 for (int i = 0; i < array.length; i++) {
                     String color = array[i].trim().toUpperCase();

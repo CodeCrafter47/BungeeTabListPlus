@@ -19,9 +19,9 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablist.Slot;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ChatColor;
@@ -31,7 +31,7 @@ import java.util.HashSet;
 
 public class MyTabList implements TabListHandler {
 
-    private static final char[] FILLER = new char[]{'0', '1', '2', '2', '4',
+    private static final char[] FILLER = {'0', '1', '2', '2', '4',
             '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final int MAX_LEN = 16;
     /* ======================================================================== */
@@ -61,7 +61,7 @@ public class MyTabList implements TabListHandler {
     }
 
     @Override
-    public void sendTabList(ITabList tabList) {
+    public void sendTabList(TabList tabList) {
         clear();
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;

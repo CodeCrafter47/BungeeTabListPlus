@@ -17,9 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.api.bungee.tablist;
 
-public interface PlaceholderRegistry {
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-    void registerPlaceholder(Placeholder placeholder);
+/**
+ * To create a custom tab list all methods in this interface must be implemented.
+ */
+public interface TabListProvider {
+
+    /**
+     * This method is periodically invoked by BungeeTabListPlus to update the tablist.
+     * <p>
+     * This method must fill the tablist with it's content. It cannot change the size of
+     * the tab list.
+     * <p>
+     * This method will not be invoked concurrently.
+     *
+     * @param player  the player who will see the tab list
+     * @param tabList an empty TabList
+     * @param context the TabListContext
+     */
+    void fillTabList(ProxiedPlayer player, TabList tabList, TabListContext context);
 }

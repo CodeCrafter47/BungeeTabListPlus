@@ -19,10 +19,9 @@
 
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.ITabList;
-import codecrafter47.bungeetablistplus.tablist.Slot;
-import codecrafter47.bungeetablistplus.tablist.SlotBuilder;
-import codecrafter47.bungeetablistplus.tablist.TabList;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,8 +29,8 @@ public class TestTabList {
 
     @Test
     public void testTabList() {
-        ITabList tabList = new TabList(20, 3);
-        Slot slot1 = new SlotBuilder().appendText("test").build();
+        TabList tabList = new GenericTabList(20, 3);
+        Slot slot1 = new Slot("test", 0, null);
         tabList.setSlot(0, 2, slot1);
         Assert.assertEquals(tabList.getSlot(0, 2), slot1);
         Assert.assertEquals(tabList.flip().getSlot(2, 0), slot1);

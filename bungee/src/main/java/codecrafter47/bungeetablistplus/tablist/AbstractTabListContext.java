@@ -19,35 +19,17 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.ServerGroup;
-import codecrafter47.bungeetablistplus.managers.PlayerManager;
-import codecrafter47.bungeetablistplus.player.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Optional;
 
-public abstract class TabListContext {
+public abstract class AbstractTabListContext implements TabListContext {
 
-    public abstract int getTabSize();
-
-    public abstract int getRows();
-
-    public abstract int getColumns();
-
-    public abstract ProxiedPlayer getViewer();
-
-    public abstract PlayerManager getPlayerManager();
-
-    public abstract IPlayer getPlayer();
-
-    public abstract Optional<ServerInfo> getServer();
-
-    public abstract Optional<ServerGroup> getServerGroup();
-
-    public abstract int getOtherPlayerCount();
-
+    @Override
     public TabListContext setPlayer(IPlayer player) {
         return new DelegatingTabListContext(this) {
             @Override
@@ -62,11 +44,12 @@ public abstract class TabListContext {
 
             @Override
             public Optional<ServerGroup> getServerGroup() {
-                return player.getServer().map(ServerInfo::getName).map(ServerGroup::of);
+                return player.getServer().map(ServerInfo::getName).map(GenericServerGroup::of);
             }
         };
     }
 
+    @Override
     public TabListContext setOtherCount(int otherCount) {
         return new DelegatingTabListContext(this) {
             @Override
@@ -76,6 +59,7 @@ public abstract class TabListContext {
         };
     }
 
+    @Override
     public TabListContext setServerGroup(ServerGroup serverGroup) {
         if (serverGroup.getServerNames().size() == 1) {
             return new DelegatingTabListContext(this) {

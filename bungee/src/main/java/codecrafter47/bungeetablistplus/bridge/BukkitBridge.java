@@ -19,12 +19,12 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.player.IPlayer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.SneakyThrows;
@@ -67,7 +67,7 @@ public class BukkitBridge implements Listener {
                 try {
                     for (String variable : variables) {
                         if (!registeredThirdPartyVariables.contains(variable)) {
-                            plugin.registerPlaceholderProvider(new PlaceholderProvider() {
+                            plugin.registerPlaceholderProvider0(new PlaceholderProvider() {
                                 @Override
                                 public void setup() {
                                     bind(variable).to(context -> plugin.getBridge().get(context.getPlayer(), BTLPDataKeys.createThirdPartyVariableDataKey(variable)).orElse(""));

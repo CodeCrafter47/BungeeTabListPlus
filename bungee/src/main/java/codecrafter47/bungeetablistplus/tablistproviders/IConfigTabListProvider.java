@@ -17,47 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api;
+package codecrafter47.bungeetablistplus.tablistproviders;
 
-import codecrafter47.bungeetablistplus.skin.Skin;
-import codecrafter47.bungeetablistplus.tablist.Slot;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public interface ITabList {
-    String getHeader();
+public interface IConfigTabListProvider extends TabListProvider {
+    boolean appliesTo(ProxiedPlayer player);
 
-    void setHeader(String header);
-
-    String getFooter();
-
-    void setFooter(String footer);
-
-    int getRows();
-
-    int getColumns();
-
-    int getUsedSlots();
-
-    Slot getSlot(int n);
-
-    Slot getSlot(int row, int column);
-
-    void setSlot(int n, Slot s);
-
-    void setSlot(int row, int column, Slot s);
-
-    int getDefaultPing();
-
-    void setDefaultPing(int defaultPing);
-
-    int getSize();
-
-    Skin getDefaultSkin();
-
-    void setDefaultSkin(Skin defaultSkin);
-
-    ITabList flip();
-
-    boolean shouldShrink();
-
-    void setShouldShrink(boolean shouldShrink);
+    int getPriority();
 }

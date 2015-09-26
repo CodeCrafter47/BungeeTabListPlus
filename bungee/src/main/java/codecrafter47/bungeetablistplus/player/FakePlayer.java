@@ -20,8 +20,9 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
-import codecrafter47.bungeetablistplus.skin.Skin;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.config.ServerInfo;
 

@@ -19,9 +19,9 @@
 package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ITabList;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
-import codecrafter47.bungeetablistplus.player.IPlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
@@ -32,7 +32,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
-import net.md_5.bungee.tab.TabList;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * @author Florian Stober
  */
-public class CustomTabList18 extends TabList implements PlayerTablistHandler {
+public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements PlayerTablistHandler {
     protected TabListHandler tabListHandler;
     boolean isExcluded = false;
 
@@ -294,7 +293,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
     }
 
     @Override
-    public void sendTablist(ITabList tabList) {
+    public void sendTablist(TabList tabList) {
         if (tabListHandler instanceof TabList18) {
             if (tabList.getSize() < 80 || tabList.shouldShrink()) {
                 setTabListHandler(new TabList18v3(this));

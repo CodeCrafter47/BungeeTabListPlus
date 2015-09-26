@@ -18,7 +18,12 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
@@ -30,13 +35,18 @@ import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.packet.*;
 import codecrafter47.bungeetablistplus.placeholder.*;
-import codecrafter47.bungeetablistplus.player.*;
+import codecrafter47.bungeetablistplus.player.BungeePlayerProvider;
+import codecrafter47.bungeetablistplus.player.FakePlayerManager;
+import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import codecrafter47.bungeetablistplus.player.RedisPlayerProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.PingTask;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -58,6 +68,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -65,7 +76,7 @@ import java.util.stream.Collectors;
  *
  * @author Florian Stober
  */
-public class BungeeTabListPlus {
+public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     /**
      * Holds an INSTANCE of itself if the plugin is enabled
@@ -107,7 +118,7 @@ public class BungeeTabListPlus {
     /**
      * provides access to the Placeholder Manager use this to add Placeholders
      */
-    private PlaceholderManager placeholderManager;
+    private PlaceholderManagerImpl placeholderManager;
 
     private PermissionManager pm;
 
@@ -165,6 +176,14 @@ public class BungeeTabListPlus {
      * Called when the plugin is enabled
      */
     public void onEnable() {
+        try {
+            Field field = BungeeTabListPlusAPI.class.getDeclaredField("instance");
+            field.setAccessible(true);
+            field.set(null, this);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
+        }
+
         INSTANCE = this;
         try {
             config = new ConfigManager(plugin);
@@ -233,17 +252,17 @@ public class BungeeTabListPlus {
         bukkitBridge = new BukkitBridge(this);
 
         pm = new PermissionManager(this);
-        placeholderManager = new PlaceholderManager();
-        placeholderManager.registerPlaceholderProvider(new BasicPlaceholders());
-        placeholderManager.registerPlaceholderProvider(new BukkitPlaceholders());
-        placeholderManager.registerPlaceholderProvider(new ColorPlaceholder());
-        placeholderManager.registerPlaceholderProvider(new ConditionalPlaceholders());
-        placeholderManager.registerPlaceholderProvider(new OnlineStatePlaceholder());
-        placeholderManager.registerPlaceholderProvider(new PlayerCountPlaceholder());
+        placeholderManager = new PlaceholderManagerImpl();
+        placeholderManager.internalRegisterPlaceholderProvider(new BasicPlaceholders());
+        placeholderManager.internalRegisterPlaceholderProvider(new BukkitPlaceholders());
+        placeholderManager.internalRegisterPlaceholderProvider(new ColorPlaceholder());
+        placeholderManager.internalRegisterPlaceholderProvider(new ConditionalPlaceholders());
+        placeholderManager.internalRegisterPlaceholderProvider(new OnlineStatePlaceholder());
+        placeholderManager.internalRegisterPlaceholderProvider(new PlayerCountPlaceholder());
         if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
-            placeholderManager.registerPlaceholderProvider(new RedisBungeePlaceholders());
+            placeholderManager.internalRegisterPlaceholderProvider(new RedisBungeePlaceholders());
         }
-        placeholderManager.registerPlaceholderProvider(new TimePlaceholders());
+        placeholderManager.internalRegisterPlaceholderProvider(new TimePlaceholders());
 
         tabLists = new TabListManager(this);
         if (!tabLists.loadTabLists()) {
@@ -324,7 +343,7 @@ public class BungeeTabListPlus {
             }
         }
 
-        int serversHash[] = {getProxy().getServers().hashCode()};
+        int[] serversHash = {getProxy().getServers().hashCode()};
         getProxy().getScheduler().schedule(plugin, () -> {
             int hash = getProxy().getServers().hashCode();
             if (hash != serversHash[0]) {
@@ -399,8 +418,8 @@ public class BungeeTabListPlus {
         return false;
     }
 
-    public void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
-        getPlaceholderManager().registerPlaceholderProvider(placeholderProvider);
+    public void registerPlaceholderProvider0(PlaceholderProvider placeholderProvider) {
+        getPlaceholderManager0().internalRegisterPlaceholderProvider(placeholderProvider);
         reloadTablists();
     }
 
@@ -424,7 +443,7 @@ public class BungeeTabListPlus {
      * @return an instance of the PlayerManager or null
      */
     public PlayerManager constructPlayerManager() {
-        return new PlayerManager(this, playerProviders);
+        return new PlayerManagerImpl(this, playerProviders);
     }
 
     public SkinManager getSkinManager() {
@@ -457,7 +476,7 @@ public class BungeeTabListPlus {
         return config;
     }
 
-    public PlaceholderManager getPlaceholderManager() {
+    public PlaceholderManagerImpl getPlaceholderManager0() {
         return placeholderManager;
     }
 
@@ -617,5 +636,42 @@ public class BungeeTabListPlus {
             }
         }
         return false;
+    }
+
+    private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
+
+    @Override
+    protected Skin getSkinForPlayer0(String nameOrUUID) {
+        if (!PATTERN_VALID_USERNAME.matcher(nameOrUUID).matches()) {
+            try {
+                UUID.fromString(nameOrUUID);
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException("Given string is neither valid username nor uuid: " + nameOrUUID);
+            }
+        }
+        Preconditions.checkState(getSkinManager() != null, "BungeeTabListPlus not initialized");
+        return getSkinManager().getSkin(nameOrUUID);
+    }
+
+    @Override
+    protected Skin getDefaultSkin0() {
+        return SkinManager.defaultSkin;
+    }
+
+    @Override
+    protected void requireTabListUpdateInterval0(double interval) {
+        requireUpdateInterval(interval);
+    }
+
+    @Override
+    protected void setCustomTabList0(ProxiedPlayer player, TabListProvider tabListProvider) {
+        Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
+        getTabListManager().setCustomTabList(player, new CheckedTabListProvider(tabListProvider));
+    }
+
+    @Override
+    protected void removeCustomTabList0(ProxiedPlayer player) {
+        Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
+        getTabListManager().removeCustomTabList(player);
     }
 }

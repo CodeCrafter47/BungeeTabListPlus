@@ -19,8 +19,8 @@
 
 package codecrafter47.bungeetablistplus.sorting;
 
-import codecrafter47.bungeetablistplus.player.IPlayer;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 
 import java.util.Collections;
 import java.util.List;

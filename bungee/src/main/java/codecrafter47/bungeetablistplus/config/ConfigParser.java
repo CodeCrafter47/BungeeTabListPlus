@@ -19,14 +19,17 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.sorting.SortingRule;
 import codecrafter47.bungeetablistplus.sorting.SortingRuleRegistry;
-import codecrafter47.bungeetablistplus.tablist.SlotTemplate;
-import codecrafter47.bungeetablistplus.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.tablist.GenericServerGroup;
+import codecrafter47.bungeetablistplus.tablistproviders.ConfigTabListProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.IConfigTabListProvider;
 import com.google.common.collect.HashMultimap;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -58,7 +61,7 @@ public class ConfigParser {
         this.plugin = plugin;
     }
 
-    public TabListProvider parse(TabListConfig config) {
+    public IConfigTabListProvider parse(TabListConfig config) {
         List<SlotTemplate> playerLines = config.playerLines.stream().map(this::parseSlot).collect(Collectors.toList());
         List<SlotTemplate> morePlayerLines = config.morePlayersLines.stream().map(this::parseSlot).collect(Collectors.toList());
 
@@ -202,7 +205,7 @@ public class ConfigParser {
         SlotTemplate header = SlotTemplate.animate(config.header.stream().map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
         SlotTemplate footer = SlotTemplate.animate(config.footer.stream().map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
 
-        return new TabListProvider(plugin, topSectionProviders, botSectionProviders, config, config.shownFooterHeader, header, footer);
+        return new ConfigTabListProvider(topSectionProviders, plugin, config, config.shownFooterHeader, botSectionProviders, header, footer);
     }
 
     public AutoFillPlayers parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, List<String> g_sort, int g_maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
@@ -225,10 +228,10 @@ public class ConfigParser {
             if (alias != null) {
                 Set<String> strings = aliasToServerMap.get(alias);
                 serverSet.removeAll(strings);
-                list.add(ServerGroup.of(serverSet, alias));
+                list.add(GenericServerGroup.of(serverSet, alias));
             } else {
                 serverSet.remove(server);
-                list.add(ServerGroup.of(server));
+                list.add(GenericServerGroup.of(server));
             }
         }
 
@@ -326,7 +329,7 @@ public class ConfigParser {
     }
 
     private SlotTemplate parseSlot(String line) {
-        return plugin.getPlaceholderManager().parseSlot(line);
+        return plugin.getPlaceholderManager0().parseSlot(line);
     }
 
     private String findTag(String text, Pattern pattern, Consumer<Matcher> onFound) {
