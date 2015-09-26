@@ -32,6 +32,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 class ResendThread implements Runnable {
@@ -61,7 +62,7 @@ class ResendThread implements Runnable {
                         PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
                         update(tablistHandler);
                     } else {
-                        BungeeTabListPlus.getInstance().sendLater(player);
+                        BungeeTabListPlus.getInstance().getProxy().getScheduler().schedule(BungeeTabListPlus.getInstance().getPlugin(), () -> BungeeTabListPlus.getInstance().updateTabListForPlayer(player), 1, TimeUnit.SECONDS);
                     }
                 }
             } catch (InterruptedException ex) {

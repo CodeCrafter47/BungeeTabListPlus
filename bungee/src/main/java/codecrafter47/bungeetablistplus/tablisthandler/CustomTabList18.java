@@ -199,7 +199,7 @@ public class CustomTabList18 extends TabList implements PlayerTablistHandler {
                     // Pass the Packet to the client
                     player.unsafe().sendPacket(pli);
                     // update list on the client
-                    BungeeTabListPlus.getInstance().sendImmediate(player);
+                    BungeeTabListPlus.getInstance().updateTabListForPlayer(player);
                 }
                 // save which packets are send to the client
                 synchronized (usernames) {

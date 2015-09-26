@@ -414,13 +414,8 @@ public class BungeeTabListPlus {
     }
 
 
-    public void sendImmediate(ProxiedPlayer player) {
+    public void updateTabListForPlayer(ProxiedPlayer player) {
         resendThread.add(player);
-    }
-
-
-    public void sendLater(ProxiedPlayer player) {
-        plugin.getProxy().getScheduler().schedule(plugin, () -> resendThread.add(player), 1, TimeUnit.SECONDS);
     }
 
     /**

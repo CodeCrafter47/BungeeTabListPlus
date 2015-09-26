@@ -69,7 +69,7 @@ public class TabListListener implements Listener {
             if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
                 plugin.resendTabLists();
             }
-            plugin.sendImmediate(e.getPlayer());
+            plugin.updateTabListForPlayer(e.getPlayer());
         } catch (Throwable th){
             BungeeTabListPlus.getInstance().reportError(th);
         }
@@ -77,7 +77,7 @@ public class TabListListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(ServerConnectedEvent e) {
-        plugin.sendImmediate(e.getPlayer());
+        plugin.updateTabListForPlayer(e.getPlayer());
         if (plugin.getConfigManager().getMainConfig().updateOnServerChange) {
             plugin.resendTabLists();
         }
