@@ -47,7 +47,14 @@ public abstract class Configuration {
         InputStreamReader reader = new InputStreamReader(inputStream, "UTF-8");
         BufferedReader bufferedReader = new BufferedReader(reader);
         readHeader(bufferedReader);
-        read((Map<Object, Object>) yaml.get().load(bufferedReader));
+        Map<Object, Object> map = (Map<Object, Object>) yaml.get().load(bufferedReader);
+        for (Iterator<Map.Entry<Object, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<Object, Object> entry = iterator.next();
+            if (entry.getKey() == null || entry.getValue() == null) {
+                iterator.remove();
+            }
+        }
+        read(map);
         bufferedReader.close();
     }
 
@@ -68,10 +75,10 @@ public abstract class Configuration {
     protected abstract void read(Map<Object, Object> map);
 
     public final void write(File file) throws IOException {
-        if(!file.getParentFile().exists()){
+        if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-        if(file.exists()){
+        if (file.exists()) {
             file.delete();
         }
         file.createNewFile();
@@ -104,7 +111,7 @@ public abstract class Configuration {
         writer.println(yaml.get().dumpAsMap(Collections.singletonMap(key, value)));
     }
 
-    public void setHeader(String... header){
+    public void setHeader(String... header) {
         this.header = Arrays.asList(header);
     }
 }
