@@ -166,6 +166,9 @@ public class MainConfig extends Configuration {
 
         if (map.containsKey("serverAlias")) {
             serverAlias = (HashMap<String, String>) map.get("serverAlias");
+            if (serverAlias == null) {
+                serverAlias = new HashMap<>();
+            }
         }
 
         if (map.containsKey("worldAlias")) {
