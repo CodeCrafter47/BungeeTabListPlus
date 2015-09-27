@@ -23,7 +23,7 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.md_5.bungee.BungeeCord;
@@ -250,7 +250,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public List<IPlayer> getPlayers() {
-        return ImmutableList.copyOf(bukkitplayers.values());
+        return Lists.newArrayList(bukkitplayers.values());
     }
 
     /**
