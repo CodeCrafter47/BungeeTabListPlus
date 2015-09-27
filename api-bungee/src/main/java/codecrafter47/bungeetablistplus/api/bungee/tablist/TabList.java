@@ -34,7 +34,7 @@ public interface TabList {
 
     /**
      * set the header for the tab list
-     * may contain color codes like &6
+     * may contain color codes like &amp;6
      *
      * @param header the header
      */
