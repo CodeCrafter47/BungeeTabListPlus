@@ -228,7 +228,7 @@ public class ConfigParser {
             if (alias != null) {
                 Set<String> strings = aliasToServerMap.get(alias);
                 serverSet.removeAll(strings);
-                list.add(GenericServerGroup.of(serverSet, alias));
+                list.add(GenericServerGroup.of(strings, alias));
             } else {
                 serverSet.remove(server);
                 list.add(GenericServerGroup.of(server));
