@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
+import com.google.common.collect.Multiset;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 
 import java.util.Optional;
@@ -32,8 +33,9 @@ public class RedisBungeePlaceholders extends PlaceholderProvider {
             int sum = 0;
             Optional<ServerGroup> serverGroup = context.getServerGroup();
             if (serverGroup.isPresent()) {
+                Multiset<String> serverCount = RedisBungee.getApi().getServerToPlayers().keys();
                 for (String server : serverGroup.get().getServerNames()) {
-                    sum += RedisBungee.getApi().getPlayersOnServer(server).size();
+                    sum += serverCount.count(server);
                 }
             }
             return Integer.toString(sum);
