@@ -137,7 +137,7 @@ public class UpdateChecker implements Runnable {
         if (equal) {
             if (current.length < latest.length) {
                 updateAvailable = true;
-            } else if (usesDevBuild) {
+            } else if (current.length == latest.length && usesDevBuild) {
                 updateAvailable = true;
             }
         }

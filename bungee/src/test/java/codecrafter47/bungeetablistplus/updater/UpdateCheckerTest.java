@@ -37,5 +37,6 @@ public class UpdateCheckerTest {
         Assert.assertFalse(UpdateChecker.compareVersions("2.0", "2.1"));
         Assert.assertFalse(UpdateChecker.compareVersions("2.0", "2.0.1"));
         Assert.assertFalse(UpdateChecker.compareVersions("2.0", "2.1-SNAPSHOT"));
+        Assert.assertFalse(UpdateChecker.compareVersions("2.2", "2.2.1-SNAPSHOT"));
     }
 }
