@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>data-bukkit-parent</artifactId>
         <groupId>codecrafter47.bungeetablistplus</groupId>
-        <version>2.1.6-SNAPSHOT</version>
+        <version>2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,55 +13,55 @@
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-core</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-vault</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-vanishnopacket</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-playerpoints</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-factions-2.7.5</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-factionsuuid</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-supervanish</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-simpleclans</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-essentials</artifactId>
-            <version>2.1.6-SNAPSHOT</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
