@@ -32,8 +32,8 @@ import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccess;
 import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccess;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -168,7 +168,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         }
 
         if (placeholderAPIHook != null) {
-            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess(), placeholderAPIHook.getDataAccessor());
+            playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess(), placeholderAPIHook.getDataAccess());
         } else {
             playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess());
         }
@@ -313,7 +313,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
             bind(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
                 apiLock.readLock().lock();
                 try {
-                    return ImmutableList.copyOf(variablesByName.keySet());
+                    return Lists.newArrayList(variablesByName.keySet());
                 } finally {
                     apiLock.readLock().unlock();
                 }

@@ -31,7 +31,7 @@ public class PlaceholderAPIHook {
         this.plugin = plugin;
     }
 
-    public DataAccess<Player> getDataAccessor() {
+    public DataAccess<Player> getDataAccess() {
         return new PlaceholderAPIDataAccess(plugin.getLogger());
     }
 
