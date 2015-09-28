@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.util.ColorParser;
@@ -40,13 +39,13 @@ public class TabList18 implements TabListHandler {
         return " ?tab" + s;
     }
 
-    private final int[] slots_ping = new int[ConfigManager.getTabSize()];
+    private final int[] slots_ping = new int[80];
 
     private int sendSlots = 0;
 
-    private final String[] send = new String[ConfigManager.getTabSize()];
+    private final String[] send = new String[80];
 
-    private final String[] sendTextures = new String[ConfigManager.getTabSize()];
+    private final String[] sendTextures = new String[80];
 
     private final PacketAccess packetAccess = BungeeTabListPlus.getInstance().getPacketAccess();
 
