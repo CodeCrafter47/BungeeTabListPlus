@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.layout.Layout;
 import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
 import codecrafter47.bungeetablistplus.section.Section;
+import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -64,14 +65,17 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
     public void fillTabList(ProxiedPlayer player, TabList tabList, TabListContext context) {
         if (config.verticalMode) {
             tabList = tabList.flip();
+            context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), player, context.getPlayerManager());
+            context = context.setPlayer(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer()));
         }
 
         if (config.autoShrinkTabList) {
             tabList.setShouldShrink(true);
         }
 
-        List<Section> topSections = topSectionsProvider.stream().flatMap(f -> f.apply(context).stream()).collect(Collectors.toCollection(ArrayList::new));
-        List<Section> botSections = botSectionsProvider.stream().flatMap(f -> f.apply(context).stream()).collect(Collectors.toCollection(ArrayList::new));
+        final TabListContext finalContext = context;
+        List<Section> topSections = topSectionsProvider.stream().flatMap(f -> f.apply(finalContext).stream()).collect(Collectors.toCollection(ArrayList::new));
+        List<Section> botSections = botSectionsProvider.stream().flatMap(f -> f.apply(finalContext).stream()).collect(Collectors.toCollection(ArrayList::new));
 
         // precalculate all sections
         precalculateSections(context, topSections);
