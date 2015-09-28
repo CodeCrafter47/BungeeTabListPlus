@@ -186,23 +186,27 @@ public class BukkitBridge implements Listener {
         if (key.getScope() == DataKey.Scope.SERVER) {
             return player.getServer().flatMap(server -> get(server, key));
         }
-        Optional<T> value = getPlayerDataCache(player.getUniqueID()).getValue(key);
-        if (!value.isPresent()) {
-            ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(player.getUniqueID());
-            if (proxiedPlayer != null) {
-                try {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    ObjectOutputStream out = new ObjectOutputStream(os);
-                    out.writeUTF(Constants.subchannelRequestPlayerVariable);
-                    out.writeObject(key);
-                    out.close();
-                    Optional.ofNullable(proxiedPlayer.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
-                } catch (IOException ex) {
-                    plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+        UUID uniqueID = player.getUniqueID();
+        if (uniqueID != null) {
+            Optional<T> value = getPlayerDataCache(uniqueID).getValue(key);
+            if (!value.isPresent()) {
+                ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueID);
+                if (proxiedPlayer != null) {
+                    try {
+                        ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        ObjectOutputStream out = new ObjectOutputStream(os);
+                        out.writeUTF(Constants.subchannelRequestPlayerVariable);
+                        out.writeObject(key);
+                        out.close();
+                        Optional.ofNullable(proxiedPlayer.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
+                    } catch (IOException ex) {
+                        plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+                    }
                 }
             }
+            return value;
         }
-        return value;
+        return Optional.empty();
     }
 
     private void requestReset(ProxiedPlayer player) {
