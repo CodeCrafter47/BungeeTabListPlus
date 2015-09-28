@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
+import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
@@ -100,7 +101,7 @@ class ResendThread implements Runnable {
             tablistHandler.sendTablist(tabList);
         } catch (Throwable th) {
             try {
-                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Error while updating tablist", th);
+                BungeeTabListPlus.getInstance().getLogger().log(th instanceof LayoutException ? Level.WARNING : Level.SEVERE, "Error while updating tablist", th);
                 TabList tabList;
                 if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {
                     tabList = new GenericTabList(20, 4);
