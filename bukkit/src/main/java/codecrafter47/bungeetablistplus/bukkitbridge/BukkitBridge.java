@@ -49,7 +49,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -257,11 +260,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         apiLock.writeLock().lock();
         try {
             Preconditions.checkArgument(variablesByName.remove(variable.getName(), variable), "variable not registered");
-            for (Iterator<Variable> iterator = variablesByPlugin.values().iterator(); iterator.hasNext(); ) {
-                if (iterator.next().equals(variable)) {
-                    iterator.remove();
-                }
-            }
+            variablesByPlugin.values().remove(variable);
         } finally {
             apiLock.writeLock().unlock();
         }
