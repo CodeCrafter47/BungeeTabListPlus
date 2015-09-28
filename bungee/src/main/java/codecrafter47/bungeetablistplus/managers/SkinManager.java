@@ -30,6 +30,7 @@ import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -96,7 +97,7 @@ public class SkinManager {
             }
             return null;
         } catch (Throwable e) {
-            if (e instanceof ConnectException || e instanceof UnknownHostException) {
+            if (e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SSLHandshakeException) {
                 // generic connection error, retry in 30 seconds
                 plugin.getLogger().warning("An error occurred while connecting to mojang servers: " + e.getMessage() + ". Will retry in 30 Seconds");
                 plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
