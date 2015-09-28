@@ -6,7 +6,7 @@
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>BungeeTabListPlus-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.2</version>
+    <version>2.2.3-SNAPSHOT</version>
     <modules>
         <module>bungee</module>
         <module>bukkit</module>
@@ -27,7 +27,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/CodeCrafter47/BungeeTabListPlus</developerConnection>
-        <tag>2.2.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
