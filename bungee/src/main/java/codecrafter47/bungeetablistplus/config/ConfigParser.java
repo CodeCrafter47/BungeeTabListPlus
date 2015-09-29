@@ -175,7 +175,7 @@ public class ConfigParser {
                         cs = new ColumnSplitSection();
                         sections.add(cs);
                     }
-                    cs.addCollumn(column[0], new PlayerColumn(filter, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                    cs.addColumn(column[0], new PlayerColumn(filter, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
                 }
             } else if (fillbukkitplayersMatcher.matches()) {
                 SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));

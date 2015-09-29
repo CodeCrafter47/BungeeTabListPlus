@@ -64,8 +64,8 @@ public class ColumnSplitSection extends Section {
         return (proposedSize / ConfigManager.getCols()) * ConfigManager.getCols();
     }
 
-    public void addCollumn(int i, PlayerColumn collumn) {
-        pc[i] = collumn;
+    public void addColumn(int i, PlayerColumn column) {
+        pc[i] = column;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ColumnSplitSection extends Section {
             pre--;
             span += pre;
             columnPos = columnPos * span + pre;
-            playerColumn.getSlotAt(context, columnPos, sizePerCol * span);
+            return playerColumn.getSlotAt(context, columnPos, sizePerCol * span);
         }
         return null;
     }
