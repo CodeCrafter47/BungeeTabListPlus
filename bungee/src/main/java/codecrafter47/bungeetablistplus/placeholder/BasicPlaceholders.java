@@ -61,9 +61,9 @@ public class BasicPlaceholders extends PlaceholderProvider {
         });
         bind("rawname").to(context -> context.getPlayer().getName());
         bind("server").to(context -> context.getServerGroup().map(ServerGroup::getName).orElse(""));
-        bind("permprefix").alias("prefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context.getPlayer()));
+        bind("permprefix").alias("prefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context));
         bind("prefixColor").to(context -> {
-            String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context.getPlayer());
+            String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context);
             if (prefix.length() < 2) {
                 return "";
             }

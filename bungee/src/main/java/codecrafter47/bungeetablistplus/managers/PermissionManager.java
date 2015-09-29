@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
@@ -168,7 +169,8 @@ public class PermissionManager {
         return 0;
     }
 
-    public String getPrefix(IPlayer player) {
+    public String getPrefix(TabListContext context) {
+        IPlayer player = context.getPlayer();
         // BungeePerms
         String bpprefix = null;
         Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
@@ -198,6 +200,9 @@ public class PermissionManager {
 
         String bprefix = plugin.getConfigManager().getMainConfig().prefixes.get(
                 getMainGroup(player));
+        if (bprefix != null) {
+            bprefix = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(bprefix).buildSlot(context).getText();
+        }
 
         Optional<String> vprefix = plugin.getBridge().get(player, DataKeys.Vault_Prefix);
 
