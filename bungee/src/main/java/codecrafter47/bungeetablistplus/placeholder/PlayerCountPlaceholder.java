@@ -28,7 +28,7 @@ public class PlayerCountPlaceholder extends PlaceholderProvider {
     @Override
     public void setup() {
         bind("server_player_count").to(context -> String.format("%d", context.getServerGroup().map(group -> context.getPlayerManager().getPlayerCount(group.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3)).orElse(0)));
-        bind("player_count").alias("gcout").to(context -> String.format("%d", context.getPlayerManager().getGlobalPlayerCount(context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3)));
+        bind("player_count").alias("gcount").to(context -> String.format("%d", context.getPlayerManager().getGlobalPlayerCount(context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3)));
         bind("players").alias("rplayers").withArgs().to((context, args) -> {
             if (args == null) {
                 return Integer.toString(context.getPlayerManager().getGlobalPlayerCount(context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3));
