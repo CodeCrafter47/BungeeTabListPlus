@@ -62,14 +62,16 @@ public class ConfigParser {
     }
 
     public IConfigTabListProvider parse(TabListConfig config) {
-        List<SlotTemplate> playerLines = config.playerLines.stream().map(this::parseSlot).collect(Collectors.toList());
-        List<SlotTemplate> morePlayerLines = config.morePlayersLines.stream().map(this::parseSlot).collect(Collectors.toList());
+        List<SlotTemplate> playerLines = config.playerLines.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList());
+        List<SlotTemplate> morePlayerLines = config.morePlayersLines.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList());
 
 
         List<Function<TabListContext, List<Section>>> topSectionProviders = new ArrayList<>();
         List<Function<TabListContext, List<Section>>> botSectionProviders = new ArrayList<>();
         final boolean[] bottom = {false};
         for (String line : config.tabList) {
+            if (line == null) continue;
+
             // Its properties
             final int[] startColumn = {-1};
             final int[] column = {-1};
@@ -202,8 +204,8 @@ public class ConfigParser {
             plugin.requireUpdateInterval(config.footerCycleInterval);
         }
 
-        SlotTemplate header = SlotTemplate.animate(config.header.stream().map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
-        SlotTemplate footer = SlotTemplate.animate(config.footer.stream().map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
+        SlotTemplate header = SlotTemplate.animate(config.header.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
+        SlotTemplate footer = SlotTemplate.animate(config.footer.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
 
         return new ConfigTabListProvider(topSectionProviders, plugin, config, config.shownFooterHeader, botSectionProviders, header, footer);
     }
@@ -237,6 +239,8 @@ public class ConfigParser {
 
         List<Function<ServerGroup, Section>> sections = new ArrayList<>();
         for (String line : config.groupLines) {
+            if (line == null) continue;
+
             // Its properties
             final int[] startColumn = {-1};
             final List<String> sortrules = new ArrayList<>();
