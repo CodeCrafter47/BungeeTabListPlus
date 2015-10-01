@@ -30,15 +30,12 @@ import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import javax.net.ssl.SSLHandshakeException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -98,16 +95,7 @@ public class SkinManager {
             }
             return null;
         } catch (Throwable e) {
-            if (e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SSLHandshakeException) {
-                // generic connection error, retry in 30 seconds
-                plugin.getLogger().warning("An error occurred while connecting to mojang servers: " + e.getMessage() + ". Will retry in 30 Seconds");
-                plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        fetchingSkins.remove(player);
-                    }
-                }, 30, TimeUnit.SECONDS);
-            } else if (e instanceof IOException && e.getMessage().contains("429")) {
+            if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
                 plugin.getLogger().warning("Hit mojang rate limits while fetching uuid for " + player + ".");
                 String headerField = connection.getHeaderField("Retry-After");
@@ -118,7 +106,14 @@ public class SkinManager {
                     }
                 }, headerField == null ? 300 : Integer.valueOf(headerField), TimeUnit.SECONDS);
             } else {
-                BungeeTabListPlus.getInstance().reportError(e);
+                // generic connection error, retry in 30 seconds
+                plugin.getLogger().warning("An error occurred while connecting to mojang servers: " + e.getMessage() + ". Will retry in 30 Seconds");
+                plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        fetchingSkins.remove(player);
+                    }
+                }, 30, TimeUnit.SECONDS);
             }
         }
         return null;
