@@ -54,7 +54,7 @@ public class PermissionManager {
             try {
                 PermissionsManager pm = bp.getPermissionsManager();
                 if (pm != null) {
-                    User user = pm.getUser(player.getName());
+                    User user = pm.getUser(player.getUniqueID());
                     Group mainGroup = null;
                     if (user != null) {
                         mainGroup = pm.getMainGroup(user);
@@ -127,8 +127,8 @@ public class PermissionManager {
             try {
                 PermissionsManager pm = bp.getPermissionsManager();
                 if (pm != null) {
-                    User u1 = pm.getUser(p1.getName());
-                    User u2 = pm.getUser(p2.getName());
+                    User u1 = pm.getUser(p1.getUniqueID());
+                    User u2 = pm.getUser(p2.getUniqueID());
                     if (u1 != null && u2 != null) {
                         Group g1 = pm.getMainGroup(u1);
                         Group g2 = pm.getMainGroup(u2);
@@ -179,7 +179,7 @@ public class PermissionManager {
             try {
                 PermissionsManager pm = bp.getPermissionsManager();
                 if (pm != null) {
-                    User user = pm.getUser(player.getName());
+                    User user = pm.getUser(player.getUniqueID());
                     if (user != null) {
                         if (isBungeePerms3()) {
                             bpprefix = user.buildPrefix();
@@ -236,7 +236,7 @@ public class PermissionManager {
             try {
                 PermissionsManager pm = bp.getPermissionsManager();
                 if (pm != null) {
-                    User user = pm.getUser(player.getName());
+                    User user = pm.getUser(player.getUniqueID());
                     if (user != null) {
                         if (isBungeePerms3()) {
                             display = user.getDisplay();
@@ -277,7 +277,7 @@ public class PermissionManager {
             try {
                 PermissionsManager pm = bp.getPermissionsManager();
                 if (pm != null) {
-                    User user = pm.getUser(player.getName());
+                    User user = pm.getUser(player.getUniqueID());
                     if (user != null) {
                         if (isBungeePerms3()) {
                             suffix = user.buildSuffix();
@@ -317,6 +317,27 @@ public class PermissionManager {
     }
 
     public boolean hasPermission(CommandSender sender, String permission) {
+        // This speeds up permission lookups with BungeePerms
+        if (sender instanceof ProxiedPlayer) {
+            Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+            if (p != null) {
+                BungeePerms bp = BungeePerms.getInstance();
+                try {
+                    PermissionsManager pm = bp.getPermissionsManager();
+                    if (pm != null) {
+                        User user = pm.getUser(((ProxiedPlayer) sender).getUniqueId());
+                        if (user != null) {
+                            return user.hasPerm(permission);
+                        }
+                    }
+                } catch (NullPointerException ex) {
+                    BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occurred while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
+                } catch (Throwable th) {
+                    BungeeTabListPlus.getInstance().reportError(th);
+                }
+            }
+        }
+
         if (sender.hasPermission(permission)) {
             return true;
         }
