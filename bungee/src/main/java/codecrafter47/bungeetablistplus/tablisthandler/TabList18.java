@@ -32,6 +32,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class TabList18 implements TabListHandler {
@@ -57,6 +58,9 @@ public class TabList18 implements TabListHandler {
     private final PacketAccess packetAccess = BungeeTabListPlus.getInstance().getPacketAccess();
 
     private final PlayerTablistHandler playerTablistHandler;
+
+    private String sentHeader = null;
+    private String sendFooter = null;
 
     public TabList18(PlayerTablistHandler playerTablistHandler) {
         this.playerTablistHandler = playerTablistHandler;
@@ -107,23 +111,27 @@ public class TabList18 implements TabListHandler {
         // update header/footer
         if (packetAccess.isTabHeaderFooterSupported()) {
             String header = tabList.getHeader();
-            if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
-                header = header.substring(0, header.length() - 1);
-            }
-            if (header != null) {
-                header = ChatColor.translateAlternateColorCodes('&', header);
-            }
             String footer = tabList.getFooter();
-            if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
-                footer = footer.substring(0, footer.length() - 1);
-            }
-            if (footer != null) {
-                footer = ChatColor.translateAlternateColorCodes('&', footer);
-            }
-            if (header != null || footer != null) {
-                String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
-                String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
-                packetAccess.setTabHeaderAndFooter(playerTablistHandler.getPlayer().unsafe(), headerJson, footerJson);
+            if (!Objects.equals(header, sentHeader) && !Objects.equals(footer, sendFooter)) {
+                sentHeader = header;
+                sendFooter = footer;
+                if (header != null || footer != null) {
+                    if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
+                        header = header.substring(0, header.length() - 1);
+                    }
+                    if (header != null) {
+                        header = ChatColor.translateAlternateColorCodes('&', header);
+                    }
+                    if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
+                        footer = footer.substring(0, footer.length() - 1);
+                    }
+                    if (footer != null) {
+                        footer = ChatColor.translateAlternateColorCodes('&', footer);
+                    }
+                    String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
+                    String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
+                    packetAccess.setTabHeaderAndFooter(playerTablistHandler.getPlayer().unsafe(), headerJson, footerJson);
+                }
             }
         }
     }

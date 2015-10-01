@@ -26,6 +26,7 @@ import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Sets;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -49,6 +50,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     final Collection<String> usernames = new HashSet<>();
     final Map<UUID, String> uuids = new HashMap<>();
+    final Set<UUID> requiresUpdate = Sets.newConcurrentHashSet();
     private final Map<String, FakePlayer> bukkitplayers = new ConcurrentHashMap<>();
     private final Multimap<String, String> teamToPlayerMap = MultimapBuilder.hashKeys().arrayListValues().build();
     private final ReentrantLock teamLock = new ReentrantLock();
@@ -197,6 +199,12 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                 if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
                     // Pass the Packet to the client
                     player.unsafe().sendPacket(pli);
+                    for (PlayerListItem.Item item : pli.getItems()) {
+                        if (item.getUuid() != null) {
+                            requiresUpdate.add(item.getUuid());
+                        }
+                    }
+
                     // update list on the client
                     BungeeTabListPlus.getInstance().updateTabListForPlayer(player);
                 }
@@ -312,6 +320,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
             }
         }
         tabListHandler.sendTabList(tabList);
+        requiresUpdate.clear();
     }
 
     @Override

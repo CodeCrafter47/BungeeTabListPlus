@@ -64,6 +64,9 @@ public class TabList18v3 implements TabListHandler {
 
     private final CustomTabList18 playerTabListHandler;
 
+    private String sentHeader = null;
+    private String sendFooter = null;
+
     public TabList18v3(CustomTabList18 playerTabListHandler) {
         this.playerTabListHandler = playerTabListHandler;
     }
@@ -187,23 +190,27 @@ public class TabList18v3 implements TabListHandler {
             // update header/footer
             if (packetAccess.isTabHeaderFooterSupported()) {
                 String header = tabList.getHeader();
-                if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
-                    header = header.substring(0, header.length() - 1);
-                }
-                if (header != null) {
-                    header = ChatColor.translateAlternateColorCodes('&', header);
-                }
                 String footer = tabList.getFooter();
-                if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
-                    footer = footer.substring(0, footer.length() - 1);
-                }
-                if (footer != null) {
-                    footer = ChatColor.translateAlternateColorCodes('&', footer);
-                }
-                if (header != null || footer != null) {
-                    String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
-                    String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
-                    packetAccess.setTabHeaderAndFooter(playerTabListHandler.getPlayer().unsafe(), headerJson, footerJson);
+                if (!Objects.equals(header, sentHeader) && !Objects.equals(footer, sendFooter)) {
+                    sentHeader = header;
+                    sendFooter = footer;
+                    if (header != null || footer != null) {
+                        if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
+                            header = header.substring(0, header.length() - 1);
+                        }
+                        if (header != null) {
+                            header = ChatColor.translateAlternateColorCodes('&', header);
+                        }
+                        if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
+                            footer = footer.substring(0, footer.length() - 1);
+                        }
+                        if (footer != null) {
+                            footer = ChatColor.translateAlternateColorCodes('&', footer);
+                        }
+                        String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
+                        String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
+                        packetAccess.setTabHeaderAndFooter(playerTabListHandler.getPlayer().unsafe(), headerJson, footerJson);
+                    }
                 }
             }
         }
@@ -267,7 +274,7 @@ public class TabList18v3 implements TabListHandler {
 
         // update name
         String old = send.get(offlineId);
-        if (textureUpdate || old == null || !old.equals(text) || playerTabListHandler.uuids.containsKey(offlineId)) {
+        if (textureUpdate || old == null || !old.equals(text) || playerTabListHandler.requiresUpdate.contains(offlineId)) {
             send.put(offlineId, text);
             packetAccess.updateDisplayName(playerTabListHandler.getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
