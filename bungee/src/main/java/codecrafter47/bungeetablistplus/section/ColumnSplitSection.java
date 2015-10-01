@@ -72,7 +72,7 @@ public class ColumnSplitSection extends Section {
     public Slot getSlotAt(TabListContext context, int pos, int size) {
         int column = pos % context.getColumns();
         int sizePerCol = size / ConfigManager.getCols();
-        int columnPos = (pos + ConfigManager.getCols() - 1) / ConfigManager.getCols();
+        int columnPos = pos / ConfigManager.getCols();
         PlayerColumn playerColumn = pc[column];
         if (playerColumn != null) {
             int span = 1;
