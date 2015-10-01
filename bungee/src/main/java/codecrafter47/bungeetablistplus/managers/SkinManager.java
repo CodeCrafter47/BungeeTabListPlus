@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public class SkinManager {
@@ -138,15 +139,12 @@ public class SkinManager {
                         get(0).signature});
             }
         } catch (Throwable e) {
-            if (e instanceof ConnectException || e instanceof UnknownHostException) {
-                // generic connection error
-                plugin.getLogger().warning("An error occurred while connecting to mojang servers(" + e.getMessage() + "). Couldn't fetch skin for " + uuid + ". Will retry in 5 minutes.");
-            } else if (e instanceof IOException && e.getMessage().contains("429")) {
+            if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
                 plugin.getLogger().info("Hit mojang rate limits while fetching skin for " + uuid + ". Will retry in 5 minutes. (This is not an error)");
             } else {
-                // this will spam some users logs, but we can ignore more exceptions later
-                BungeeTabListPlus.getInstance().reportError(new Exception("Unable to resolve skin for " + uuid, e));
+                // generic connection error
+                plugin.getLogger().log(Level.WARNING, "An error occurred while connecting to mojang servers. Couldn't fetch skin for " + uuid + ". Will retry in 5 minutes.", e);
             }
         }
         return null;
