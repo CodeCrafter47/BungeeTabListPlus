@@ -36,9 +36,14 @@ import java.util.UUID;
 
 public class TabList18 implements TabListHandler {
 
-    private static String getSlotID(int n) {
-        String s = Integer.toString(n + 1000);
-        return " ?tab" + s;
+    private static final String[] fakePlayerUsernames = new String[80];
+    private static final UUID[] fakePlayerUUIDs = new UUID[80];
+
+    {
+        for (int i = 0; i < 80; i++) {
+            fakePlayerUsernames[i] = " §" + (char) (970 + i) + " ?tab";
+            fakePlayerUUIDs[i] = UUID.nameUUIDFromBytes(("OfflinePlayer:" + fakePlayerUsernames[i]).getBytes(Charsets.UTF_8));
+        }
     }
 
     private final int[] slots_ping = new int[80];
@@ -141,7 +146,7 @@ public class TabList18 implements TabListHandler {
     }
 
     private void removeSlot(int i) {
-        UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
+        UUID uuid = fakePlayerUUIDs[i];
         packetAccess.removePlayer(playerTablistHandler.getPlayer().unsafe(), uuid);
     }
 
@@ -153,7 +158,7 @@ public class TabList18 implements TabListHandler {
         }
         if ((sendTextures[row] == null && textures != null) || (sendTextures[row] != null && textures == null) || (textures != null && sendTextures[row] != null && !textures[0].equals(sendTextures[row]))) {
             // update texture
-            UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
+            UUID offlineId = fakePlayerUUIDs[row];
             String[][] properties;
             if (textures != null) {
                 properties = new String[][]{{"textures", textures[0], textures[1]}};
@@ -162,7 +167,7 @@ public class TabList18 implements TabListHandler {
                 properties = new String[0][0];
                 sendTextures[row] = null;
             }
-            packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, getSlotID(row), 0, ping, properties);
+            packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, fakePlayerUsernames[row], 0, ping, properties);
             textureUpdate = true;
             slots_ping[row] = ping;
         }
@@ -170,7 +175,7 @@ public class TabList18 implements TabListHandler {
         // update ping
         if (ping != slots_ping[row]) {
             slots_ping[row] = ping;
-            UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
+            UUID offlineId = fakePlayerUUIDs[row];
             packetAccess.updatePing(playerTablistHandler.getPlayer().unsafe(), offlineId, ping);
         }
 
@@ -178,14 +183,14 @@ public class TabList18 implements TabListHandler {
         String old = send[row];
         if (old == null || !old.equals(text) || textureUpdate) {
             send[row] = text;
-            UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
+            UUID offlineId = fakePlayerUUIDs[row];
             packetAccess.updateDisplayName(playerTablistHandler.getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
     }
 
     private void createSlot(int row) {
-        UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-        packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
+        UUID offlineId = fakePlayerUUIDs[row];
+        packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, fakePlayerUsernames[row], 0, 0, new String[0][0]);
         send[row] = null;
         slots_ping[row] = 0;
         sendTextures[row] = null;

@@ -38,12 +38,14 @@ import java.util.logging.Level;
 
 public class TabList18v3 implements TabListHandler {
 
-    private static String getSlotID(int n) {
-        return getSlotPrefix(n) + " ?tab";
-    }
+    private static final String[] fakePlayerUsernames = new String[80];
+    private static final UUID[] fakePlayerUUIDs = new UUID[80];
 
-    private static String getSlotPrefix(int n) {
-        return " §" + (char) (970 + n);
+    {
+        for (int i = 0; i < 80; i++) {
+            fakePlayerUsernames[i] = " §" + (char) (970 + i) + " ?tab";
+            fakePlayerUUIDs[i] = UUID.nameUUIDFromBytes(("OfflinePlayer:" + fakePlayerUsernames[i]).getBytes(Charsets.UTF_8));
+        }
     }
 
     private final Map<UUID, Integer> sendPing = new HashMap<>();
@@ -108,9 +110,9 @@ public class TabList18v3 implements TabListHandler {
 
             List<UUID> fakeUUIDs = new ArrayList<>();
             for (int i = 0; i < numFakePlayers; i++) {
-                UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
+                UUID uuid = fakePlayerUUIDs[i];
                 fakeUUIDs.add(uuid);
-                sendUsernames.put(uuid, getSlotID(i));
+                sendUsernames.put(uuid, fakePlayerUsernames[i]);
             }
 
             for (int i = 0; i < tab_size; i++) {
@@ -170,12 +172,12 @@ public class TabList18v3 implements TabListHandler {
                 String oldPlayer = sendTeam.get(i);
                 if (oldPlayer != null) {
                     if (!oldPlayer.equals(sendUsernames.get(uuid))) {
-                        packetAccess.removePlayerFromTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(i), oldPlayer);
-                        packetAccess.addPlayerToTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
+                        packetAccess.removePlayerFromTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[i], oldPlayer);
+                        packetAccess.addPlayerToTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[i], sendUsernames.get(uuid));
                         sendTeam.put(i, sendUsernames.get(uuid));
                     }
                 } else {
-                    packetAccess.createTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(i), sendUsernames.get(uuid));
+                    packetAccess.createTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[i], sendUsernames.get(uuid));
                     sendTeam.put(i, sendUsernames.get(uuid));
                 }
 
@@ -225,7 +227,7 @@ public class TabList18v3 implements TabListHandler {
     }
 
     private void removeSlot(int i) {
-        UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(i)).getBytes(Charsets.UTF_8));
+        UUID offlineId = fakePlayerUUIDs[i];
         packetAccess.removePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId);
         send.remove(offlineId);
         sendTextures.remove(offlineId);
@@ -272,8 +274,8 @@ public class TabList18v3 implements TabListHandler {
     }
 
     private void createSlot(int row) {
-        UUID offlineId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + getSlotID(row)).getBytes(Charsets.UTF_8));
-        packetAccess.createOrUpdatePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId, getSlotID(row), 0, 0, new String[0][0]);
+        UUID offlineId = fakePlayerUUIDs[row];
+        packetAccess.createOrUpdatePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId, fakePlayerUsernames[row], 0, 0, new String[0][0]);
         sendPing.put(offlineId, 0);
         send.put(offlineId, null);
     }
@@ -282,7 +284,7 @@ public class TabList18v3 implements TabListHandler {
     public void unload() {
         resize(0);
         sendTeam.forEachKey(value -> {
-            packetAccess.removeTeam(playerTabListHandler.getPlayer().unsafe(), getSlotID(value));
+            packetAccess.removeTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[value]);
             return true;
         });
         sendTeam.clear();
