@@ -78,16 +78,18 @@ public class ErrorTabListProvider implements IConfigTabListProvider {
             pos += 1;
         }
 
-        StringWriter stringWriter = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(stringWriter));
-        BufferedReader reader = new BufferedReader(new StringReader(stringWriter.toString()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            int lineStart = pos = ((pos + tabList.getColumns() - 1) / tabList.getColumns()) * tabList.getColumns();
-            while ((pos - lineStart) * partLength < line.length() && pos < tabList.getSize()) {
-                int endIndex = (pos - lineStart) * partLength + partLength;
-                tabList.setSlot(pos, new Slot(line.substring((pos - lineStart) * partLength, endIndex > line.length() ? line.length() : endIndex), -1, SkinManager.defaultSkin));
-                pos += 1;
+        if (throwable != null) {
+            StringWriter stringWriter = new StringWriter();
+            throwable.printStackTrace(new PrintWriter(stringWriter));
+            BufferedReader reader = new BufferedReader(new StringReader(stringWriter.toString()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                int lineStart = pos = ((pos + tabList.getColumns() - 1) / tabList.getColumns()) * tabList.getColumns();
+                while ((pos - lineStart) * partLength < line.length() && pos < tabList.getSize()) {
+                    int endIndex = (pos - lineStart) * partLength + partLength;
+                    tabList.setSlot(pos, new Slot(line.substring((pos - lineStart) * partLength, endIndex > line.length() ? line.length() : endIndex), -1, SkinManager.defaultSkin));
+                    pos += 1;
+                }
             }
         }
     }
