@@ -31,7 +31,6 @@ public interface PlayerManager {
      * gets a list of players
      * Does not include hidden players
      *
-     * @param includeSpectators whether players in spectator mode should be included
      * @param filter            names of servers or permission groups, if provided only players on these
      *                          servers/ in these permission groups will be shown in the tab list
      * @return the resulting list of players
@@ -42,7 +41,6 @@ public interface PlayerManager {
      * The number of players on a server
      * Does not count hidden players
      *
-     * @param includeSpectators whether players in spectator mode should be included
      * @param server            the name of the server
      * @return the number of players on the given server
      */
@@ -52,7 +50,6 @@ public interface PlayerManager {
      * The number of players on the network
      * Does not count hidden players
      *
-     * @param includeSpectators whether players in spectator mode should be included
      * @return the number of players on the given server
      */
     int getGlobalPlayerCount();
@@ -61,7 +58,6 @@ public interface PlayerManager {
      * Counts players
      * Does not count hidden players
      *
-     * @param includeSpectators whether players in spectator mode should be included
      * @param filter            names of servers or permission groups, if provided only players on these
      *                          servers/ in these permission groups will be shown in the tab list
      * @return the number of players on the given server
