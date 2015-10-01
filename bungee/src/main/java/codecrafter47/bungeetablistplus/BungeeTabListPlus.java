@@ -86,6 +86,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private final Plugin plugin;
     private Collection<IPlayerProvider> playerProviders;
     private ResendThread resendThread;
+    private static Field tabListHandlerField;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -210,6 +211,14 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             isAbove995 = true;
         } catch (ClassNotFoundException ex) {
             isAbove995 = false;
+        }
+
+        try {
+            tabListHandlerField = UserConnection.class.getDeclaredField(isVersion18() ? "tabListHandler" : "tabList");
+        } catch (NoSuchFieldException e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to access tabListHandler field", e);
+            plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
+            plugin.getLogger().warning("Disabling Plugin");
         }
 
         legacyPacketAccess = new LegacyPacketAccessImpl();
@@ -591,24 +600,14 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return is18;
     }
 
-    public static Object getTabList(ProxiedPlayer player) throws
-            IllegalArgumentException, IllegalAccessException,
-            NoSuchFieldException {
-        Class cplayer = UserConnection.class;
-        Field tabListHandler = cplayer.getDeclaredField(
-                isVersion18() ? "tabListHandler" : "tabList");
-        tabListHandler.setAccessible(true);
-        return tabListHandler.get(player);
+    public static Object getTabList(ProxiedPlayer player) throws IllegalAccessException {
+        tabListHandlerField.setAccessible(true);
+        return tabListHandlerField.get(player);
     }
 
-    public static void setTabList(ProxiedPlayer player, Object tabList) throws
-            IllegalArgumentException, IllegalAccessException,
-            NoSuchFieldException {
-        Class cplayer = UserConnection.class;
-        Field tabListHandler = cplayer.getDeclaredField(
-                isVersion18() ? "tabListHandler" : "tabList");
-        tabListHandler.setAccessible(true);
-        tabListHandler.set(player, tabList);
+    public static void setTabList(ProxiedPlayer player, Object tabList) throws IllegalAccessException {
+        tabListHandlerField.setAccessible(true);
+        tabListHandlerField.set(player, tabList);
     }
 
     public static boolean isAbove995() {
