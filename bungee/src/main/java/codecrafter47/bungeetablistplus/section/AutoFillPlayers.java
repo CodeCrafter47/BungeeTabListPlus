@@ -18,7 +18,6 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 
@@ -44,8 +43,8 @@ public class AutoFillPlayers implements Function<TabListContext, List<Section>> 
     public List<Section> apply(TabListContext context) {
         // sort groups, most populated first
         Collections.sort(groups, (s1, s2) -> {
-            int p1 = context.getPlayerManager().getPlayerCount(s1.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
-            int p2 = context.getPlayerManager().getPlayerCount(s2.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+            int p1 = context.getPlayerManager().getPlayerCount(s1.getServerNames());
+            int p2 = context.getPlayerManager().getPlayerCount(s2.getServerNames());
             if (p1 < p2) {
                 return 1;
             }
@@ -57,7 +56,7 @@ public class AutoFillPlayers implements Function<TabListContext, List<Section>> 
 
         List<Section> sections = new ArrayList<>();
         for (ServerGroup serverGroup : groups) {
-            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(serverGroup.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3) > 0) {
+            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(serverGroup.getServerNames()) > 0) {
                 sections.addAll(this.sections.stream().map(section -> section.apply(serverGroup)).collect(Collectors.toList()));
             }
         }

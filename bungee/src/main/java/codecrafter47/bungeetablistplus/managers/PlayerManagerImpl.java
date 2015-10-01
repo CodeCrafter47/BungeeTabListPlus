@@ -37,16 +37,19 @@ import java.util.Optional;
 public class PlayerManagerImpl implements PlayerManager {
 
     private final BungeeTabListPlus plugin;
-
+    private final ProxiedPlayer viewer;
     private final Collection<IPlayer> players;
+    private final boolean includeSpectators;
 
-    public PlayerManagerImpl(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders) {
+    public PlayerManagerImpl(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders, ProxiedPlayer viewer) {
         this.plugin = plugin;
+        this.viewer = viewer;
         this.players = ImmutableList.copyOf(Iterables.concat(Collections2.transform(playerProviders, IPlayerProvider::getPlayers)));
+        includeSpectators = plugin.getConfigManager().getMainConfig().showPlayersInGamemode3;
     }
 
     @Override
-    public List<IPlayer> getPlayers(Collection<String> filter, ProxiedPlayer who, boolean includeSpectators) {
+    public List<IPlayer> getPlayers(Collection<String> filter) {
         List<IPlayer> list = new ArrayList<>();
         for (IPlayer p : players) {
             boolean areGroupRules = false;
@@ -61,9 +64,9 @@ public class PlayerManagerImpl implements PlayerManager {
                     Optional<ServerInfo> server = p.getServer();
                     if (rule.equalsIgnoreCase("currentserver")) {
                         areServerRules = true;
-                        if (server.isPresent() && who.getServer() != null) {
+                        if (server.isPresent() && viewer.getServer() != null) {
                             if (server.get().getName().equalsIgnoreCase(
-                                    who.getServer().getInfo().getName())) {
+                                    viewer.getServer().getInfo().getName())) {
                                 fitServerRules = true;
                             }
                         }
@@ -97,7 +100,7 @@ public class PlayerManagerImpl implements PlayerManager {
                 }
             }
             if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.
-                    isHidden(p, who) && (includeSpectators || p.getGameMode() != 3)) {
+                    isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
                 list.add(p);
             }
         }
@@ -105,7 +108,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSpectators) {
+    public int getServerPlayerCount(String server) {
         int num = 0;
         for (IPlayer p : players) {
             Optional<ServerInfo> s = p.getServer();
@@ -120,7 +123,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSpectators) {
+    public int getGlobalPlayerCount() {
         int num = 0;
         for (IPlayer p : players) {
             if (!BungeeTabListPlus.isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
@@ -131,7 +134,7 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public int getPlayerCount(Collection<String> filter, ProxiedPlayer player, boolean includeSpectators) {
-        return this.getPlayers(filter, player, includeSpectators).size();
+    public int getPlayerCount(Collection<String> filter) {
+        return this.getPlayers(filter).size();
     }
 }

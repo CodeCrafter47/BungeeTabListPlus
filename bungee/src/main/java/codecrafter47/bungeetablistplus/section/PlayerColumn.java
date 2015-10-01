@@ -18,7 +18,6 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
@@ -50,7 +49,7 @@ public class PlayerColumn {
     }
 
     public void precalculate(TabListContext context) {
-        this.players = context.getPlayerManager().getPlayers(filter, context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+        this.players = context.getPlayerManager().getPlayers(filter);
         sorter.sort(context, players);
     }
 

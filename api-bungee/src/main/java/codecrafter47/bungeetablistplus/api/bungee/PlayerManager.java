@@ -19,8 +19,6 @@
 
 package codecrafter47.bungeetablistplus.api.bungee;
 
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -33,44 +31,40 @@ public interface PlayerManager {
      * gets a list of players
      * Does not include hidden players
      *
+     * @param includeSpectators whether players in spectator mode should be included
      * @param filter            names of servers or permission groups, if provided only players on these
      *                          servers/ in these permission groups will be shown in the tab list
-     * @param who               the player who will see the tablist
-     * @param includeSpectators whether players in spectator mode should be included
      * @return the resulting list of players
      */
-    List<IPlayer> getPlayers(Collection<String> filter, ProxiedPlayer who, boolean includeSpectators);
+    List<IPlayer> getPlayers(Collection<String> filter);
 
     /**
      * The number of players on a server
      * Does not count hidden players
      *
-     * @param server            the name of the server
-     * @param viewer            the player who will see that tablist
      * @param includeSpectators whether players in spectator mode should be included
+     * @param server            the name of the server
      * @return the number of players on the given server
      */
-    int getServerPlayerCount(String server, ProxiedPlayer viewer, boolean includeSpectators);
+    int getServerPlayerCount(String server);
 
     /**
      * The number of players on the network
      * Does not count hidden players
      *
-     * @param viewer            the player who will see that tablist
      * @param includeSpectators whether players in spectator mode should be included
      * @return the number of players on the given server
      */
-    int getGlobalPlayerCount(ProxiedPlayer viewer, boolean includeSpectators);
+    int getGlobalPlayerCount();
 
     /**
      * Counts players
      * Does not count hidden players
      *
+     * @param includeSpectators whether players in spectator mode should be included
      * @param filter            names of servers or permission groups, if provided only players on these
      *                          servers/ in these permission groups will be shown in the tab list
-     * @param viewer            the player who will see that tablist
-     * @param includeSpectators whether players in spectator mode should be included
      * @return the number of players on the given server
      */
-    int getPlayerCount(Collection<String> filter, ProxiedPlayer viewer, boolean includeSpectators);
+    int getPlayerCount(Collection<String> filter);
 }

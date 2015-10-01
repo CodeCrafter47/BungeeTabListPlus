@@ -19,7 +19,6 @@
 
 package codecrafter47.bungeetablistplus.placeholder;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 
 import java.util.Arrays;
@@ -27,13 +26,13 @@ import java.util.Arrays;
 public class PlayerCountPlaceholder extends PlaceholderProvider {
     @Override
     public void setup() {
-        bind("server_player_count").to(context -> String.format("%d", context.getServerGroup().map(group -> context.getPlayerManager().getPlayerCount(group.getServerNames(), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3)).orElse(0)));
-        bind("player_count").alias("gcount").to(context -> String.format("%d", context.getPlayerManager().getGlobalPlayerCount(context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3)));
+        bind("server_player_count").to(context -> String.format("%d", context.getServerGroup().map(group -> context.getPlayerManager().getPlayerCount(group.getServerNames())).orElse(0)));
+        bind("player_count").alias("gcount").to(context -> String.format("%d", context.getPlayerManager().getGlobalPlayerCount()));
         bind("players").alias("rplayers").withArgs().to((context, args) -> {
             if (args == null) {
-                return Integer.toString(context.getPlayerManager().getGlobalPlayerCount(context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3));
+                return Integer.toString(context.getPlayerManager().getGlobalPlayerCount());
             } else
-                return Integer.toString(context.getPlayerManager().getPlayerCount(Arrays.asList(args.split(",|\\+")), context.getViewer(), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3));
+                return Integer.toString(context.getPlayerManager().getPlayerCount(Arrays.asList(args.split(",|\\+"))));
         });
     }
 }

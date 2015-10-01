@@ -451,8 +451,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      *
      * @return an instance of the PlayerManager or null
      */
-    public PlayerManager constructPlayerManager() {
-        return new PlayerManagerImpl(this, playerProviders);
+    public PlayerManager constructPlayerManager(ProxiedPlayer viewer) {
+        return new PlayerManagerImpl(this, playerProviders, viewer);
     }
 
     public SkinManager getSkinManager() {

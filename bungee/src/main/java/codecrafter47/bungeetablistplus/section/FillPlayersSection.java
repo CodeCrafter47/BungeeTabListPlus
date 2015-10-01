@@ -18,7 +18,6 @@
  */
 package codecrafter47.bungeetablistplus.section;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
@@ -64,7 +63,7 @@ public class FillPlayersSection extends Section {
 
     protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
         return context.getPlayerManager().getPlayers(
-                filter, player, BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().showPlayersInGamemode3);
+                filter);
     }
 
     @Override
