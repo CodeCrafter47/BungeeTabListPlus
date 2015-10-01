@@ -82,6 +82,7 @@ public class TabList18v3 implements TabListHandler {
                 tab_size = tabList.getUsedSlots();
                 if (tab_size < playerTabListHandler.uuids.size()) {
                     tab_size = playerTabListHandler.uuids.size();
+                    tab_size = tab_size > 80 ? 80 : tab_size;
                 }
             }
 
