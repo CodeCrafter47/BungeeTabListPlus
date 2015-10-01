@@ -92,18 +92,20 @@ public final class PlaceholderManagerImpl implements PlaceholderManager {
 
     @SneakyThrows
     private void update() {
-        placeholders.clear();
-        for (PlaceholderProvider placeholderProvider : placeholderProviderList) {
-            boolean isExternal = !placeholderProvider.getClass().getClassLoader().equals(PlaceholderManagerImpl.class.getClassLoader());
-            Field registry = PlaceholderProvider.class.getDeclaredField("registry");
-            registry.setAccessible(true);
-            registry.set(placeholderProvider, isExternal
-                    ? (PlaceholderProvider.PlaceholderRegistry) placeholder -> placeholders.add(new ExceptionSafePlaceholder(placeholder))
-                    : (PlaceholderProvider.PlaceholderRegistry) placeholders::add);
-            placeholderProvider.setup();
+        synchronized (placeholders) {
+            placeholders.clear();
+            for (PlaceholderProvider placeholderProvider : placeholderProviderList) {
+                boolean isExternal = !placeholderProvider.getClass().getClassLoader().equals(PlaceholderManagerImpl.class.getClassLoader());
+                Field registry = PlaceholderProvider.class.getDeclaredField("registry");
+                registry.setAccessible(true);
+                registry.set(placeholderProvider, isExternal
+                        ? (PlaceholderProvider.PlaceholderRegistry) placeholder -> placeholders.add(new ExceptionSafePlaceholder(placeholder))
+                        : (PlaceholderProvider.PlaceholderRegistry) placeholders::add);
+                placeholderProvider.setup();
+            }
+            pattern_all = Pattern.compile("(?ims)" + Joiner.on('|').join(Iterables.transform(placeholders, v -> "(?:" + v.getRegex() + ")")));
+            needsUpdate = false;
         }
-        pattern_all = Pattern.compile("(?ims)" + Joiner.on('|').join(Iterables.transform(placeholders, v -> "(?:" + v.getRegex() + ")")));
-        needsUpdate = false;
     }
 
     public void reload() {
