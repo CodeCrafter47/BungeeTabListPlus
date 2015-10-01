@@ -59,6 +59,7 @@ public abstract class SlotTemplate {
 
     /**
      * Creates a SlotTemplate that sets the skin of the Slot
+     *
      * @param skin the Skin
      * @return the created SlotTemplate
      */
@@ -68,6 +69,7 @@ public abstract class SlotTemplate {
 
     /**
      * Creates a SlotTemplate by combining all given SlotTemplates
+     *
      * @param templates the SlotTemplates to combine
      * @return the combines SlotTemplate
      */
@@ -77,6 +79,7 @@ public abstract class SlotTemplate {
 
     /**
      * Creates a SlotTemplate by combining all given SlotTemplates
+     *
      * @param templates the SlotTemplates to combine
      * @return the combines SlotTemplate
      */
@@ -86,12 +89,12 @@ public abstract class SlotTemplate {
 
     /**
      * Creates an animated SlotTemplate
-     *
+     * <p>
      * The animation is done by cycling through the given templates at
      * the given interval
      *
      * @param templates the templates
-     * @param interval the interval
+     * @param interval  the interval
      * @return the created SlotTemplate
      */
     public static SlotTemplate animate(List<SlotTemplate> templates, double interval) {
@@ -100,6 +103,7 @@ public abstract class SlotTemplate {
 
     /**
      * Creates a new SlotTemplateBuilder
+     *
      * @return the new SlotTemplateBuilder
      */
     public static SlotTemplateBuilder builder() {
@@ -108,28 +112,49 @@ public abstract class SlotTemplate {
 
     /**
      * Get an empty SlotTemplate
+     *
      * @return an empty SlotTemplate
      */
     public static SlotTemplate empty() {
         return emptyTemplate;
     }
 
+    private Slot cached = null;
+
     /**
      * Build a Slot using the given TabListContext
+     *
      * @param context the TabListContext
      * @return the created Slot
      */
     public Slot buildSlot(TabListContext context) {
-        return buildSlot(new SlotBuilder(), context).build();
+        if (cached != null) {
+            return cached;
+        }
+        Slot slot = buildSlot(new SlotBuilder(), context).build();
+        if (isConstant()) {
+            cached = slot;
+        }
+        return slot;
     }
 
     /**
      * Build a Slot using the given TabListContext
+     *
      * @param builder the builder which should be used
      * @param context the TabListContext
      * @return the builder
      */
     public abstract SlotBuilder buildSlot(SlotBuilder builder, TabListContext context);
+
+    /**
+     * Whether this SlotTemplate is immutable
+     *
+     * @return whether this SlotTemplate is immutable
+     */
+    protected boolean isConstant() {
+        return false;
+    }
 
     private static class SlotTemplateText extends SlotTemplate {
         private final String text;
@@ -141,6 +166,11 @@ public abstract class SlotTemplate {
         @Override
         public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
             return builder.appendText(text);
+        }
+
+        @Override
+        protected boolean isConstant() {
+            return true;
         }
     }
 
@@ -155,6 +185,11 @@ public abstract class SlotTemplate {
         public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
             return builder.setPing(ping);
         }
+
+        @Override
+        protected boolean isConstant() {
+            return true;
+        }
     }
 
     private static class SlotTemplateSkin extends SlotTemplate {
@@ -167,6 +202,11 @@ public abstract class SlotTemplate {
         @Override
         public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
             return builder.setSkin(skin);
+        }
+
+        @Override
+        protected boolean isConstant() {
+            return true;
         }
     }
 
@@ -188,9 +228,15 @@ public abstract class SlotTemplate {
 
     private static class SlotTemplateCompound extends SlotTemplate {
         private final Iterable<SlotTemplate> templates;
+        private final boolean constant;
 
         private SlotTemplateCompound(Iterable<SlotTemplate> templates) {
             this.templates = templates;
+            boolean b = true;
+            for (SlotTemplate template : templates) {
+                b = b && template.isConstant();
+            }
+            constant = b;
         }
 
         @Override
@@ -199,6 +245,11 @@ public abstract class SlotTemplate {
                 builder = template.buildSlot(builder, context);
             }
             return builder;
+        }
+
+        @Override
+        protected boolean isConstant() {
+            return constant;
         }
     }
 
@@ -214,6 +265,7 @@ public abstract class SlotTemplate {
 
         /**
          * Appends a SlotTemplate
+         *
          * @param template the SlotTemplate
          * @return itself
          */
@@ -224,6 +276,7 @@ public abstract class SlotTemplate {
 
         /**
          * Appends text to the SlotTemplate
+         *
          * @param text the text
          * @return itself
          */
@@ -233,6 +286,7 @@ public abstract class SlotTemplate {
 
         /**
          * Set the ping
+         *
          * @param ping the ping
          * @return itself
          */
@@ -242,6 +296,7 @@ public abstract class SlotTemplate {
 
         /**
          * Set the Skin
+         *
          * @param skin the skin
          * @return itself
          */
@@ -251,7 +306,7 @@ public abstract class SlotTemplate {
 
         /**
          * Builds a SlotTemplate from this SlotTemplateBuilder
-         *
+         * <p>
          * The SlotTemplateBuilder shouldn't be used anymore after invoking this method
          *
          * @return the created SlotTemplate
