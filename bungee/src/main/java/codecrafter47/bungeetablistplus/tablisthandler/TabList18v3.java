@@ -95,6 +95,7 @@ public class TabList18v3 implements TabListHandler {
                 numFakePlayers = tab_size - playerTabListHandler.uuids.size();
                 if (numFakePlayers < 0) {
                     BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Could not update tablist for {0}. Please increase tab_size", playerTabListHandler.getPlayer().getName());
+                    return;
                 }
             }
 
