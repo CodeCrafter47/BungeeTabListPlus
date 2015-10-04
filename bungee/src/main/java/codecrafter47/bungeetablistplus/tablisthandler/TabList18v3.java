@@ -120,7 +120,7 @@ public class TabList18v3 implements TabListHandler {
             }
 
             for (int i = 0; i < tab_size; i++) {
-                Slot slot = tabList.getSlot(i);
+                Slot slot = i < tabList.getSize() ? tabList.getSlot(i) : null;
                 String text;
                 int ping;
                 Skin skin;
