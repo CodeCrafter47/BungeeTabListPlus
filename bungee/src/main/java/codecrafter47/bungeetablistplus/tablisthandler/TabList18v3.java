@@ -191,7 +191,7 @@ public class TabList18v3 implements TabListHandler {
             if (packetAccess.isTabHeaderFooterSupported()) {
                 String header = tabList.getHeader();
                 String footer = tabList.getFooter();
-                if (!Objects.equals(header, sentHeader) && !Objects.equals(footer, sendFooter)) {
+                if (!Objects.equals(header, sentHeader) || !Objects.equals(footer, sendFooter)) {
                     sentHeader = header;
                     sendFooter = footer;
                     if (header != null || footer != null) {
