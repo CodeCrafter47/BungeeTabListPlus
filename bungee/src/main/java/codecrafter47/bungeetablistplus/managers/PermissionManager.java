@@ -86,14 +86,17 @@ public class PermissionManager {
 
         // BungeeCord
         String bgroup = null;
-        Collection<String> groups = plugin.getProxy().getConfigurationAdapter().getGroups(player.getName());
-        if (groups.size() == 1) {
-            bgroup = groups.iterator().next();
-        }
-        for (String group : groups) {
-            if (!group.equals("default")) {
-                bgroup = group;
-                break;
+        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(player.getName());
+        if (proxiedPlayer != null) {
+            Collection<String> groups = proxiedPlayer.getGroups();
+            if (groups.size() == 1) {
+                bgroup = groups.iterator().next();
+            }
+            for (String group : groups) {
+                if (!group.equals("default")) {
+                    bgroup = group;
+                    break;
+                }
             }
         }
         if (bgroup == null) {
