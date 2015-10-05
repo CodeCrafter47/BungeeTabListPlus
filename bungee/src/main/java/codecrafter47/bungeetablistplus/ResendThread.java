@@ -26,9 +26,10 @@ import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
-import com.google.common.collect.Sets;
+import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,7 +38,7 @@ import java.util.logging.Level;
 class ResendThread implements Runnable {
 
     private final BlockingQueue<ProxiedPlayer> queue = new LinkedBlockingQueue<>();
-    private final Set<ProxiedPlayer> set = Sets.newConcurrentHashSet();
+    private final Set<ProxiedPlayer> set = Collections.synchronizedSet(new THashSet<>());
 
     public void add(ProxiedPlayer player) {
         if (!set.contains(player)) {
