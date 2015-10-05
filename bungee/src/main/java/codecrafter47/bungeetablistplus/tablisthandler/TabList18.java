@@ -27,10 +27,9 @@ import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import codecrafter47.bungeetablistplus.util.ColorParser;
+import codecrafter47.bungeetablistplus.util.FastChat;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -86,8 +85,8 @@ public class TabList18 implements TabListHandler {
             Skin skin;
             if (slot != null) {
                 text = slot.getText();
-                text = ChatColor.translateAlternateColorCodes('&', text);
                 if (charLimit > 0) {
+                    text = ChatColor.translateAlternateColorCodes('&', text);
                     text = ColorParser.substringIgnoreColors(text, charLimit);
                     for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
                         text += ' ';
@@ -118,20 +117,8 @@ public class TabList18 implements TabListHandler {
                 sentHeader = header;
                 sendFooter = footer;
                 if (header != null || footer != null) {
-                    if (header != null && header.endsWith("" + ChatColor.COLOR_CHAR)) {
-                        header = header.substring(0, header.length() - 1);
-                    }
-                    if (header != null) {
-                        header = ChatColor.translateAlternateColorCodes('&', header);
-                    }
-                    if (footer != null && footer.endsWith("" + ChatColor.COLOR_CHAR)) {
-                        footer = footer.substring(0, footer.length() - 1);
-                    }
-                    if (footer != null) {
-                        footer = ChatColor.translateAlternateColorCodes('&', footer);
-                    }
-                    String headerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(header != null ? header : ""));
-                    String footerJson = ComponentSerializer.toString(TextComponent.fromLegacyText(footer != null ? footer : ""));
+                    String headerJson = FastChat.legacyTextToJson(header != null ? header : "", '&');
+                    String footerJson = FastChat.legacyTextToJson(footer != null ? footer : "", '&');
                     packetAccess.setTabHeaderAndFooter(playerTablistHandler.getPlayer().unsafe(), headerJson, footerJson);
                 }
             }
@@ -194,7 +181,7 @@ public class TabList18 implements TabListHandler {
         if (old == null || !old.equals(text) || textureUpdate) {
             send[row] = text;
             UUID offlineId = fakePlayerUUIDs[row];
-            batch.updateDisplayName(offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
+            batch.updateDisplayName(offlineId, FastChat.legacyTextToJson(text, '&'));
         }
     }
 
