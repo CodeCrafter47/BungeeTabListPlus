@@ -56,7 +56,7 @@ public class PlayerManagerImpl implements PlayerManager {
             boolean areServerRules = false;
             boolean fitGroupRules = false;
             boolean fitServerRules = false;
-            String group = plugin.getPermissionManager().getMainGroup(p);
+            String group = null;
             for (String rule : filter) {
                 if (rule.isEmpty()) {
                     // ignore
@@ -91,10 +91,11 @@ public class PlayerManagerImpl implements PlayerManager {
                         }
                     } else {
                         areGroupRules = true;
-                        if (group != null) {
-                            if (group.equalsIgnoreCase(rule)) {
-                                fitGroupRules = true;
-                            }
+                        if (group == null) {
+                            group = plugin.getPermissionManager().getMainGroup(p);
+                        }
+                        if (group.equalsIgnoreCase(rule)) {
+                            fitGroupRules = true;
                         }
                     }
                 }
