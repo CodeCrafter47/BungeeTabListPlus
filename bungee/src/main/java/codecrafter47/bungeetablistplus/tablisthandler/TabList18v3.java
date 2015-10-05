@@ -99,7 +99,8 @@ public class TabList18v3 implements TabListHandler {
                 }
             }
 
-            resize(numFakePlayers);
+            PacketAccess.Batch batch = packetAccess.createBatch();
+            resize(batch, numFakePlayers);
 
             int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
                     getMainConfig().charLimit;
@@ -176,17 +177,18 @@ public class TabList18v3 implements TabListHandler {
                 String oldPlayer = sendTeam.get(i);
                 if (oldPlayer != null) {
                     if (!oldPlayer.equals(sendUsernames.get(uuid))) {
-                        packetAccess.removePlayerFromTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[i], oldPlayer);
-                        packetAccess.addPlayerToTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[i], sendUsernames.get(uuid));
+                        batch.removePlayerFromTeam(fakePlayerUsernames[i], oldPlayer);
+                        batch.addPlayerToTeam(fakePlayerUsernames[i], sendUsernames.get(uuid));
                         sendTeam.put(i, sendUsernames.get(uuid));
                     }
                 } else {
-                    packetAccess.createTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[i], sendUsernames.get(uuid));
+                    batch.createTeam(fakePlayerUsernames[i], sendUsernames.get(uuid));
                     sendTeam.put(i, sendUsernames.get(uuid));
                 }
 
-                updateSlot(uuid, text, ping, skin);
+                updateSlot(batch, uuid, text, ping, skin);
             }
+            batch.send(playerTabListHandler.getPlayer().unsafe());
 
             // update header/footer
             if (packetAccess.isTabHeaderFooterSupported()) {
@@ -217,32 +219,32 @@ public class TabList18v3 implements TabListHandler {
         }
     }
 
-    private void resize(int size) {
+    private void resize(PacketAccess.Batch batch, int size) {
         if (size == sendSlots) {
             return;
         }
         if (size > sendSlots) {
             for (int i = sendSlots; i < size; i++) {
-                createSlot(i);
+                createSlot(batch, i);
             }
             sendSlots = size;
         } else if (size < sendSlots) {
             for (int i = size; i < sendSlots; i++) {
-                removeSlot(i);
+                removeSlot(batch, i);
             }
         }
         sendSlots = size;
     }
 
-    private void removeSlot(int i) {
+    private void removeSlot(PacketAccess.Batch batch, int i) {
         UUID offlineId = fakePlayerUUIDs[i];
-        packetAccess.removePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId);
+        batch.removePlayer(offlineId);
         send.remove(offlineId);
         sendTextures.remove(offlineId);
         sendPing.remove(offlineId);
     }
 
-    private void updateSlot(UUID offlineId, String text, int ping, Skin skin) {
+    private void updateSlot(PacketAccess.Batch batch, UUID offlineId, String text, int ping, Skin skin) {
         boolean textureUpdate = false;
         String[] textures = skin.toProperty();
         if (textures != null) {
@@ -259,7 +261,7 @@ public class TabList18v3 implements TabListHandler {
                 properties = new String[0][0];
                 sendTextures.remove(offlineId);
             }
-            packetAccess.createOrUpdatePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId, sendUsernames.get(offlineId), 0, ping, properties);
+            batch.createOrUpdatePlayer(offlineId, sendUsernames.get(offlineId), 0, ping, properties);
             textureUpdate = true;
             sendPing.put(offlineId, 0);
         }
@@ -270,31 +272,33 @@ public class TabList18v3 implements TabListHandler {
         }
         if (ping != sendPing.get(offlineId)) {
             sendPing.put(offlineId, ping);
-            packetAccess.updatePing(playerTabListHandler.getPlayer().unsafe(), offlineId, ping);
+            batch.updatePing(offlineId, ping);
         }
 
         // update name
         String old = send.get(offlineId);
         if (textureUpdate || old == null || !old.equals(text) || playerTabListHandler.requiresUpdate.contains(offlineId)) {
             send.put(offlineId, text);
-            packetAccess.updateDisplayName(playerTabListHandler.getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
+            batch.updateDisplayName(offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
     }
 
-    private void createSlot(int row) {
+    private void createSlot(PacketAccess.Batch batch, int row) {
         UUID offlineId = fakePlayerUUIDs[row];
-        packetAccess.createOrUpdatePlayer(playerTabListHandler.getPlayer().unsafe(), offlineId, fakePlayerUsernames[row], 0, 0, new String[0][0]);
+        batch.createOrUpdatePlayer(offlineId, fakePlayerUsernames[row], 0, 0, new String[0][0]);
         sendPing.put(offlineId, 0);
         send.put(offlineId, null);
     }
 
     @Override
     public void unload() {
-        resize(0);
+        PacketAccess.Batch batch = packetAccess.createBatch();
+        resize(batch, 0);
         sendTeam.forEachKey(value -> {
-            packetAccess.removeTeam(playerTabListHandler.getPlayer().unsafe(), fakePlayerUsernames[value]);
+            batch.removeTeam(fakePlayerUsernames[value]);
             return true;
         });
         sendTeam.clear();
+        batch.send(playerTabListHandler.getPlayer().unsafe());
     }
 }

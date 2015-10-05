@@ -34,21 +34,28 @@ public interface PacketAccess {
      */
     void setTabHeaderAndFooter(Connection.Unsafe connection, String header, String footer);
 
-    void createTeam(Connection.Unsafe connection, String name, String player);
+    Batch createBatch();
 
-    void addPlayerToTeam(Connection.Unsafe connection, String team, String player);
+    interface Batch {
 
-    void removePlayerFromTeam(Connection.Unsafe connection, String team, String player);
+        void createTeam(String name, String player);
 
-    void removeTeam(Connection.Unsafe connection, String name);
+        void addPlayerToTeam(String team, String player);
 
-    void createOrUpdatePlayer(Connection.Unsafe connection, UUID player, String username, int gamemode, int ping, String[][] properties);
+        void removePlayerFromTeam(String team, String player);
 
-    void updateDisplayName(Connection.Unsafe connection, UUID player, String displayName);
+        void removeTeam(String name);
 
-    void updatePing(Connection.Unsafe connection, UUID player, int ping);
+        void createOrUpdatePlayer(UUID player, String username, int gamemode, int ping, String[][] properties);
 
-    void removePlayer(Connection.Unsafe connection, UUID player);
+        void updateDisplayName(UUID player, String displayName);
+
+        void updatePing(UUID player, int ping);
+
+        void removePlayer(UUID player);
+
+        void send(Connection.Unsafe connection);
+    }
 
     interface TabHeaderPacketAccess {
 

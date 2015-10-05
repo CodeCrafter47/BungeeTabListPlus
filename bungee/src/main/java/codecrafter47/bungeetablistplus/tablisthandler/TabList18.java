@@ -73,7 +73,8 @@ public class TabList18 implements TabListHandler {
             tabList = new GenericTabList(4, 20);
             ErrorTabListProvider.constructErrorTabList(playerTablistHandler.getPlayer(), tabList, "Maximum tab_size for 1.8 is 80.", null);
         }
-        resize(tabList.getColumns() * tabList.getRows());
+        PacketAccess.Batch batch = packetAccess.createBatch();
+        resize(batch, tabList.getColumns() * tabList.getRows());
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
                 getMainConfig().charLimit;
@@ -105,8 +106,9 @@ public class TabList18 implements TabListHandler {
                 ping = tabList.getDefaultPing();
                 skin = tabList.getDefaultSkin();
             }
-            updateSlot(i, text, ping, skin);
+            updateSlot(batch, i, text, ping, skin);
         }
+        batch.send(playerTablistHandler.getPlayer().unsafe());
 
         // update header/footer
         if (packetAccess.isTabHeaderFooterSupported()) {
@@ -136,29 +138,29 @@ public class TabList18 implements TabListHandler {
         }
     }
 
-    private void resize(int size) {
+    private void resize(PacketAccess.Batch batch, int size) {
         if (size == sendSlots) {
             return;
         }
         if (size > sendSlots) {
             for (int i = sendSlots; i < size; i++) {
-                createSlot(i);
+                createSlot(batch, i);
             }
             sendSlots = size;
         } else if (size < sendSlots) {
             for (int i = size; i < sendSlots; i++) {
-                removeSlot(i);
+                removeSlot(batch, i);
             }
         }
         sendSlots = size;
     }
 
-    private void removeSlot(int i) {
+    private void removeSlot(PacketAccess.Batch batch, int i) {
         UUID uuid = fakePlayerUUIDs[i];
-        packetAccess.removePlayer(playerTablistHandler.getPlayer().unsafe(), uuid);
+        batch.removePlayer(uuid);
     }
 
-    private void updateSlot(int row, String text, int ping, Skin skin) {
+    private void updateSlot(PacketAccess.Batch batch, int row, String text, int ping, Skin skin) {
         boolean textureUpdate = false;
         String[] textures = skin.toProperty();
         if (textures != null) {
@@ -175,7 +177,7 @@ public class TabList18 implements TabListHandler {
                 properties = new String[0][0];
                 sendTextures[row] = null;
             }
-            packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, fakePlayerUsernames[row], 0, ping, properties);
+            batch.createOrUpdatePlayer(offlineId, fakePlayerUsernames[row], 0, ping, properties);
             textureUpdate = true;
             slots_ping[row] = ping;
         }
@@ -184,7 +186,7 @@ public class TabList18 implements TabListHandler {
         if (ping != slots_ping[row]) {
             slots_ping[row] = ping;
             UUID offlineId = fakePlayerUUIDs[row];
-            packetAccess.updatePing(playerTablistHandler.getPlayer().unsafe(), offlineId, ping);
+            batch.updatePing(offlineId, ping);
         }
 
         // update name
@@ -192,13 +194,13 @@ public class TabList18 implements TabListHandler {
         if (old == null || !old.equals(text) || textureUpdate) {
             send[row] = text;
             UUID offlineId = fakePlayerUUIDs[row];
-            packetAccess.updateDisplayName(playerTablistHandler.getPlayer().unsafe(), offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
+            batch.updateDisplayName(offlineId, ComponentSerializer.toString(TextComponent.fromLegacyText(text)));
         }
     }
 
-    private void createSlot(int row) {
+    private void createSlot(PacketAccess.Batch batch, int row) {
         UUID offlineId = fakePlayerUUIDs[row];
-        packetAccess.createOrUpdatePlayer(playerTablistHandler.getPlayer().unsafe(), offlineId, fakePlayerUsernames[row], 0, 0, new String[0][0]);
+        batch.createOrUpdatePlayer(offlineId, fakePlayerUsernames[row], 0, 0, new String[0][0]);
         send[row] = null;
         slots_ping[row] = 0;
         sendTextures[row] = null;
@@ -206,6 +208,8 @@ public class TabList18 implements TabListHandler {
 
     @Override
     public void unload() {
-        resize(0);
+        PacketAccess.Batch batch = packetAccess.createBatch();
+        resize(batch, 0);
+        batch.send(playerTablistHandler.getPlayer().unsafe());
     }
 }
