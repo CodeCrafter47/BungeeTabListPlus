@@ -24,7 +24,6 @@ import com.google.common.cache.CacheStats;
 import com.google.common.collect.ImmutableMap;
 import lombok.SneakyThrows;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -42,7 +41,6 @@ public class ExpireAfterAccessCache<K, V> implements Cache<K, V> {
         this.expireAfter = expireAfter;
     }
 
-    @Nullable
     @Override
     public V getIfPresent(Object o) {
         CachedValue<V> cachedValue = map.get(o);
