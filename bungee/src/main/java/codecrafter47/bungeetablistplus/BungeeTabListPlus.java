@@ -504,18 +504,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * @param player the player object for which the check should be performed
      * @return true if the player is hidden, false otherwise
      */
-    public static boolean isHidden(IPlayer player, ProxiedPlayer viewer) {
-        if (getInstance().getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished")) return false;
-        return isHidden(player) || isHiddenServer(player.getServer().orElse(null));
-    }
-
-    /**
-     * checks whether a player is hidden from the tablist
-     *
-     * @param player the player object for which the check should be performed
-     * @return true if the player is hidden, false otherwise
-     */
     public static boolean isHidden(IPlayer player) {
+        if (isHiddenServer(player.getServer().orElse(null))) return true;
         final boolean[] hidden = new boolean[1];
         synchronized (hiddenPlayers) {
             String name = player.getName();

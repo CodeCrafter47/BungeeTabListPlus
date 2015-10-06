@@ -43,8 +43,8 @@ public class AutoFillPlayers implements Function<TabListContext, List<Section>> 
     public List<Section> apply(TabListContext context) {
         // sort groups, most populated first
         Collections.sort(groups, (s1, s2) -> {
-            int p1 = context.getPlayerManager().getPlayerCount(s1.getServerNames());
-            int p2 = context.getPlayerManager().getPlayerCount(s2.getServerNames());
+            int p1 = context.getPlayerManager().getPlayerCount(s1.getFilterForPlayerManager());
+            int p2 = context.getPlayerManager().getPlayerCount(s2.getFilterForPlayerManager());
             if (p1 < p2) {
                 return 1;
             }
@@ -56,7 +56,7 @@ public class AutoFillPlayers implements Function<TabListContext, List<Section>> 
 
         List<Section> sections = new ArrayList<>();
         for (ServerGroup serverGroup : groups) {
-            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(serverGroup.getServerNames()) > 0) {
+            if (showEmptyGroups || context.getPlayerManager().getPlayerCount(serverGroup.getFilterForPlayerManager()) > 0) {
                 sections.addAll(this.sections.stream().map(section -> section.apply(serverGroup)).collect(Collectors.toList()));
             }
         }

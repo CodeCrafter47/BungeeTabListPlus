@@ -19,17 +19,17 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
 
-import java.util.Collection;
 import java.util.List;
 
 public class PlayerColumn {
 
-    final Collection<String> filter;
+    final PlayerManager.Filter filter;
     private final SlotTemplate prefix;
     private final SlotTemplate suffix;
     private List<IPlayer> players;
@@ -38,7 +38,7 @@ public class PlayerColumn {
     private final List<SlotTemplate> playerLines;
     private final List<SlotTemplate> morePlayerLines;
 
-    public PlayerColumn(List<String> filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+    public PlayerColumn(PlayerManager.Filter filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         this.filter = filter;
         this.prefix = prefix;
         this.suffix = suffix;

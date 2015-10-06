@@ -19,9 +19,12 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
@@ -31,9 +34,12 @@ import codecrafter47.bungeetablistplus.tablist.GenericServerGroup;
 import codecrafter47.bungeetablistplus.tablistproviders.ConfigTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.IConfigTabListProvider;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -167,7 +173,7 @@ public class ConfigParser {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
                         sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     } else {
-                        sections.add(new FillPlayersSection(startColumn[0], filter, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                        sections.add(new FillPlayersSection(startColumn[0], parseFilter(filter), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
                     }
                 } else {
                     ColumnSplitSection cs;
@@ -177,7 +183,7 @@ public class ConfigParser {
                         cs = new ColumnSplitSection();
                         sections.add(cs);
                     }
-                    cs.addColumn(column[0], new PlayerColumn(filter, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                    cs.addColumn(column[0], new PlayerColumn(parseFilter(filter), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
                 }
             } else if (fillbukkitplayersMatcher.matches()) {
                 SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));
@@ -317,7 +323,7 @@ public class ConfigParser {
                     List<String> finalFilters = new ArrayList<>();
                     finalFilters.addAll(filter);
                     finalFilters.addAll(group.getServerNames());
-                    return new FillPlayersSection(startColumn[0], finalFilters, prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines);
+                    return new FillPlayersSection(startColumn[0], parseFilter(finalFilters), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines);
                 });
             } else {
                 SlotTemplate slotTemplate = SlotTemplate.of(g_prefix, parseSlot(line), g_suffix);
@@ -360,6 +366,46 @@ public class ConfigParser {
         return new PlayerSorter(rules);
     }
 
+    public static PlayerManager.Filter parseFilter(Collection<String> filter) {
+        List<PlayerManager.Filter> servers = new ArrayList<>();
+        List<PlayerManager.Filter> groups = new ArrayList<>();
+        for (String s : filter) {
+            if (s.isEmpty()) {
+                continue;
+            }
+            if (s.equalsIgnoreCase("currentserver")) {
+                servers.add(new FilterCurrentServer());
+            } else if (BungeeTabListPlus.getInstance().isServer(s)) {
+                if (s.contains("#")) {
+                    String[] split = s.split("#");
+                    servers.add(new FilterServerAndWorld(split[0], split[1]));
+                } else {
+                    servers.add(new FilterServer(s));
+                }
+            } else {
+                groups.add(new FilterGroup(s));
+            }
+        }
+        if (servers.isEmpty() && groups.isEmpty()) {
+            return FILTER_ALWAYS_TRUE;
+        }
+        if (servers.isEmpty()) {
+            if (groups.size() == 1) {
+                return groups.get(0);
+            } else {
+                return new OrFilter(groups);
+            }
+        }
+        if (groups.isEmpty()) {
+            if (servers.size() == 1) {
+                return servers.get(0);
+            } else {
+                return new OrFilter(servers);
+            }
+        }
+        return new AndFilter(ImmutableList.of(new OrFilter(servers), new OrFilter(groups)));
+    }
+
     private void checkServer(List<String> filter) {
         for (String s : filter) {
             if (plugin.isServer(s)) {
@@ -369,6 +415,150 @@ public class ConfigParser {
             if (s.equalsIgnoreCase("currentserver")) {
                 plugin.getLogger().warning(
                         ChatColor.RED + "You shouldn't use {fillplayers:currentserver} in groupLines");
+            }
+        }
+    }
+
+    private static PlayerManager.Filter FILTER_ALWAYS_TRUE = new PlayerManager.Filter() {
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
+            return true;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj == FILTER_ALWAYS_TRUE;
+        }
+    };
+
+    private static class FilterCurrentServer implements PlayerManager.Filter {
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
+            Optional<ServerInfo> server1 = iPlayer.getServer();
+            Server server2 = viewer.getServer();
+            if (!server1.isPresent() && server2 == null) {
+                return true;
+            }
+            if (server1.isPresent() && server2 != null) {
+                return server1.get().getName().endsWith(server2.getInfo().getName());
+            }
+            return false;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof FilterCurrentServer;
+        }
+    }
+
+    private static class FilterServer implements PlayerManager.Filter {
+        private final String server;
+
+        public FilterServer(String server) {
+            this.server = server;
+        }
+
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
+            return iPlayer.getServer().map(serverInfo -> server.equalsIgnoreCase(serverInfo.getName())).orElse(false);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof FilterServer && ((FilterServer) obj).server.equals(server);
+        }
+    }
+
+    private static class FilterServerAndWorld implements PlayerManager.Filter {
+        private final String server;
+        private final String world;
+
+        public FilterServerAndWorld(String server, String world) {
+            this.server = server;
+            this.world = world;
+        }
+
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
+            return iPlayer.getServer().map(serverInfo -> server.equalsIgnoreCase(serverInfo.getName()) && BungeeTabListPlus.getInstance().getBridge().get(iPlayer, DataKeys.World).map(w -> w.equalsIgnoreCase(world)).orElse(false)).orElse(false);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof FilterServerAndWorld && ((FilterServerAndWorld) obj).server.equals(server) && ((FilterServerAndWorld) obj).world.equals(world);
+        }
+    }
+
+    private static class FilterGroup implements PlayerManager.Filter {
+        private final String group;
+
+        public FilterGroup(String group) {
+            this.group = group;
+        }
+
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
+            return BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(iPlayer).equalsIgnoreCase(group);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof FilterGroup && ((FilterGroup) obj).group.equals(group);
+        }
+    }
+
+    private static class OrFilter implements PlayerManager.Filter {
+        private final List<? extends PlayerManager.Filter> components;
+
+        private OrFilter(List<? extends PlayerManager.Filter> components) {
+            this.components = components;
+        }
+
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer player) {
+            for (int i = 0; i < this.components.size(); ++i) {
+                if (this.components.get(i).test(viewer, player)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public boolean equals(Object obj) {
+            if (obj instanceof OrFilter) {
+                OrFilter that = (OrFilter) obj;
+                return this.components.equals(that.components);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private static class AndFilter<T> implements PlayerManager.Filter {
+        private final List<? extends PlayerManager.Filter> components;
+
+        private AndFilter(List<? extends PlayerManager.Filter> components) {
+            this.components = components;
+        }
+
+        @Override
+        public boolean test(ProxiedPlayer viewer, IPlayer player) {
+            for (int i = 0; i < this.components.size(); ++i) {
+                if (!this.components.get(i).test(viewer, player)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public boolean equals(Object obj) {
+            if (obj instanceof AndFilter) {
+                AndFilter that = (AndFilter) obj;
+                return this.components.equals(that.components);
+            } else {
+                return false;
             }
         }
     }

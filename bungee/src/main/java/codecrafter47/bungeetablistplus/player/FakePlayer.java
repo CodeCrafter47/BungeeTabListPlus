@@ -35,11 +35,13 @@ public class FakePlayer implements IPlayer {
     private int ping;
     private int gamemode;
     private PlayerSkin skin;
+    private UUID uuid;
 
     public FakePlayer(String name, ServerInfo server) {
         this();
         this.name = name;
         this.server = server;
+        uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
     }
 
     public FakePlayer() {
@@ -55,7 +57,7 @@ public class FakePlayer implements IPlayer {
 
     @Override
     public UUID getUniqueID() {
-        return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
+        return uuid;
     }
 
     @Override

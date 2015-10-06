@@ -25,7 +25,7 @@ public final class FastChat {
     private final static String emptyJsonText = "{\"text\":\"\"}";
 
     public static String legacyTextToJson(String legacyText, char alternateColorChar) {
-        StringBuilder jsonBuilder = new StringBuilder("{\"text\":\"\",extra:[");
+        StringBuilder jsonBuilder = new StringBuilder("{\"text\":\"\",\"extra\":[");
         StringBuilder builder = new StringBuilder();
         boolean bold = false;
         boolean italic = false;

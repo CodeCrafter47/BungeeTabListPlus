@@ -19,23 +19,20 @@
 package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.OptionalInt;
 
-/**
- * @author Florian Stober
- */
 public class FillPlayersSection extends Section {
 
     private final OptionalInt vAlign;
-    private final Collection<String> filter;
+    private final PlayerManager.Filter filter;
     private final SlotTemplate prefix;
     private final SlotTemplate suffix;
     private List<IPlayer> players;
@@ -44,7 +41,7 @@ public class FillPlayersSection extends Section {
     private final List<SlotTemplate> playerLines;
     private final List<SlotTemplate> morePlayerLines;
 
-    public FillPlayersSection(int vAlign, Collection<String> filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+    public FillPlayersSection(int vAlign, PlayerManager.Filter filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         this.playerLines = playerLines;
         this.morePlayerLines = morePlayerLines;
         this.vAlign = vAlign == -1 ? OptionalInt.empty() : OptionalInt.of(vAlign);
@@ -62,8 +59,7 @@ public class FillPlayersSection extends Section {
     }
 
     protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
-        return context.getPlayerManager().getPlayers(
-                filter);
+        return context.getPlayerManager().getPlayers(filter);
     }
 
     @Override

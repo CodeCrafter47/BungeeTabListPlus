@@ -25,8 +25,9 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.util.ExpireAfterAccessCache;
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -48,8 +49,8 @@ import java.util.logging.Level;
 public class BukkitBridge implements Listener {
     private final BungeeTabListPlus plugin;
 
-    private final Map<String, DataCache> serverInformation = new ConcurrentHashMap<>();
-    private final Cache<UUID, DataCache> playerInformation = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
+    private final Map<String, BukkitData> serverInformation = new ConcurrentHashMap<>();
+    private final Cache<UUID, BukkitData> playerInformation = new ExpireAfterAccessCache<>(60000);
 
     private final Set<String> registeredThirdPartyVariables = new HashSet<>();
     private final ReentrantLock thirdPartyVariablesLock = new ReentrantLock();
@@ -58,6 +59,7 @@ public class BukkitBridge implements Listener {
         this.plugin = plugin;
         plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
         plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::checkForThirdPartyVariables, 2, 2, TimeUnit.SECONDS);
+        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), playerInformation::cleanUp, 10, 10, TimeUnit.SECONDS);
     }
 
     private void checkForThirdPartyVariables() {
@@ -84,16 +86,16 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    private DataCache getServerDataCache(String serverName) {
+    private BukkitData getServerDataCache(String serverName) {
         if (!serverInformation.containsKey(serverName)) {
-            serverInformation.putIfAbsent(serverName, new DataCache());
+            serverInformation.putIfAbsent(serverName, new BukkitData());
         }
         return serverInformation.get(serverName);
     }
 
     @SneakyThrows
-    private DataCache getPlayerDataCache(UUID uuid) {
-        return playerInformation.get(uuid, DataCache::new);
+    private BukkitData getPlayerDataCache(UUID uuid) {
+        return playerInformation.get(uuid, BukkitData::new);
     }
 
     @EventHandler
@@ -166,17 +168,22 @@ public class BukkitBridge implements Listener {
     }
 
     public <T> Optional<T> get(ServerInfo server, DataKey<T> key) {
-        Optional<T> value = getServerDataCache(server.getName()).getValue(key);
+        BukkitData data = getServerDataCache(server.getName());
+        Optional<T> value = data.getValue(key);
         if (!value.isPresent()) {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ObjectOutputStream out = new ObjectOutputStream(os);
-                out.writeUTF(Constants.subchannelRequestServerVariable);
-                out.writeObject(key);
-                out.close();
-                server.sendData(Constants.channel, os.toByteArray(), false);
-            } catch (IOException ex) {
-                plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+            Set<DataKey> requestedData = data.getRequestedData();
+            if (!requestedData.contains(key)) {
+                requestedData.add(key);
+                try {
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    ObjectOutputStream out = new ObjectOutputStream(os);
+                    out.writeUTF(Constants.subchannelRequestServerVariable);
+                    out.writeObject(key);
+                    out.close();
+                    server.sendData(Constants.channel, os.toByteArray(), false);
+                } catch (IOException ex) {
+                    plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+                }
             }
         }
         return value;
@@ -188,19 +195,24 @@ public class BukkitBridge implements Listener {
         }
         UUID uniqueID = player.getUniqueID();
         if (uniqueID != null) {
-            Optional<T> value = getPlayerDataCache(uniqueID).getValue(key);
+            BukkitData data = getPlayerDataCache(uniqueID);
+            Optional<T> value = data.getValue(key);
             if (!value.isPresent()) {
-                ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueID);
-                if (proxiedPlayer != null) {
-                    try {
-                        ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        ObjectOutputStream out = new ObjectOutputStream(os);
-                        out.writeUTF(Constants.subchannelRequestPlayerVariable);
-                        out.writeObject(key);
-                        out.close();
-                        Optional.ofNullable(proxiedPlayer.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
-                    } catch (IOException ex) {
-                        plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+                Set<DataKey> requestedData = data.getRequestedData();
+                if (!requestedData.contains(key)) {
+                    requestedData.add(key);
+                    ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueID);
+                    if (proxiedPlayer != null) {
+                        try {
+                            ByteArrayOutputStream os = new ByteArrayOutputStream();
+                            ObjectOutputStream out = new ObjectOutputStream(os);
+                            out.writeUTF(Constants.subchannelRequestPlayerVariable);
+                            out.writeObject(key);
+                            out.close();
+                            Optional.ofNullable(proxiedPlayer.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
+                        } catch (IOException ex) {
+                            plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+                        }
                     }
                 }
             }
@@ -230,6 +242,19 @@ public class BukkitBridge implements Listener {
             server.sendData(Constants.channel, os.toByteArray());
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+        }
+    }
+
+    private class BukkitData extends DataCache {
+        private Set<DataKey> requestedData = Sets.newConcurrentHashSet();
+        private long lastAccess = System.currentTimeMillis();
+
+        public Set<DataKey> getRequestedData() {
+            if (System.currentTimeMillis() - lastAccess > 1000) {
+                requestedData.clear();
+                lastAccess = System.currentTimeMillis();
+            }
+            return requestedData;
         }
     }
 }

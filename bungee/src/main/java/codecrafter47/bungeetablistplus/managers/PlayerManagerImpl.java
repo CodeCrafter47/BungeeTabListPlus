@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.managers;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
-import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -36,72 +35,24 @@ import java.util.Optional;
 
 public class PlayerManagerImpl implements PlayerManager {
 
-    private final BungeeTabListPlus plugin;
     private final ProxiedPlayer viewer;
     private final Collection<IPlayer> players;
     private final boolean includeSpectators;
+    private final boolean canSeeHiddenPlayers;
 
     public PlayerManagerImpl(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders, ProxiedPlayer viewer) {
-        this.plugin = plugin;
         this.viewer = viewer;
         this.players = ImmutableList.copyOf(Iterables.concat(Collections2.transform(playerProviders, IPlayerProvider::getPlayers)));
         includeSpectators = plugin.getConfigManager().getMainConfig().showPlayersInGamemode3;
+        canSeeHiddenPlayers = plugin.getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished");
     }
 
     @Override
-    public List<IPlayer> getPlayers(Collection<String> filter) {
+    public List<IPlayer> getPlayers(Filter filter) {
         List<IPlayer> list = new ArrayList<>();
         for (IPlayer p : players) {
-            boolean areGroupRules = false;
-            boolean areServerRules = false;
-            boolean fitGroupRules = false;
-            boolean fitServerRules = false;
-            String group = null;
-            for (String rule : filter) {
-                if (rule.isEmpty()) {
-                    // ignore
-                } else {
-                    Optional<ServerInfo> server = p.getServer();
-                    if (rule.equalsIgnoreCase("currentserver")) {
-                        areServerRules = true;
-                        if (server.isPresent() && viewer.getServer() != null) {
-                            if (server.get().getName().equalsIgnoreCase(
-                                    viewer.getServer().getInfo().getName())) {
-                                fitServerRules = true;
-                            }
-                        }
-                    } else if (plugin.isServer(rule)) {
-                        areServerRules = true;
-                        if (server.isPresent()) {
-                            if (server.get().getName().equalsIgnoreCase(rule)) {
-                                fitServerRules = true;
-                            }
-                            String[] s = rule.split("#");
-                            if (s.length == 2) {
-                                if (server.get().getName().
-                                        equalsIgnoreCase(s[0])) {
-                                    Optional<String> world = plugin.getBridge().get(p, DataKeys.World);
-                                    if (world.isPresent()) {
-                                        if (world.get().equalsIgnoreCase(s[1])) {
-                                            fitServerRules = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        areGroupRules = true;
-                        if (group == null) {
-                            group = plugin.getPermissionManager().getMainGroup(p);
-                        }
-                        if (group.equalsIgnoreCase(rule)) {
-                            fitGroupRules = true;
-                        }
-                    }
-                }
-            }
-            if (((!areServerRules) || fitServerRules) && ((!areGroupRules) || fitGroupRules) && !BungeeTabListPlus.
-                    isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
+
+            if ((includeSpectators || p.getGameMode() != 3) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && filter.test(viewer, p)) {
                 list.add(p);
             }
         }
@@ -114,8 +65,7 @@ public class PlayerManagerImpl implements PlayerManager {
         for (IPlayer p : players) {
             Optional<ServerInfo> s = p.getServer();
             if (s.isPresent()) {
-                if (s.get().getName().equalsIgnoreCase(server) && !BungeeTabListPlus.
-                        isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
+                if (s.get().getName().equalsIgnoreCase(server) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && (includeSpectators || p.getGameMode() != 3)) {
                     num++;
                 }
             }
@@ -127,7 +77,7 @@ public class PlayerManagerImpl implements PlayerManager {
     public int getGlobalPlayerCount() {
         int num = 0;
         for (IPlayer p : players) {
-            if (!BungeeTabListPlus.isHidden(p, viewer) && (includeSpectators || p.getGameMode() != 3)) {
+            if ((canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && (includeSpectators || p.getGameMode() != 3)) {
                 num++;
             }
         }
@@ -135,7 +85,13 @@ public class PlayerManagerImpl implements PlayerManager {
     }
 
     @Override
-    public int getPlayerCount(Collection<String> filter) {
-        return this.getPlayers(filter).size();
+    public int getPlayerCount(Filter filter) {
+        int num = 0;
+        for (IPlayer p : players) {
+            if ((includeSpectators || p.getGameMode() != 3) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && filter.test(viewer, p)) {
+                num++;
+            }
+        }
+        return num;
     }
 }

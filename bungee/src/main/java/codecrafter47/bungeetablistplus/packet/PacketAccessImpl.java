@@ -196,7 +196,7 @@ public class PacketAccessImpl implements PacketAccess {
             }
             if (updatedPings != null) {
                 PlayerListItem packet = new PlayerListItem();
-                packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+                packet.setAction(PlayerListItem.Action.UPDATE_LATENCY);
                 packet.setItems(updatedPings.toArray(new PlayerListItem.Item[updatedPings.size()]));
                 connection.sendPacket(packet);
             }

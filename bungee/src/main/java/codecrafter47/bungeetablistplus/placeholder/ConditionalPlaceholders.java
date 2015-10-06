@@ -30,7 +30,7 @@ public class ConditionalPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         bind("insertIfGamemode3").withTemplateArgs().to((context, args) -> context.getPlayer().getGameMode() == 3 ? args : SlotTemplate.empty());
-        bind("insertIfHidden").withTemplateArgs().to((context, args) -> BungeeTabListPlus.isHidden(context.getPlayer(), context.getViewer()) ? args : SlotTemplate.empty());
+        bind("insertIfHidden").withTemplateArgs().to((context, args) -> BungeeTabListPlus.isHidden(context.getPlayer()) ? args : SlotTemplate.empty());
         bind("insertIfServersSame").withTemplateArgs().to((context, args) -> {
             Optional<ServerGroup> serverGroup = context.getServerGroup();
             if (serverGroup.isPresent() && serverGroup.get().getServerNames().contains(context.getViewer().getServer().getInfo().getName()))

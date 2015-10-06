@@ -39,4 +39,11 @@ public interface ServerGroup {
      * @return the name of this group
      */
     String getName();
+
+    /**
+     * Get a filter that applies for every player which is on a server that is part of the group
+     *
+     * @return the predicate
+     */
+    PlayerManager.Filter getFilterForPlayerManager();
 }

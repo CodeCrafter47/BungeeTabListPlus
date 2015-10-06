@@ -20,19 +20,22 @@
 package codecrafter47.bungeetablistplus.tablist;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
 import java.util.Collections;
 
 public class GenericServerGroup implements ServerGroup {
-    private final ImmutableList<String> serverNames;
+    private final ImmutableSet<String> serverNames;
     private final String name;
+    private final PlayerManager.Filter filter;
 
     public GenericServerGroup(Collection<String> servers, String name) {
-        this.serverNames = ImmutableList.copyOf(servers);
+        this.serverNames = ImmutableSet.copyOf(servers);
         this.name = name;
+        this.filter = (viewer, player) -> player.getServer().map(server -> serverNames.contains(server.getName())).orElse(false);
     }
 
     public static ServerGroup of(String serverName) {
@@ -52,5 +55,10 @@ public class GenericServerGroup implements ServerGroup {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public PlayerManager.Filter getFilterForPlayerManager() {
+        return filter;
     }
 }

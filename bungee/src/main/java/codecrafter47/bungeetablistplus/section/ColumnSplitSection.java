@@ -40,8 +40,7 @@ public class ColumnSplitSection extends Section {
             if (pc[i] != null) {
                 int m = pc[i].getMaxSize();
                 int span = 1;
-                while (i + span != pc.length && pc[i + span] != null && (i + span < pc.length && pc[i + span - 1].filter.
-                        equals(pc[i + span].filter))) {
+                while (i + span != pc.length && pc[i + span] != null && (i + span < pc.length && pc[i + span - 1].filter.equals(pc[i + span].filter))) {
                     span++;
                 }
                 m = (m + span - 1) / span;

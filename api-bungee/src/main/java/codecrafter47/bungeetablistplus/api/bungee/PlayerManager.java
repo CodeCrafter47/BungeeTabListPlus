@@ -19,7 +19,8 @@
 
 package codecrafter47.bungeetablistplus.api.bungee;
 
-import java.util.Collection;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 import java.util.List;
 
 /**
@@ -31,17 +32,16 @@ public interface PlayerManager {
      * gets a list of players
      * Does not include hidden players
      *
-     * @param filter            names of servers or permission groups, if provided only players on these
-     *                          servers/ in these permission groups will be shown in the tab list
+     * @param filter decides which players you want
      * @return the resulting list of players
      */
-    List<IPlayer> getPlayers(Collection<String> filter);
+    List<IPlayer> getPlayers(Filter filter);
 
     /**
      * The number of players on a server
      * Does not count hidden players
      *
-     * @param server            the name of the server
+     * @param server the name of the server
      * @return the number of players on the given server
      */
     int getServerPlayerCount(String server);
@@ -58,9 +58,13 @@ public interface PlayerManager {
      * Counts players
      * Does not count hidden players
      *
-     * @param filter            names of servers or permission groups, if provided only players on these
-     *                          servers/ in these permission groups will be shown in the tab list
+     * @param filter decides which players you want
      * @return the number of players on the given server
      */
-    int getPlayerCount(Collection<String> filter);
+    int getPlayerCount(Filter filter);
+
+    interface Filter {
+
+        boolean test(ProxiedPlayer viewer, IPlayer player);
+    }
 }
