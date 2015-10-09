@@ -63,11 +63,14 @@ public class TabList18v3 implements TabListHandler {
 
     private final CustomTabList18 playerTabListHandler;
 
+    private final boolean isOnlineMode;
+
     private String sentHeader = null;
     private String sendFooter = null;
 
     public TabList18v3(CustomTabList18 playerTabListHandler) {
         this.playerTabListHandler = playerTabListHandler;
+        this.isOnlineMode = playerTabListHandler.getPlayer().getPendingConnection().isOnlineMode();
     }
 
     @Override
@@ -123,7 +126,7 @@ public class TabList18v3 implements TabListHandler {
                 Slot slot = i < tabList.getSize() ? tabList.getSlot(i) : null;
                 String text;
                 int ping;
-                Skin skin;
+                Skin skin = SkinManager.defaultSkin;
                 if (slot != null) {
                     text = slot.getText();
                     if (charLimit > 0) {
@@ -137,14 +140,18 @@ public class TabList18v3 implements TabListHandler {
                         text = text.substring(0, text.length() - 1);
                     }
                     ping = slot.getPing();
-                    skin = slot.getSkin();
-                    if (skin == SkinManager.defaultSkin) {
-                        skin = tabList.getDefaultSkin();
+                    if (isOnlineMode) {
+                        skin = slot.getSkin();
+                        if (skin == SkinManager.defaultSkin) {
+                            skin = tabList.getDefaultSkin();
+                        }
                     }
                 } else {
                     text = "";
                     ping = tabList.getDefaultPing();
-                    skin = tabList.getDefaultSkin();
+                    if (isOnlineMode) {
+                        skin = tabList.getDefaultSkin();
+                    }
                 }
 
                 UUID uuid = null;

@@ -58,11 +58,14 @@ public class TabList18 implements TabListHandler {
 
     private final PlayerTablistHandler playerTablistHandler;
 
+    private final boolean isOnlineMode;
+
     private String sentHeader = null;
     private String sendFooter = null;
 
     public TabList18(PlayerTablistHandler playerTablistHandler) {
         this.playerTablistHandler = playerTablistHandler;
+        isOnlineMode = playerTablistHandler.getPlayer().getPendingConnection().isOnlineMode();
     }
 
     @Override
@@ -82,7 +85,7 @@ public class TabList18 implements TabListHandler {
             Slot slot = tabList.getSlot((i % tabList.getRows()) * tabList.getColumns() + (i / tabList.getRows()));
             String text;
             int ping;
-            Skin skin;
+            Skin skin = SkinManager.defaultSkin;
             if (slot != null) {
                 text = slot.getText();
                 if (charLimit > 0) {
@@ -96,14 +99,18 @@ public class TabList18 implements TabListHandler {
                     text = text.substring(0, text.length() - 1);
                 }
                 ping = slot.getPing();
-                skin = slot.getSkin();
-                if (skin == SkinManager.defaultSkin) {
-                    skin = tabList.getDefaultSkin();
+                if (isOnlineMode) {
+                    skin = slot.getSkin();
+                    if (skin == SkinManager.defaultSkin) {
+                        skin = tabList.getDefaultSkin();
+                    }
                 }
             } else {
                 text = "";
                 ping = tabList.getDefaultPing();
-                skin = tabList.getDefaultSkin();
+                if (isOnlineMode) {
+                    skin = tabList.getDefaultSkin();
+                }
             }
             updateSlot(batch, i, text, ping, skin);
         }
