@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.api.bungee.tablist;
 
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
@@ -98,6 +99,8 @@ public abstract class SlotTemplate {
      * @return the created SlotTemplate
      */
     public static SlotTemplate animate(List<SlotTemplate> templates, double interval) {
+        Preconditions.checkArgument(!templates.isEmpty(), "List of templates is empty");
+        Preconditions.checkArgument(interval > 0, "Interval must be greater than zero");
         return new SlotTemplateAnimated(templates, interval);
     }
 
