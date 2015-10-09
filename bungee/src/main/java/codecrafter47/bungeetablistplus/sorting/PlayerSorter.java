@@ -19,11 +19,13 @@
 
 package codecrafter47.bungeetablistplus.sorting;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 public class PlayerSorter {
     private final List<SortingRule> rules;
@@ -33,17 +35,21 @@ public class PlayerSorter {
     }
 
     public void sort(TabListContext context, List<IPlayer> players) {
-        Collections.sort(players, (p1, p2) -> {
-            for (SortingRule rule : rules) {
-                int i = rule.compare(context, p1, p2);
-                if (i != 0) {
-                    return i;
+        try {
+            Collections.sort(players, (p1, p2) -> {
+                for (SortingRule rule : rules) {
+                    int i = rule.compare(context, p1, p2);
+                    if (i != 0) {
+                        return i;
+                    }
                 }
-            }
-            if (players.indexOf(p2) > players.indexOf(p1)) {
-                return -1;
-            }
-            return 1;
-        });
+                if (players.indexOf(p2) > players.indexOf(p1)) {
+                    return -1;
+                }
+                return 1;
+            });
+        } catch (IllegalArgumentException ex) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to sort players using rules " + rules, ex);
+        }
     }
 }
