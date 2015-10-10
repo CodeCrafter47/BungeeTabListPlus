@@ -27,12 +27,16 @@ import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import codecrafter47.bungeetablistplus.util.FastChat;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class TabList18v3 implements TabListHandler {
@@ -47,15 +51,11 @@ public class TabList18v3 implements TabListHandler {
         }
     }
 
-    private final Map<UUID, Integer> sendPing = new HashMap<>();
-
     private int sendSlots = 0;
 
     private final Map<UUID, String> send = new HashMap<>();
-
+    private final Map<UUID, Integer> sendPing = new HashMap<>();
     private final Map<UUID, String> sendTextures = new HashMap<>();
-
-    private final Map<UUID, String> sendUsernames = new HashMap<>();
 
     private final TIntObjectMap<String> sendTeam = new TIntObjectHashMap<>();
 
@@ -104,22 +104,14 @@ public class TabList18v3 implements TabListHandler {
             PacketAccess.Batch batch = packetAccess.createBatch();
             resize(batch, numFakePlayers);
 
-            int charLimit = BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().charLimit;
+            int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+            boolean isSpectator = ((UserConnection) playerTabListHandler.getPlayer()).getGamemode() == 3;
 
-            // create uuidList
-            List<UUID> list = new ArrayList<>(playerTabListHandler.uuids.keySet());
+            Map<UUID, String> realPlayerMap = Maps.newHashMap(playerTabListHandler.uuids);
+            int fakePlayerCnt = 0;
 
-            sendUsernames.clear();
-            for (UUID uuid : list) {
-                sendUsernames.put(uuid, playerTabListHandler.uuids.get(uuid));
-            }
-
-            List<UUID> fakeUUIDs = new ArrayList<>();
-            for (int i = 0; i < numFakePlayers; i++) {
-                UUID uuid = fakePlayerUUIDs[i];
-                fakeUUIDs.add(uuid);
-                sendUsernames.put(uuid, fakePlayerUsernames[i]);
+            if (isSpectator) {
+                realPlayerMap.remove(playerTabListHandler.getPlayer().getUniqueId());
             }
 
             for (int i = 0; i < tab_size; i++) {
@@ -154,45 +146,39 @@ public class TabList18v3 implements TabListHandler {
                     }
                 }
 
-                UUID uuid = null;
-                boolean reorder = true;
-                if (skin.getOwner() != null && list.contains(skin.getOwner()) && (((UserConnection) playerTabListHandler.getPlayer()).getGamemode() != 3 || !Objects.equals(skin.getOwner(), playerTabListHandler.getPlayer().getUniqueId()))) {
+                UUID uuid;
+                String username;
+                if (skin.getOwner() != null && realPlayerMap.containsKey(skin.getOwner())) {
                     uuid = skin.getOwner();
-                    list.remove(uuid);
-                }
-                if (uuid == null && !fakeUUIDs.isEmpty()) {
-                    uuid = fakeUUIDs.get(0);
-                    fakeUUIDs.remove(uuid);
-                }
-                if (uuid == null) {
-                    for (int j = 0; j < list.size(); j++) {
-                        uuid = list.get(0);
-                        if (!(Objects.equals(uuid, playerTabListHandler.getPlayer().getUniqueId()) && ((UserConnection) playerTabListHandler.getPlayer()).getGamemode() == 3)) {
-                            list.remove(uuid);
-                            reorder = false;
-                            break;
-                        }
-                    }
-                }
-                if (uuid == null) {
-                    uuid = list.get(0);
-                    list.remove(uuid);
-                    reorder = false;
+                    username = realPlayerMap.get(uuid);
+                    realPlayerMap.remove(uuid);
+                } else if (fakePlayerCnt < numFakePlayers) {
+                    uuid = fakePlayerUUIDs[fakePlayerCnt];
+                    username = fakePlayerUsernames[fakePlayerCnt];
+                    fakePlayerCnt++;
+                } else if (!realPlayerMap.isEmpty()) {
+                    Map.Entry<UUID, String> entry = realPlayerMap.entrySet().iterator().next();
+                    uuid = entry.getKey();
+                    username = entry.getValue();
+                    realPlayerMap.remove(uuid);
+                } else {
+                    uuid = playerTabListHandler.getPlayer().getUniqueId();
+                    username = playerTabListHandler.getPlayer().getName();
                 }
 
                 String oldPlayer = sendTeam.get(i);
                 if (oldPlayer != null) {
-                    if (!oldPlayer.equals(sendUsernames.get(uuid))) {
+                    if (!oldPlayer.equals(username)) {
                         batch.removePlayerFromTeam(fakePlayerUsernames[i], oldPlayer);
-                        batch.addPlayerToTeam(fakePlayerUsernames[i], sendUsernames.get(uuid));
-                        sendTeam.put(i, sendUsernames.get(uuid));
+                        batch.addPlayerToTeam(fakePlayerUsernames[i], username);
+                        sendTeam.put(i, username);
                     }
                 } else {
-                    batch.createTeam(fakePlayerUsernames[i], sendUsernames.get(uuid));
-                    sendTeam.put(i, sendUsernames.get(uuid));
+                    batch.createTeam(fakePlayerUsernames[i], username);
+                    sendTeam.put(i, username);
                 }
 
-                updateSlot(batch, uuid, text, ping, skin);
+                updateSlot(batch, uuid, username, text, ping, skin);
             }
             batch.send(playerTabListHandler.getPlayer().unsafe());
 
@@ -238,7 +224,7 @@ public class TabList18v3 implements TabListHandler {
         sendPing.remove(offlineId);
     }
 
-    private void updateSlot(PacketAccess.Batch batch, UUID offlineId, String text, int ping, Skin skin) {
+    private void updateSlot(PacketAccess.Batch batch, UUID offlineId, String username, String text, int ping, Skin skin) {
         boolean textureUpdate = false;
         String[] textures = skin.toProperty();
         if (textures != null) {
@@ -255,7 +241,7 @@ public class TabList18v3 implements TabListHandler {
                 properties = new String[0][0];
                 sendTextures.remove(offlineId);
             }
-            batch.createOrUpdatePlayer(offlineId, sendUsernames.get(offlineId), 0, ping, properties);
+            batch.createOrUpdatePlayer(offlineId, username, 0, ping, properties);
             textureUpdate = true;
             sendPing.put(offlineId, 0);
         }

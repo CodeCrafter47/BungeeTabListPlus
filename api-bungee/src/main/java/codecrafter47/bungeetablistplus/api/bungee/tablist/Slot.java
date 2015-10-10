@@ -58,7 +58,6 @@ public final class Slot {
      * @param skin the skin
      */
     public Slot(String text, int ping, Skin skin) {
-        super();
         this.text = text;
         if (ping < 0) {
             this.ping = -1;
@@ -102,5 +101,26 @@ public final class Slot {
      */
     public Skin getSkin() {
         return skin;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Slot slot = (Slot) o;
+
+        if (ping != slot.ping) return false;
+        if (!text.equals(slot.text)) return false;
+        return skin.equals(slot.skin);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = text.hashCode();
+        result = 31 * result + ping;
+        result = 31 * result + skin.hashCode();
+        return result;
     }
 }
