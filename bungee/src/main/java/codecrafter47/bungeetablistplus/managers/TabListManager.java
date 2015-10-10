@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.config.ConfigParser;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.IConfigTabListProvider;
 import net.md_5.bungee.api.ChatColor;
@@ -187,6 +188,9 @@ public class TabListManager implements Listener {
     }
 
     public void setCustomTabList(ProxiedPlayer player, TabListProvider tabList) {
+        if (!(tabList instanceof CheckedTabListProvider)) {
+            setCustomTabList(player, new CheckedTabListProvider(tabList));
+        }
         customTabLists.put(player, tabList);
     }
 
