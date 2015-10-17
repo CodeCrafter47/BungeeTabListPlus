@@ -149,6 +149,11 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     @Override
     public void onUpdate(PlayerListItem pli) {
         try {
+            if (pli.getItems().length == 0) {
+                // ignore
+                return;
+            }
+
             pli = CustomTabList18.rewrite(pli);
 
             for (PlayerListItem.Item i : pli.getItems()) {
