@@ -37,9 +37,9 @@ public class MyTabList implements TabListHandler {
     /* ======================================================================== */
     private final Collection<String> sentStuff = new HashSet<>();
     /* ======================================================================== */
-    private final String[] sent = new String[ConfigManager.getTabSize()];
-    private final String[] slots = new String[ConfigManager.getTabSize()];
-    private final int[] slots_ping = new int[ConfigManager.getTabSize()];
+    private final String[] sent = new String[160];
+    private final String[] slots = new String[160];
+    private final int[] slots_ping = new int[160];
     private int rowLim;
     private final PlayerTablistHandler playerTablistHandler;
 

@@ -44,11 +44,11 @@ public class ScoreboardTabList implements TabListHandler {
         return String.valueOf(ChatColor.MAGIC) + String.valueOf(alloc) + ChatColor.RESET;
     }
 
-    private final int[] slots_ping = new int[ConfigManager.getTabSize()];
+    private final int[] slots_ping = new int[160];
 
     private int sendSlots = 0;
 
-    private final String[] send = new String[ConfigManager.getTabSize()];
+    private final String[] send = new String[160];
 
     public ScoreboardTabList(PlayerTablistHandler playerTablistHandler) {
         this.playerTablistHandler = playerTablistHandler;
