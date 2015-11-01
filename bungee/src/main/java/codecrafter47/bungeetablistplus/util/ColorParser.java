@@ -20,9 +20,6 @@ package codecrafter47.bungeetablistplus.util;
 
 import net.md_5.bungee.api.ChatColor;
 
-/**
- * @author Florian Stober
- */
 public class ColorParser {
 
     public static String extractColorCodes(String s) {
@@ -30,7 +27,7 @@ public class ColorParser {
         boolean underlined = false;
         boolean magic = false;
         boolean italic = false;
-        boolean durchgestrichen = false;
+        boolean strikethrough = false;
         ChatColor color = ChatColor.WHITE;
 
         boolean escaped = false;
@@ -48,21 +45,21 @@ public class ColorParser {
                 } else if (code.equals(ChatColor.UNDERLINE)) {
                     underlined = true;
                 } else if (code.equals(ChatColor.STRIKETHROUGH)) {
-                    durchgestrichen = true;
+                    strikethrough = true;
                 } else if (code.equals(ChatColor.MAGIC)) {
                     magic = true;
                 } else if (code.equals(ChatColor.RESET)) {
                     bold = false;
                     italic = false;
                     underlined = false;
-                    durchgestrichen = false;
+                    strikethrough = false;
                     magic = false;
                     color = ChatColor.WHITE;
                 } else {
                     bold = false;
                     italic = false;
                     underlined = false;
-                    durchgestrichen = false;
+                    strikethrough = false;
                     magic = false;
                     color = code;
                 }
@@ -86,7 +83,7 @@ public class ColorParser {
         if (underlined) {
             string.append(ChatColor.UNDERLINE);
         }
-        if (durchgestrichen) {
+        if (strikethrough) {
             string.append(ChatColor.STRIKETHROUGH);
         }
         if (magic) {
