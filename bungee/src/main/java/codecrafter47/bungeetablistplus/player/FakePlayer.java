@@ -30,24 +30,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FakePlayer implements IPlayer {
-    String name;
+    private final String name;
     ServerInfo server;
     private int ping;
     private int gamemode;
     private PlayerSkin skin;
-    private UUID uuid;
+    private final UUID uuid;
 
     public FakePlayer(String name, ServerInfo server) {
-        this();
+        this.ping = 0;
+        this.gamemode = 0;
+        this.skin = null;
         this.name = name;
         this.server = server;
-        uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
-    }
-
-    public FakePlayer() {
-        ping = 0;
-        gamemode = 0;
-        skin = null;
+        this.uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
     }
 
     @Override

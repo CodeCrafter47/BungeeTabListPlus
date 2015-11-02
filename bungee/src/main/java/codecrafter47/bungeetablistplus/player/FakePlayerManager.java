@@ -57,9 +57,7 @@ public class FakePlayerManager implements IPlayerProvider {
         } else if (Math.random() < 0.9 && offline.size() > 0) {
             // add player
             String name = offline.get((int) (Math.random() * offline.size()));
-            FakePlayer player = new FakePlayer();
-            player.name = name;
-            player.server = new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size()));
+            FakePlayer player = new FakePlayer(name, new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size())));
             offline.remove(name);
             online.add(player);
         } else if (online.size() > 0) {
