@@ -44,6 +44,15 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         });
         addBukkitBridgePlaceholder("team", DataKeys.Team);
         addBukkitBridgePlaceholder("balance", DataKeys.Vault_Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
+        addBukkitBridgePlaceholder("balance2", DataKeys.Vault_Balance, balance -> balance.map(b -> {
+            if (b > 2000000) {
+                return String.format("%1.0fM", b / 1000000);
+            } else if (b > 2000) {
+                return String.format("%1.0fK", b / 1000);
+            } else {
+                return String.format("%1.0f", b);
+            }
+        }).orElse("-"));
         addBukkitBridgePlaceholder("factionName", DataKeys.Factions_FactionName);
         addBukkitBridgePlaceholder("onlineFactionMembers", DataKeys.Factions_OnlineFactionMembers, num -> num.orElse(-1).toString());
         addBukkitBridgePlaceholder("factionsWhere", DataKeys.Factions_FactionsWhere);
