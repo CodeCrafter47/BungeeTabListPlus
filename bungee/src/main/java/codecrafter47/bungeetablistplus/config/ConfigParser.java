@@ -26,7 +26,14 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.section.*;
+import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
+import codecrafter47.bungeetablistplus.section.ColumnSplitSection;
+import codecrafter47.bungeetablistplus.section.FillBukkitPlayers;
+import codecrafter47.bungeetablistplus.section.FillPlayersSection;
+import codecrafter47.bungeetablistplus.section.PlayerColumn;
+import codecrafter47.bungeetablistplus.section.Section;
+import codecrafter47.bungeetablistplus.section.ServerSection;
+import codecrafter47.bungeetablistplus.section.StaticSection;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.sorting.SortingRule;
 import codecrafter47.bungeetablistplus.sorting.SortingRuleRegistry;
@@ -41,7 +48,14 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -210,8 +224,18 @@ public class ConfigParser {
             plugin.requireUpdateInterval(config.footerCycleInterval);
         }
 
-        SlotTemplate header = SlotTemplate.animate(config.header.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
-        SlotTemplate footer = SlotTemplate.animate(config.footer.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
+        SlotTemplate header;
+        if (!config.header.isEmpty()) {
+            header = SlotTemplate.animate(config.header.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
+        } else {
+            header = SlotTemplate.empty();
+        }
+        SlotTemplate footer;
+        if (!config.footer.isEmpty()) {
+            footer = SlotTemplate.animate(config.footer.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
+        } else {
+            footer = SlotTemplate.empty();
+        }
 
         return new ConfigTabListProvider(topSectionProviders, plugin, config, config.shownFooterHeader, botSectionProviders, header, footer);
     }
