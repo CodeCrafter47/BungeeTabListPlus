@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
@@ -62,6 +63,7 @@ public class SkinManager {
 
     @SneakyThrows
     public Skin getSkin(String nameOrUUID) {
+        Preconditions.checkNotNull(nameOrUUID, "nameOrUuid");
         Skin skin = cache.getIfPresent(nameOrUUID);
         if (skin != null) return skin;
         if (!fetchingSkins.contains(nameOrUUID)) {
