@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.tablist;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -35,6 +36,8 @@ public class GenericTabListContext extends AbstractTabListContext {
     private final PlayerManager playerManager;
 
     public GenericTabListContext(int rows, int columns, ProxiedPlayer player, PlayerManager playerManager) {
+        Preconditions.checkArgument(rows > 0, "tab list has 0 rows");
+        Preconditions.checkArgument(columns > 0, "tab list has 0 columns");
         this.rows = rows;
         this.columns = columns;
         this.playerManager = playerManager;
