@@ -63,5 +63,20 @@ public final class BTLPDataKeys {
         public String getName() {
             return name;
         }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode() + name.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof ThirdPartyVariableDataKey && ((ThirdPartyVariableDataKey) obj).name.equals(name);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + ":" + name;
+        }
     }
 }
