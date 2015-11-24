@@ -9,6 +9,13 @@
 
     <artifactId>bungee-plugin</artifactId>
 
+    <repositories>
+        <repository>
+            <id>sabbertran-repo</id>
+            <url>http://repo.sabbertran.de</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>net.md-5</groupId>
@@ -104,6 +111,12 @@
             <groupId>protocolsupport</groupId>
             <artifactId>ProtocolSupportBungee</artifactId>
             <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.sabbertran.proxysuite</groupId>
+            <artifactId>ProxySuite</artifactId>
+            <version>BETA-0.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

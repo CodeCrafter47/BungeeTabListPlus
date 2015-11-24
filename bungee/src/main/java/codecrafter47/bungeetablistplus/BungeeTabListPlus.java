@@ -32,9 +32,25 @@ import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
-import codecrafter47.bungeetablistplus.managers.*;
-import codecrafter47.bungeetablistplus.packet.*;
-import codecrafter47.bungeetablistplus.placeholder.*;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.managers.PermissionManager;
+import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
+import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.managers.TabListManager;
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
+import codecrafter47.bungeetablistplus.packet.LegacyPacketAccessImpl;
+import codecrafter47.bungeetablistplus.packet.PacketAccess;
+import codecrafter47.bungeetablistplus.packet.PacketAccessImpl;
+import codecrafter47.bungeetablistplus.packet.TeamPacket;
+import codecrafter47.bungeetablistplus.placeholder.BasicPlaceholders;
+import codecrafter47.bungeetablistplus.placeholder.BukkitPlaceholders;
+import codecrafter47.bungeetablistplus.placeholder.ColorPlaceholder;
+import codecrafter47.bungeetablistplus.placeholder.ConditionalPlaceholders;
+import codecrafter47.bungeetablistplus.placeholder.OnlineStatePlaceholder;
+import codecrafter47.bungeetablistplus.placeholder.PlayerCountPlaceholder;
+import codecrafter47.bungeetablistplus.placeholder.RedisBungeePlaceholders;
+import codecrafter47.bungeetablistplus.placeholder.TimePlaceholders;
 import codecrafter47.bungeetablistplus.player.BungeePlayerProvider;
 import codecrafter47.bungeetablistplus.player.FakePlayerManager;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
@@ -47,6 +63,7 @@ import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import com.google.common.base.Preconditions;
+import de.sabbertran.proxysuite.ProxySuiteAPI;
 import lombok.Getter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
@@ -63,7 +80,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -522,6 +546,21 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         bukkitBridge.get(player, DataKeys.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
         bukkitBridge.get(player, DataKeys.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
         bukkitBridge.get(player, DataKeys.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
+
+        // check ProxyCore
+        if (!hidden[0]) {
+            if (ProxyServer.getInstance().getPluginManager().getPlugin("ProxySuite") != null) {
+                try {
+                    ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(player.getName());
+                    if (proxiedPlayer != null) {
+                        hidden[0] |= ProxySuiteAPI.isVanished(proxiedPlayer);
+                    }
+                } catch (Throwable th) {
+                    getInstance().getLogger().log(Level.WARNING, "An error occurred while looking up a players vanish status from ProxyCore.", th);
+                }
+            }
+        }
+
         return hidden[0];
     }
 
