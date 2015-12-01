@@ -35,21 +35,33 @@ public class PlayerSorter {
     }
 
     public void sort(TabListContext context, List<IPlayer> players) {
-        try {
-            Collections.sort(players, (p1, p2) -> {
-                for (SortingRule rule : rules) {
-                    int i = rule.compare(context, p1, p2);
-                    if (i != 0) {
-                        return i;
+        Throwable exception = null;
+        // TODO this isn't a really efficient solution for the problem
+        //      problem is we are sorting mutable data. Trying 5 times increases
+        //      the chance that the won't be an error. A better solution would be
+        //      to use a sort algorithm that doesn't care about concurrent modification
+        //      of the sorted data. If the players aren't sorted 100% correctly
+        //      that would be acceptable.
+        for (int attempt = 1; attempt <= 5; attempt++) {
+            try {
+                Collections.sort(players, (p1, p2) -> {
+                    for (SortingRule rule : rules) {
+                        int i = rule.compare(context, p1, p2);
+                        if (i != 0) {
+                            return i;
+                        }
                     }
-                }
-                if (players.indexOf(p2) > players.indexOf(p1)) {
-                    return -1;
-                }
-                return 1;
-            });
-        } catch (IllegalArgumentException ex) {
-            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to sort players using rules " + rules, ex);
+                    if (players.indexOf(p2) > players.indexOf(p1)) {
+                        return -1;
+                    }
+                    return 1;
+                });
+            } catch (IllegalArgumentException ex) {
+                exception = ex;
+            }
+        }
+        if (exception != null) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to sort players using rules " + rules, exception);
         }
     }
 }
