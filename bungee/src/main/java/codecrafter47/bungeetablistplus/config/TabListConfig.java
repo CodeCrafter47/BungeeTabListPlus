@@ -224,6 +224,9 @@ public class TabListConfig extends Configuration {
         }
 
         headerCycleInterval = ((Number) map.getOrDefault("headerAnimationUpdateInterval", headerCycleInterval)).doubleValue();
+        if (headerCycleInterval <= 0) {
+            headerCycleInterval = 1;
+        }
 
         if (map.containsKey("footer")) {
             Object footer = map.get("footer");
@@ -235,6 +238,9 @@ public class TabListConfig extends Configuration {
         }
 
         footerCycleInterval = ((Number) map.getOrDefault("footerAnimationUpdateInterval", footerCycleInterval)).doubleValue();
+        if (footerCycleInterval <= 0) {
+            footerCycleInterval = 1;
+        }
 
         if (map.containsKey("shownFooterHeader")) {
             shownFooterHeader = (boolean) map.get("shownFooterHeader");
