@@ -21,9 +21,7 @@ package codecrafter47.bungeetablistplus.packet;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.DownstreamBridge;
 import net.md_5.bungee.protocol.AbstractPacketHandler;
@@ -80,6 +78,8 @@ public class TeamPacket extends Team {
         }
         try {
             super.handle(handler);
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "An error has occurred in BungeePerms while handling a scoreboard packet. This is a serious issue and may lead to a client crash.", th);
         } finally {
             try {
                 if (modified) {
