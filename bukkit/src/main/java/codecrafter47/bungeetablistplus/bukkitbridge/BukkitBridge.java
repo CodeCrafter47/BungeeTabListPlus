@@ -47,7 +47,12 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -140,7 +145,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
                                             player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
                                         }
                                     } catch (Throwable ex) {
-                                        plugin.getLogger().log(Level.SEVERE, "something funny happened", ex);
+                                        plugin.getLogger().log(Level.WARNING, "PlaceholderAPI error", ex);
                                     }
                                 });
                             }
