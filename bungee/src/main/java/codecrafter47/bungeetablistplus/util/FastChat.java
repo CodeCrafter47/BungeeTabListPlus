@@ -72,31 +72,33 @@ public final class FastChat {
                 }
 
                 ChatColor var10 = ChatColor.getByChar(c);
-                switch (var10) {
-                    case BOLD:
-                        bold = true;
-                        break;
-                    case ITALIC:
-                        italic = true;
-                        break;
-                    case UNDERLINE:
-                        underlined = true;
-                        break;
-                    case STRIKETHROUGH:
-                        strikethrough = true;
-                        break;
-                    case MAGIC:
-                        obfuscated = true;
-                        break;
-                    case RESET:
-                        var10 = ChatColor.WHITE;
-                    default:
-                        bold = false;
-                        italic = false;
-                        underlined = false;
-                        strikethrough = false;
-                        obfuscated = false;
-                        color = var10;
+                if (var10 != null) {
+                    switch (var10) {
+                        case BOLD:
+                            bold = true;
+                            break;
+                        case ITALIC:
+                            italic = true;
+                            break;
+                        case UNDERLINE:
+                            underlined = true;
+                            break;
+                        case STRIKETHROUGH:
+                            strikethrough = true;
+                            break;
+                        case MAGIC:
+                            obfuscated = true;
+                            break;
+                        case RESET:
+                            var10 = ChatColor.WHITE;
+                        default:
+                            bold = false;
+                            italic = false;
+                            underlined = false;
+                            strikethrough = false;
+                            obfuscated = false;
+                            color = var10;
+                    }
                 }
             } else {
                 if (c == '"') {
