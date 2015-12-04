@@ -89,7 +89,21 @@ class ResendThread implements Runnable {
                 tablistHandler.unload();
                 return;
             }
-            TabList tabList = new GenericTabList();
+            TabList tabList;
+
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {
+                int whishedTabListSize = tlp.getWhishedTabListSize();
+                if (whishedTabListSize < 1) {
+                    whishedTabListSize = 1;
+                }
+                if (whishedTabListSize > 80) {
+                    whishedTabListSize = 80;
+                }
+                int columns = (whishedTabListSize + 19) / 20;
+                tabList = new GenericTabList(whishedTabListSize / columns, columns);
+            } else {
+                tabList = new GenericTabList();
+            }
 
             TabListContext context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager(tablistHandler.getPlayer()));
             context = context.setPlayer(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer()));

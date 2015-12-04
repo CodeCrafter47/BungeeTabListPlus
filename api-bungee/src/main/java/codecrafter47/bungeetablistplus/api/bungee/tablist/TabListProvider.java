@@ -39,4 +39,16 @@ public interface TabListProvider {
      * @param context the TabListContext
      */
     void fillTabList(ProxiedPlayer player, TabList tabList, TabListContext context);
+
+    /**
+     * This method may be called by BungeeTabListPlus. You can use it to tell BungeeTabListPlus how big you like
+     * the tab list to be. The plugin will do its best to fulfill your request. However there is no guarantee
+     * that the tab list will have the size you asked for. You can query the tab list size from the TabListContext
+     * object in the fillTabList method.
+     *
+     * @return requested tab list size
+     */
+    default int getWhishedTabListSize() {
+        return 80;
+    }
 }

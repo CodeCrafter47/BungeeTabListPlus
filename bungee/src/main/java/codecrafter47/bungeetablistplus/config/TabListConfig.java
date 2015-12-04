@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.Configuration;
+import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -82,6 +83,9 @@ public class TabListConfig extends Configuration {
     public List<String> morePlayersLines = new ArrayList<>();
 
     public List<String> tabList = new ArrayList<>();
+
+    public int tab_size = ConfigManager.getTabSize();
+
     private final String name;
 
     {
@@ -285,6 +289,14 @@ public class TabListConfig extends Configuration {
         if (map.containsKey("tabList")) {
             tabList = (List<String>) map.get("tabList");
         }
+
+        tab_size = ((Number) map.getOrDefault("tab_size", 80)).intValue();
+        if (tab_size <= 0) {
+            tab_size = 1;
+        }
+        if (tab_size > 80) {
+            tab_size = 80;
+        }
     }
 
     @Override
@@ -340,6 +352,12 @@ public class TabListConfig extends Configuration {
                 "WARNING: [ALIGN=LEFT] and other formatting tags will not operate correctly",
                 "WARNING: If this is enabled it is STRONGLY recommended to also enable verticalMode");
         write("autoShrinkTabList", autoShrinkTabList);
+
+        writeComments("1.8 ONLY",
+                "Number of slots in the tab list. Please not that this only affects 1.8 clients",
+                "tab_size for 1.7 and older clients is configured in bungee's config.yml",
+                "Can be from 1 to 80.");
+        write("tab_size", tab_size);
 
         writeComments("how Players should be grouped",
                 "You can use 'SERVER' or 'NONE'");

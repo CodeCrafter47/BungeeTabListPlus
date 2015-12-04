@@ -25,15 +25,7 @@ import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
-import codecrafter47.bungeetablistplus.section.ColumnSplitSection;
-import codecrafter47.bungeetablistplus.section.FillBukkitPlayers;
-import codecrafter47.bungeetablistplus.section.FillPlayersSection;
-import codecrafter47.bungeetablistplus.section.PlayerColumn;
-import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.section.ServerSection;
-import codecrafter47.bungeetablistplus.section.StaticSection;
+import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.sorting.SortingRule;
 import codecrafter47.bungeetablistplus.sorting.SortingRuleRegistry;
@@ -48,14 +40,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -65,6 +50,7 @@ import java.util.stream.Collectors;
 public class ConfigParser {
 
     private final BungeeTabListPlus plugin;
+    private final int tab_size;
 
     private static final Pattern PATTERN_ALIGN_BOTTOM = Pattern.compile("\\[ALIGN BOTTOM\\]");
     private static final Pattern PATTERN_ALIGN_LEFT = Pattern.compile("\\[ALIGN LEFT\\]");
@@ -76,9 +62,14 @@ public class ConfigParser {
 
     private static final Pattern PATTERN_FILLPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillplayers(?::(?<filter>.*))?\\}(?<suffix>.*)$");
     private static final Pattern PATTERN_FILLBUKKITPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillbukkitplayers\\}(?<suffix>.*)$");
+    private final int columns;
+    private final int rows;
 
-    public ConfigParser(BungeeTabListPlus plugin) {
+    public ConfigParser(BungeeTabListPlus plugin, int tab_size) {
         this.plugin = plugin;
+        this.tab_size = tab_size;
+        columns = (tab_size + 19) / 20;
+        rows = tab_size / columns;
     }
 
     public IConfigTabListProvider parse(TabListConfig config) {
@@ -119,7 +110,7 @@ public class ConfigParser {
                 if (config.verticalMode) {
                     plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
                 } else {
-                    startColumn[0] = ConfigManager.getCols() - 1;
+                    startColumn[0] = columns - 1;
                 }
             });
 
@@ -128,10 +119,10 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
                 } else {
                     column[0] = Integer.parseInt(matcher.group(1));
-                    if (column[0] >= ConfigManager.getCols()) {
+                    if (column[0] >= columns) {
                         plugin.getLogger().warning(String.format("You used [COLUMN=%d] but the tablist only has %d columns. Setting column to %d",
-                                column[0], ConfigManager.getCols(), ConfigManager.getCols() - 1));
-                        column[0] = ConfigManager.getCols() - 1;
+                                column[0], columns, columns - 1));
+                        column[0] = columns - 1;
                     }
                 }
             });
@@ -141,10 +132,10 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
                 } else {
                     column[0] = Integer.parseInt(matcher.group(1));
-                    if (column[0] >= ConfigManager.getRows()) {
+                    if (column[0] >= rows) {
                         plugin.getLogger().warning(String.format("You used [ROW=%d] but the tablist only has %d rows. Setting row to %d",
-                                column[0], ConfigManager.getRows(), ConfigManager.getRows() - 1));
-                        column[0] = ConfigManager.getRows() - 1;
+                                column[0], rows, rows - 1));
+                        column[0] = rows - 1;
                     }
                 }
             });
@@ -237,7 +228,7 @@ public class ConfigParser {
             footer = SlotTemplate.empty();
         }
 
-        return new ConfigTabListProvider(topSectionProviders, plugin, config, config.shownFooterHeader, botSectionProviders, header, footer);
+        return new ConfigTabListProvider(topSectionProviders, plugin, config, config.shownFooterHeader, botSectionProviders, header, footer, tab_size);
     }
 
     public AutoFillPlayers parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, List<String> g_sort, int g_maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
@@ -289,7 +280,7 @@ public class ConfigParser {
                 if (config.verticalMode) {
                     plugin.getLogger().warning("You can not use [ALIGN RIGHT] in verticalMode");
                 } else {
-                    startColumn[0] = ConfigManager.getCols() - 1;
+                    startColumn[0] = columns - 1;
                 }
             });
 
@@ -302,10 +293,10 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [COLUMN=?] in verticalMode");
                 } else {
                     startColumn[0] = Integer.parseInt(matcher.group(1));
-                    if (startColumn[0] >= ConfigManager.getCols()) {
+                    if (startColumn[0] >= columns) {
                         plugin.getLogger().warning(String.format("You used [COLUMN=%d] but the tablist only has %dcolumns. Setting columns to %d",
-                                startColumn[0], ConfigManager.getCols(), ConfigManager.getCols() - 1));
-                        startColumn[0] = ConfigManager.getCols() - 1;
+                                startColumn[0], columns, columns - 1));
+                        startColumn[0] = columns - 1;
                     }
                 }
             });
@@ -315,10 +306,10 @@ public class ConfigParser {
                     plugin.getLogger().warning("You can not use [ROW=?] in horizontalMode");
                 } else {
                     startColumn[0] = Integer.parseInt(matcher.group(1));
-                    if (startColumn[0] >= ConfigManager.getRows()) {
+                    if (startColumn[0] >= rows) {
                         plugin.getLogger().warning(String.format("You used [ROW=%d] but the tablist only has %d rows. Setting row to %d",
-                                startColumn[0], ConfigManager.getRows(), ConfigManager.getRows() - 1));
-                        startColumn[0] = ConfigManager.getRows() - 1;
+                                startColumn[0], rows, rows - 1));
+                        startColumn[0] = rows - 1;
                     }
                 }
             });

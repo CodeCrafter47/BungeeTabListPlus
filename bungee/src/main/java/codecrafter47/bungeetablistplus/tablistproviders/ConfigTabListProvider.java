@@ -49,8 +49,9 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
     protected final SlotTemplate header;
     protected final SlotTemplate footer;
     private final TablistLayoutManager<Section> layoutManager = new TablistLayoutManager<>();
+    private final int tab_size;
 
-    public ConfigTabListProvider(List<Function<TabListContext, List<Section>>> top, BungeeTabListPlus plugin, TabListConfig config, boolean showHeaderFooter, List<Function<TabListContext, List<Section>>> bot, SlotTemplate header, SlotTemplate footer) {
+    public ConfigTabListProvider(List<Function<TabListContext, List<Section>>> top, BungeeTabListPlus plugin, TabListConfig config, boolean showHeaderFooter, List<Function<TabListContext, List<Section>>> bot, SlotTemplate header, SlotTemplate footer, int tab_size) {
         this.topSectionsProvider = top;
         this.plugin = plugin;
         this.config = config;
@@ -58,6 +59,7 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
         this.botSectionsProvider = bot;
         this.header = header;
         this.footer = footer;
+        this.tab_size = tab_size;
     }
 
     @Override
@@ -117,6 +119,11 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
         }
 
         tabList.setDefaultPing(config.defaultPing);
+    }
+
+    @Override
+    public int getWhishedTabListSize() {
+        return tab_size;
     }
 
     private void precalculateSections(TabListContext context, List<Section> topSections) {
