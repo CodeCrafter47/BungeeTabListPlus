@@ -52,6 +52,8 @@ public class PermissionManager {
             return group != null ? group : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return plugin.getBridge().get(player, DataKeys.Vault_PermissionGroup).orElse("");
+		} else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
+			return plugin.getBridge().get(player, DataKeys.PermissionsEx_PermissionGroup).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
             return getMainGroupFromBungeeCord(player);
         } else {
@@ -179,6 +181,8 @@ public class PermissionManager {
             return prefix != null ? prefix : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return plugin.getBridge().get(player, DataKeys.Vault_Prefix).orElse("");
+		} else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
+			return plugin.getBridge().get(player, DataKeys.PermissionsEx_Prefix).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
             String prefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
             if (prefix != null) {
@@ -275,6 +279,8 @@ public class PermissionManager {
             return suffix == null ? "" : suffix;
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return plugin.getBridge().get(player, DataKeys.Vault_Suffix).orElse("");
+        } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
+            return plugin.getBridge().get(player, DataKeys.PermissionsEx_Suffix).orElse("");
         }
         String suffix = getSuffixFromBungeePerms(player);
         if (suffix != null) {

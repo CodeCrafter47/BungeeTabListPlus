@@ -20,6 +20,7 @@
         <module>supervanish</module>
         <module>simpleclans</module>
         <module>essentials</module>
+        <module>permissionsex</module>
     </modules>
 
     <dependencies>
