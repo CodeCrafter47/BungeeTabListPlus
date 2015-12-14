@@ -72,7 +72,7 @@ public class TabList18 implements TabListHandler {
     public void sendTabList(TabList tabList) {
         if (tabList.getColumns() * tabList.getRows() > 80) {
             // tab_size not supported
-            tabList = new GenericTabList(4, 20);
+            tabList = new GenericTabList(20, 4);
             ErrorTabListProvider.constructErrorTabList(playerTablistHandler.getPlayer(), tabList, "Maximum tab_size for 1.8 is 80.", null);
         }
         PacketAccess.Batch batch = packetAccess.createBatch();
