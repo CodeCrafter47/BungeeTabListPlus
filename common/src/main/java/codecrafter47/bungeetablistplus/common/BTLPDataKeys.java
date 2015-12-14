@@ -48,6 +48,21 @@ public final class BTLPDataKeys {
         public String getPlaceholder() {
             return placeholder;
         }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode() + placeholder.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof PlaceholderAPIDataKey && ((PlaceholderAPIDataKey) obj).placeholder.equals(placeholder);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + ":" + placeholder;
+        }
     }
 
     public static class ThirdPartyVariableDataKey extends DataKey<String> {
