@@ -8,20 +8,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>data-bukkit-permissionsex</artifactId>
-   <!-- TODO -->
-    <repositories>
-        <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-         <id>baumscraft</id>
-         <url>http://baums-craft.net:12311/nexus/content/repositories/baumscraft</url>
-        </repository>
-   </repositories>
 
     <dependencies>
    <dependency>
