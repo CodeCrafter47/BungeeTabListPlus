@@ -141,7 +141,8 @@ public class ConfigManager {
         if (!config.permissionSource.equalsIgnoreCase("AUTO") && !config.permissionSource.
                 equalsIgnoreCase("BUKKIT") && !config.permissionSource.
                 equalsIgnoreCase("BUNGEE") && !config.permissionSource.
-                equalsIgnoreCase("BUNGEEPERMS")) {
+                equalsIgnoreCase("BUNGEEPERMS") && !config.permissionSource.
+                equalsIgnoreCase("BUKKITPERMISSIONSEX")) {
             BungeeTabListPlus.getInstance().getPlugin().getLogger().warning(
                     "CONFIG-ERROR: Unknown value for 'permissionSource'");
         }

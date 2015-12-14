@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>data-bukkit-parent</artifactId>
+        <groupId>codecrafter47.bungeetablistplus</groupId>
+        <version>2.2.9-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>data-bukkit-permissionsex</artifactId>
+   <!-- TODO -->
+    <repositories>
+        <repository>
+            <id>vault-repo</id>
+            <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+         <id>baumscraft</id>
+         <url>http://baums-craft.net:12311/nexus/content/repositories/baumscraft</url>
+        </repository>
+   </repositories>
+
+    <dependencies>
+   <dependency>
+     <groupId>ru.tehkode</groupId>
+     <artifactId>PermissionsEx</artifactId>
+     <version>1.23.3</version>
+	        <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+            </exclusions>
+   </dependency>
+    </dependencies>
+</project>

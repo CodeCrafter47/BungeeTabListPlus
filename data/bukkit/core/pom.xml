@@ -64,5 +64,11 @@
             <version>2.2.9-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>codecrafter47.bungeetablistplus</groupId>
+            <artifactId>data-bukkit-permissionsex</artifactId>
+            <version>2.2.9-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

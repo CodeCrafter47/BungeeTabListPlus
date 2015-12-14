@@ -244,6 +244,7 @@ public class MainConfig extends Configuration {
                 "Possible values:",
                 "AUTO        - take best source",
                 "BUKKIT      - take information from Bukkit/Vault",
+                "BUKKITPERMISSIONSEX      - take information from Bukkit/PermissionsEx",
                 "BUNGEEPERMS - take information from BungeePerms",
                 "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee");
         write("permissionSource", permissionSource);
