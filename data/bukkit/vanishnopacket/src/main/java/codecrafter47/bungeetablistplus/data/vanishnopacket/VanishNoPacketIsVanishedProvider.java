@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.data.vanishnopacket;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.kitteh.vanish.VanishManager;
 import org.kitteh.vanish.VanishPlugin;
 
 import java.util.function.Function;
@@ -28,6 +29,13 @@ import java.util.function.Function;
 public class VanishNoPacketIsVanishedProvider implements Function<Player, Boolean> {
     @Override
     public Boolean apply(Player player) {
-        return ((VanishPlugin) Bukkit.getPluginManager().getPlugin("VanishNoPacket")).getManager().isVanished(player);
+        VanishPlugin plugin = (VanishPlugin) Bukkit.getPluginManager().getPlugin("VanishNoPacket");
+        if (plugin != null) {
+            VanishManager manager = plugin.getManager();
+            if (manager != null) {
+                return manager.isVanished(player);
+            }
+        }
+        return null;
     }
 }
