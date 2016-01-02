@@ -23,6 +23,7 @@ import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -37,13 +38,18 @@ public class PlayerPointsProvider implements Function<Player, Integer> {
 
     @Override
     public Integer apply(Player player) {
-        PlayerPointsAPI playerPoints = ((PlayerPoints) Bukkit.getPluginManager().getPlugin("PlayerPoints")).getAPI();
-        for (int i = 0; i < 5; i++) {
-            try {
-                return playerPoints.look(player.getUniqueId());
-            } catch (Throwable th) {
-                if (i == 4) {
-                    logger.log(Level.SEVERE, "Failed to query PlayerPoints for " + player.getName() + ". Attempt 5", th);
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("PlayerPoints");
+        if (plugin != null) {
+            PlayerPointsAPI playerPoints = ((PlayerPoints) plugin).getAPI();
+            if (playerPoints != null) {
+                for (int i = 0; i < 5; i++) {
+                    try {
+                        return playerPoints.look(player.getUniqueId());
+                    } catch (Throwable th) {
+                        if (i == 4) {
+                            logger.log(Level.SEVERE, "Failed to query PlayerPoints for " + player.getName() + ". Attempt 5", th);
+                        }
+                    }
                 }
             }
         }
