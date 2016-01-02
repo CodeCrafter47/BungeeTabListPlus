@@ -19,17 +19,27 @@
 
 package codecrafter47.bungeetablistplus.data.bukkit;
 
-import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.data.PermissionDataKey;
 import codecrafter47.bungeetablistplus.data.essentials.EssentialsIsVanishedProvider;
-import codecrafter47.bungeetablistplus.data.factions.*;
+import codecrafter47.bungeetablistplus.data.factions.FactionMembersProvider;
+import codecrafter47.bungeetablistplus.data.factions.FactionNameProvider;
+import codecrafter47.bungeetablistplus.data.factions.FactionOnlineMembersProvider;
+import codecrafter47.bungeetablistplus.data.factions.FactionPowerProvider;
+import codecrafter47.bungeetablistplus.data.factions.FactionRankProvider;
+import codecrafter47.bungeetablistplus.data.factions.FactionWhereProvider;
+import codecrafter47.bungeetablistplus.data.factions.FactionsPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.factionsuuid.FactionPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExPrefixProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExSuffixProvider;
 import codecrafter47.bungeetablistplus.data.playerpoints.PlayerPointsProvider;
-import codecrafter47.bungeetablistplus.data.simpleclans.*;
+import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansClanColorTagProvider;
+import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansClanNameProvider;
+import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansClanTagLabelProvider;
+import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansClanTagProvider;
+import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansMembersProvider;
+import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansOnlineClanMembersProvider;
 import codecrafter47.bungeetablistplus.data.supervanish.SuperVanishIsVanishedProvider;
 import codecrafter47.bungeetablistplus.data.vanishnopacket.VanishNoPacketIsVanishedProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultBalanceProvider;
@@ -46,7 +56,7 @@ public class PlayerDataAccess extends AbstractDataAccess<Player> {
     private final Plugin plugin;
 
     public PlayerDataAccess(Plugin plugin) {
-        super(plugin.getLogger());
+        super(plugin.getLogger(), plugin);
         this.plugin = plugin;
         init();
     }

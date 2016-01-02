@@ -17,7 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.data;
+package codecrafter47.bungeetablistplus.data.bukkit;
+
+import codecrafter47.bungeetablistplus.data.DataAccess;
+import codecrafter47.bungeetablistplus.data.DataKey;
 
 import java.util.Arrays;
 import java.util.Collection;

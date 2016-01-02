@@ -32,7 +32,7 @@ public class PlaceholderAPIHook {
     }
 
     public DataAccess<Player> getDataAccess() {
-        return new PlaceholderAPIDataAccess(plugin.getLogger());
+        return new PlaceholderAPIDataAccess(plugin.getLogger(), plugin);
     }
 
     public boolean isPlaceholder(Player player, String placeholder) {

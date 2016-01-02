@@ -19,7 +19,6 @@
 
 package codecrafter47.bungeetablistplus.data.bukkit;
 
-import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.data.vault.VaultCurrencyNamePluralProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultCurrencyNameSingularProvider;
@@ -32,7 +31,7 @@ public class ServerDataAccess extends AbstractDataAccess<Server> {
     private final Plugin plugin;
 
     public ServerDataAccess(Plugin plugin) {
-        super(plugin.getLogger());
+        super(plugin.getLogger(), plugin);
         this.plugin = plugin;
         init();
     }

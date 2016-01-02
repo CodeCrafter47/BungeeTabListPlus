@@ -24,10 +24,10 @@ import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAP
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
-import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
 import codecrafter47.bungeetablistplus.data.DataAccess;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.JoinedDataAccess;
+import codecrafter47.bungeetablistplus.data.bukkit.AbstractDataAccess;
+import codecrafter47.bungeetablistplus.data.bukkit.JoinedDataAccess;
 import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccess;
 import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccess;
 import com.google.common.base.Preconditions;
@@ -287,7 +287,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
 
     private class ThirdPartyVariablesAccess extends AbstractDataAccess<Player> {
         public ThirdPartyVariablesAccess() {
-            super(plugin.getLogger());
+            super(plugin.getLogger(), plugin);
             bind(BTLPDataKeys.ThirdPartyVariableDataKey.class, this::resolveVariable);
         }
 
@@ -313,7 +313,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
 
     private class BTLPServerDataKeyAccess extends AbstractDataAccess<Server> {
         public BTLPServerDataKeyAccess() {
-            super(plugin.getLogger());
+            super(plugin.getLogger(), plugin);
             bind(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
                 apiLock.readLock().lock();
                 try {

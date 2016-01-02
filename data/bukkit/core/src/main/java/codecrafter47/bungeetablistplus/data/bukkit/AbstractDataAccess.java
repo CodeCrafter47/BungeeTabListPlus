@@ -17,11 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.data;
+package codecrafter47.bungeetablistplus.data.bukkit;
+
+import codecrafter47.bungeetablistplus.data.DataAccess;
+import codecrafter47.bungeetablistplus.data.DataKey;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -30,11 +36,13 @@ import java.util.logging.Logger;
 
 public abstract class AbstractDataAccess<B> implements DataAccess<B> {
     protected final Logger logger;
+    private final Plugin plugin;
     private final Map<DataKey<?>, Function<B, ?>> providersByDataKey = new HashMap<>();
     private final Map<Class, BiFunction<B, DataKey<?>, ?>> providersByDataKeyClass = new HashMap<>();
 
-    public AbstractDataAccess(Logger logger) {
+    public AbstractDataAccess(Logger logger, Plugin plugin) {
         this.logger = logger;
+        this.plugin = plugin;
     }
 
     protected <V> void bind(DataKey<V> dataKey, Function<B, V> provider) {
@@ -56,8 +64,21 @@ public abstract class AbstractDataAccess<B> implements DataAccess<B> {
                 return Optional.ofNullable(providersByDataKey.get(key)).map(provider -> (V) provider.apply(context));
             }
         } catch (Throwable th) {
+            if (isAsyncOpError(th)) {
+                if (!Bukkit.isPrimaryThread()) {
+                    try {
+                        return Bukkit.getScheduler().callSyncMethod(plugin, () -> getValue(key, context)).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.log(Level.SEVERE, "Unexpected exception", e);
+                    }
+                }
+            }
             logger.log(Level.SEVERE, "Unexpected exception", th);
         }
         return Optional.empty();
+    }
+
+    private boolean isAsyncOpError(Throwable th) {
+        return th.getStackTrace()[0].getClassName().equals("org.spigotmc.AsyncCatcher") || (th.getCause() != null && isAsyncOpError(th.getCause()));
     }
 }
