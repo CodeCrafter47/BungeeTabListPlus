@@ -48,7 +48,7 @@ public interface TabListProvider {
      *
      * @return requested tab list size
      */
-    default int getWhishedTabListSize() {
+    default int getWishedTabListSize() {
         return 80;
     }
 }

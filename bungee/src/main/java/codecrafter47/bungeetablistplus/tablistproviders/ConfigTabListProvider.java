@@ -122,7 +122,7 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
     }
 
     @Override
-    public int getWhishedTabListSize() {
+    public int getWishedTabListSize() {
         return tab_size;
     }
 

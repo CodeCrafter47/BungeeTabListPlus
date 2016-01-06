@@ -128,15 +128,15 @@ class ResendThread implements Runnable, Executor {
             TabList tabList;
 
             if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {
-                int whishedTabListSize = tlp.getWhishedTabListSize();
-                if (whishedTabListSize < 1) {
-                    whishedTabListSize = 1;
+                int wishedTabListSize = tlp.getWishedTabListSize();
+                if (wishedTabListSize < 1) {
+                    wishedTabListSize = 1;
                 }
-                if (whishedTabListSize > 80) {
-                    whishedTabListSize = 80;
+                if (wishedTabListSize > 80) {
+                    wishedTabListSize = 80;
                 }
-                int columns = (whishedTabListSize + 19) / 20;
-                tabList = new GenericTabList(whishedTabListSize / columns, columns);
+                int columns = (wishedTabListSize + 19) / 20;
+                tabList = new GenericTabList(wishedTabListSize / columns, columns);
             } else {
                 tabList = new GenericTabList();
             }
