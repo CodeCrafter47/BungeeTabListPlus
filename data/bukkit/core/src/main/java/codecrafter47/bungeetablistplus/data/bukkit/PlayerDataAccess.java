@@ -31,6 +31,7 @@ import codecrafter47.bungeetablistplus.data.factions.FactionWhereProvider;
 import codecrafter47.bungeetablistplus.data.factions.FactionsPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.factionsuuid.FactionPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupProvider;
+import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupRankProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExPrefixProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExSuffixProvider;
 import codecrafter47.bungeetablistplus.data.playerpoints.PlayerPointsProvider;
@@ -93,7 +94,8 @@ public class PlayerDataAccess extends AbstractDataAccess<Player> {
 			bind(DataKeys.PermissionsEx_PermissionGroup, new PermissionsExGroupProvider());
 			bind(DataKeys.PermissionsEx_Prefix, new PermissionsExPrefixProvider());
 			bind(DataKeys.PermissionsEx_Suffix, new PermissionsExSuffixProvider());
-		}
+            bind(DataKeys.PermissionsEx_GroupRank, new PermissionsExGroupRankProvider());
+        }
 
         if (Bukkit.getPluginManager().getPlugin("VanishNoPacket") != null) {
             bind(DataKeys.VanishNoPacket_IsVanished, new VanishNoPacketIsVanishedProvider());

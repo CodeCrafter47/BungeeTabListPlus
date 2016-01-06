@@ -128,8 +128,6 @@ public class PermissionManager {
     }
 
     public int comparePlayers(IPlayer p1, IPlayer p2) {
-        // TODO Vault/Bukkit support
-
         Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
         if (p != null) {
             BungeePerms bp = BungeePerms.getInstance();
@@ -150,6 +148,14 @@ public class PermissionManager {
                 }
             } catch (Throwable th) {
                 BungeeTabListPlus.getInstance().reportError(th);
+            }
+        }
+
+        Optional<Integer> p1Rank = plugin.getBridge().get(p1, DataKeys.PermissionsEx_GroupRank);
+        if (p1Rank.isPresent()) {
+            Optional<Integer> p2Rank = plugin.getBridge().get(p2, DataKeys.PermissionsEx_GroupRank);
+            if (p2Rank.isPresent()) {
+                return p2Rank.get() - p1Rank.get();
             }
         }
 

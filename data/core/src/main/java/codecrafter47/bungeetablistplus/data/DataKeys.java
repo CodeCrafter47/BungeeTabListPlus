@@ -43,6 +43,7 @@ public class DataKeys {
     public final static DataKey<String> PermissionsEx_Prefix = DataKey.builder().player().id("permissionsex:prefix").build();
     public final static DataKey<String> PermissionsEx_Suffix = DataKey.builder().player().id("permissionsex:suffix").build();
     public final static DataKey<String> PermissionsEx_PermissionGroup = DataKey.builder().player().id("permissionsex:permgroup").build();
+    public final static DataKey<Integer> PermissionsEx_GroupRank = DataKey.builder().player().id("permissionsex:permgroup.rank").build();
     public final static DataKey<Boolean> VanishNoPacket_IsVanished = DataKey.builder().player().id("vanishnopacket:isvanished").build();
     public final static DataKey<Integer> PlayerPoints_Points = DataKey.builder().player().id("playerpoints:points").build();
     public final static DataKey<String> Factions_FactionName = DataKey.builder().player().id("factions:factionname").build();
