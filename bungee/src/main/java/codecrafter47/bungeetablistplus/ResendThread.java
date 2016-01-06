@@ -29,9 +29,11 @@ import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.LinkedList;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -40,11 +42,12 @@ import java.util.logging.Level;
 
 class ResendThread implements Runnable, Executor {
 
-    private final Queue<ProxiedPlayer> queue = new LinkedList<>();
-    private final Queue<Runnable> tasks = new LinkedList<>();
-    private final Set<ProxiedPlayer> set = new THashSet<>();
+    private final Queue<ProxiedPlayer> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
+    private final Set<ProxiedPlayer> set = Collections.synchronizedSet(new THashSet<>());
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
+    private Thread mainThread = null;
 
     public void add(ProxiedPlayer player) {
         lock.lock();
@@ -71,39 +74,42 @@ class ResendThread implements Runnable, Executor {
     }
 
     public boolean isInMainThread() {
-        return lock.isHeldByCurrentThread();
+        return Objects.equals(Thread.currentThread(), mainThread);
     }
 
     @Override
     public void run() {
-        lock.lock();
-        try {
-            while (true) {
-                try {
-                    while (!tasks.isEmpty()) {
-                        tasks.poll().run();
+        mainThread = Thread.currentThread();
+        while (true) {
+            try {
+                while (tasks.isEmpty() && queue.isEmpty()) {
+                    lock.lock();
+                    try {
+                        condition.await(1, TimeUnit.SECONDS);
+                    } finally {
+                        lock.unlock();
                     }
-                    while (!queue.isEmpty()) {
-                        ProxiedPlayer player = queue.poll();
-                        set.remove(player);
-                        Object tabList = BungeeTabListPlus.getTabList(player);
-                        if (tabList instanceof PlayerTablistHandler) {
-                            if (player.getServer() != null) {
-                                PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
-                                update(tablistHandler);
-                            }
+                }
+                while (!tasks.isEmpty()) {
+                    tasks.poll().run();
+                }
+                while (!queue.isEmpty()) {
+                    ProxiedPlayer player = queue.poll();
+                    set.remove(player);
+                    Object tabList = BungeeTabListPlus.getTabList(player);
+                    if (tabList instanceof PlayerTablistHandler) {
+                        if (player.getServer() != null) {
+                            PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
+                            update(tablistHandler);
                         }
                     }
-                    set.clear();
-                    condition.await(1, TimeUnit.SECONDS);
-                } catch (InterruptedException ex) {
-                    break;
-                } catch (Throwable th) {
-                    BungeeTabListPlus.getInstance().reportError(th);
                 }
+                set.clear();
+            } catch (InterruptedException ex) {
+                break;
+            } catch (Throwable th) {
+                BungeeTabListPlus.getInstance().reportError(th);
             }
-        } finally {
-            lock.unlock();
         }
     }
 
