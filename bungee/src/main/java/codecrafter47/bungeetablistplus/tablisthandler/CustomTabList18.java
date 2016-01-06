@@ -34,8 +34,15 @@ import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
@@ -331,6 +338,17 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     @Override
     public void unload() {
         tabListHandler.unload();
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+        packet.setItems(
+                uuids.entrySet().stream().map(entry -> {
+                    PlayerListItem.Item item = new PlayerListItem.Item();
+                    item.setUuid(entry.getKey());
+                    item.setUsername(entry.getValue());
+                    item.setDisplayName(entry.getValue());
+                    return item;
+                }).toArray(PlayerListItem.Item[]::new));
+        getPlayer().unsafe().sendPacket(packet);
     }
 
     @Override
