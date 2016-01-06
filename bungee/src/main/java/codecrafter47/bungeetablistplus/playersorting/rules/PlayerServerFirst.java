@@ -16,25 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.sorting.rules;
+
+package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.sorting.SortingRule;
+import codecrafter47.bungeetablistplus.playersorting.SortingRule;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.Server;
 
-import java.util.Objects;
+import java.util.Optional;
 
-public class YouFirst implements SortingRule {
-
+public class PlayerServerFirst implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        if (Objects.equals(player1.getName(), context.getViewer().getName())) {
-            return -1;
-        }
-        if (Objects.equals(player2.getName(), context.getViewer().getName())) {
-            return 1;
+        Server server = context.getViewer().getServer();
+        if (server != null) {
+            ServerInfo info = server.getInfo();
+            Optional<ServerInfo> server1 = player1.getServer();
+            Optional<ServerInfo> server2 = player2.getServer();
+            if (!server1.equals(server2)) {
+                if (server1.isPresent() && server1.get().equals(server)) return -1;
+                if (server2.isPresent() && server2.get().equals(server)) return 1;
+            }
         }
         return 0;
     }
-
 }

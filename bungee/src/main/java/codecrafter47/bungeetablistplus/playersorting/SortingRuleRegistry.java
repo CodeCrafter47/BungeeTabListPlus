@@ -17,9 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.sorting;
+package codecrafter47.bungeetablistplus.playersorting;
 
-import codecrafter47.bungeetablistplus.sorting.rules.*;
+import codecrafter47.bungeetablistplus.playersorting.rules.AdminFirst;
+import codecrafter47.bungeetablistplus.playersorting.rules.Alphabet;
+import codecrafter47.bungeetablistplus.playersorting.rules.FactionFirst;
+import codecrafter47.bungeetablistplus.playersorting.rules.FactionsAlphabetically;
+import codecrafter47.bungeetablistplus.playersorting.rules.PlayerServerFirst;
+import codecrafter47.bungeetablistplus.playersorting.rules.PlayerWorld;
+import codecrafter47.bungeetablistplus.playersorting.rules.ServerAlphabetically;
+import codecrafter47.bungeetablistplus.playersorting.rules.TeamFirst;
+import codecrafter47.bungeetablistplus.playersorting.rules.TeamsAlphabetically;
+import codecrafter47.bungeetablistplus.playersorting.rules.WorldByName;
+import codecrafter47.bungeetablistplus.playersorting.rules.YouFirst;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Optional;
@@ -41,6 +51,11 @@ public class SortingRuleRegistry {
             .put("teams", new TeamsAlphabetically())
             .put("factionfirst", new FactionFirst())
             .put("factions", new FactionsAlphabetically())
+            .put("worldname", new WorldByName())
+            .put("playerworld", new PlayerWorld())
+            .put("playerworldfirst", new PlayerWorld())
+            .put("serveralphabetically", new ServerAlphabetically())
+            .put("playerserverfirst", new PlayerServerFirst())
             .build();
 
     public static Optional<SortingRule> getRule(String name) {

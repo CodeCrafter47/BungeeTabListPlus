@@ -16,12 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.sorting;
+package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
-public interface SortingRule {
+import java.text.Collator;
 
-    int compare(TabListContext context, IPlayer player1, IPlayer player2);
+public class Alphabet implements SortingRule {
+
+    @Override
+    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
+        String name1 = player1.getName();
+        String name2 = player2.getName();
+        return Collator.getInstance().compare(name1, name2);
+    }
+
 }

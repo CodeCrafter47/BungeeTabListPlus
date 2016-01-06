@@ -22,7 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

@@ -16,28 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package codecrafter47.bungeetablistplus.sorting.rules;
+package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
-import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.sorting.SortingRule;
+import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
-import java.text.Collator;
-import java.util.Optional;
+public class AdminFirst implements SortingRule {
 
-public class FactionsAlphabetically implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> faction1 = bridge.get(player1, DataKeys.Factions_FactionName);
-        Optional<String> faction2 = bridge.get(player2, DataKeys.Factions_FactionName);
-        if (faction1.isPresent() && faction2.isPresent()) {
-            return Collator.getInstance().compare(faction1.get(), faction2.get());
-        }
-        return 0;
+        return BungeeTabListPlus.getInstance().getPermissionManager().
+                comparePlayers(player1, player2);
     }
+
 }

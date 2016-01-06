@@ -23,7 +23,7 @@ import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.sorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;

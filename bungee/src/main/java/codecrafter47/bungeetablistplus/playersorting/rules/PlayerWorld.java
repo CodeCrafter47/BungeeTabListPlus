@@ -16,32 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package codecrafter47.bungeetablistplus.sorting.rules;
+package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.sorting.SortingRule;
+import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
 import java.util.Optional;
 
-public class TeamFirst implements SortingRule {
+public class PlayerWorld implements SortingRule {
+
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         IPlayer viewer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer());
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> team = bridge.get(viewer, DataKeys.Team);
-        if (team.isPresent()) {
-            Optional<String> team1 = bridge.get(player1, DataKeys.Team);
-            Optional<String> team2 = bridge.get(player2, DataKeys.Team);
-            if (!team1.equals(team2)) {
-                if (team1.equals(team)) return -1;
-                if (team2.equals(team)) return 1;
+        Optional<String> world = bridge.get(viewer, DataKeys.World);
+        if (world.isPresent()) {
+            Optional<String> world1 = bridge.get(player1, DataKeys.World);
+            Optional<String> world2 = bridge.get(player2, DataKeys.World);
+            if (!world1.equals(world2)) {
+                if (world1.equals(world)) return -1;
+                if (world2.equals(world)) return 1;
             }
         }
         return 0;
     }
+
 }

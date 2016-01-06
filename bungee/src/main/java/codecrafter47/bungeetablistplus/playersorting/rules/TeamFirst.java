@@ -17,29 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.sorting.rules;
+package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.sorting.SortingRule;
+import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
 import java.util.Optional;
 
-public class FactionFirst implements SortingRule {
+public class TeamFirst implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         IPlayer viewer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer());
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> faction = bridge.get(viewer, DataKeys.Factions_FactionName);
-        if (faction.isPresent()) {
-            Optional<String> faction1 = bridge.get(player1, DataKeys.Factions_FactionName);
-            Optional<String> faction2 = bridge.get(player2, DataKeys.Factions_FactionName);
-            if (!faction1.equals(faction2)) {
-                if (faction1.equals(faction)) return -1;
-                if (faction2.equals(faction)) return 1;
+        Optional<String> team = bridge.get(viewer, DataKeys.Team);
+        if (team.isPresent()) {
+            Optional<String> team1 = bridge.get(player1, DataKeys.Team);
+            Optional<String> team2 = bridge.get(player2, DataKeys.Team);
+            if (!team1.equals(team2)) {
+                if (team1.equals(team)) return -1;
+                if (team2.equals(team)) return 1;
             }
         }
         return 0;
