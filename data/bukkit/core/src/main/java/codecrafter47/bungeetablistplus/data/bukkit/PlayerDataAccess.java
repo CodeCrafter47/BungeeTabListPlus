@@ -30,6 +30,7 @@ import codecrafter47.bungeetablistplus.data.factions.FactionRankProvider;
 import codecrafter47.bungeetablistplus.data.factions.FactionWhereProvider;
 import codecrafter47.bungeetablistplus.data.factions.FactionsPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.factionsuuid.FactionPlayerPowerProvider;
+import codecrafter47.bungeetablistplus.data.multiverse.MultiverseWorldAliasProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupRankProvider;
 import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExPrefixProvider;
@@ -144,6 +145,10 @@ public class PlayerDataAccess extends AbstractDataAccess<Player> {
 
         if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
             bind(DataKeys.Essentials_IsVanished, new EssentialsIsVanishedProvider());
+        }
+
+        if (Bukkit.getPluginManager().getPlugin("Multiverse-Core") != null) {
+            bind(DataKeys.Multiverse_WorldAlias, new MultiverseWorldAliasProvider());
         }
     }
 

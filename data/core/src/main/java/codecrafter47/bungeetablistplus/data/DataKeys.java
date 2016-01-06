@@ -61,6 +61,8 @@ public class DataKeys {
     public final static DataKey<String> SimpleClans_ClanTagLabel = DataKey.builder().player().id("simpleclans:clantaglabel").build();
     public final static DataKey<String> SimpleClans_ClanColorTag = DataKey.builder().player().id("simpleclans:clancolortag").build();
     public final static DataKey<Boolean> Essentials_IsVanished = DataKey.builder().player().id("essentials:vanished").build();
+    public final static DataKey<String> Multiverse_WorldAlias = DataKey.builder().player().id("multiverse:worldalias").build();
+
     public final static DataKey<String> Vault_CurrencyNameSingular = DataKey.builder().server().id("vault:currencynamesingular").build();
     public final static DataKey<String> Vault_CurrencyNamePlural = DataKey.builder().server().id("vault:currencynameplural").build();
     public final static DataKey<Double> TPS = DataKey.builder().server().id("minecraft:tps").build();

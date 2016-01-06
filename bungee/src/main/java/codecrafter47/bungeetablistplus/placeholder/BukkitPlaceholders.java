@@ -54,6 +54,7 @@ public class BukkitPlaceholders extends PlaceholderProvider {
             }
         }).orElse("-"));
         addBukkitBridgePlaceholder("factionName", DataKeys.Factions_FactionName);
+        addBukkitBridgePlaceholder("MVWorldAlias", DataKeys.Multiverse_WorldAlias);
         addBukkitBridgePlaceholder("onlineFactionMembers", DataKeys.Factions_OnlineFactionMembers, num -> num.orElse(-1).toString());
         addBukkitBridgePlaceholder("factionsWhere", DataKeys.Factions_FactionsWhere);
         addBukkitBridgePlaceholder("factionPower", DataKeys.Factions_FactionPower);
