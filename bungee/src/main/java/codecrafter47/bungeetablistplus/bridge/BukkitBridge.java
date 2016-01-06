@@ -38,9 +38,18 @@ import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,7 +67,7 @@ public class BukkitBridge implements Listener {
     public BukkitBridge(BungeeTabListPlus plugin) {
         this.plugin = plugin;
         plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
-        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::checkForThirdPartyVariables, 2, 2, TimeUnit.SECONDS);
+        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), () -> plugin.runInMainThread(this::checkForThirdPartyVariables), 2, 2, TimeUnit.SECONDS);
         plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), playerInformation::cleanUp, 10, 10, TimeUnit.SECONDS);
     }
 
@@ -87,6 +96,7 @@ public class BukkitBridge implements Listener {
     }
 
     private BukkitData getServerDataCache(String serverName) {
+        plugin.failIfNotMainThread();
         if (!serverInformation.containsKey(serverName)) {
             serverInformation.putIfAbsent(serverName, new BukkitData());
         }
@@ -95,6 +105,7 @@ public class BukkitBridge implements Listener {
 
     @SneakyThrows
     private BukkitData getPlayerDataCache(UUID uuid) {
+        plugin.failIfNotMainThread();
         return playerInformation.get(uuid, BukkitData::new);
     }
 
@@ -103,45 +114,47 @@ public class BukkitBridge implements Listener {
         if (event.getTag().equals(Constants.channel)) {
             event.setCancelled(true);
             if (event.getReceiver() instanceof ProxiedPlayer && event.getSender() instanceof Server) {
-                try {
-                    ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
-                    Server server = (Server) event.getSender();
+                plugin.runInMainThread(() -> {
+                    try {
+                        ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
+                        Server server = (Server) event.getSender();
 
-                    ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(event.getData()));
+                        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(event.getData()));
 
-                    String subchannel = in.readUTF();
+                        String subchannel = in.readUTF();
 
-                    switch (subchannel) {
-                        case Constants.subchannelUpdateServer:
-                            updateData(in, getServerDataCache(server.getInfo().getName()));
-                            break;
-                        case Constants.subchannelUpdatePlayer:
-                            updateData(in, getPlayerDataCache(player.getUniqueId()));
-                            break;
-                        case Constants.subchannelPlayerHash:
-                            if (getPlayerDataCache(player.getUniqueId()).getMap().hashCode() != in.readInt()) {
-                                requestReset(player);
-                            }
-                            break;
-                        case Constants.subchannelServerHash:
-                            if (getServerDataCache(server.getInfo().getName()).getMap().hashCode() != in.readInt()) {
-                                requestReset(server);
-                            }
-                            break;
-                        case Constants.subchannelPlaceholder:
-                            plugin.getPlaceholderAPIHook().onPlaceholderConfirmed(in.readUTF());
-                            break;
-                        default:
-                            plugin.getLogger().log(Level.SEVERE,
-                                    "BukkitBridge on server " + server.getInfo().
-                                            getName() + " send an unknown packet! Is everything up-to-date?");
-                            break;
+                        switch (subchannel) {
+                            case Constants.subchannelUpdateServer:
+                                updateData(in, getServerDataCache(server.getInfo().getName()));
+                                break;
+                            case Constants.subchannelUpdatePlayer:
+                                updateData(in, getPlayerDataCache(player.getUniqueId()));
+                                break;
+                            case Constants.subchannelPlayerHash:
+                                if (getPlayerDataCache(player.getUniqueId()).getMap().hashCode() != in.readInt()) {
+                                    requestReset(player);
+                                }
+                                break;
+                            case Constants.subchannelServerHash:
+                                if (getServerDataCache(server.getInfo().getName()).getMap().hashCode() != in.readInt()) {
+                                    requestReset(server);
+                                }
+                                break;
+                            case Constants.subchannelPlaceholder:
+                                plugin.getPlaceholderAPIHook().onPlaceholderConfirmed(in.readUTF());
+                                break;
+                            default:
+                                plugin.getLogger().log(Level.SEVERE,
+                                        "BukkitBridge on server " + server.getInfo().
+                                                getName() + " send an unknown packet! Is everything up-to-date?");
+                                break;
+                        }
+                    } catch (StreamCorruptedException ex) {
+                        plugin.getLogger().log(Level.WARNING, "BungeeTabListPlus_BukkitBridge.jar on server {0} needs to be updated", ((Server) event.getSender()).getInfo());
+                    } catch (IOException | ClassNotFoundException ex) {
+                        plugin.getLogger().log(Level.SEVERE, "Exception while parsing data from Bukkit", ex);
                     }
-                } catch (StreamCorruptedException ex) {
-                    plugin.getLogger().log(Level.WARNING, "BungeeTabListPlus_BukkitBridge.jar on server {0} needs to be updated", ((Server) event.getSender()).getInfo());
-                } catch (IOException | ClassNotFoundException ex) {
-                    plugin.getLogger().log(Level.SEVERE, "Exception while parsing data from Bukkit", ex);
-                }
+                });
             }
         }
     }

@@ -90,6 +90,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -427,6 +428,21 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * Reloads most settings of the plugin
      */
     public boolean reload() {
+        if (!resendThread.isInMainThread()) {
+            AtomicReference<Boolean> ref = new AtomicReference<>(null);
+            resendThread.execute(() -> {
+                ref.set(reload());
+            });
+            while (ref.get() == null) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ignored) {
+                    return false;
+                }
+            }
+            return ref.get();
+        }
+        failIfNotMainThread();
         try {
             requestedUpdateInterval = null;
             config = new ConfigManager(plugin);
@@ -443,6 +459,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     private boolean reloadTablists() {
+        failIfNotMainThread();
         TabListManager tabListManager = new TabListManager(this);
         if (!tabListManager.loadTabLists()) {
             return true;
@@ -453,7 +470,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     public void registerPlaceholderProvider0(PlaceholderProvider placeholderProvider) {
         getPlaceholderManager0().internalRegisterPlaceholderProvider(placeholderProvider);
-        reloadTablists();
+        runInMainThread(this::reloadTablists);
     }
 
     /**
@@ -465,6 +482,15 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
     }
 
+    public void runInMainThread(Runnable runnable) {
+        resendThread.execute(runnable);
+    }
+
+    public void failIfNotMainThread() {
+        if (!resendThread.isInMainThread()) {
+            throw new IllegalStateException("Not in main thread");
+        }
+    }
 
     public void updateTabListForPlayer(ProxiedPlayer player) {
         resendThread.add(player);
@@ -476,6 +502,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * @return an instance of the PlayerManager or null
      */
     public PlayerManager constructPlayerManager(ProxiedPlayer viewer) {
+        failIfNotMainThread();
         return new PlayerManagerImpl(this, playerProviders, viewer);
     }
 

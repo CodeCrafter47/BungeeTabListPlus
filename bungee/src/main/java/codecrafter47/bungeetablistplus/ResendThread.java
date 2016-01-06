@@ -29,45 +29,81 @@ import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-class ResendThread implements Runnable {
+class ResendThread implements Runnable, Executor {
 
-    private final BlockingQueue<ProxiedPlayer> queue = new LinkedBlockingQueue<>();
-    private final Set<ProxiedPlayer> set = Collections.synchronizedSet(new THashSet<>());
+    private final Queue<ProxiedPlayer> queue = new LinkedList<>();
+    private final Queue<Runnable> tasks = new LinkedList<>();
+    private final Set<ProxiedPlayer> set = new THashSet<>();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
 
     public void add(ProxiedPlayer player) {
-        if (!set.contains(player)) {
-            set.add(player);
-            queue.add(player);
+        lock.lock();
+        try {
+            if (!set.contains(player)) {
+                set.add(player);
+                queue.add(player);
+                condition.signal();
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
+    public void execute(Runnable runnable) {
+        lock.lock();
+        try {
+            tasks.add(runnable);
+            condition.signal();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean isInMainThread() {
+        return lock.isHeldByCurrentThread();
+    }
+
+    @Override
     public void run() {
-        while (true) {
-            try {
-                if (queue.isEmpty()) {
-                    set.clear();
-                }
-                ProxiedPlayer player = queue.take();
-                set.remove(player);
-                Object tabList = BungeeTabListPlus.getTabList(player);
-                if (tabList instanceof PlayerTablistHandler) {
-                    if (player.getServer() != null) {
-                        PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
-                        update(tablistHandler);
+        lock.lock();
+        try {
+            while (true) {
+                try {
+                    while (!tasks.isEmpty()) {
+                        tasks.poll().run();
                     }
+                    while (!queue.isEmpty()) {
+                        ProxiedPlayer player = queue.poll();
+                        set.remove(player);
+                        Object tabList = BungeeTabListPlus.getTabList(player);
+                        if (tabList instanceof PlayerTablistHandler) {
+                            if (player.getServer() != null) {
+                                PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
+                                update(tablistHandler);
+                            }
+                        }
+                    }
+                    set.clear();
+                    condition.await(1, TimeUnit.SECONDS);
+                } catch (InterruptedException ex) {
+                    break;
+                } catch (Throwable th) {
+                    BungeeTabListPlus.getInstance().reportError(th);
                 }
-            } catch (InterruptedException ex) {
-                break;
-            } catch (Throwable th) {
-                BungeeTabListPlus.getInstance().reportError(th);
             }
+        } finally {
+            lock.unlock();
         }
     }
 

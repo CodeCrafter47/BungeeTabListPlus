@@ -48,7 +48,7 @@ public class PlaceholderAPIHook implements Listener {
 
     public PlaceholderAPIHook(BungeeTabListPlus bungeeTabListPlus) {
         this.bungeeTabListPlus = bungeeTabListPlus;
-        bungeeTabListPlus.getPlugin().getProxy().getScheduler().schedule(bungeeTabListPlus.getPlugin(), this::askServersForPlaceholders, 2, 2, TimeUnit.SECONDS);
+        bungeeTabListPlus.getPlugin().getProxy().getScheduler().schedule(bungeeTabListPlus.getPlugin(), () -> bungeeTabListPlus.runInMainThread(this::askServersForPlaceholders), 2, 2, TimeUnit.SECONDS);
     }
 
     public void askServersForPlaceholders() {
