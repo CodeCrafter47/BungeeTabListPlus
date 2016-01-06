@@ -61,11 +61,16 @@ public class PermissionManager {
             if (group != null) {
                 return group;
             }
-            Optional<String> optional = plugin.getBridge().get(player, DataKeys.Vault_PermissionGroup);
+            Optional<String> optional = plugin.getBridge().get(player, DataKeys.PermissionsEx_PermissionGroup);
             if (optional.isPresent()) {
                 return optional.get();
             } else {
-                return getMainGroupFromBungeeCord(player);
+                optional = plugin.getBridge().get(player, DataKeys.Vault_PermissionGroup);
+                if (optional.isPresent()) {
+                    return optional.get();
+                } else {
+                    return getMainGroupFromBungeeCord(player);
+                }
             }
         }
     }
@@ -200,7 +205,7 @@ public class PermissionManager {
         if (prefix != null) {
             return prefix;
         }
-        return plugin.getBridge().get(player, DataKeys.Vault_Prefix).orElse("");
+        return plugin.getBridge().get(player, DataKeys.PermissionsEx_Prefix).orElseGet(() -> plugin.getBridge().get(player, DataKeys.Vault_Prefix).orElse(""));
     }
 
     private String getPrefixFromBungeePerms(IPlayer player) {
@@ -286,7 +291,7 @@ public class PermissionManager {
         if (suffix != null) {
             return suffix;
         }
-        return plugin.getBridge().get(player, DataKeys.Vault_Suffix).orElse("");
+        return plugin.getBridge().get(player, DataKeys.PermissionsEx_Suffix).orElseGet(() -> plugin.getBridge().get(player, DataKeys.Vault_Suffix).orElse(""));
     }
 
     private String getSuffixFromBungeePerms(IPlayer player) {
