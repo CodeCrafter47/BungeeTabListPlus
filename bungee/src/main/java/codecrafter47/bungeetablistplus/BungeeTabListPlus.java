@@ -488,7 +488,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     public void failIfNotMainThread() {
         if (!resendThread.isInMainThread()) {
-            throw new IllegalStateException("Not in main thread");
+            getLogger().log(Level.SEVERE, "Not in main thread", new IllegalStateException("Not in main thread"));
         }
     }
 
