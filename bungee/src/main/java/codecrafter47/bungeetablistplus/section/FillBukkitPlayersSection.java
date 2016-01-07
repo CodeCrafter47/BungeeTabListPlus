@@ -32,11 +32,11 @@ import java.util.List;
 /**
  * @author Florian Stober
  */
-public class FillBukkitPlayers extends FillPlayersSection {
+public class FillBukkitPlayersSection extends AbstractFillPlayersSection {
 
-    public FillBukkitPlayers(int startColumn, SlotTemplate prefix, SlotTemplate suffix,
-                             PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        super(startColumn, null, prefix, suffix, sorter, maxPlayers, playerLines, morePlayerLines);
+    public FillBukkitPlayersSection(int startColumn, SlotTemplate prefix, SlotTemplate suffix,
+                                    PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+        super(startColumn, prefix, suffix, sorter, maxPlayers, playerLines, morePlayerLines);
     }
 
     @Override

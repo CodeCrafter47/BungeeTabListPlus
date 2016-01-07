@@ -30,7 +30,7 @@ import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 import codecrafter47.bungeetablistplus.playersorting.SortingRuleRegistry;
 import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
 import codecrafter47.bungeetablistplus.section.ColumnSplitSection;
-import codecrafter47.bungeetablistplus.section.FillBukkitPlayers;
+import codecrafter47.bungeetablistplus.section.FillBukkitPlayersSection;
 import codecrafter47.bungeetablistplus.section.FillPlayersSection;
 import codecrafter47.bungeetablistplus.section.PlayerColumn;
 import codecrafter47.bungeetablistplus.section.Section;
@@ -207,7 +207,7 @@ public class ConfigParser {
             } else if (fillbukkitplayersMatcher.matches()) {
                 SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));
                 SlotTemplate suffix = parseSlot(fillbukkitplayersMatcher.group("suffix"));
-                sections.add(new FillBukkitPlayers(startColumn[0], prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                sections.add(new FillBukkitPlayersSection(startColumn[0], prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
             } else {
                 SlotTemplate template = parseSlot(line);
                 StaticSection section;

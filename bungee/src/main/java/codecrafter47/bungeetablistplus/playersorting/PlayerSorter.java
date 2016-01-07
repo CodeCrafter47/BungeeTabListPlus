@@ -64,4 +64,20 @@ public class PlayerSorter {
             BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to sort players using rules " + rules, exception);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PlayerSorter that = (PlayerSorter) o;
+
+        return rules.equals(that.rules);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return rules.hashCode();
+    }
 }
