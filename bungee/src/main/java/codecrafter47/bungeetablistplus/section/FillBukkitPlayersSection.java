@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,13 +37,19 @@ public class FillBukkitPlayersSection extends AbstractFillPlayersSection {
 
     public FillBukkitPlayersSection(int startColumn, SlotTemplate prefix, SlotTemplate suffix,
                                     PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        super(startColumn, prefix, suffix, sorter, maxPlayers, playerLines, morePlayerLines);
+        super(startColumn, maxPlayers, playerLines, morePlayerLines, Collections.singletonList(new BukkitPlayers(prefix, suffix, sorter)));
     }
 
-    @Override
-    @SneakyThrows
-    protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
-        PlayerTablistHandler tabList = (PlayerTablistHandler) BungeeTabListPlus.getTabList(player);
-        return tabList.getPlayers();
+    private static class BukkitPlayers extends PlayerList {
+        protected BukkitPlayers(SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter) {
+            super(prefix, suffix, sorter);
+        }
+
+        @Override
+        @SneakyThrows
+        protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
+            PlayerTablistHandler tabList = (PlayerTablistHandler) BungeeTabListPlus.getTabList(player);
+            return tabList.getPlayers();
+        }
     }
 }

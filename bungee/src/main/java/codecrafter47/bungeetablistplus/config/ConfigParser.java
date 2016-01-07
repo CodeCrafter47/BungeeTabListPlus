@@ -192,7 +192,13 @@ public class ConfigParser {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
                         sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, maxplayers[0], playerLines, morePlayerLines));
                     } else {
-                        sections.add(new FillPlayersSection(startColumn[0], parseFilter(filter), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                        boolean allowsExtension = maxplayers[0] == 1000 && startColumn[0] == -1;
+                        if (allowsExtension && !sections.isEmpty() && sections.get(sections.size() - 1) instanceof FillPlayersSection
+                                && ((FillPlayersSection) sections.get(sections.size() - 1)).allowsExtension()) {
+                            ((FillPlayersSection) sections.get(sections.size() - 1)).addPlayers(parseFilter(filter), prefix, suffix, sorter);
+                        } else {
+                            sections.add(new FillPlayersSection(startColumn[0], parseFilter(filter), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                        }
                     }
                 } else {
                     ColumnSplitSection cs;

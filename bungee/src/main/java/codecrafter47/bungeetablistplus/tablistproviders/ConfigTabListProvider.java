@@ -80,8 +80,8 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
         List<Section> botSections = botSectionsProvider.stream().flatMap(f -> f.apply(finalContext).stream()).collect(Collectors.toCollection(ArrayList::new));
 
         // precalculate all sections
-        precalculateSections(context, topSections);
-        precalculateSections(context, botSections);
+        preCalculateSections(context, topSections);
+        preCalculateSections(context, botSections);
 
         // remove empty sections
         for (Iterator<Section> iterator = topSections.iterator(); iterator.hasNext(); ) {
@@ -126,9 +126,9 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
         return tab_size;
     }
 
-    private void precalculateSections(TabListContext context, List<Section> topSections) {
+    private void preCalculateSections(TabListContext context, List<Section> topSections) {
         for (Section section : topSections) {
-            section.precalculate(context);
+            section.preCalculate(context);
         }
     }
 

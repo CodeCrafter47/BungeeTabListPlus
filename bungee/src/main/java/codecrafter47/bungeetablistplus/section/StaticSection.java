@@ -73,7 +73,7 @@ public class StaticSection extends Section {
     }
 
     @Override
-    public void precalculate(TabListContext context) {
+    public void preCalculate(TabListContext context) {
     }
 
     @Override

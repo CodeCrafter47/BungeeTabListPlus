@@ -25,37 +25,32 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.OptionalInt;
 
 public abstract class AbstractFillPlayersSection extends Section {
 
     private final OptionalInt vAlign;
-    private final SlotTemplate prefix;
-    private final SlotTemplate suffix;
-    protected List<IPlayer> players;
-    protected final PlayerSorter sorter;
-    private final int maxPlayers;
+    protected final int maxPlayers;
     private final List<SlotTemplate> playerLines;
     private final List<SlotTemplate> morePlayerLines;
+    protected final List<PlayerList> playerLists;
 
-    public AbstractFillPlayersSection(int vAlign, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+    public AbstractFillPlayersSection(int vAlign, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines, List<PlayerList> playerLists) {
         this.playerLines = playerLines;
         this.morePlayerLines = morePlayerLines;
+        this.playerLists = playerLists;
         this.vAlign = vAlign == -1 ? OptionalInt.empty() : OptionalInt.of(vAlign);
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.sorter = sorter;
         this.maxPlayers = maxPlayers;
     }
 
     @Override
-    public void precalculate(TabListContext context) {
-        players = getPlayers(context.getViewer(), context);
-        sorter.sort(context, players);
+    public void preCalculate(TabListContext context) {
+        for (PlayerList playerList : playerLists) {
+            playerList.preCalculate(context);
+        }
     }
-
-    protected abstract List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context);
 
     @Override
     public int getMinSize() {
@@ -64,11 +59,19 @@ public abstract class AbstractFillPlayersSection extends Section {
 
     @Override
     public int getMaxSize() {
-        int m = players.size();
+        int m = getNumberOfPlayers();
         if (m > this.maxPlayers) {
             m = this.maxPlayers;
         }
         return m * playerLines.size();
+    }
+
+    private int getNumberOfPlayers() {
+        int n = 0;
+        for (PlayerList playerList : playerLists) {
+            n += playerList.players.size();
+        }
+        return n;
     }
 
     @Override
@@ -78,7 +81,7 @@ public abstract class AbstractFillPlayersSection extends Section {
 
     @Override
     public int getEffectiveSize(int proposedSize) {
-        int playersToShow = players.size();
+        int playersToShow = getNumberOfPlayers();
         if (playersToShow > this.maxPlayers) {
             playersToShow = this.maxPlayers;
         }
@@ -88,13 +91,13 @@ public abstract class AbstractFillPlayersSection extends Section {
                 playersToShow = 0;
             }
         }
-        int other_count = players.size() - playersToShow;
+        int other_count = getNumberOfPlayers() - playersToShow;
         return playersToShow * playerLines.size() + (other_count > 0 ? morePlayerLines.size() : 0);
     }
 
     @Override
     public Slot getSlotAt(TabListContext context, int pos, int size) {
-        int playersToShow = players.size();
+        int playersToShow = getNumberOfPlayers();
         if (playersToShow > this.maxPlayers) {
             playersToShow = this.maxPlayers;
         }
@@ -104,18 +107,25 @@ public abstract class AbstractFillPlayersSection extends Section {
                 playersToShow = 0;
             }
         }
-        int other_count = players.size() - playersToShow;
+        int other_count = getNumberOfPlayers() - playersToShow;
 
         if (pos < playersToShow * playerLines.size()) {
             int playerIndex = pos / playerLines.size();
+            Iterator<PlayerList> iterator = playerLists.iterator();
+            PlayerList playerList = iterator.next();
+            while (playerIndex >= playerList.players.size()) {
+                playerIndex -= playerList.players.size();
+                playerList = iterator.next();
+            }
             int playerLinesIndex = pos % playerLines.size();
-            IPlayer player = players.get(playerIndex);
+
+            IPlayer player = playerList.players.get(playerIndex);
             return SlotTemplate.of(SlotTemplate.skin(player.getSkin()), SlotTemplate.ping(player.getPing()),
-                    prefix, playerLines.get(playerLinesIndex), suffix)
+                    playerList.prefix, playerLines.get(playerLinesIndex), playerList.suffix)
                     .buildSlot(context.setPlayer(player));
         } else if (other_count > 0) {
             int morePlayerLinesIndex = pos - playersToShow * playerLines.size();
-            return SlotTemplate.of(prefix, morePlayerLines.get(morePlayerLinesIndex), suffix).buildSlot(context.setOtherCount(other_count));
+            return morePlayerLines.get(morePlayerLinesIndex).buildSlot(context.setOtherCount(other_count));
         } else {
             return null;
         }
@@ -124,6 +134,26 @@ public abstract class AbstractFillPlayersSection extends Section {
     @Override
     public OptionalInt getStartColumn() {
         return vAlign;
+    }
+
+    protected static abstract class PlayerList {
+        private final SlotTemplate prefix;
+        private final SlotTemplate suffix;
+        protected List<IPlayer> players;
+        protected final PlayerSorter sorter;
+
+        protected PlayerList(SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter) {
+            this.prefix = prefix;
+            this.suffix = suffix;
+            this.sorter = sorter;
+        }
+
+        public void preCalculate(TabListContext context) {
+            players = getPlayers(context.getViewer(), context);
+            sorter.sort(context, players);
+        }
+
+        protected abstract List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context);
     }
 
 }

@@ -29,7 +29,7 @@ import java.util.function.Function;
 public abstract class Section implements LayoutSection, Function<TabListContext, List<Section>> {
     public abstract Slot getSlotAt(TabListContext context, int pos, int size);
 
-    public abstract void precalculate(TabListContext context);
+    public abstract void preCalculate(TabListContext context);
 
     @Override
     public String toString() {

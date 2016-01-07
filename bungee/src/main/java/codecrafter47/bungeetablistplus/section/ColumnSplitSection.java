@@ -91,7 +91,7 @@ public class ColumnSplitSection extends Section {
     }
 
     @Override
-    public void precalculate(TabListContext context) {
+    public void preCalculate(TabListContext context) {
         for (PlayerColumn aPc : pc) {
             if (aPc != null) {
                 aPc.precalculate(context);

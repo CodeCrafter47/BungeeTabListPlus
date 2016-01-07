@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class AutoFillPlayers implements Function<TabListContext, List<Section>> {
 
@@ -57,7 +56,16 @@ public class AutoFillPlayers implements Function<TabListContext, List<Section>> 
         List<Section> sections = new ArrayList<>();
         for (ServerGroup serverGroup : groups) {
             if (showEmptyGroups || context.getPlayerManager().getPlayerCount(serverGroup.getFilterForPlayerManager()) > 0) {
-                sections.addAll(this.sections.stream().map(section -> section.apply(serverGroup)).collect(Collectors.toList()));
+                for (Function<ServerGroup, Section> section : this.sections) {
+                    Section section1 = section.apply(serverGroup);
+                    if (!sections.isEmpty() && sections.get(sections.size() - 1) instanceof FillPlayersSection
+                            && section1 instanceof FillPlayersSection && ((FillPlayersSection) section1).allowsExtension()
+                            && ((FillPlayersSection) sections.get(sections.size() - 1)).allowsExtension()) {
+                        ((FillPlayersSection) sections.get(sections.size() - 1)).playerLists.addAll(((FillPlayersSection) section1).playerLists);
+                    } else {
+                        sections.add(section1);
+                    }
+                }
             }
         }
 

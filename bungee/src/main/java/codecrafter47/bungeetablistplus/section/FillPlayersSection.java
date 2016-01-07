@@ -26,25 +26,37 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FillPlayersSection extends AbstractFillPlayersSection {
 
-    private final PlayerManager.Filter filter;
-
     public FillPlayersSection(int vAlign, PlayerManager.Filter filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        super(vAlign, prefix, suffix, sorter, maxPlayers, playerLines, morePlayerLines);
-        this.filter = filter;
+        super(vAlign, maxPlayers, playerLines, morePlayerLines, new ArrayList<>());
+        addPlayers(filter, prefix, suffix, sorter);
     }
 
-    @Override
-    public void precalculate(TabListContext context) {
-        players = getPlayers(context.getViewer(), context);
-        sorter.sort(context, players);
+    public void addPlayers(PlayerManager.Filter filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter) {
+        playerLists.add(new Players(prefix, suffix, sorter, filter));
     }
 
-    @Override
-    protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
-        return context.getPlayerManager().getPlayers(filter);
+    public boolean allowsExtension() {
+        return maxPlayers == 1000 && !getStartColumn().isPresent();
+    }
+
+    private class Players extends PlayerList {
+
+        private final PlayerManager.Filter filter;
+
+        protected Players(SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, PlayerManager.Filter filter) {
+            super(prefix, suffix, sorter);
+            this.filter = filter;
+        }
+
+        @Override
+        protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
+            return context.getPlayerManager().getPlayers(filter);
+        }
+
     }
 }
