@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.data.DataKey;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -79,6 +80,6 @@ public abstract class AbstractDataAccess<B> implements DataAccess<B> {
     }
 
     private boolean isAsyncOpError(Throwable th) {
-        return th.getStackTrace()[0].getClassName().equals("org.spigotmc.AsyncCatcher") || (th.getCause() != null && isAsyncOpError(th.getCause()));
+        return th instanceof ConcurrentModificationException || th.getStackTrace()[0].getClassName().equals("org.spigotmc.AsyncCatcher") || (th.getCause() != null && isAsyncOpError(th.getCause()));
     }
 }
