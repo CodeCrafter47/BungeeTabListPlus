@@ -36,77 +36,79 @@ public class OldSuperCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] arg1) {
-        if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
-            if (sender.hasPermission("bungeetablistplus.admin")) {
-                sendReloadComplete(sender, BungeeTabListPlus.getInstance().reload());
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
-            if (sender.hasPermission("bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        BungeeTabListPlus.unhidePlayer(player);
-                        sendPlayerUnhide(player);
+        plugin.runInMainThread(() -> {
+            if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
+                if (sender.hasPermission("bungeetablistplus.admin")) {
+                    sendReloadComplete(sender, BungeeTabListPlus.getInstance().reload());
+                } else {
+                    sendNoPermission(sender);
+                }
+            } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
+                if (sender.hasPermission("bungeetablistplus.hide")) {
+                    if (sender instanceof ProxiedPlayer) {
+                        ProxiedPlayer player = (ProxiedPlayer) sender;
+                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                            BungeeTabListPlus.unhidePlayer(player);
+                            sendPlayerUnhide(player);
+                        } else {
+                            BungeeTabListPlus.hidePlayer(player);
+                            sendPlayerHide(player);
+                        }
                     } else {
-                        BungeeTabListPlus.hidePlayer(player);
-                        sendPlayerHide(player);
+                        sendNeedsPlayer(sender);
                     }
                 } else {
-                    sendNeedsPlayer(sender);
+                    sendNoPermission(sender);
                 }
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
-                equalsIgnoreCase("on")) {
-            if (sender.hasPermission("bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        sendAlreadyHidden(player);
+            } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                    equalsIgnoreCase("on")) {
+                if (sender.hasPermission("bungeetablistplus.hide")) {
+                    if (sender instanceof ProxiedPlayer) {
+                        ProxiedPlayer player = (ProxiedPlayer) sender;
+                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                            sendAlreadyHidden(player);
+                        } else {
+                            BungeeTabListPlus.hidePlayer(player);
+                            sendPlayerHide(player);
+                        }
                     } else {
-                        BungeeTabListPlus.hidePlayer(player);
-                        sendPlayerHide(player);
+                        sendNeedsPlayer(sender);
                     }
                 } else {
-                    sendNeedsPlayer(sender);
+                    sendNoPermission(sender);
                 }
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
-                equalsIgnoreCase("off")) {
-            if (sender.hasPermission("bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        BungeeTabListPlus.unhidePlayer(player);
-                        sendPlayerUnhide(player);
+            } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                    equalsIgnoreCase("off")) {
+                if (sender.hasPermission("bungeetablistplus.hide")) {
+                    if (sender instanceof ProxiedPlayer) {
+                        ProxiedPlayer player = (ProxiedPlayer) sender;
+                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                            BungeeTabListPlus.unhidePlayer(player);
+                            sendPlayerUnhide(player);
+                        } else {
+                            sendErrorNotHidden(player);
+                        }
                     } else {
-                        sendErrorNotHidden(player);
+                        sendNeedsPlayer(sender);
                     }
                 } else {
-                    sendNeedsPlayer(sender);
+                    sendNoPermission(sender);
                 }
             } else {
-                sendNoPermission(sender);
+                if (sender.hasPermission("bungeetablistplus.help") || sender.
+                        hasPermission("bungeetablistplus.admin")) {
+                    sender.sendMessage(
+                            ChatColor.DARK_PURPLE + "BungeeTabListPlus " + BungeeTabListPlus.
+                                    getInstance().getPlugin().getDescription().getVersion());
+                    sender.sendMessage(
+                            ChatColor.DARK_PURPLE + "/BungeeTabListPlus reload");
+                    sender.sendMessage(
+                            ChatColor.DARK_PURPLE + "/BungeeTabListPlus hide [on/off]");
+                } else {
+                    sendNoPermission(sender);
+                }
             }
-        } else {
-            if (sender.hasPermission("bungeetablistplus.help") || sender.
-                    hasPermission("bungeetablistplus.admin")) {
-                sender.sendMessage(
-                        ChatColor.DARK_PURPLE + "BungeeTabListPlus " + BungeeTabListPlus.
-                                getInstance().getPlugin().getDescription().getVersion());
-                sender.sendMessage(
-                        ChatColor.DARK_PURPLE + "/BungeeTabListPlus reload");
-                sender.sendMessage(
-                        ChatColor.DARK_PURPLE + "/BungeeTabListPlus hide [on/off]");
-            } else {
-                sendNoPermission(sender);
-            }
-        }
+        });
     }
 
     private void sendNoPermission(CommandSender target) {

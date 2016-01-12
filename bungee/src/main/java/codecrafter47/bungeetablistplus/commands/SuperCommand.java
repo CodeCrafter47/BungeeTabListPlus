@@ -39,76 +39,78 @@ public class SuperCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] arg1) {
-        if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
-            if (plugin.getPermissionManager().hasPermission(sender,
-                    "bungeetablistplus.admin")) {
-                sendReloadComplete(sender, BungeeTabListPlus.getInstance().reload());
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
-            if (plugin.getPermissionManager().hasPermission(sender,
-                    "bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        BungeeTabListPlus.unhidePlayer(player);
-                        sendPlayerUnhide(player);
+        plugin.runInMainThread(() -> {
+            if (arg1.length == 1 && arg1[0].equalsIgnoreCase("reload")) {
+                if (plugin.getPermissionManager().hasPermission(sender,
+                        "bungeetablistplus.admin")) {
+                    sendReloadComplete(sender, BungeeTabListPlus.getInstance().reload());
+                } else {
+                    sendNoPermission(sender);
+                }
+            } else if (arg1.length == 1 && arg1[0].equalsIgnoreCase("hide")) {
+                if (plugin.getPermissionManager().hasPermission(sender,
+                        "bungeetablistplus.hide")) {
+                    if (sender instanceof ProxiedPlayer) {
+                        ProxiedPlayer player = (ProxiedPlayer) sender;
+                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                            BungeeTabListPlus.unhidePlayer(player);
+                            sendPlayerUnhide(player);
+                        } else {
+                            BungeeTabListPlus.hidePlayer(player);
+                            sendPlayerHide(player);
+                        }
                     } else {
-                        BungeeTabListPlus.hidePlayer(player);
-                        sendPlayerHide(player);
+                        sendNeedsPlayer(sender);
                     }
                 } else {
-                    sendNeedsPlayer(sender);
+                    sendNoPermission(sender);
                 }
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
-                equalsIgnoreCase("on")) {
-            if (plugin.getPermissionManager().hasPermission(sender,
-                    "bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        sendAlreadyHidden(player);
+            } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                    equalsIgnoreCase("on")) {
+                if (plugin.getPermissionManager().hasPermission(sender,
+                        "bungeetablistplus.hide")) {
+                    if (sender instanceof ProxiedPlayer) {
+                        ProxiedPlayer player = (ProxiedPlayer) sender;
+                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                            sendAlreadyHidden(player);
+                        } else {
+                            BungeeTabListPlus.hidePlayer(player);
+                            sendPlayerHide(player);
+                        }
                     } else {
-                        BungeeTabListPlus.hidePlayer(player);
-                        sendPlayerHide(player);
+                        sendNeedsPlayer(sender);
                     }
                 } else {
-                    sendNeedsPlayer(sender);
+                    sendNoPermission(sender);
                 }
-            } else {
-                sendNoPermission(sender);
-            }
-        } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
-                equalsIgnoreCase("off")) {
-            if (plugin.getPermissionManager().hasPermission(sender,
-                    "bungeetablistplus.hide")) {
-                if (sender instanceof ProxiedPlayer) {
-                    ProxiedPlayer player = (ProxiedPlayer) sender;
-                    if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
-                        BungeeTabListPlus.unhidePlayer(player);
-                        sendPlayerUnhide(player);
+            } else if (arg1.length == 2 && arg1[0].equalsIgnoreCase("hide") && arg1[1].
+                    equalsIgnoreCase("off")) {
+                if (plugin.getPermissionManager().hasPermission(sender,
+                        "bungeetablistplus.hide")) {
+                    if (sender instanceof ProxiedPlayer) {
+                        ProxiedPlayer player = (ProxiedPlayer) sender;
+                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                            BungeeTabListPlus.unhidePlayer(player);
+                            sendPlayerUnhide(player);
+                        } else {
+                            sendErrorNotHidden(player);
+                        }
                     } else {
-                        sendErrorNotHidden(player);
+                        sendNeedsPlayer(sender);
                     }
                 } else {
-                    sendNeedsPlayer(sender);
+                    sendNoPermission(sender);
                 }
             } else {
-                sendNoPermission(sender);
+                if (plugin.getPermissionManager().hasPermission(sender,
+                        "bungeetablistplus.help") || plugin.getPermissionManager().
+                        hasPermission(sender, "bungeetablistplus.admin")) {
+                    sendHelp(sender);
+                } else {
+                    sendNoPermission(sender);
+                }
             }
-        } else {
-            if (plugin.getPermissionManager().hasPermission(sender,
-                    "bungeetablistplus.help") || plugin.getPermissionManager().
-                    hasPermission(sender, "bungeetablistplus.admin")) {
-                sendHelp(sender);
-            } else {
-                sendNoPermission(sender);
-            }
-        }
+        });
     }
 
     private void sendHelp(CommandSender target) {
