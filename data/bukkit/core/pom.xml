@@ -3,7 +3,7 @@
     <parent>
         <artifactId>data-bukkit-parent</artifactId>
         <groupId>codecrafter47.bungeetablistplus</groupId>
-        <version>2.3.1</version>
+        <version>2.3.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,67 +13,67 @@
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-core</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-vault</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-vanishnopacket</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-playerpoints</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-factions-2.7.5</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-factionsuuid</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-supervanish</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-simpleclans</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-essentials</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-permissionsex</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>data-bukkit-multiverse</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
