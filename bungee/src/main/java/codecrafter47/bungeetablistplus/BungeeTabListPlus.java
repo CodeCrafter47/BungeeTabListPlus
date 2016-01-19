@@ -273,14 +273,14 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         playerProviders = new ArrayList<>();
 
-        playerProviders.add(fakePlayerManager);
-
         if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
             playerProviders.add(new RedisPlayerProvider());
             plugin.getLogger().info("Hooked RedisBungee");
         } else {
             playerProviders.add(bungeePlayerProvider);
         }
+
+        playerProviders.add(fakePlayerManager);
 
         plugin.getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
