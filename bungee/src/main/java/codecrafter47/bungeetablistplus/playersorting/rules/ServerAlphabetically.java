@@ -33,7 +33,7 @@ public class ServerAlphabetically implements SortingRule {
         Optional<ServerInfo> server1 = player1.getServer();
         Optional<ServerInfo> server2 = player2.getServer();
         if (server1.isPresent() && server2.isPresent()) {
-            return Collator.getInstance().compare(server1.get(), server2.get());
+            return Collator.getInstance().compare(server1.get().getName(), server2.get().getName());
         }
         return 0;
     }

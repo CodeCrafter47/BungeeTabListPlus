@@ -36,8 +36,9 @@ public class PlayerServerFirst implements SortingRule {
             Optional<ServerInfo> server1 = player1.getServer();
             Optional<ServerInfo> server2 = player2.getServer();
             if (!server1.equals(server2)) {
-                if (server1.isPresent() && server1.get().equals(server)) return -1;
-                if (server2.isPresent() && server2.get().equals(server)) return 1;
+                if (server1.isPresent() && server1.get().equals(info))
+                    return -1;
+                if (server2.isPresent() && server2.get().equals(info)) return 1;
             }
         }
         return 0;
