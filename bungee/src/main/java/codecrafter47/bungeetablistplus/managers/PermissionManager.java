@@ -155,7 +155,7 @@ public class PermissionManager {
         if (p1Rank.isPresent()) {
             Optional<Integer> p2Rank = plugin.getBridge().get(p2, DataKeys.PermissionsEx_GroupRank);
             if (p2Rank.isPresent()) {
-                return p2Rank.get() - p1Rank.get();
+                return p1Rank.get() - p2Rank.get();
             }
         }
 
