@@ -347,17 +347,19 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     @Override
     public void unload() {
         tabListHandler.unload();
-        PlayerListItem packet = new PlayerListItem();
-        packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
-        packet.setItems(
-                uuids.entrySet().stream().map(entry -> {
-                    PlayerListItem.Item item = new PlayerListItem.Item();
-                    item.setUuid(entry.getKey());
-                    item.setUsername(entry.getValue());
-                    item.setDisplayName(entry.getValue());
-                    return item;
-                }).toArray(PlayerListItem.Item[]::new));
-        getPlayer().unsafe().sendPacket(packet);
+        synchronized (usernames) {
+            PlayerListItem packet = new PlayerListItem();
+            packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+            packet.setItems(
+                    uuids.entrySet().stream().map(entry -> {
+                        PlayerListItem.Item item = new PlayerListItem.Item();
+                        item.setUuid(entry.getKey());
+                        item.setUsername(entry.getValue());
+                        item.setDisplayName(entry.getValue());
+                        return item;
+                    }).toArray(PlayerListItem.Item[]::new));
+            getPlayer().unsafe().sendPacket(packet);
+        }
     }
 
     @Override
