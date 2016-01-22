@@ -93,7 +93,7 @@ class ResendThread implements Runnable, Executor {
                 while (!tasks.isEmpty()) {
                     tasks.poll().run();
                 }
-                while (!queue.isEmpty()) {
+                if (!queue.isEmpty()) {
                     ProxiedPlayer player = queue.poll();
                     set.remove(player);
                     Object tabList = BungeeTabListPlus.getTabList(player);
