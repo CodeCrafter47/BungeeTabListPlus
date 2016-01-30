@@ -151,11 +151,19 @@ public class PermissionManager {
             }
         }
 
-        Optional<Integer> p1Rank = plugin.getBridge().get(p1, DataKeys.PermissionsEx_GroupRank);
-        if (p1Rank.isPresent()) {
+        {
+            Optional<Integer> p1Rank = plugin.getBridge().get(p1, DataKeys.PermissionsEx_GroupRank);
             Optional<Integer> p2Rank = plugin.getBridge().get(p2, DataKeys.PermissionsEx_GroupRank);
-            if (p2Rank.isPresent()) {
-                return p1Rank.get() - p2Rank.get();
+            if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+            }
+        }
+
+        {
+            Optional<Integer> p1Rank = plugin.getBridge().get(p1, DataKeys.Vault_PermissionGroupRank);
+            Optional<Integer> p2Rank = plugin.getBridge().get(p2, DataKeys.Vault_PermissionGroupRank);
+            if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
         }
 

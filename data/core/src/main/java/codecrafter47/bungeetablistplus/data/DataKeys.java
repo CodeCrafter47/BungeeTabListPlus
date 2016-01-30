@@ -39,6 +39,7 @@ public class DataKeys {
     public final static DataKey<String> Vault_Prefix = DataKey.builder().player().id("vault:prefix").build();
     public final static DataKey<String> Vault_Suffix = DataKey.builder().player().id("vault:suffix").build();
     public final static DataKey<String> Vault_PermissionGroup = DataKey.builder().player().id("vault:permgroup").build();
+    public final static DataKey<Integer> Vault_PermissionGroupRank = DataKey.builder().player().id("vault:permgrouprank").build();
     public final static DataKey<Double> Vault_Balance = DataKey.builder().player().id("vault:balance").build();
     public final static DataKey<String> PermissionsEx_Prefix = DataKey.builder().player().id("permissionsex:prefix").build();
     public final static DataKey<String> PermissionsEx_Suffix = DataKey.builder().player().id("permissionsex:suffix").build();
