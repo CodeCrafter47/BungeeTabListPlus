@@ -65,9 +65,30 @@ public class BasicPlaceholders extends PlaceholderProvider {
         bind("prefixColor").to(context -> {
             String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context);
             if (prefix.length() < 2) {
-                return "";
+                return prefix;
             }
             return prefix.substring(0, 2);
+        });
+        bind("prefixFormat").to(context -> {
+            String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context);
+            if (prefix.length() < 4) {
+                return prefix;
+            }
+            return prefix.substring(0, 4);
+        });
+        bind("suffixColor").to(context -> {
+            String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getSuffix(context.getPlayer());
+            if (prefix.length() < 2) {
+                return prefix;
+            }
+            return prefix.substring(0, 2);
+        });
+        bind("suffixFormat").to(context -> {
+            String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getSuffix(context.getPlayer());
+            if (prefix.length() < 4) {
+                return prefix;
+            }
+            return prefix.substring(0, 4);
         });
         bind("permsuffix").alias("suffix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getSuffix(context.getPlayer()));
         bind("displayprefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getDisplayPrefix(context.getPlayer()));
