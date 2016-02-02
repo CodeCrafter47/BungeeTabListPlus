@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -287,8 +288,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
      */
     public static PlayerListItem rewrite(PlayerListItem playerListItem) {
         for (PlayerListItem.Item item : playerListItem.getItems()) {
-            if (item.getUuid() == null) // Old style ping
-            {
+            if (item.getUuid() == null) {
                 continue;
             }
             UserConnection player = BungeeCord.getInstance().getPlayerByOfflineUUID(item.getUuid());
@@ -297,20 +297,43 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
             }
             if (player != null) {
                 item.setUuid(player.getUniqueId());
-                LoginResult loginResult = player.getPendingConnection().getLoginProfile();
-                if (loginResult != null) {
-                    String[][] props = new String[loginResult.getProperties().length][];
-                    for (int i = 0; i < props.length; i++) {
-                        props[i] = new String[]
-                                {
-                                        loginResult.getProperties()[i].getName(),
-                                        loginResult.getProperties()[i].getValue(),
-                                        loginResult.getProperties()[i].getSignature()
-                                };
+                if (playerListItem.getAction() == PlayerListItem.Action.ADD_PLAYER) {
+                    Map<String, String[]> loginProperties = new HashMap<>();
+                    for (String[] property : item.getProperties()) {
+                        if (property.length == 3 && property[2] == null) {
+                            loginProperties.put(property[0], new String[]{property[0], property[1]});
+                        } else {
+                            loginProperties.put(property[0], property);
+                        }
                     }
-                    item.setProperties(props);
-                } else {
-                    item.setProperties(new String[0][0]);
+                    LoginResult loginResult = player.getPendingConnection().getLoginProfile();
+                    if (loginResult != null) {
+                        LoginResult.Property[] properties = loginResult.getProperties();
+                        for (LoginResult.Property property : properties) {
+                            if (property.getSignature() != null) {
+                                loginProperties.putIfAbsent(property.getName(), new String[]{property.getName(), property.getValue(), property.getSignature()});
+                            } else {
+                                loginProperties.putIfAbsent(property.getName(), new String[]{property.getName(), property.getValue()});
+                            }
+                        }
+                    }
+
+                    // filter properties
+                    for (Iterator<String[]> iterator = loginProperties.values().iterator(); iterator.hasNext(); ) {
+                        String[] property = iterator.next();
+                        if (property[0].equals("textures")) {
+                            // good
+                        } else if (property[0].equals("forgeClient") || property[0].equals("extraData")) {
+                            // bad
+                            iterator.remove();
+                        } else {
+                            // unknown
+                            BungeeTabListPlus.getInstance().getLogger().severe("Unknown user property: " + Arrays.toString(property));
+                        }
+                    }
+
+                    // set properties
+                    item.setProperties(loginProperties.values().toArray(new String[loginProperties.size()][]));
                 }
                 if (playerListItem.getAction() == PlayerListItem.Action.ADD_PLAYER || playerListItem.getAction() == PlayerListItem.Action.UPDATE_GAMEMODE) {
                     player.setGamemode(item.getGamemode());
