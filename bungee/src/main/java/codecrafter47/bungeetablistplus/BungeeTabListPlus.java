@@ -33,6 +33,7 @@ import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
+import codecrafter47.bungeetablistplus.managers.DataManager;
 import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
 import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
@@ -389,6 +390,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         placeholderAPIHook = new PlaceholderAPIHook(this);
         placeholderAPIHook.onLoad();
+
+        new DataManager(this);
     }
 
     private Double requestedUpdateInterval = null;

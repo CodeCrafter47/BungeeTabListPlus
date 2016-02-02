@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.managers;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import com.google.common.collect.ImmutableList;
 import lombok.Synchronized;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -39,12 +41,13 @@ import java.util.UUID;
 public class ConnectedPlayerManager implements IPlayerProvider {
 
     private Set<ConnectedPlayer> players = Collections.newSetFromMap(new IdentityHashMap<>());
+    private List<ConnectedPlayer> playerList = Collections.emptyList();
     private Map<String, ConnectedPlayer> byName = new HashMap<>();
     private Map<UUID, ConnectedPlayer> byUUID = new HashMap<>();
 
     @Override
     public Collection<ConnectedPlayer> getPlayers() {
-        return players;
+        return playerList;
     }
 
     @Nonnull
@@ -83,6 +86,7 @@ public class ConnectedPlayerManager implements IPlayerProvider {
         players.add(player);
         byName.put(player.getName(), player);
         byUUID.put(player.getUniqueID(), player);
+        playerList = ImmutableList.copyOf((Iterable<? extends ConnectedPlayer>) players);
     }
 
     @Synchronized
@@ -91,5 +95,6 @@ public class ConnectedPlayerManager implements IPlayerProvider {
         byName.remove(player.getName(), player);
         byUUID.remove(player.getUniqueID(), player);
         BungeeTabListPlus.getInstance().getBridge().onDisconnected(player.getPlayer());
+        playerList = ImmutableList.copyOf((Iterable<? extends ConnectedPlayer>) players);
     }
 }

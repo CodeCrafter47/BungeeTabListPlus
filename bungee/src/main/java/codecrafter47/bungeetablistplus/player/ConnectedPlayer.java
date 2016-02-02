@@ -23,9 +23,11 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -48,6 +50,9 @@ public class ConnectedPlayer implements Player {
 
     @Setter
     private BukkitBridge.BukkitData bukkitData;
+
+    @Getter
+    private DataCache data = new DataCache();
 
     public ConnectedPlayer(ProxiedPlayer player) {
         this.player = player;
@@ -106,6 +111,10 @@ public class ConnectedPlayer implements Player {
 
     @Override
     public <T> Optional<T> get(DataKey<T> key) {
+        Optional<T> dataValue = data.getValue(key);
+        if (dataValue.isPresent()) {
+            return dataValue;
+        }
         if (key.getScope() == DataKey.Scope.SERVER) {
             return getServer().flatMap(server -> BungeeTabListPlus.getInstance().getBridge().get(server, key));
         }

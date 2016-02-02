@@ -71,6 +71,15 @@ public class DataKeys {
     public final static DataKey<String> ServerModName = DataKey.builder().server().id("bukkit:name").build();
     public final static DataKey<String> ServerModVersion = DataKey.builder().server().id("bukkit:version").build();
 
+    public final static DataKey<String> BungeePerms_PrimaryGroup = DataKey.builder().player().id("bungeeperms:group").build();
+    public final static DataKey<String> BungeePerms_Prefix = DataKey.builder().player().id("bungeeperms:prefix").build();
+    public final static DataKey<String> BungeePerms_DisplayPrefix = DataKey.builder().player().id("bungeeperms:displayprefix").build();
+    public final static DataKey<String> BungeePerms_Suffix = DataKey.builder().player().id("bungeeperms:suffix").build();
+    public final static DataKey<Integer> BungeePerms_Rank = DataKey.builder().player().id("bungeeperms:rank").build();
+
+    public final static DataKey<String> BungeeCord_PrimaryGroup = DataKey.builder().player().id("bungeecord:group").build();
+    public final static DataKey<Integer> BungeeCord_Rank = DataKey.builder().player().id("bungeecord:rank").build();
+
     public static PermissionDataKey permission(String permission) {
         return new PermissionDataKey(permission);
     }

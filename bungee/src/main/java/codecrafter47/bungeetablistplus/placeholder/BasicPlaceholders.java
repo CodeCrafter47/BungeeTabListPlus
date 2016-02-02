@@ -92,7 +92,7 @@ public class BasicPlaceholders extends PlaceholderProvider {
             return prefix.substring(0, 4);
         });
         bind("permsuffix").alias("suffix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getSuffix(context.getPlayer()));
-        bind("displayprefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getDisplayPrefix(context.getPlayer()));
+        bind("displayprefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_DisplayPrefix).orElse(""));
         bind("ping").to(context -> String.format("%d", context.getPlayer().getPing()));
         bind("group").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(context.getPlayer()));
         bind("uuid").to(context -> context.getPlayer().getUniqueID().toString());
