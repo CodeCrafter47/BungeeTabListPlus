@@ -1,9 +1,9 @@
 package codecrafter47.bungeetablistplus.data.permissionsex;
 
-import java.util.List;
-
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
+
+import java.util.List;
 
 public class PermissionsExHelper {
 
@@ -17,7 +17,7 @@ public class PermissionsExHelper {
 
 		PermissionGroup maingroup = null;
 		for (PermissionGroup pg : groups) {
-			if (pg.getRankLadder().equals("default") && (maingroup == null || pg.getRank() < maingroup.getRank()))
+			if (pg.isRanked() && pg.getRankLadder().equals("default") && (maingroup == null || pg.getRank() < maingroup.getRank()))
 				maingroup = pg;
 		}
 		return maingroup;
