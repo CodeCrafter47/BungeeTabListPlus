@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
@@ -148,11 +149,14 @@ class ResendThread implements Runnable, Executor {
             }
 
             TabListContext context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager(tablistHandler.getPlayer()));
-            context = context.setPlayer(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer()));
+            ConnectedPlayer connectedPlayer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(context.getViewer());
+            if (connectedPlayer != null) {
+                context = context.setPlayer(connectedPlayer);
 
-            tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
+                tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
 
-            tablistHandler.sendTablist(tabList);
+                tablistHandler.sendTablist(tabList);
+            }
         } catch (Throwable th) {
             try {
                 BungeeTabListPlus.getInstance().getLogger().log(th instanceof LayoutException ? Level.WARNING : Level.SEVERE, "Error while updating tablist", th);

@@ -28,6 +28,7 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Sets;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Listener;
@@ -83,7 +84,7 @@ public class PlaceholderAPIHook implements Listener {
                     bindRegex(Pattern.quote(placeholder)).to((placeholderManager, matcher) -> new SlotTemplate() {
                         @Override
                         public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
-                            return builder.appendText(bungeeTabListPlus.getBridge().get(context.getPlayer(), BTLPDataKeys.createPlaceholderAPIDataKey(placeholder)).orElse(""));
+                            return builder.appendText(((Player) context.getPlayer()).get(BTLPDataKeys.createPlaceholderAPIDataKey(placeholder)).orElse(""));
                         }
                     });
                 }

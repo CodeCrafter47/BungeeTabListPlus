@@ -68,7 +68,7 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
         if (config.verticalMode) {
             tabList = tabList.flip();
             context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), player, context.getPlayerManager());
-            context = context.setPlayer(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(context.getViewer()));
+            context = context.setPlayer(BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(context.getViewer()));
         }
 
         if (config.autoShrinkTabList) {

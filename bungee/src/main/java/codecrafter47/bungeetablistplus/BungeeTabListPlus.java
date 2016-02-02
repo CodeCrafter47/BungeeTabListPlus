@@ -19,7 +19,6 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
@@ -33,6 +32,7 @@ import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
 import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
@@ -51,9 +51,9 @@ import codecrafter47.bungeetablistplus.placeholder.OnlineStatePlaceholder;
 import codecrafter47.bungeetablistplus.placeholder.PlayerCountPlaceholder;
 import codecrafter47.bungeetablistplus.placeholder.RedisBungeePlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.TimePlaceholders;
-import codecrafter47.bungeetablistplus.player.BungeePlayerProvider;
 import codecrafter47.bungeetablistplus.player.FakePlayerManager;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.player.RedisPlayerProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
@@ -172,7 +172,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private SkinManager skins;
 
     @Getter
-    private BungeePlayerProvider bungeePlayerProvider = new BungeePlayerProvider();
+    private ConnectedPlayerManager connectedPlayerManager = new ConnectedPlayerManager();
 
     @Getter
     private PlaceholderAPIHook placeholderAPIHook;
@@ -277,7 +277,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             playerProviders.add(new RedisPlayerProvider());
             plugin.getLogger().info("Hooked RedisBungee");
         } else {
-            playerProviders.add(bungeePlayerProvider);
+            playerProviders.add(connectedPlayerManager);
         }
 
         playerProviders.add(fakePlayerManager);
@@ -555,7 +555,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * @param player the player object for which the check should be performed
      * @return true if the player is hidden, false otherwise
      */
-    public static boolean isHidden(IPlayer player) {
+    public static boolean isHidden(Player player) {
         if (isHiddenServer(player.getServer().orElse(null))) return true;
         final boolean[] hidden = new boolean[1];
         synchronized (hiddenPlayers) {
@@ -570,9 +570,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             hidden[0] = true;
         }
         BukkitBridge bukkitBridge = getInstance().bukkitBridge;
-        bukkitBridge.get(player, DataKeys.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
-        bukkitBridge.get(player, DataKeys.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
-        bukkitBridge.get(player, DataKeys.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.get(DataKeys.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.get(DataKeys.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.get(DataKeys.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
 
         // check ProxyCore
         if (!hidden[0]) {

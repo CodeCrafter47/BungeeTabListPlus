@@ -20,7 +20,14 @@ package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.tablisthandler.*;
+import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
+import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
+import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
+import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;
+import codecrafter47.bungeetablistplus.tablisthandler.TabListHandler;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -28,6 +35,7 @@ import net.md_5.bungee.api.event.ProxyReloadEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class TabListListener implements Listener {
 
@@ -37,7 +45,7 @@ public class TabListListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PostLoginEvent e) {
         try {
             PlayerTablistHandler tab;
@@ -50,7 +58,9 @@ public class TabListListener implements Listener {
                     handler = new ScoreboardTabList(tab);
                 }
             } else {
-                tab = new CustomTabList18(e.getPlayer());
+                CustomTabList18 customTabList18 = new CustomTabList18(e.getPlayer());
+                customTabList18.onConnect();
+                tab = customTabList18;
                 if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(e.getPlayer()) < 47) {
                     if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
                         handler = new MyTabList(tab);

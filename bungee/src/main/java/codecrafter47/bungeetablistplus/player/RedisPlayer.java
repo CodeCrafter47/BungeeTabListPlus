@@ -20,8 +20,8 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.data.DataKey;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
@@ -30,7 +30,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RedisPlayer implements IPlayer {
+public class RedisPlayer implements Player {
     private String name;
     private final UUID uuid;
     private ServerInfo server;
@@ -84,5 +84,10 @@ public class RedisPlayer implements IPlayer {
     public int getGameMode() {
         // we don't know -> survival mode
         return 0;
+    }
+
+    @Override
+    public <T> Optional<T> get(DataKey<T> key) {
+        return Optional.empty();// TODO: 02.02.16
     }
 }

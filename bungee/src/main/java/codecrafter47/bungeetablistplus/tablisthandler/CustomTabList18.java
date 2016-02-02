@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.collect.Lists;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
 public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements PlayerTablistHandler {
     protected TabListHandler tabListHandler;
     boolean isExcluded = false;
+    private ConnectedPlayer connectedPlayer = null;
 
     final Collection<String> usernames = new HashSet<>();
     final Map<UUID, String> uuids = new HashMap<>();
@@ -73,6 +75,10 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     @Override
     public ProxiedPlayer getPlayer() {
         return player;
+    }
+
+    public ConnectedPlayer getConnectedPlayer() {
+        return connectedPlayer;
     }
 
     @Override
@@ -261,12 +267,17 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public void onConnect() {
-        // nothing to do
+        if (connectedPlayer == null) {
+            connectedPlayer = new ConnectedPlayer(getPlayer());
+            BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerConnected(connectedPlayer);
+        }
     }
 
     @Override
     public void onDisconnect() {
-        // nothing to do
+        if (connectedPlayer != null) {
+            BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerDisconnected(connectedPlayer);
+        }
     }
 
     public int size() {

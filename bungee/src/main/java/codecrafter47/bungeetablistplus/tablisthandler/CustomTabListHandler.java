@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -38,6 +39,7 @@ import java.util.List;
 public class CustomTabListHandler extends TabListAdapter implements PlayerTablistHandler {
 
     boolean isExcluded = false;
+    private ConnectedPlayer connectedPlayer = null;
 
     private final Collection<String> usernames = new HashSet<>();
     public final List<String> bukkitplayers = new ArrayList<>(100);
@@ -53,6 +55,22 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
             this.tabListHandler.unload();
         }
         this.tabListHandler = tabListHandler;
+    }
+
+    @Override
+    public void onConnect() {
+        if (connectedPlayer == null) {
+            System.out.println("connect: " + getPlayer());
+            connectedPlayer = new ConnectedPlayer(getPlayer());
+            BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerConnected(connectedPlayer);
+        }
+    }
+
+    @Override
+    public void onDisconnect() {
+        if (connectedPlayer != null) {
+            BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerDisconnected(connectedPlayer);
+        }
     }
 
     @Override

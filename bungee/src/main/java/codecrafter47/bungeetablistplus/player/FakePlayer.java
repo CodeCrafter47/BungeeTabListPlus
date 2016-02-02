@@ -20,8 +20,8 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -29,7 +29,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FakePlayer implements IPlayer {
+public class FakePlayer implements Player {
     private final String name;
     ServerInfo server;
     private int ping;
@@ -86,5 +86,10 @@ public class FakePlayer implements IPlayer {
 
     public void setSkin(PlayerSkin skin) {
         this.skin = skin;
+    }
+
+    @Override
+    public <T> Optional<T> get(DataKey<T> key) {
+        return Optional.empty();// TODO: 02.02.16
     }
 }

@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.tablist;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -31,6 +32,7 @@ public abstract class AbstractTabListContext implements TabListContext {
 
     @Override
     public TabListContext setPlayer(IPlayer player) {
+        Preconditions.checkNotNull(player, "player");
         return new DelegatingTabListContext(this) {
             @Override
             public IPlayer getPlayer() {
@@ -61,6 +63,7 @@ public abstract class AbstractTabListContext implements TabListContext {
 
     @Override
     public TabListContext setServerGroup(ServerGroup serverGroup) {
+        Preconditions.checkNotNull(serverGroup, "serverGroup");
         if (serverGroup.getServerNames().size() == 1) {
             return new DelegatingTabListContext(this) {
                 @Override

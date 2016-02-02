@@ -26,7 +26,8 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.player.Player;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Optional;
@@ -51,12 +52,12 @@ public class BasicPlaceholders extends PlaceholderProvider {
             }
         });
         bind("name").alias("player").to(context -> {
-            Optional<String> displayName = BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), DataKeys.DisplayName);
+            Optional<String> displayName = ((Player) context.getPlayer()).get(DataKeys.DisplayName);
             if (displayName.isPresent()) {
                 return displayName.get();
             }
-            if (context.getPlayer() instanceof BungeePlayer)
-                return ((BungeePlayer) context.getPlayer()).getPlayer().getDisplayName();
+            if (context.getPlayer() instanceof ConnectedPlayer)
+                return ((ConnectedPlayer) context.getPlayer()).getPlayer().getDisplayName();
             return context.getPlayer().getName();
         });
         bind("rawname").to(context -> context.getPlayer().getName());

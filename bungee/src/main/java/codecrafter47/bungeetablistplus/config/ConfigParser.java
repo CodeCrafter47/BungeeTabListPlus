@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKeys;
+import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 import codecrafter47.bungeetablistplus.playersorting.SortingRuleRegistry;
@@ -526,7 +527,7 @@ public class ConfigParser {
 
         @Override
         public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
-            return iPlayer.getServer().map(serverInfo -> server.equalsIgnoreCase(serverInfo.getName()) && BungeeTabListPlus.getInstance().getBridge().get(iPlayer, DataKeys.World).map(w -> w.equalsIgnoreCase(world)).orElse(false)).orElse(false);
+            return iPlayer.getServer().map(serverInfo -> server.equalsIgnoreCase(serverInfo.getName()) && ((Player) iPlayer).get(DataKeys.World).map(w -> w.equalsIgnoreCase(world)).orElse(false)).orElse(false);
         }
 
         @Override

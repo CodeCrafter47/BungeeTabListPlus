@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import codecrafter47.bungeetablistplus.player.Player;
 
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class ConditionalPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         bind("insertIfGamemode3").withTemplateArgs().to((context, args) -> context.getPlayer().getGameMode() == 3 ? args : SlotTemplate.empty());
-        bind("insertIfHidden").withTemplateArgs().to((context, args) -> BungeeTabListPlus.isHidden(context.getPlayer()) ? args : SlotTemplate.empty());
+        bind("insertIfHidden").withTemplateArgs().to((context, args) -> BungeeTabListPlus.isHidden((Player) context.getPlayer()) ? args : SlotTemplate.empty());
         bind("insertIfServersSame").withTemplateArgs().to((context, args) -> {
             Optional<ServerGroup> serverGroup = context.getServerGroup();
             if (serverGroup.isPresent() && serverGroup.get().getServerNames().contains(context.getViewer().getServer().getInfo().getName()))

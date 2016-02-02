@@ -23,7 +23,8 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.player.Player;
 import net.alpenblock.bungeeperms.BungeePerms;
 import net.alpenblock.bungeeperms.Group;
 import net.alpenblock.bungeeperms.PermissionsManager;
@@ -51,9 +52,9 @@ public class PermissionManager {
             String group = getMainGroupFromBungeePerms(player);
             return group != null ? group : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
-            return plugin.getBridge().get(player, DataKeys.Vault_PermissionGroup).orElse("");
-		} else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-			return plugin.getBridge().get(player, DataKeys.PermissionsEx_PermissionGroup).orElse("");
+            return ((Player) player).get(DataKeys.Vault_PermissionGroup).orElse("");
+        } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
+            return ((Player) player).get(DataKeys.PermissionsEx_PermissionGroup).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
             return getMainGroupFromBungeeCord(player);
         } else {
@@ -61,11 +62,11 @@ public class PermissionManager {
             if (group != null) {
                 return group;
             }
-            Optional<String> optional = plugin.getBridge().get(player, DataKeys.PermissionsEx_PermissionGroup);
+            Optional<String> optional = ((Player) player).get(DataKeys.PermissionsEx_PermissionGroup);
             if (optional.isPresent()) {
                 return optional.get();
             } else {
-                optional = plugin.getBridge().get(player, DataKeys.Vault_PermissionGroup);
+                optional = ((Player) player).get(DataKeys.Vault_PermissionGroup);
                 if (optional.isPresent()) {
                     return optional.get();
                 } else {
@@ -152,25 +153,25 @@ public class PermissionManager {
         }
 
         {
-            Optional<Integer> p1Rank = plugin.getBridge().get(p1, DataKeys.PermissionsEx_GroupRank);
-            Optional<Integer> p2Rank = plugin.getBridge().get(p2, DataKeys.PermissionsEx_GroupRank);
+            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.PermissionsEx_GroupRank);
+            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.PermissionsEx_GroupRank);
             if (p1Rank.isPresent() || p2Rank.isPresent()) {
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
         }
 
         {
-            Optional<Integer> p1Rank = plugin.getBridge().get(p1, DataKeys.Vault_PermissionGroupRank);
-            Optional<Integer> p2Rank = plugin.getBridge().get(p2, DataKeys.Vault_PermissionGroupRank);
+            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
+            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
             if (p1Rank.isPresent() || p2Rank.isPresent()) {
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
         }
 
         // BungeeCord
-        if (p1 instanceof BungeePlayer && p2 instanceof BungeePlayer) {
+        if (p1 instanceof ConnectedPlayer && p2 instanceof ConnectedPlayer) {
             int r1 = 0;
-            for (String group : ((BungeePlayer) p1).getPlayer().getGroups()) {
+            for (String group : ((ConnectedPlayer) p1).getPlayer().getGroups()) {
                 if (!group.equals("default")) {
                     r1 += 1;
                 }
@@ -179,7 +180,7 @@ public class PermissionManager {
                 }
             }
             int r2 = 0;
-            for (String group : ((BungeePlayer) p2).getPlayer().getGroups()) {
+            for (String group : ((ConnectedPlayer) p2).getPlayer().getGroups()) {
                 if (!group.equals("default")) {
                     r2 += 1;
                 }
@@ -199,9 +200,9 @@ public class PermissionManager {
             String prefix = getPrefixFromBungeePerms(player);
             return prefix != null ? prefix : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
-            return plugin.getBridge().get(player, DataKeys.Vault_Prefix).orElse("");
-		} else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-			return plugin.getBridge().get(player, DataKeys.PermissionsEx_Prefix).orElse("");
+            return ((Player) player).get(DataKeys.Vault_Prefix).orElse("");
+        } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
+            return ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
             String prefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
             if (prefix != null) {
@@ -219,7 +220,7 @@ public class PermissionManager {
         if (prefix != null) {
             return prefix;
         }
-        return plugin.getBridge().get(player, DataKeys.PermissionsEx_Prefix).orElseGet(() -> plugin.getBridge().get(player, DataKeys.Vault_Prefix).orElse(""));
+        return ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse(""));
     }
 
     private String getPrefixFromBungeePerms(IPlayer player) {
@@ -297,15 +298,15 @@ public class PermissionManager {
             String suffix = getSuffixFromBungeePerms(player);
             return suffix == null ? "" : suffix;
         } else if (mode.equalsIgnoreCase("Bukkit")) {
-            return plugin.getBridge().get(player, DataKeys.Vault_Suffix).orElse("");
+            return ((Player) player).get(DataKeys.Vault_Suffix).orElse("");
         } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return plugin.getBridge().get(player, DataKeys.PermissionsEx_Suffix).orElse("");
+            return ((Player) player).get(DataKeys.PermissionsEx_Suffix).orElse("");
         }
         String suffix = getSuffixFromBungeePerms(player);
         if (suffix != null) {
             return suffix;
         }
-        return plugin.getBridge().get(player, DataKeys.PermissionsEx_Suffix).orElseGet(() -> plugin.getBridge().get(player, DataKeys.Vault_Suffix).orElse(""));
+        return ((Player) player).get(DataKeys.PermissionsEx_Suffix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Suffix).orElse(""));
     }
 
     private String getSuffixFromBungeePerms(IPlayer player) {
@@ -343,8 +344,11 @@ public class PermissionManager {
 
         try {
             DataKey<Boolean> dataKey = DataKeys.permission(permission);
-            Optional<Boolean> has = plugin.getBridge().get(plugin.getBungeePlayerProvider().wrapPlayer((ProxiedPlayer) sender), dataKey);
-            if (has.isPresent()) return has.get();
+            ConnectedPlayer player = plugin.getConnectedPlayerManager().getPlayerIfPresent((ProxiedPlayer) sender);
+            if (player != null) {
+                Optional<Boolean> has = player.get(dataKey);
+                if (has.isPresent()) return has.get();
+            }
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }

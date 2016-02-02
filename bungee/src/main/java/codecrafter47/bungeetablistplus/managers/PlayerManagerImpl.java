@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -52,7 +53,7 @@ public class PlayerManagerImpl implements PlayerManager {
         List<IPlayer> list = new ArrayList<>();
         for (IPlayer p : players) {
 
-            if ((includeSpectators || p.getGameMode() != 3) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && filter.test(viewer, p)) {
+            if ((includeSpectators || p.getGameMode() != 3) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden((Player) p)) && filter.test(viewer, p)) {
                 list.add(p);
             }
         }
@@ -65,7 +66,7 @@ public class PlayerManagerImpl implements PlayerManager {
         for (IPlayer p : players) {
             Optional<ServerInfo> s = p.getServer();
             if (s.isPresent()) {
-                if (s.get().getName().equalsIgnoreCase(server) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && (includeSpectators || p.getGameMode() != 3)) {
+                if (s.get().getName().equalsIgnoreCase(server) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden((Player) p)) && (includeSpectators || p.getGameMode() != 3)) {
                     num++;
                 }
             }
@@ -77,7 +78,7 @@ public class PlayerManagerImpl implements PlayerManager {
     public int getGlobalPlayerCount() {
         int num = 0;
         for (IPlayer p : players) {
-            if ((canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && (includeSpectators || p.getGameMode() != 3)) {
+            if ((canSeeHiddenPlayers || !BungeeTabListPlus.isHidden((Player) p)) && (includeSpectators || p.getGameMode() != 3)) {
                 num++;
             }
         }
@@ -88,7 +89,7 @@ public class PlayerManagerImpl implements PlayerManager {
     public int getPlayerCount(Filter filter) {
         int num = 0;
         for (IPlayer p : players) {
-            if ((includeSpectators || p.getGameMode() != 3) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden(p)) && filter.test(viewer, p)) {
+            if ((includeSpectators || p.getGameMode() != 3) && (canSeeHiddenPlayers || !BungeeTabListPlus.isHidden((Player) p)) && filter.test(viewer, p)) {
                 num++;
             }
         }

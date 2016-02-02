@@ -23,7 +23,8 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.player.Player;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -32,7 +33,7 @@ public class BukkitPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
         bind("world").to(context -> {
-            Optional<String> world = BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), DataKeys.World);
+            Optional<String> world = ((Player) context.getPlayer()).get(DataKeys.World);
             if (!world.isPresent()) {
                 return "";
             }
@@ -80,12 +81,12 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         addBukkitBridgeServerPlaceholder("currencyPl", DataKeys.Vault_CurrencyNamePlural);
         addBukkitBridgeServerPlaceholder("tps", DataKeys.TPS, tps -> tps.map(d -> String.format("%1.1f", d)).orElse(""));
         bind("tabName").to(context -> {
-            Optional<String> tabName = BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), DataKeys.PlayerListName);
+            Optional<String> tabName = ((Player) context.getPlayer()).get(DataKeys.PlayerListName);
             if (tabName.isPresent()) {
                 return tabName.get();
             }
-            if (context.getPlayer() instanceof BungeePlayer)
-                return ((BungeePlayer) context.getPlayer()).getPlayer().getDisplayName();
+            if (context.getPlayer() instanceof ConnectedPlayer)
+                return ((ConnectedPlayer) context.getPlayer()).getPlayer().getDisplayName();
             return context.getPlayer().getName();
         });
     }
@@ -95,7 +96,7 @@ public class BukkitPlaceholders extends PlaceholderProvider {
     }
 
     public <T> void addBukkitBridgePlaceholder(String name, DataKey<T> dataKey, Function<Optional<T>, String> toString) {
-        bind(name).to(context -> toString.apply(BungeeTabListPlus.getInstance().getBridge().get(context.getPlayer(), dataKey)));
+        bind(name).to(context -> toString.apply(((Player) context.getPlayer()).get(dataKey)));
     }
 
     public <T> void addBukkitBridgeServerPlaceholder(String name, DataKey<T> dataKey) {

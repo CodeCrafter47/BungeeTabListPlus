@@ -19,38 +19,35 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.util.ExpireAfterAccessCache;
-import com.google.common.cache.Cache;
+import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Sets;
-import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -58,8 +55,8 @@ import java.util.logging.Level;
 public class BukkitBridge implements Listener {
     private final BungeeTabListPlus plugin;
 
-    private final Map<String, BukkitData> serverInformation = new ConcurrentHashMap<>();
-    private final Cache<UUID, BukkitData> playerInformation = new ExpireAfterAccessCache<>(60000);
+    private final Map<String, BukkitData> serverInformation = new HashMap<>();
+    private final Map<ProxiedPlayer, BukkitData> playerInformation = new IdentityHashMap<>();
 
     private final Set<String> registeredThirdPartyVariables = new HashSet<>();
     private final ReentrantLock thirdPartyVariablesLock = new ReentrantLock();
@@ -68,7 +65,6 @@ public class BukkitBridge implements Listener {
         this.plugin = plugin;
         plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
         plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), () -> plugin.runInMainThread(this::checkForThirdPartyVariables), 2, 2, TimeUnit.SECONDS);
-        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), playerInformation::cleanUp, 10, 10, TimeUnit.SECONDS);
     }
 
     private void checkForThirdPartyVariables() {
@@ -81,13 +77,12 @@ public class BukkitBridge implements Listener {
                             plugin.registerPlaceholderProvider0(new PlaceholderProvider() {
                                 @Override
                                 public void setup() {
-                                    bind(variable).to(context -> plugin.getBridge().get(context.getPlayer(), BTLPDataKeys.createThirdPartyVariableDataKey(variable)).orElse(""));
+                                    bind(variable).to(context -> ((Player) context.getPlayer()).get(BTLPDataKeys.createThirdPartyVariableDataKey(variable)).orElse(""));
                                 }
                             });
                             registeredThirdPartyVariables.add(variable);
                         }
                     }
-
                 } finally {
                     thirdPartyVariablesLock.unlock();
                 }
@@ -103,10 +98,10 @@ public class BukkitBridge implements Listener {
         return serverInformation.get(serverName);
     }
 
-    @SneakyThrows
-    private BukkitData getPlayerDataCache(UUID uuid) {
+    @Nullable
+    private BukkitData getPlayerDataCache(ProxiedPlayer player) {
         plugin.failIfNotMainThread();
-        return playerInformation.get(uuid, BukkitData::new);
+        return playerInformation.get(player);
     }
 
     @EventHandler
@@ -128,10 +123,11 @@ public class BukkitBridge implements Listener {
                                 updateData(in, getServerDataCache(server.getInfo().getName()));
                                 break;
                             case Constants.subchannelUpdatePlayer:
-                                updateData(in, getPlayerDataCache(player.getUniqueId()));
+                                updateData(in, getPlayerDataCache(player));
                                 break;
                             case Constants.subchannelPlayerHash:
-                                if (getPlayerDataCache(player.getUniqueId()).getMap().hashCode() != in.readInt()) {
+                                BukkitData bukkitData = getPlayerDataCache(player);
+                                if (bukkitData == null || bukkitData.getMap().hashCode() != in.readInt()) {
                                     requestReset(player);
                                 }
                                 break;
@@ -161,6 +157,9 @@ public class BukkitBridge implements Listener {
 
     @SuppressWarnings("unchecked")
     private void updateData(ObjectInputStream in, DataCache dataCache) throws IOException, ClassNotFoundException {
+        if (dataCache == null) {
+            return;
+        }
         for (Entry<DataKey, Object> entry : ((Map<DataKey, Object>) in.readObject()).entrySet()) {
             dataCache.updateValue(entry.getKey(), entry.getValue());
         }
@@ -168,16 +167,11 @@ public class BukkitBridge implements Listener {
 
     @EventHandler
     public void onServerChange(ServerConnectedEvent event) {
-        final ProxiedPlayer player = event.getPlayer();
-
-        playerInformation.invalidate(player.getUniqueId());
-    }
-
-    @EventHandler
-    public void onDisconnect(PlayerDisconnectEvent event) {
-        final ProxiedPlayer player = event.getPlayer();
-
-        playerInformation.invalidate(player.getUniqueId());
+        ProxiedPlayer player = event.getPlayer();
+        BukkitData bukkitData = playerInformation.get(player);
+        if (bukkitData != null) {
+            bukkitData.getMap().clear();
+        }
     }
 
     public <T> Optional<T> get(ServerInfo server, DataKey<T> key) {
@@ -200,38 +194,6 @@ public class BukkitBridge implements Listener {
             }
         }
         return value;
-    }
-
-    public <T> Optional<T> get(IPlayer player, DataKey<T> key) {
-        if (key.getScope() == DataKey.Scope.SERVER) {
-            return player.getServer().flatMap(server -> get(server, key));
-        }
-        UUID uniqueID = player.getUniqueID();
-        if (uniqueID != null) {
-            BukkitData data = getPlayerDataCache(uniqueID);
-            Optional<T> value = data.getValue(key);
-            if (!value.isPresent()) {
-                Set<DataKey> requestedData = data.getRequestedData();
-                if (!requestedData.contains(key)) {
-                    requestedData.add(key);
-                    ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueID);
-                    if (proxiedPlayer != null) {
-                        try {
-                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-                            ObjectOutputStream out = new ObjectOutputStream(os);
-                            out.writeUTF(Constants.subchannelRequestPlayerVariable);
-                            out.writeObject(key);
-                            out.close();
-                            Optional.ofNullable(proxiedPlayer.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
-                        } catch (IOException ex) {
-                            plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
-                        }
-                    }
-                }
-            }
-            return value;
-        }
-        return Optional.empty();
     }
 
     private void requestReset(ProxiedPlayer player) {
@@ -258,7 +220,17 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    private class BukkitData extends DataCache {
+    public BukkitData onConnected(ProxiedPlayer player) {
+        BukkitData bukkitData = new BukkitData();
+        playerInformation.put(player, bukkitData);
+        return bukkitData;
+    }
+
+    public void onDisconnected(ProxiedPlayer player) {
+        playerInformation.remove(player);
+    }
+
+    public static class BukkitData extends DataCache {
         private Set<DataKey> requestedData = Sets.newConcurrentHashSet();
         private long lastAccess = System.currentTimeMillis();
 

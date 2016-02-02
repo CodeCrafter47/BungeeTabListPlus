@@ -20,25 +20,36 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import lombok.Setter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.connection.LoginResult;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
-public class BungeePlayer implements IPlayer {
+public class ConnectedPlayer implements Player {
 
     private final ProxiedPlayer player;
     private Skin skin = null;
 
-    public BungeePlayer(ProxiedPlayer player) {
+    @Setter
+    private BukkitBridge.BukkitData bukkitData;
+
+    public ConnectedPlayer(ProxiedPlayer player) {
         this.player = player;
     }
 
@@ -91,5 +102,30 @@ public class BungeePlayer implements IPlayer {
 
     public ProxiedPlayer getPlayer() {
         return player;
+    }
+
+    @Override
+    public <T> Optional<T> get(DataKey<T> key) {
+        if (key.getScope() == DataKey.Scope.SERVER) {
+            return getServer().flatMap(server -> BungeeTabListPlus.getInstance().getBridge().get(server, key));
+        }
+        Optional<T> value = bukkitData.getValue(key);
+        if (!value.isPresent()) {
+            Set<DataKey> requestedData = bukkitData.getRequestedData();
+            if (!requestedData.contains(key)) {
+                requestedData.add(key);
+                try {
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    ObjectOutputStream out = new ObjectOutputStream(os);
+                    out.writeUTF(Constants.subchannelRequestPlayerVariable);
+                    out.writeObject(key);
+                    out.close();
+                    Optional.ofNullable(player.getServer()).ifPresent(server -> server.sendData(Constants.channel, os.toByteArray()));
+                } catch (IOException ex) {
+                    BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
+                }
+            }
+        }
+        return value;
     }
 }

@@ -20,23 +20,11 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import com.google.common.collect.Collections2;
-import lombok.SneakyThrows;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import codecrafter47.bungeetablistplus.data.DataKey;
 
-import java.util.Collection;
+import java.util.Optional;
 
-public class BungeePlayerProvider implements IPlayerProvider {
+public interface Player extends IPlayer {
 
-    @Override
-    public Collection<IPlayer> getPlayers() {
-        return Collections2.transform(ProxyServer.getInstance().getPlayers(), this::wrapPlayer);
-
-    }
-
-    @SneakyThrows
-    public IPlayer wrapPlayer(final ProxiedPlayer player) {
-        return new BungeePlayer(player);
-    }
+    <T> Optional<T> get(DataKey<T> key);
 }

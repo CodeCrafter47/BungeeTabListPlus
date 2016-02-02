@@ -52,7 +52,7 @@ public class SuperCommand extends Command {
                         "bungeetablistplus.hide")) {
                     if (sender instanceof ProxiedPlayer) {
                         ProxiedPlayer player = (ProxiedPlayer) sender;
-                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                        if (BungeeTabListPlus.isHidden(plugin.getConnectedPlayerManager().getPlayer(player))) {
                             BungeeTabListPlus.unhidePlayer(player);
                             sendPlayerUnhide(player);
                         } else {
@@ -71,7 +71,7 @@ public class SuperCommand extends Command {
                         "bungeetablistplus.hide")) {
                     if (sender instanceof ProxiedPlayer) {
                         ProxiedPlayer player = (ProxiedPlayer) sender;
-                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                        if (BungeeTabListPlus.isHidden(plugin.getConnectedPlayerManager().getPlayer(player))) {
                             sendAlreadyHidden(player);
                         } else {
                             BungeeTabListPlus.hidePlayer(player);
@@ -89,7 +89,7 @@ public class SuperCommand extends Command {
                         "bungeetablistplus.hide")) {
                     if (sender instanceof ProxiedPlayer) {
                         ProxiedPlayer player = (ProxiedPlayer) sender;
-                        if (BungeeTabListPlus.isHidden(plugin.getBungeePlayerProvider().wrapPlayer(player))) {
+                        if (BungeeTabListPlus.isHidden(plugin.getConnectedPlayerManager().getPlayer(player))) {
                             BungeeTabListPlus.unhidePlayer(player);
                             sendPlayerUnhide(player);
                         } else {

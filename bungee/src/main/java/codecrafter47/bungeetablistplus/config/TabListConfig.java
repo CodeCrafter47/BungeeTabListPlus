@@ -188,7 +188,7 @@ public class TabListConfig extends Configuration {
         }
 
         String group = BungeeTabListPlus.getInstance().getPermissionManager().
-                getMainGroup(BungeeTabListPlus.getInstance().getBungeePlayerProvider().wrapPlayer(player));
+                getMainGroup(BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(player));
 
         if (group != null) {
             if (s[0].equalsIgnoreCase("group")) {
