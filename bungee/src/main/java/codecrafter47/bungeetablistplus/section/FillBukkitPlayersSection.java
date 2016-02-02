@@ -36,8 +36,8 @@ import java.util.List;
 public class FillBukkitPlayersSection extends AbstractFillPlayersSection {
 
     public FillBukkitPlayersSection(int startColumn, SlotTemplate prefix, SlotTemplate suffix,
-                                    PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        super(startColumn, maxPlayers, playerLines, morePlayerLines, Collections.singletonList(new BukkitPlayers(prefix, suffix, sorter)));
+                                    PlayerSorter sorter, int minSlots, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+        super(startColumn, minSlots, maxPlayers, playerLines, morePlayerLines, Collections.singletonList(new BukkitPlayers(prefix, suffix, sorter)));
     }
 
     private static class BukkitPlayers extends PlayerList {

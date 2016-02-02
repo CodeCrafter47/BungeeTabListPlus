@@ -31,8 +31,8 @@ import java.util.List;
 
 public class FillPlayersSection extends AbstractFillPlayersSection {
 
-    public FillPlayersSection(int vAlign, PlayerManager.Filter filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
-        super(vAlign, maxPlayers, playerLines, morePlayerLines, new ArrayList<>());
+    public FillPlayersSection(int vAlign, PlayerManager.Filter filter, SlotTemplate prefix, SlotTemplate suffix, PlayerSorter sorter, int minSlots, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+        super(vAlign, minSlots, maxPlayers, playerLines, morePlayerLines, new ArrayList<>());
         addPlayers(filter, prefix, suffix, sorter);
     }
 
@@ -41,7 +41,7 @@ public class FillPlayersSection extends AbstractFillPlayersSection {
     }
 
     public boolean allowsExtension() {
-        return maxPlayers == 1000 && !getStartColumn().isPresent();
+        return minSlots == 0 && maxPlayers == 1000 && !getStartColumn().isPresent();
     }
 
     private class Players extends PlayerList {

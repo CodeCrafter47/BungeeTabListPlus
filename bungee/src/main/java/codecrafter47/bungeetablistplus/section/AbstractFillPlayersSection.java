@@ -32,12 +32,14 @@ import java.util.OptionalInt;
 public abstract class AbstractFillPlayersSection extends Section {
 
     private final OptionalInt vAlign;
+    protected final int minSlots;
     protected final int maxPlayers;
     private final List<SlotTemplate> playerLines;
     private final List<SlotTemplate> morePlayerLines;
     protected final List<PlayerList> playerLists;
 
-    public AbstractFillPlayersSection(int vAlign, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines, List<PlayerList> playerLists) {
+    public AbstractFillPlayersSection(int vAlign, int minSlots, int maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines, List<PlayerList> playerLists) {
+        this.minSlots = minSlots;
         this.playerLines = playerLines;
         this.morePlayerLines = morePlayerLines;
         this.playerLists = playerLists;
@@ -63,7 +65,7 @@ public abstract class AbstractFillPlayersSection extends Section {
         if (m > this.maxPlayers) {
             m = this.maxPlayers;
         }
-        return m * playerLines.size();
+        return Math.max(minSlots, m * playerLines.size());
     }
 
     private int getNumberOfPlayers() {
@@ -92,7 +94,7 @@ public abstract class AbstractFillPlayersSection extends Section {
             }
         }
         int other_count = getNumberOfPlayers() - playersToShow;
-        return playersToShow * playerLines.size() + (other_count > 0 ? morePlayerLines.size() : 0);
+        return Math.max(minSlots, playersToShow * playerLines.size() + (other_count > 0 ? morePlayerLines.size() : 0));
     }
 
     @Override
@@ -123,7 +125,7 @@ public abstract class AbstractFillPlayersSection extends Section {
             return SlotTemplate.of(SlotTemplate.skin(player.getSkin()), SlotTemplate.ping(player.getPing()),
                     playerList.prefix, playerLines.get(playerLinesIndex), playerList.suffix)
                     .buildSlot(context.setPlayer(player));
-        } else if (other_count > 0) {
+        } else if (other_count > 0 && pos - playersToShow * playerLines.size() < morePlayerLines.size()) {
             int morePlayerLinesIndex = pos - playersToShow * playerLines.size();
             return morePlayerLines.get(morePlayerLinesIndex).buildSlot(context.setOtherCount(other_count));
         } else {

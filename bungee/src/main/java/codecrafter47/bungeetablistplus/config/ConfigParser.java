@@ -72,6 +72,7 @@ public class ConfigParser {
     private static final Pattern PATTERN_COLUMN = Pattern.compile("\\[COLUMN=(\\d+)\\]");
     private static final Pattern PATTERN_ROW = Pattern.compile("\\[ROW=(\\d+)\\]");
     private static final Pattern PATTERN_MAXPLAYERS = Pattern.compile("\\[MAXPLAYERS=(\\d+)\\]");
+    private static final Pattern PATTERN_MINSLOTS = Pattern.compile("\\[MIN(?:(?:PLAYERS)|(?:SLOTS))=(\\d+)\\]");
     private static final Pattern PATTERN_SORT = Pattern.compile("\\[SORT=([^]]+)\\]");
 
     private static final Pattern PATTERN_FILLPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillplayers(?::(?<filter>(?:(?:[^{}]*)\\{(?:[^{}]*)\\})*(?:[^{}]*)))?\\}(?<suffix>.*)$");
@@ -100,6 +101,7 @@ public class ConfigParser {
             // Its properties
             final int[] startColumn = {-1};
             final int[] column = {-1};
+            final int[] minslots = {0};
             final int[] maxplayers = {1000};
             final List<String> sortrules = new ArrayList<>();
 
@@ -162,6 +164,10 @@ public class ConfigParser {
                 maxplayers[0] = Integer.parseInt(matcher.group(1));
             });
 
+            line = findTag(line, PATTERN_MINSLOTS, matcher -> {
+                minslots[0] = Integer.parseInt(matcher.group(1));
+            });
+
             if (startColumn[0] == -1 && column[0] != -1) {
                 startColumn[0] = column[0];
             }
@@ -190,14 +196,14 @@ public class ConfigParser {
                 }
                 if (column[0] == -1) {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
-                        sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, maxplayers[0], playerLines, morePlayerLines));
+                        sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, minslots[0], maxplayers[0], playerLines, morePlayerLines));
                     } else {
-                        boolean allowsExtension = maxplayers[0] == 1000 && startColumn[0] == -1;
+                        boolean allowsExtension = minslots[0] == 0 && maxplayers[0] == 1000 && startColumn[0] == -1;
                         if (allowsExtension && !sections.isEmpty() && sections.get(sections.size() - 1) instanceof FillPlayersSection
                                 && ((FillPlayersSection) sections.get(sections.size() - 1)).allowsExtension()) {
                             ((FillPlayersSection) sections.get(sections.size() - 1)).addPlayers(parseFilter(filter), prefix, suffix, sorter);
                         } else {
-                            sections.add(new FillPlayersSection(startColumn[0], parseFilter(filter), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                            sections.add(new FillPlayersSection(startColumn[0], parseFilter(filter), prefix, suffix, sorter, minslots[0], maxplayers[0], playerLines, morePlayerLines));
                         }
                     }
                 } else {
@@ -213,7 +219,7 @@ public class ConfigParser {
             } else if (fillbukkitplayersMatcher.matches()) {
                 SlotTemplate prefix = parseSlot(fillbukkitplayersMatcher.group("prefix"));
                 SlotTemplate suffix = parseSlot(fillbukkitplayersMatcher.group("suffix"));
-                sections.add(new FillBukkitPlayersSection(startColumn[0], prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines));
+                sections.add(new FillBukkitPlayersSection(startColumn[0], prefix, suffix, sorter, minslots[0], maxplayers[0], playerLines, morePlayerLines));
             } else {
                 SlotTemplate template = parseSlot(line);
                 StaticSection section;
@@ -251,7 +257,7 @@ public class ConfigParser {
         return new ConfigTabListProvider(topSectionProviders, plugin, config, config.shownFooterHeader, botSectionProviders, header, footer, tab_size);
     }
 
-    public AutoFillPlayers parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, List<String> g_sort, int g_maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
+    public AutoFillPlayers parseServerSections(TabListConfig config, SlotTemplate g_prefix, SlotTemplate g_suffix, List<String> g_filter, List<String> g_sort, int g_minSlots, int g_maxPlayers, List<SlotTemplate> playerLines, List<SlotTemplate> morePlayerLines) {
         Map<String, ServerInfo> servers = ProxyServer.getInstance().getServers();
 
         Set<String> serverSet = new HashSet<>(servers.keySet());
@@ -286,6 +292,7 @@ public class ConfigParser {
             final int[] startColumn = {-1};
             final List<String> sortrules = new ArrayList<>();
             final int[] maxplayers = {g_maxPlayers};
+            final int[] minslots = {g_minSlots};
 
             // Parsing tags
             line = findTag(line, PATTERN_ALIGN_LEFT, matcher -> {
@@ -338,6 +345,10 @@ public class ConfigParser {
                 maxplayers[0] = Integer.parseInt(matcher.group(1));
             });
 
+            line = findTag(line, PATTERN_MINSLOTS, matcher -> {
+                minslots[0] = Integer.parseInt(matcher.group(1));
+            });
+
             sortrules.addAll(g_sort);
             PlayerSorter sorter = parseSortrules(sortrules);
 
@@ -358,7 +369,7 @@ public class ConfigParser {
                     List<String> finalFilters = new ArrayList<>();
                     finalFilters.addAll(filter);
                     finalFilters.addAll(group.getServerNames());
-                    return new FillPlayersSection(startColumn[0], parseFilter(finalFilters), prefix, suffix, sorter, maxplayers[0], playerLines, morePlayerLines);
+                    return new FillPlayersSection(startColumn[0], parseFilter(finalFilters), prefix, suffix, sorter, minslots[0], maxplayers[0], playerLines, morePlayerLines);
                 });
             } else {
                 SlotTemplate slotTemplate = SlotTemplate.of(g_prefix, parseSlot(line), g_suffix);
