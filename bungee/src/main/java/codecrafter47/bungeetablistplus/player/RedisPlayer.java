@@ -88,6 +88,10 @@ public class RedisPlayer implements Player {
 
     @Override
     public <T> Optional<T> get(DataKey<T> key) {
-        return Optional.empty();// TODO: 02.02.16
+        ConnectedPlayer player = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(getName());
+        if (player != null) {
+            return player.get(key);
+        }
+        return Optional.empty();
     }
 }

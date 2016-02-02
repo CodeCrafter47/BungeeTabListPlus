@@ -44,7 +44,7 @@ public class TabList18v3 implements TabListHandler {
     private static final String[] fakePlayerUsernames = new String[80];
     private static final UUID[] fakePlayerUUIDs = new UUID[80];
 
-    {
+    static {
         for (int i = 0; i < 80; i++) {
             fakePlayerUsernames[i] = " §" + (char) (970 + i) + " ?tab";
             fakePlayerUUIDs[i] = UUID.nameUUIDFromBytes(("OfflinePlayer:" + fakePlayerUsernames[i]).getBytes(Charsets.UTF_8));

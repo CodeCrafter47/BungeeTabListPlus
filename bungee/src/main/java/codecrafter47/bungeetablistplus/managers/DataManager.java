@@ -21,10 +21,12 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.data.DataCache;
+import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import net.md_5.bungee.api.ProxyServer;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class DataManager {
@@ -38,7 +40,6 @@ public class DataManager {
     private void updateData() {
         PermissionManager permissionManager = bungeeTabListPlus.getPermissionManager();
         for (ConnectedPlayer player : bungeeTabListPlus.getConnectedPlayerManager().getPlayers()) {
-            DataCache data = player.getData();
             String bungeecord_group = permissionManager.getMainGroupFromBungeeCord(player.getPlayer());
             int bungeecord_rank = permissionManager.getBungeeCordRank(player.getPlayer());
 
@@ -48,16 +49,21 @@ public class DataManager {
             String bungeeperms_suffix = permissionManager.getSuffixFromBungeePerms(player.getPlayer());
             Integer bungeeperms_rank = permissionManager.getBungeePermsRank(player.getPlayer());
 
-            bungeeTabListPlus.runInMainThread(() -> {
-                data.updateValue(DataKeys.BungeeCord_PrimaryGroup, bungeecord_group);
-                data.updateValue(DataKeys.BungeeCord_Rank, bungeecord_rank);
+            updateIfNecessary(player, DataKeys.BungeeCord_PrimaryGroup, bungeecord_group);
+            updateIfNecessary(player, DataKeys.BungeeCord_Rank, bungeecord_rank);
 
-                data.updateValue(DataKeys.BungeePerms_PrimaryGroup, bungeeperms_group);
-                data.updateValue(DataKeys.BungeePerms_Prefix, bungeeperms_prefix);
-                data.updateValue(DataKeys.BungeePerms_DisplayPrefix, bungeeperms_displayprefix);
-                data.updateValue(DataKeys.BungeePerms_Suffix, bungeeperms_suffix);
-                data.updateValue(DataKeys.BungeePerms_Rank, bungeeperms_rank);
-            });
+            updateIfNecessary(player, DataKeys.BungeePerms_PrimaryGroup, bungeeperms_group);
+            updateIfNecessary(player, DataKeys.BungeePerms_Prefix, bungeeperms_prefix);
+            updateIfNecessary(player, DataKeys.BungeePerms_DisplayPrefix, bungeeperms_displayprefix);
+            updateIfNecessary(player, DataKeys.BungeePerms_Suffix, bungeeperms_suffix);
+            updateIfNecessary(player, DataKeys.BungeePerms_Rank, bungeeperms_rank);
+        }
+    }
+
+    private <T> void updateIfNecessary(ConnectedPlayer player, DataKey<T> key, T value) {
+        DataCache data = player.getData();
+        if (!Objects.equals(data.getMap().get(key), value)) {
+            bungeeTabListPlus.runInMainThread(() -> data.updateValue(key, value));
         }
     }
 }
