@@ -132,7 +132,7 @@ public class PlayerDataAccess extends AbstractDataAccess<Player> {
             }
         }
 
-        if (Bukkit.getPluginManager().getPlugin("SuperVanish") != null) {
+        if (Bukkit.getPluginManager().getPlugin("SuperVanish") != null || Bukkit.getPluginManager().getPlugin("PremiumVanish") != null) {
             bind(DataKeys.SuperVanish_IsVanished, new SuperVanishIsVanishedProvider());
         }
 

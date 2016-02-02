@@ -13,7 +13,7 @@
         <dependency>
             <groupId>me.MyzelYam</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>5.3.5</version>
+            <version>5.4.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
