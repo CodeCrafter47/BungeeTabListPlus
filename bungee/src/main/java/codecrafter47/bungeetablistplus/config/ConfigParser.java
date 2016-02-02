@@ -74,7 +74,7 @@ public class ConfigParser {
     private static final Pattern PATTERN_MAXPLAYERS = Pattern.compile("\\[MAXPLAYERS=(\\d+)\\]");
     private static final Pattern PATTERN_SORT = Pattern.compile("\\[SORT=([^]]+)\\]");
 
-    private static final Pattern PATTERN_FILLPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillplayers(?::(?<filter>.*))?\\}(?<suffix>.*)$");
+    private static final Pattern PATTERN_FILLPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillplayers(?::(?<filter>(?:(?:[^{}]*)\\{(?:[^{}]*)\\})*(?:[^{}]*)))?\\}(?<suffix>.*)$");
     private static final Pattern PATTERN_FILLBUKKITPLAYERS = Pattern.compile("^(?<prefix>.*)\\{fillbukkitplayers\\}(?<suffix>.*)$");
     private final int columns;
     private final int rows;
