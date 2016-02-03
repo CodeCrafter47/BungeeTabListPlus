@@ -95,7 +95,7 @@ public class SkinManager {
             if (profiles != null && profiles.length >= 1) {
                 return profiles[0].id;
             }
-            return null;
+            BungeeTabListPlus.getInstance().getLogger().warning("can't fetch uuid for '" + player + "', is not valid name");
         } catch (Throwable e) {
             if (e instanceof IOException && e.getMessage().contains("429")) {
                 // mojang rate limit; try again later
@@ -200,8 +200,6 @@ public class SkinManager {
                         }
                     }, 5, TimeUnit.MINUTES);
                 }
-            } else {
-                BungeeTabListPlus.getInstance().getLogger().warning("can't fetch skin for '" + nameOrUUID + "', is neither a name nor an uuid");
             }
         }
     }
