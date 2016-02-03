@@ -15,6 +15,10 @@ public class PermissionsExHelper {
 		if (groups.size() <= 0)
 			return null;
 
+		if (groups.size() == 1) {
+			return groups.get(0);
+		}
+
 		PermissionGroup maingroup = null;
 		for (PermissionGroup pg : groups) {
 			if (pg.isRanked() && pg.getRankLadder().equals("default") && (maingroup == null || pg.getRank() < maingroup.getRank()))
