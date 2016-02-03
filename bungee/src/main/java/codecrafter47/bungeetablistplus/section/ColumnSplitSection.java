@@ -20,13 +20,13 @@ package codecrafter47.bungeetablistplus.section;
 
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 
 import java.util.OptionalInt;
 
 public class ColumnSplitSection extends Section {
 
-    private final PlayerColumn[] pc = new PlayerColumn[ConfigManager.getCols()];
+    private final PlayerColumn[] pc = new PlayerColumn[10];
+    private int columns = 10;
 
     @Override
     public int getMinSize() {
@@ -50,7 +50,7 @@ public class ColumnSplitSection extends Section {
                 i += span - 1;
             }
         }
-        return max * ConfigManager.getCols();
+        return max * columns;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ColumnSplitSection extends Section {
 
     @Override
     public int getEffectiveSize(int proposedSize) {
-        return (proposedSize / ConfigManager.getCols()) * ConfigManager.getCols();
+        return (proposedSize / columns) * columns;
     }
 
     public void addColumn(int i, PlayerColumn column) {
@@ -69,9 +69,9 @@ public class ColumnSplitSection extends Section {
 
     @Override
     public Slot getSlotAt(TabListContext context, int pos, int size) {
-        int column = pos % context.getColumns();
-        int sizePerCol = size / ConfigManager.getCols();
-        int columnPos = pos / ConfigManager.getCols();
+        int column = pos % columns;
+        int sizePerCol = size / columns;
+        int columnPos = pos / columns;
         PlayerColumn playerColumn = pc[column];
         if (playerColumn != null) {
             int span = 1;
@@ -97,6 +97,7 @@ public class ColumnSplitSection extends Section {
                 aPc.precalculate(context);
             }
         }
+        columns = context.getColumns();
     }
 
     @Override
