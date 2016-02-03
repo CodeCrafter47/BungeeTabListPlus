@@ -62,7 +62,7 @@ public class DataManager {
 
     private <T> void updateIfNecessary(ConnectedPlayer player, DataKey<T> key, T value) {
         DataCache data = player.getData();
-        if (!Objects.equals(data.getMap().get(key), value)) {
+        if (!Objects.equals(data.getRawValue(key), value)) {
             bungeeTabListPlus.runInMainThread(() -> data.updateValue(key, value));
         }
     }

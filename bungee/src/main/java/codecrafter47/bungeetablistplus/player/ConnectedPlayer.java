@@ -41,6 +41,7 @@ import java.io.ObjectOutputStream;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class ConnectedPlayer implements Player {
@@ -136,5 +137,10 @@ public class ConnectedPlayer implements Player {
             }
         }
         return value;
+    }
+
+    public <T> void registerDataChangeListener(DataKey<T> key, Consumer<T> listener) {
+        data.registerValueChangeListener(key, listener);
+        bukkitData.registerValueChangeListener(key, listener);
     }
 }

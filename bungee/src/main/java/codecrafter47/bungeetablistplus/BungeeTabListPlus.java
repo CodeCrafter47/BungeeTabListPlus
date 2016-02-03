@@ -37,6 +37,7 @@ import codecrafter47.bungeetablistplus.managers.DataManager;
 import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
 import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
+import codecrafter47.bungeetablistplus.managers.RedisPlayerManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
@@ -55,7 +56,6 @@ import codecrafter47.bungeetablistplus.placeholder.TimePlaceholders;
 import codecrafter47.bungeetablistplus.player.FakePlayerManager;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
-import codecrafter47.bungeetablistplus.player.RedisPlayerProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
@@ -113,6 +113,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private Collection<IPlayerProvider> playerProviders;
     private ResendThread resendThread;
     private static Field tabListHandlerField;
+    @Getter
+    private RedisPlayerManager redisPlayerManager;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -275,11 +277,12 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         playerProviders = new ArrayList<>();
 
         if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
-            playerProviders.add(new RedisPlayerProvider());
+            redisPlayerManager = new RedisPlayerManager(connectedPlayerManager);
+            playerProviders.add(redisPlayerManager);
             plugin.getLogger().info("Hooked RedisBungee");
-        } else {
-            playerProviders.add(connectedPlayerManager);
         }
+
+        playerProviders.add(connectedPlayerManager);
 
         playerProviders.add(fakePlayerManager);
 

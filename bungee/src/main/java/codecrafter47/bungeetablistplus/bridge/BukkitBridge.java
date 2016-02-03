@@ -170,7 +170,7 @@ public class BukkitBridge implements Listener {
         ProxiedPlayer player = event.getPlayer();
         BukkitData bukkitData = playerInformation.get(player);
         if (bukkitData != null) {
-            bukkitData.getMap().clear();
+            bukkitData.clear();
         }
     }
 

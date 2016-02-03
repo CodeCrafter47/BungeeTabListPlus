@@ -19,24 +19,46 @@
 
 package codecrafter47.bungeetablistplus.data;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Multimaps;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class DataCache {
     private final Map<DataKey<?>, Object> cache = new ConcurrentHashMap<>();
+    private final Multimap<DataKey<?>, Consumer<?>> listeners = Multimaps.synchronizedMultimap(MultimapBuilder.hashKeys().linkedListValues().build());
 
+    @SuppressWarnings("unchecked")
     public <T> void updateValue(DataKey<T> dataKey, T object) {
         if (object == null) {
             cache.remove(dataKey);
         } else {
             cache.put(dataKey, object);
         }
+        listeners.get(dataKey).forEach(consumer -> ((Consumer<T>) consumer).accept(object));
     }
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getValue(DataKey<T> dataKey) {
         return Optional.ofNullable((T) cache.get(dataKey));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getRawValue(DataKey<T> dataKey) {
+        return (T) cache.get(dataKey);
+    }
+
+    public void clear() {
+        cache.keySet().forEach(key -> listeners.get(key).forEach(consumer -> consumer.accept(null)));
+        cache.clear();
+    }
+
+    public <T> void registerValueChangeListener(DataKey<T> key, Consumer<T> listener) {
+        listeners.put(key, listener);
     }
 
     public Map<DataKey<?>, Object> getMap() {

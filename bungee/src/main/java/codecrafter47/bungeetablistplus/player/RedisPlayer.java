@@ -21,13 +21,17 @@ package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class RedisPlayer implements Player {
@@ -35,6 +39,10 @@ public class RedisPlayer implements Player {
     private final UUID uuid;
     private ServerInfo server;
     private long lastServerLookup = 0;
+
+    @Getter
+    private final DataCache data = new DataCache();
+    private final Set<DataKey<?>> requestedData = new HashSet<>();
 
     public RedisPlayer(UUID uuid) {
         this.uuid = uuid;
@@ -44,7 +52,6 @@ public class RedisPlayer implements Player {
     @Override
     @SneakyThrows
     public String getName() {
-        int i = 0;
         if (name == null) {
             return uuid.toString();
         }
@@ -88,10 +95,14 @@ public class RedisPlayer implements Player {
 
     @Override
     public <T> Optional<T> get(DataKey<T> key) {
-        ConnectedPlayer player = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(getName());
-        if (player != null) {
-            return player.get(key);
+        if (key.getScope() == DataKey.Scope.SERVER) {
+            return getServer().flatMap(server -> BungeeTabListPlus.getInstance().getBridge().get(server, key));
         }
-        return Optional.empty();
+        Optional<T> value = data.getValue(key);
+        if (!value.isPresent() && !requestedData.contains(key)) {
+            BungeeTabListPlus.getInstance().getRedisPlayerManager().request(uuid, key);
+            requestedData.add(key);
+        }
+        return value;
     }
 }
