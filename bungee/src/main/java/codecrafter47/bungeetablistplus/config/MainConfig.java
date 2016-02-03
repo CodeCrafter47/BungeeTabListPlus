@@ -20,7 +20,12 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.common.Configuration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 public class MainConfig extends Configuration {
 
@@ -123,25 +128,25 @@ public class MainConfig extends Configuration {
     @SuppressWarnings("unchecked")
     protected void read(Map<Object, Object> map) {
         if (map.containsKey("tablistUpdateInterval")) {
-            tablistUpdateInterval = ((Number) map.get("tablistUpdateInterval")).doubleValue();
+            tablistUpdateInterval = parseDouble(map.get("tablistUpdateInterval"));
         } else if (map.containsKey("tablistUpdateIntervall")) {
-            tablistUpdateInterval = ((Number) map.get("tablistUpdateIntervall")).doubleValue();
+            tablistUpdateInterval = parseDouble(map.get("tablistUpdateIntervall"));
         }
 
         if (map.containsKey("updateOnPlayerJoinLeave")) {
-            updateOnPlayerJoinLeave = (boolean) map.get("updateOnPlayerJoinLeave");
+            updateOnPlayerJoinLeave = parseBoolean(map.get("updateOnPlayerJoinLeave"));
         }
 
         if (map.containsKey("updateOnServerChange")) {
-            updateOnServerChange = (boolean) map.get("updateOnServerChange");
+            updateOnServerChange = parseBoolean(map.get("updateOnServerChange"));
         }
 
         if (map.containsKey("useScoreboardToBypass16CharLimit")) {
-            useScoreboardToBypass16CharLimit = (boolean) map.get("useScoreboardToBypass16CharLimit");
+            useScoreboardToBypass16CharLimit = parseBoolean(map.get("useScoreboardToBypass16CharLimit"));
         }
 
         if (map.containsKey("charLimit")) {
-            charLimit = ((Number) map.get("charLimit")).intValue();
+            charLimit = parseInteger(map.get("charLimit"));
         }
 
         if (map.containsKey("permissionSource")) {
@@ -149,19 +154,19 @@ public class MainConfig extends Configuration {
         }
 
         if (map.containsKey("showPlayersInGamemode3")) {
-            showPlayersInGamemode3 = (boolean) map.get("showPlayersInGamemode3");
+            showPlayersInGamemode3 = parseBoolean(map.get("showPlayersInGamemode3"));
         }
 
         if (map.containsKey("checkForUpdates")) {
-            checkForUpdates = (boolean) map.get("checkForUpdates");
+            checkForUpdates = parseBoolean(map.get("checkForUpdates"));
         }
 
         if (map.containsKey("notifyAdminsIfUpdateAvailable")) {
-            notifyAdminsIfUpdateAvailable = (boolean) map.get("notifyAdminsIfUpdateAvailable");
+            notifyAdminsIfUpdateAvailable = parseBoolean(map.get("notifyAdminsIfUpdateAvailable"));
         }
 
         if (map.containsKey("automaticallySendBugReports")) {
-            automaticallySendBugReports = (boolean) map.get("automaticallySendBugReports");
+            automaticallySendBugReports = parseBoolean(map.get("automaticallySendBugReports"));
         }
 
         if (map.containsKey("serverAlias")) {
@@ -181,7 +186,7 @@ public class MainConfig extends Configuration {
         }
 
         if (map.containsKey("pingDelay")) {
-            pingDelay = ((Number) map.get("pingDelay")).intValue();
+            pingDelay = parseInteger(map.get("pingDelay"));
         }
 
         if (map.containsKey("online-text")) {
@@ -197,7 +202,7 @@ public class MainConfig extends Configuration {
         }
 
         if (map.containsKey("fakePlayers")) {
-            fakePlayers = (List<String>) map.get("fakePlayers");
+            fakePlayers = ((List<?>) map.get("fakePlayers")).stream().map(Object::toString).collect(Collectors.toList());
         }
 
         if (map.containsKey("excludeServers")) {
@@ -209,7 +214,7 @@ public class MainConfig extends Configuration {
         }
 
         if (map.containsKey("autoExcludeServers")) {
-            autoExcludeServers = (boolean) map.get("autoExcludeServers");
+            autoExcludeServers = parseBoolean(map.get("autoExcludeServers"));
         }
 
         if (map.containsKey("time-zone")) {

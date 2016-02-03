@@ -216,7 +216,7 @@ public class TabListConfig extends Configuration {
             showTo = map.get("showTo").toString();
         }
 
-        priority = ((Number) map.getOrDefault("priority", priority)).intValue();
+        priority = parseInteger(map.getOrDefault("priority", priority));
 
         if (map.containsKey("header")) {
             Object header = map.get("header");
@@ -227,7 +227,7 @@ public class TabListConfig extends Configuration {
             }
         }
 
-        headerCycleInterval = ((Number) map.getOrDefault("headerAnimationUpdateInterval", headerCycleInterval)).doubleValue();
+        headerCycleInterval = parseDouble(map.getOrDefault("headerAnimationUpdateInterval", headerCycleInterval));
         if (headerCycleInterval <= 0) {
             headerCycleInterval = 1;
         }
@@ -241,13 +241,13 @@ public class TabListConfig extends Configuration {
             }
         }
 
-        footerCycleInterval = ((Number) map.getOrDefault("footerAnimationUpdateInterval", footerCycleInterval)).doubleValue();
+        footerCycleInterval = parseDouble(map.getOrDefault("footerAnimationUpdateInterval", footerCycleInterval));
         if (footerCycleInterval <= 0) {
             footerCycleInterval = 1;
         }
 
         if (map.containsKey("shownFooterHeader")) {
-            shownFooterHeader = (boolean) map.get("shownFooterHeader");
+            shownFooterHeader = parseBoolean(map.get("shownFooterHeader"));
         }
 
         if (map.containsKey("defaultSkin")) {
@@ -255,11 +255,11 @@ public class TabListConfig extends Configuration {
         }
 
         if (map.containsKey("defaultPing")) {
-            defaultPing = ((Number) map.get("defaultPing")).intValue();
+            defaultPing = parseInteger(map.get("defaultPing"));
         }
 
         if (map.containsKey("autoShrinkTabList")) {
-            autoShrinkTabList = (boolean) map.get("autoShrinkTabList");
+            autoShrinkTabList = parseBoolean(map.get("autoShrinkTabList"));
         }
 
         if (map.containsKey("groupPlayers")) {
@@ -267,11 +267,11 @@ public class TabListConfig extends Configuration {
         }
 
         if (map.containsKey("showEmptyGroups")) {
-            showEmptyGroups = (boolean) map.get("showEmptyGroups");
+            showEmptyGroups = parseBoolean(map.get("showEmptyGroups"));
         }
 
         if (map.containsKey("verticalMode")) {
-            verticalMode = (boolean) map.get("verticalMode");
+            verticalMode = parseBoolean(map.get("verticalMode"));
         }
 
         if (map.containsKey("groupLines")) {
@@ -290,7 +290,7 @@ public class TabListConfig extends Configuration {
             tabList = (List<String>) map.get("tabList");
         }
 
-        tab_size = ((Number) map.getOrDefault("tab_size", 80)).intValue();
+        tab_size = parseInteger(map.getOrDefault("tab_size", 80));
         if (tab_size <= 0) {
             tab_size = 1;
         }

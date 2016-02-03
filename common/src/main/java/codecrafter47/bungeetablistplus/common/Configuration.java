@@ -23,8 +23,21 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class Configuration {
     private static ThreadLocal<Yaml> yaml = ThreadLocal.withInitial(() -> {
@@ -113,5 +126,35 @@ public abstract class Configuration {
 
     public void setHeader(String... header) {
         this.header = Arrays.asList(header);
+    }
+
+    protected boolean parseBoolean(Object object) {
+        if (object instanceof Boolean) {
+            return (boolean) object;
+        } else if (object instanceof String) {
+            return Boolean.parseBoolean((String) object);
+        } else {
+            throw new IllegalArgumentException(Objects.toString(object) + " is not a boolean value");
+        }
+    }
+
+    protected double parseDouble(Object object) {
+        if (object instanceof Number) {
+            return ((Number) object).doubleValue();
+        } else if (object instanceof String) {
+            return Double.parseDouble((String) object);
+        } else {
+            throw new IllegalArgumentException(Objects.toString(object) + " is not a number");
+        }
+    }
+
+    protected int parseInteger(Object object) {
+        if (object instanceof Number) {
+            return ((Number) object).intValue();
+        } else if (object instanceof String) {
+            return Integer.parseInt((String) object);
+        } else {
+            throw new IllegalArgumentException(Objects.toString(object) + " is not a number");
+        }
     }
 }
