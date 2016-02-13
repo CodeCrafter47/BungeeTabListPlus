@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 
 public class DataCache {
     private final Map<DataKey<?>, Object> cache = new ConcurrentHashMap<>();
-    private final Multimap<DataKey<?>, Consumer<?>> listeners = Multimaps.synchronizedMultimap(MultimapBuilder.hashKeys().linkedListValues().build());
+    private final Multimap<DataKey<?>, Consumer<?>> listeners = Multimaps.synchronizedMultimap(MultimapBuilder.hashKeys().hashSetValues().build());
 
     @SuppressWarnings("unchecked")
     public <T> void updateValue(DataKey<T> dataKey, T object) {

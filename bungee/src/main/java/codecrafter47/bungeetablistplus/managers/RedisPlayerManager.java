@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -82,7 +83,7 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
 
                 ConnectedPlayer player = connectedPlayerManager.getPlayerIfPresent(uuid);
                 if (player != null) {
-                    player.registerDataChangeListener(dataKey, value -> updateData(uuid, dataKey, value));
+                    player.registerDataChangeListener(dataKey, new DataChangeListener(uuid, dataKey));
                     updateData(uuid, dataKey, player.get(dataKey).orElse(null));
                 }
             } catch (Throwable th) {
@@ -159,6 +160,40 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
             BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "RedisBungee Error", ex);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to send data", th);
+        }
+    }
+
+    private class DataChangeListener implements Consumer<Object> {
+        private final UUID uuid;
+        private final DataKey<Object> dataKey;
+
+        public DataChangeListener(UUID uuid, DataKey<Object> dataKey) {
+            this.uuid = uuid;
+            this.dataKey = dataKey;
+        }
+
+        @Override
+        public void accept(Object value) {
+            RedisPlayerManager.this.updateData(uuid, dataKey, value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DataChangeListener that = (DataChangeListener) o;
+
+            if (!uuid.equals(that.uuid)) return false;
+            return dataKey.equals(that.dataKey);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = uuid.hashCode();
+            result = 31 * result + dataKey.hashCode();
+            return result;
         }
     }
 }
