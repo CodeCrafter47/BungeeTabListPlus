@@ -55,7 +55,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.Team;
 
-public class PlayerDataAccess extends AbstractDataAccess<Player> {
+public class PlayerDataAccess extends AbstractBukkitDataAccess<Player> {
     private final Plugin plugin;
 
     public PlayerDataAccess(Plugin plugin) {

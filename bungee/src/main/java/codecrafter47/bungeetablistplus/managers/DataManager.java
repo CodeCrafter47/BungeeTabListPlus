@@ -20,43 +20,45 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class DataManager {
+public class DataManager extends AbstractDataAccess<ProxiedPlayer> {
     private final BungeeTabListPlus bungeeTabListPlus;
+    private final PermissionManager permissionManager;
 
-    public DataManager(BungeeTabListPlus bungeeTabListPlus) {
+    public DataManager(BungeeTabListPlus bungeeTabListPlus, PermissionManager permissionManager) {
         this.bungeeTabListPlus = bungeeTabListPlus;
+        this.permissionManager = permissionManager;
+        init();
         ProxyServer.getInstance().getScheduler().schedule(bungeeTabListPlus.getPlugin(), this::updateData, 2, 2, TimeUnit.SECONDS);
     }
 
+    private void init() {
+        bind(DataKeys.BungeeCord_PrimaryGroup, permissionManager::getMainGroupFromBungeeCord);
+        bind(DataKeys.BungeeCord_Rank, permissionManager::getBungeeCordRank);
+        bind(DataKeys.BungeePerms_PrimaryGroup, permissionManager::getMainGroupFromBungeePerms);
+        bind(DataKeys.BungeePerms_Prefix, permissionManager::getPrefixFromBungeePerms);
+        bind(DataKeys.BungeePerms_DisplayPrefix, permissionManager::getDisplayPrefix);
+        bind(DataKeys.BungeePerms_Suffix, permissionManager::getSuffixFromBungeePerms);
+        bind(DataKeys.BungeePerms_Rank, permissionManager::getBungeePermsRank);
+    }
+
+    @SuppressWarnings("unchecked")
     private void updateData() {
-        PermissionManager permissionManager = bungeeTabListPlus.getPermissionManager();
         for (ConnectedPlayer player : bungeeTabListPlus.getConnectedPlayerManager().getPlayers()) {
-            String bungeecord_group = permissionManager.getMainGroupFromBungeeCord(player.getPlayer());
-            int bungeecord_rank = permissionManager.getBungeeCordRank(player.getPlayer());
-
-            String bungeeperms_group = permissionManager.getMainGroupFromBungeePerms(player.getPlayer());
-            String bungeeperms_prefix = permissionManager.getPrefixFromBungeePerms(player.getPlayer());
-            String bungeeperms_displayprefix = permissionManager.getDisplayPrefix(player.getPlayer());
-            String bungeeperms_suffix = permissionManager.getSuffixFromBungeePerms(player.getPlayer());
-            Integer bungeeperms_rank = permissionManager.getBungeePermsRank(player.getPlayer());
-
-            updateIfNecessary(player, DataKeys.BungeeCord_PrimaryGroup, bungeecord_group);
-            updateIfNecessary(player, DataKeys.BungeeCord_Rank, bungeecord_rank);
-
-            updateIfNecessary(player, DataKeys.BungeePerms_PrimaryGroup, bungeeperms_group);
-            updateIfNecessary(player, DataKeys.BungeePerms_Prefix, bungeeperms_prefix);
-            updateIfNecessary(player, DataKeys.BungeePerms_DisplayPrefix, bungeeperms_displayprefix);
-            updateIfNecessary(player, DataKeys.BungeePerms_Suffix, bungeeperms_suffix);
-            updateIfNecessary(player, DataKeys.BungeePerms_Rank, bungeeperms_rank);
+            for (DataKey<?> dataKey : providersByDataKey.keySet()) {
+                DataKey<Object> key = (DataKey<Object>) dataKey;
+                updateIfNecessary(player, key, getRawValue(key, player.getPlayer()));
+            }
         }
     }
 

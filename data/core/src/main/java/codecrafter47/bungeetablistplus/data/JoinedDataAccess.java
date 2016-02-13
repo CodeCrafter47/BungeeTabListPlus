@@ -17,10 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.data.bukkit;
-
-import codecrafter47.bungeetablistplus.data.DataAccess;
-import codecrafter47.bungeetablistplus.data.DataKey;
+package codecrafter47.bungeetablistplus.data;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,5 +41,14 @@ public class JoinedDataAccess<B> implements DataAccess<B> {
             if (value.isPresent()) return value;
         }
         return Optional.empty();
+    }
+
+    @Override
+    public <V> V getRawValue(DataKey<V> key, B context) {
+        for (DataAccess<B> accessor : accessors) {
+            V value = accessor.getRawValue(key, context);
+            if (value != null) return value;
+        }
+        return null;
     }
 }

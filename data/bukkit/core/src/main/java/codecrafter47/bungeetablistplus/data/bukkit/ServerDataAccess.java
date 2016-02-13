@@ -26,7 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 
-public class ServerDataAccess extends AbstractDataAccess<Server> {
+public class ServerDataAccess extends AbstractBukkitDataAccess<Server> {
 
     private final Plugin plugin;
 

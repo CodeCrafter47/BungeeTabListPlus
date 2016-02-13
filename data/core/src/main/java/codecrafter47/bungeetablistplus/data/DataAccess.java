@@ -22,6 +22,10 @@ package codecrafter47.bungeetablistplus.data;
 import java.util.Optional;
 
 public interface DataAccess<B> {
-    @SuppressWarnings("unchecked")
-    <V> Optional<V> getValue(DataKey<V> key, B context);
+
+    default <V> Optional<V> getValue(DataKey<V> key, B context) {
+        return Optional.ofNullable(getRawValue(key, context));
+    }
+
+    <V> V getRawValue(DataKey<V> key, B context);
 }

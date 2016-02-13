@@ -20,14 +20,14 @@
 package codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi;
 
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
-import codecrafter47.bungeetablistplus.data.bukkit.AbstractDataAccess;
+import codecrafter47.bungeetablistplus.data.bukkit.AbstractBukkitDataAccess;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.logging.Logger;
 
-public class PlaceholderAPIDataAccess extends AbstractDataAccess<Player> {
+public class PlaceholderAPIDataAccess extends AbstractBukkitDataAccess<Player> {
 
     public PlaceholderAPIDataAccess(Logger logger, Plugin plugin) {
         super(logger, plugin);

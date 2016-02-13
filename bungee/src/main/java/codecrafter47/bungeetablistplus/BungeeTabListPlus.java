@@ -115,6 +115,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private static Field tabListHandlerField;
     @Getter
     private RedisPlayerManager redisPlayerManager;
+    @Getter
+    private DataManager dataManager;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -394,7 +396,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         placeholderAPIHook = new PlaceholderAPIHook(this);
         placeholderAPIHook.onLoad();
 
-        new DataManager(this);
+        dataManager = new DataManager(this, getPermissionManager());
     }
 
     private Double requestedUpdateInterval = null;
