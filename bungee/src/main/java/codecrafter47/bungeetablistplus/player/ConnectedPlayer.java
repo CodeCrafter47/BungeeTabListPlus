@@ -25,7 +25,6 @@ import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.managers.DataManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import lombok.Getter;
@@ -55,11 +54,9 @@ public class ConnectedPlayer implements Player {
 
     @Getter
     private DataCache data = new DataCache();
-    private final DataManager dataManager;
 
     public ConnectedPlayer(ProxiedPlayer player) {
         this.player = player;
-        dataManager = BungeeTabListPlus.getInstance().getDataManager();
     }
 
     @Override
@@ -115,7 +112,7 @@ public class ConnectedPlayer implements Player {
 
     @Override
     public <T> Optional<T> get(DataKey<T> key) {
-        if (dataManager.provides(key)) {
+        if (BungeeTabListPlus.getInstance().getDataManager().provides(key)) {
             return data.getValue(key);
         }
         if (key.getScope() == DataKey.Scope.SERVER) {
@@ -142,7 +139,10 @@ public class ConnectedPlayer implements Player {
     }
 
     public <T> void registerDataChangeListener(DataKey<T> key, Consumer<T> listener) {
-        data.registerValueChangeListener(key, listener);
-        bukkitData.registerValueChangeListener(key, listener);
+        if (BungeeTabListPlus.getInstance().getDataManager().provides(key)) {
+            data.registerValueChangeListener(key, listener);
+        } else {
+            bukkitData.registerValueChangeListener(key, listener);
+        }
     }
 }
