@@ -291,6 +291,10 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         plugin.getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
 
+        placeholderAPIHook.onLoad();
+
+        dataManager = new DataManager(this, getPermissionManager());
+
         pm = new PermissionManager(this);
         placeholderManager = new PlaceholderManagerImpl();
         placeholderManager.internalRegisterPlaceholderProvider(new BasicPlaceholders());
@@ -394,9 +398,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }, 1, 1, TimeUnit.MINUTES);
 
         placeholderAPIHook = new PlaceholderAPIHook(this);
-        placeholderAPIHook.onLoad();
-
-        dataManager = new DataManager(this, getPermissionManager());
     }
 
     private Double requestedUpdateInterval = null;
