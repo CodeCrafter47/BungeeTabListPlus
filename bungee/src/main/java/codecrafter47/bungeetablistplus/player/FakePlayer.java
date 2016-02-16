@@ -22,7 +22,6 @@ package codecrafter47.bungeetablistplus.player;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -34,7 +33,7 @@ public class FakePlayer implements Player {
     ServerInfo server;
     private int ping;
     private int gamemode;
-    private PlayerSkin skin;
+    private Skin skin;
     private final UUID uuid;
 
     public FakePlayer(String name, ServerInfo server) {
@@ -84,7 +83,7 @@ public class FakePlayer implements Player {
         this.gamemode = gamemode;
     }
 
-    public void setSkin(PlayerSkin skin) {
+    public void setSkin(Skin skin) {
         this.skin = skin;
     }
 

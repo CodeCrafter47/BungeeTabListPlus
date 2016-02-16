@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
@@ -183,10 +184,16 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                                 player.setPing(i.getPing());
                                 player.setGamemode(i.getGamemode());
                                 if (i.getUuid() != null && i.getProperties() != null) {
+                                    boolean setSkin = false;
                                     for (String[] strings : i.getProperties()) {
                                         if (strings.length == 3 && strings[0].equals("textures")) {
                                             player.setSkin(new PlayerSkin(i.getUuid(), strings));
+                                            setSkin = true;
                                         }
+                                    }
+                                    if (!setSkin) {
+                                        // todo choose correct alex/steve skin
+                                        player.setSkin(SkinManager.defaultSkin);
                                     }
                                 }
                                 bukkitplayers.put(name, player);
