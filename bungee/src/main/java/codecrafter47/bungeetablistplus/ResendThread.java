@@ -97,11 +97,13 @@ class ResendThread implements Runnable, Executor {
                 if (!queue.isEmpty()) {
                     ProxiedPlayer player = queue.poll();
                     set.remove(player);
-                    Object tabList = BungeeTabListPlus.getTabList(player);
-                    if (tabList instanceof PlayerTablistHandler) {
-                        if (player.getServer() != null) {
+                    if (player.getServer() != null) {
+                        Object tabList = BungeeTabListPlus.getTabList(player);
+                        if (tabList instanceof PlayerTablistHandler) {
                             PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
                             update(tablistHandler);
+                        } else {
+                            BungeeTabListPlus.getInstance().getLogger().severe("tabListHandler for " + player.getName() + " has been changed. It now is " + tabList.getClass() + " by " + tabList.getClass().getClassLoader());
                         }
                     }
                 }
