@@ -17,34 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api.bungee;
+package codecrafter47.bungeetablistplus.skin;
 
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
-/**
- * Represents a skin of a player
- * <p>
- * You can obtain a skin using {@link BungeeTabListPlusAPI#getSkinForPlayer(String)}
- */
-public interface Skin {
+public class AnimatedSkin implements Skin {
+    private final List<Skin> skins;
+    private final int interval;
 
-    /**
-     * The property associated with the skin.
-     * See http://wiki.vg/Mojang_API#UUID_-.3E_Profile_.2B_Skin.2FCape
-     * This is only the "textures" property.
-     * <p>
-     * If this returns null {@link Skin#getOwner()} must also return null. In that case this is a
-     * random Alex/ Steve skin.
-     *
-     * @return the properties associated with this skin
-     * can be null
-     */
-    String[] toProperty();
+    public AnimatedSkin(Skin... skins) {
+        this(Arrays.asList(skins), 1000);
+    }
 
-    /**
-     * The UUID of the player who's skin is represented by this object
-     *
-     * @return the uuid or null
-     */
-    UUID getOwner();
+    public AnimatedSkin(List<Skin> skins, int interval) {
+        this.skins = skins;
+        this.interval = interval;
+    }
+
+    private Skin getSkin() {
+        return skins.get((int) ((System.currentTimeMillis() / interval) % skins.size()));
+    }
+
+    @Override
+    public String[] toProperty() {
+        return getSkin().toProperty();
+    }
+
+    @Override
+    public UUID getOwner() {
+        return getSkin().getOwner();
+    }
 }

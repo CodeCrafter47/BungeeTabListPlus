@@ -20,7 +20,6 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.Configuration;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -35,38 +34,34 @@ public class TabListConfig extends Configuration {
     public int priority = 1;
 
     public List<String> header = Lists.newArrayList(
-            "",
-            "&bW",
-            "&bWe",
-            "&bWel",
-            "&bWelc",
-            "&bWelco",
-            "&bWelcom",
-            "&bWelcome",
-            "&bWelcome",
-            "&bWelcome",
-            "&bWelcome",
-            "",
-            "&6{player}",
-            "&6{player}",
-            "&6{player}",
-            "&6{player}",
-            "&6{player}",
-            "&6{player}",
-            "&6{player}",
-            "&6{player}");
+            "&cWelcome &f{player}",
+            "&eW&celcome &f{player}",
+            "&eWe&clcome &f{player}",
+            "&eWel&ccome &f{player}",
+            "&eWelc&come &f{player}",
+            "&eWelco&cme &f{player}",
+            "&eWelcom&ce &f{player}",
+            "&eWelcome &f{player}",
+            "&cW&eelcome &f{player}",
+            "&cWe&elcome &f{player}",
+            "&cWel&ecome &f{player}",
+            "&cWelc&eome &f{player}",
+            "&cWelco&eme &f{player}",
+            "&cWelcom&ee &f{player}",
+            "&cWelcome &f{player}"
+    );
 
-    public double headerCycleInterval = 0.25;
+    public double headerCycleInterval = 0.20;
 
-    public List<String> footer = Lists.newArrayList("&4play.minecraft.example.com");
+    public List<String> footer = Lists.newArrayList("&f&oPowered by BungeeTabListPlus");
 
     public double footerCycleInterval = 0.5;
 
     public boolean shownFooterHeader = true;
 
-    public String defaultSkin = "MHF_Question";
+    public String defaultSkin = "colors/dark_gray.png";
 
-    public int defaultPing = 0;
+    public int defaultPing = 1000;
 
     public boolean autoShrinkTabList = false;
 
@@ -84,13 +79,14 @@ public class TabListConfig extends Configuration {
 
     public List<String> tabList = new ArrayList<>();
 
-    public int tab_size = ConfigManager.getTabSize();
+    public int tab_size = 60;
 
-    private final String name;
+    private final transient String name;
 
     {
-        groupLines.add("[ALIGN LEFT][SKIN=MHF_ArrowRight]&9&l>&9 {server}({server_player_count}):");
+        groupLines.add("[ALIGN LEFT][SKIN=colors/yellow.png]&e&n{server}&f&o ({server_player_count}):");
         groupLines.add("{fillplayers}");
+        groupLines.add("[ALIGN LEFT][PING=1000]");
     }
 
     {
@@ -98,26 +94,23 @@ public class TabListConfig extends Configuration {
     }
 
     {
-        morePlayersLines.add("... and {other_count} others");
+        morePlayersLines.add("[SKIN=colors/gray.png][PING=0]&7... and &e{other_count} &7others");
     }
 
     {
-        tabList.add("&2>>>>>>>>>>>>");
-        tabList.add("&aWelcome");
-        tabList.add("&2<<<<<<<<<<<<");
-        tabList.add("&2>>>>>>>>>>>>");
-        tabList.add("&a{player}");
-        tabList.add("&2<<<<<<<<<<<<");
-        tabList.add(" ");
-        tabList.add(" ");
-        tabList.add(" ");
+        tabList.add("[SKIN=default/server.png][PING=0]&cServer: &6{server}");
+        tabList.add("[SKIN=default/rank.png][PING=0]&cRank: &6{group}");
+        tabList.add("[SKIN=default/ping.png][PING=0]&cPing: &6{ping}ms");
+        tabList.add("[PING=1000]");
+        tabList.add("[PING=1000]");
+        tabList.add("[PING=1000]");
         tabList.add("{fillplayers}");
-        tabList.add("[ALIGN BOTTOM]&2============");
-        tabList.add("&2============");
-        tabList.add("&2============");
-        tabList.add("&2Time: &a{time}");
-        tabList.add("&2Players: &a{players}");
-        tabList.add("&2Balance: &a{balance}");
+        tabList.add("[ALIGN BOTTOM][SKIN=colors/gold.png][PING=0]&6==============");
+        tabList.add("[SKIN=colors/gold.png][PING=0]&6==============");
+        tabList.add("[SKIN=colors/gold.png][PING=0]&6==============");
+        tabList.add("[SKIN=default/clock.png][PING=0]&cTime: &6{time}");
+        tabList.add("[SKIN=default/players.png][PING=0]&cPlayers: &6{players}");
+        tabList.add("[SKIN=default/balance.png][PING=0]&cBalance: &6{balance}");
     }
 
     public TabListConfig(String name) {

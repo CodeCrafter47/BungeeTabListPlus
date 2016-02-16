@@ -77,10 +77,13 @@ import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.packet.Team;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -96,6 +99,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Main Class of BungeeTabListPlus
@@ -271,7 +276,38 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 plugin.getLogger().warning("Your BungeeCord version doesn't support tablist header and footer modification");
             }
 
-            skins = new SkinManager(plugin);
+            File headsFolder = new File(plugin.getDataFolder(), "heads");
+
+            if (!headsFolder.exists()) {
+                headsFolder.mkdirs();
+
+                try {
+                    // copy default heads
+                    ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(plugin.getFile()));
+
+                    ZipEntry entry;
+                    while ((entry = zipInputStream.getNextEntry()) != null) {
+                        if (!entry.isDirectory() && entry.getName().startsWith("heads/")) {
+                            try {
+                                File targetFile = new File(plugin.getDataFolder(), entry.getName());
+                                targetFile.getParentFile().mkdirs();
+                                if (!targetFile.exists()) {
+                                    Files.copy(zipInputStream, targetFile.toPath());
+                                    getLogger().info("Extracted " + entry.getName());
+                                }
+                            } catch (IOException ex) {
+                                getLogger().log(Level.SEVERE, "Failed to extract file " + entry.getName(), ex);
+                            }
+                        }
+                    }
+
+                    zipInputStream.close();
+                } catch (IOException ex) {
+                    getLogger().log(Level.SEVERE, "Error extracting files", ex);
+                }
+            }
+
+            skins = new SkinManager(plugin, headsFolder);
         }
 
         fakePlayerManager = new FakePlayerManager(plugin);
@@ -291,11 +327,10 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         plugin.getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
 
-        placeholderAPIHook.onLoad();
+        pm = new PermissionManager(this);
 
         dataManager = new DataManager(this, getPermissionManager());
 
-        pm = new PermissionManager(this);
         placeholderManager = new PlaceholderManagerImpl();
         placeholderManager.internalRegisterPlaceholderProvider(new BasicPlaceholders());
         placeholderManager.internalRegisterPlaceholderProvider(new BukkitPlaceholders());
@@ -398,6 +433,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }, 1, 1, TimeUnit.MINUTES);
 
         placeholderAPIHook = new PlaceholderAPIHook(this);
+
+        placeholderAPIHook.onLoad();
     }
 
     private Double requestedUpdateInterval = null;
@@ -461,6 +498,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             resendTabLists();
             restartRefreshThread();
             placeholderAPIHook.onLoad();
+            skins.onReload();
         } catch (IOException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
         }

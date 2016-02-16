@@ -88,7 +88,7 @@ public abstract class BungeeTabListPlusAPI {
      * the background so the requested skin will be available next time this method is invoked.
      * For this reason skin objects obtained by this method should not be cached.
      *
-     * @param nameOrUUID a valid player name or user id
+     * @param nameOrUUID either a valid player name or uuid or the name of an image file in the plugins/BungeeTabListPlus/heads directory
      * @return the skin associated with the player or the default skin
      * @throws IllegalArgumentException if the name or uuid is invalid
      */

@@ -131,13 +131,20 @@
         <defaultGoal>package</defaultGoal>
         <resources>
             <resource>
-                <targetPath>.</targetPath>
-                <directory>${basedir}/src/main/resources/</directory>
+                <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>plugin.yml</include>
-                    <include>bungee.yml</include>
+                    <include>*.yml</include>
+                    <include>*.properties</include>
                 </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>*.yml</exclude>
+                    <exclude>*.properties</exclude>
+                </excludes>
             </resource>
         </resources>
         <plugins>
