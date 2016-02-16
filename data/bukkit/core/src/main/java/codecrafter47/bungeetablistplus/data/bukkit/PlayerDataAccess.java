@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.data.bukkit;
 
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.data.PermissionDataKey;
+import codecrafter47.bungeetablistplus.data.essentials.EssentialsIsAFKProvider;
 import codecrafter47.bungeetablistplus.data.essentials.EssentialsIsVanishedProvider;
 import codecrafter47.bungeetablistplus.data.factions.FactionMembersProvider;
 import codecrafter47.bungeetablistplus.data.factions.FactionNameProvider;
@@ -147,6 +148,7 @@ public class PlayerDataAccess extends AbstractBukkitDataAccess<Player> {
 
         if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
             bind(DataKeys.Essentials_IsVanished, new EssentialsIsVanishedProvider());
+            bind(DataKeys.Essentials_IsAFK, new EssentialsIsAFKProvider());
         }
 
         if (Bukkit.getPluginManager().getPlugin("Multiverse-Core") != null) {
