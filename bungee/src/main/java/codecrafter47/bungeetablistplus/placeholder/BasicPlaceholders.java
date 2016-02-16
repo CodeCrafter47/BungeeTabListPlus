@@ -62,6 +62,7 @@ public class BasicPlaceholders extends PlaceholderProvider {
         });
         bind("rawname").to(context -> context.getPlayer().getName());
         bind("server").to(context -> context.getServerGroup().map(ServerGroup::getName).orElse(""));
+        bind("config_prefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getConfigPrefix(context, context.getPlayer()));
         bind("permprefix").alias("prefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context));
         bind("prefixColor").to(context -> {
             String prefix = BungeeTabListPlus.getInstance().getPermissionManager().getPrefix(context);
@@ -93,6 +94,9 @@ public class BasicPlaceholders extends PlaceholderProvider {
         });
         bind("permsuffix").alias("suffix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getSuffix(context.getPlayer()));
         bind("displayprefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_DisplayPrefix).orElse(""));
+        bind("bungeeperms_prefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_Prefix).orElse(""));
+        bind("bungeeperms_suffix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_Suffix).orElse(""));
+        bind("bungeeperms_group").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_PrimaryGroup).orElse(""));
         bind("ping").to(context -> String.format("%d", context.getPlayer().getPing()));
         bind("group").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(context.getPlayer()));
         bind("uuid").to(context -> context.getPlayer().getUniqueID().toString());

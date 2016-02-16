@@ -207,19 +207,22 @@ public class PermissionManager {
         } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
             return ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
-            String prefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
-            if (prefix != null) {
-                prefix = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(prefix).buildSlot(context).getText();
-            }
-            return prefix != null ? prefix : "";
+            return getConfigPrefix(context, player);
         }
 
-        String prefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
+        String prefix = getConfigPrefix(context, player);
         if (prefix != null) {
-            prefix = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(prefix).buildSlot(context).getText();
             return prefix;
         }
         return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse("")));
+    }
+
+    public String getConfigPrefix(TabListContext context, IPlayer player) {
+        String prefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
+        if (prefix != null) {
+            prefix = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(prefix).buildSlot(context).getText();
+        }
+        return prefix != null ? prefix : "";
     }
 
     String getPrefixFromBungeePerms(ProxiedPlayer player) {
