@@ -27,7 +27,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class UpdateChecker implements Runnable {
 
@@ -99,6 +101,28 @@ public class UpdateChecker implements Runnable {
                 plugin.getLogger().info("A new version of BungeeTabListPlus (" + newVersion + ") is available. Download from http://www.spigotmc.org/resources/bungeetablistplus.313/");
             }
 
+            if (!updateAvailable && runningVersion.endsWith("-SNAPSHOT")) {
+                // Check whether there is a new dev-build available
+                try {
+                    Properties current = new Properties();
+                    current.load(getClass().getClassLoader().getResourceAsStream("version.properties"));
+                    String currentVersion = current.getProperty("build", "unknown");
+                    if (!currentVersion.equals("unknown")) {
+                        int buildNumber = Integer.valueOf(currentVersion);
+                        Properties latest = new Properties();
+                        latest.load(new URL("http://ci.codecrafter47.dyndns.eu/job/BungeeTabListPlus/lastSuccessfulBuild/artifact/bungee/target/classes/version.properties").openStream());
+                        String latestVersion = latest.getProperty("build", "unknown");
+                        if (!latestVersion.isEmpty() && !latestVersion.equals("unknown")) {
+                            int latestBuildNumber = Integer.valueOf(latestVersion);
+                            if (latestBuildNumber > buildNumber) {
+                                plugin.getLogger().info("A new dev-build is available at http://ci.codecrafter47.dyndns.eu/job/BungeeTabListPlus/");
+                            }
+                        }
+                    }
+                } catch (Throwable th) {
+                    plugin.getLogger().log(Level.WARNING, "Failed to check whether a new dev-build is available.", th);
+                }
+            }
         } catch (Throwable t) {
             error = true;
         }
