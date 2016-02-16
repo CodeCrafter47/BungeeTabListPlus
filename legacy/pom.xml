@@ -26,6 +26,21 @@
                 <version>2.3</version>
                 <executions>
                     <execution>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <includes>
+                                        <include>
+                                            net/md_5/bungee/api/tab/TabListAdapter.class
+                                        </include>
+                                        <include>
+                                            net/md_5/bungee/api/tab/TabListHandler.class
+                                        </include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                        </configuration>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
