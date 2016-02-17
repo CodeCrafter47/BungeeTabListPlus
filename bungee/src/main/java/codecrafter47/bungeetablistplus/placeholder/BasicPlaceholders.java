@@ -141,7 +141,15 @@ public class BasicPlaceholders extends PlaceholderProvider {
                 return context.getServer().map(s -> BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(s.getName())).orElse("");
             }
         });
-        bind("other_count").to(context -> String.format("%d", context.getOtherPlayerCount()));
+        bind("other_count").to(context -> {
+            try {
+                return String.format("%d", context.getOtherPlayerCount());
+            } catch (IllegalStateException ignored) {
+                // so someone is stupid enough to use {other_count} at some place
+                // that is not in morePlayerLines
+                return "\u2639"; // sad face
+            }
+        });
         bind("newline").to(context -> "\n");
     }
 }
