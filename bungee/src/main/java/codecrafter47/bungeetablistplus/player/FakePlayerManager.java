@@ -26,7 +26,9 @@ import net.md_5.bungee.api.plugin.Plugin;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +42,7 @@ public class FakePlayerManager implements IPlayerProvider {
         this.plugin = plugin;
         if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers.size() > 0) {
             offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers);
+            sanitazeFakePlayerNames();
             plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -68,9 +71,20 @@ public class FakePlayerManager implements IPlayerProvider {
 
     public void reload() {
         offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers);
+        sanitazeFakePlayerNames();
         online = new CopyOnWriteArrayList<>();
         for (int i = offline.size(); i > 0; i--) {
             triggerRandomEvent();
+        }
+    }
+
+    private void sanitazeFakePlayerNames() {
+        for (Iterator<?> iterator = offline.iterator(); iterator.hasNext(); ) {
+            Object name = iterator.next();
+            if (name == null || !(name instanceof String)) {
+                plugin.getLogger().warning("Invalid name used for fake player, removing. (" + Objects.toString(name) + ")");
+                iterator.remove();
+            }
         }
     }
 
