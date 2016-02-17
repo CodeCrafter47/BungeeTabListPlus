@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -68,25 +69,33 @@ public class BukkitBridge implements Listener {
     }
 
     private void checkForThirdPartyVariables() {
-        for (ServerInfo serverInfo : plugin.getProxy().getServers().values()) {
-            get(serverInfo, BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES).ifPresent(variables -> {
-                thirdPartyVariablesLock.lock();
-                try {
-                    for (String variable : variables) {
-                        if (!registeredThirdPartyVariables.contains(variable)) {
-                            plugin.registerPlaceholderProvider0(new PlaceholderProvider() {
-                                @Override
-                                public void setup() {
-                                    bind(variable).to(context -> ((Player) context.getPlayer()).get(BTLPDataKeys.createThirdPartyVariableDataKey(variable)).orElse(""));
-                                }
-                            });
-                            registeredThirdPartyVariables.add(variable);
+        try {
+            for (ServerInfo serverInfo : plugin.getProxy().getServers().values()) {
+                get(serverInfo, BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES).ifPresent(variables -> {
+                    thirdPartyVariablesLock.lock();
+                    try {
+                        for (String variable : variables) {
+                            if (!registeredThirdPartyVariables.contains(variable)) {
+                                plugin.registerPlaceholderProvider0(new PlaceholderProvider() {
+                                    @Override
+                                    public void setup() {
+                                        bind(variable).to(context -> ((Player) context.getPlayer()).get(BTLPDataKeys.createThirdPartyVariableDataKey(variable)).orElse(""));
+                                    }
+                                });
+                                registeredThirdPartyVariables.add(variable);
+                            }
                         }
+                    } catch (Throwable th) {
+                        plugin.getLogger().log(Level.SEVERE, "Unexpected exception", th);
+                    } finally {
+                        thirdPartyVariablesLock.unlock();
                     }
-                } finally {
-                    thirdPartyVariablesLock.unlock();
-                }
-            });
+                });
+            }
+        } catch (ConcurrentModificationException ignored) {
+            // The map returned from ProxyServer#getServers is mutable
+            // If it is mutated while we are iterating over its values
+            // an exception is thrown
         }
     }
 
