@@ -80,7 +80,13 @@ public class PlayerDataAccess extends AbstractBukkitDataAccess<Player> {
             Team team = player.getScoreboard().getPlayerTeam(player);
             return team != null ? team.getName() : null;
         });
-        bind(PermissionDataKey.class, (player, key) -> player.hasPermission(key.getPermission()));
+        bind(PermissionDataKey.class, (player, key) -> {
+            try {
+                return player.hasPermission(key.getPermission());
+            } catch (Throwable ignored) {
+                return null;
+            }
+        });
 
         bind(DataKeys.DisplayName, Player::getDisplayName);
         bind(DataKeys.PlayerListName, Player::getPlayerListName);
