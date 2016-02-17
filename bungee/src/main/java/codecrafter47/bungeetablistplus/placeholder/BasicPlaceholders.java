@@ -41,9 +41,9 @@ public class BasicPlaceholders extends PlaceholderProvider {
                 return new SlotTemplate() {
                     @Override
                     public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
-                        int bars = (int) (((System.currentTimeMillis() / 250) % 8) - 4);
+                        int bars = (int) (((System.currentTimeMillis() / 250) % 8) - 3);
                         if (bars <= 0) {
-                            bars = 1 - bars;
+                            bars = 2 - bars;
                         }
                         switch (bars) {
                             case 5:
