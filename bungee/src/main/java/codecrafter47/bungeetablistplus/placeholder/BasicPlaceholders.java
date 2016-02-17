@@ -35,12 +35,45 @@ import java.util.Optional;
 public class BasicPlaceholders extends PlaceholderProvider {
     @Override
     public void setup() {
-        bindRegex("\\[PING=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
-            SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(matcher.group(1));
+        bindRegex("\\[PING=([^]]+)\\]").to((placeholderManager, matcher) -> {
+            if (matcher.group(1).equals("?")) {
+                BungeeTabListPlus.getInstance().requireUpdateInterval(0.25);
+                return new SlotTemplate() {
+                    @Override
+                    public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                        int bars = (int) (((System.currentTimeMillis() / 250) % 8) - 4);
+                        if (bars <= 0) {
+                            bars = 1 - bars;
+                        }
+                        switch (bars) {
+                            case 5:
+                                return builder.setPing(0);
+                            case 4:
+                                return builder.setPing(150);
+                            case 3:
+                                return builder.setPing(300);
+                            case 2:
+                                return builder.setPing(600);
+                            case 1:
+                                return builder.setPing(1000);
+                            default:
+                                return builder.setPing(-1);
+                        }
+                    }
+                };
+            } else {
+                return new SlotTemplate() {
+                    SlotTemplate args = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(matcher.group(1));
 
-            @Override
-            public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
-                return builder.setPing(Integer.valueOf(args.buildSlot(context).getText()));
+                    @Override
+                    public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                        try {
+                            return builder.setPing(Integer.valueOf(args.buildSlot(context).getText()));
+                        } catch (NumberFormatException ex) {
+                            return args.buildSlot(builder.appendText("[PING="), context).appendText("]");
+                        }
+                    }
+                };
             }
         });
         bindRegex("\\[SKIN=([^]]+)\\]").to((placeholderManager, matcher) -> new SlotTemplate() {
