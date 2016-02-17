@@ -97,20 +97,17 @@ public class PlaceholderAPIHook implements Listener {
         ConfigManager configManager = bungeeTabListPlus.getConfigManager();
         if (configManager != null) {
             searchTabList(configManager.defaultTabList);
-            for (TabListConfig tabList : configManager.tabLists) {
-                searchTabList(tabList);
-            }
+            configManager.tabLists.forEach(this::searchTabList);
         }
     }
 
     private void searchTabList(TabListConfig config) {
-        config.header.forEach(this::searchString);
-        config.footer.forEach(this::searchString);
-        config.playerLines.forEach(this::searchString);
-        config.morePlayersLines.forEach(this::searchString);
-        config.groupLines.forEach(this::searchString);
-        config.tabList.forEach(this::searchString);
-
+        config.header.stream().filter(Objects::nonNull).forEach(this::searchString);
+        config.footer.stream().filter(Objects::nonNull).forEach(this::searchString);
+        config.playerLines.stream().filter(Objects::nonNull).forEach(this::searchString);
+        config.morePlayersLines.stream().filter(Objects::nonNull).forEach(this::searchString);
+        config.groupLines.stream().filter(Objects::nonNull).forEach(this::searchString);
+        config.tabList.stream().filter(Objects::nonNull).forEach(this::searchString);
     }
 
     private void searchString(String s) {
