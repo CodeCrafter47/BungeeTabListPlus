@@ -87,6 +87,7 @@ public final class PlaceholderManagerImpl implements PlaceholderManager {
 
     @Override
     public void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
+        BungeeTabListPlus.getInstance().failIfNotMainThread();
         BungeeTabListPlus.getInstance().registerPlaceholderProvider0(placeholderProvider);
     }
 
