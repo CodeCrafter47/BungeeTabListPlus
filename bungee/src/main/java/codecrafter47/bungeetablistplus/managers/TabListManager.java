@@ -138,6 +138,7 @@ public class TabListManager implements Listener {
 
         if (s.length != 2) {
             invalidShowTo(config);
+            return;
         }
 
         if (s[0].equalsIgnoreCase("player")) {
