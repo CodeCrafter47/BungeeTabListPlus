@@ -25,6 +25,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlaceholderAPIDataAccess extends AbstractBukkitDataAccess<Player> {
@@ -32,7 +33,12 @@ public class PlaceholderAPIDataAccess extends AbstractBukkitDataAccess<Player> {
     public PlaceholderAPIDataAccess(Logger logger, Plugin plugin) {
         super(logger, plugin);
         bind(BTLPDataKeys.PlaceholderAPIDataKey.class, (player, key) -> {
-            return PlaceholderAPI.setPlaceholders(player, key.getPlaceholder());
+            try {
+                return PlaceholderAPI.setPlaceholders(player, key.getPlaceholder());
+            } catch (Throwable th) {
+                logger.log(Level.WARNING, "Failed to query value for placeholder \"" + key.getPlaceholder() + "\" from PlaceholderAPI", th);
+                return null;
+            }
         });
     }
 }
