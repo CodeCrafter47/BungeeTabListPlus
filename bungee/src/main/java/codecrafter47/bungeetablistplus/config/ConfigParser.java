@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -262,6 +263,13 @@ public class ConfigParser {
         Map<String, ServerInfo> servers = ProxyServer.getInstance().getServers();
 
         Set<String> serverSet = new HashSet<>(servers.keySet());
+        for (Iterator<String> iterator = serverSet.iterator(); iterator.hasNext(); ) {
+            if (iterator.next() == null) {
+                plugin.getLogger().warning("BungeeCord misconfiguration detected: used null as server name");
+                iterator.remove();
+            }
+        }
+
         HashMultimap<String, String> aliasToServerMap = HashMultimap.create();
         for (Map.Entry<String, String> entry : BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.entrySet()) {
             if (ProxyServer.getInstance().getServerInfo(entry.getKey()) == null) {
