@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.Configuration;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -180,20 +181,22 @@ public class TabListConfig extends Configuration {
             }
         }
 
-        String group = BungeeTabListPlus.getInstance().getPermissionManager().
-                getMainGroup(BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(player));
+        ConnectedPlayer connectedPlayer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(player);
+        if (connectedPlayer != null) {
+            String group = BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(connectedPlayer);
 
-        if (group != null) {
-            if (s[0].equalsIgnoreCase("group")) {
-                if (s[1].equalsIgnoreCase(group)) {
-                    return true;
-                }
-            }
-
-            if (s[0].equals("groups")) {
-                for (String sv : s[1].split(",")) {
-                    if (sv.equalsIgnoreCase(group)) {
+            if (group != null) {
+                if (s[0].equalsIgnoreCase("group")) {
+                    if (s[1].equalsIgnoreCase(group)) {
                         return true;
+                    }
+                }
+
+                if (s[0].equals("groups")) {
+                    for (String sv : s[1].split(",")) {
+                        if (sv.equalsIgnoreCase(group)) {
+                            return true;
+                        }
                     }
                 }
             }
