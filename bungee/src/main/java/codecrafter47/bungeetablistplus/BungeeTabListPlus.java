@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
+import codecrafter47.bungeetablistplus.api.bungee.FakePlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
@@ -55,7 +56,7 @@ import codecrafter47.bungeetablistplus.placeholder.OnlineStatePlaceholder;
 import codecrafter47.bungeetablistplus.placeholder.PlayerCountPlaceholder;
 import codecrafter47.bungeetablistplus.placeholder.RedisBungeePlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.TimePlaceholders;
-import codecrafter47.bungeetablistplus.player.FakePlayerManager;
+import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
@@ -151,7 +152,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      */
     private ConfigManager config;
 
-    private FakePlayerManager fakePlayerManager;
+    private FakePlayerManagerImpl fakePlayerManager;
 
     /**
      * provides access to the Placeholder Manager use this to add Placeholders
@@ -314,7 +315,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             skins = new DummySkinManager();
         }
 
-        fakePlayerManager = new FakePlayerManager(plugin);
+        fakePlayerManager = new FakePlayerManagerImpl(plugin);
 
         playerProviders = new ArrayList<>();
 
@@ -589,6 +590,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     public PlaceholderManagerImpl getPlaceholderManager0() {
         return placeholderManager;
+    }
+
+    @Override
+    protected FakePlayerManager getFakePlayerManager0() {
+        return fakePlayerManager;
     }
 
     /**

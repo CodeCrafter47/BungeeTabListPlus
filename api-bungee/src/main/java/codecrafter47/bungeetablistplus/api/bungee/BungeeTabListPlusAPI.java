@@ -81,6 +81,18 @@ public abstract class BungeeTabListPlusAPI {
     protected abstract PlaceholderManager getPlaceholderManager0();
 
     /**
+     * Get the FakePlayerManager instance
+     *
+     * @return the FakePlayerManager instance
+     */
+    public static FakePlayerManager getFakePlayerManager() {
+        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
+        return instance.getFakePlayerManager0();
+    }
+
+    protected abstract FakePlayerManager getFakePlayerManager0();
+
+    /**
      * This method can be used to obtain a skin object. The method will always return immediately.
      * <p>
      * If the requested skin is in the cache the method will return the requested skin. If not it

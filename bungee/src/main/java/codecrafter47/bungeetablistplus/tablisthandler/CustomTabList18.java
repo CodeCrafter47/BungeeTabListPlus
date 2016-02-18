@@ -181,7 +181,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                     if (name != null) {
                         switch (pli.getAction()) {
                             case ADD_PLAYER:
-                                FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null);
+                                FakePlayer player = new FakePlayer(name, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null, randomServerSwitchEnabled);
                                 player.setPing(i.getPing());
                                 player.setGamemode(i.getGamemode());
                                 if (i.getUuid() != null && i.getProperties() != null) {

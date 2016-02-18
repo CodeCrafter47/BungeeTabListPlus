@@ -28,15 +28,17 @@ import net.md_5.bungee.api.config.ServerInfo;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FakePlayer implements Player {
+public class FakePlayer implements Player, codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer {
     private final String name;
     ServerInfo server;
     private int ping;
     private int gamemode;
     private Skin skin;
     private final UUID uuid;
+    private boolean randomServerSwitchEnabled;
 
-    public FakePlayer(String name, ServerInfo server) {
+    public FakePlayer(String name, ServerInfo server, boolean randomServerSwitchEnabled) {
+        this.randomServerSwitchEnabled = randomServerSwitchEnabled;
         this.ping = 0;
         this.gamemode = 0;
         this.skin = null;
@@ -75,14 +77,31 @@ public class FakePlayer implements Player {
         return gamemode;
     }
 
+    @Override
     public void setPing(int ping) {
         this.ping = ping;
+    }
+
+    @Override
+    public boolean isRandomServerSwitchEnabled() {
+        return randomServerSwitchEnabled;
+    }
+
+    @Override
+    public void setRandomServerSwitchEnabled(boolean value) {
+        randomServerSwitchEnabled = value;
     }
 
     public void setGamemode(int gamemode) {
         this.gamemode = gamemode;
     }
 
+    @Override
+    public void changeServer(ServerInfo newServer) {
+        server = newServer;
+    }
+
+    @Override
     public void setSkin(Skin skin) {
         this.skin = skin;
     }
