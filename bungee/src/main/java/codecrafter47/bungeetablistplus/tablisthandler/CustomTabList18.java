@@ -471,6 +471,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                         Team team = new Team(entry.getKey());
                         team.setMode((byte) 3);
                         team.setPlayers(entry.getValue().toArray(new String[entry.getValue().size()]));
+                        getPlayer().unsafe().sendPacket(team);
                     }
                 } else {
                     // remove players
@@ -478,6 +479,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                         Team team = new Team(entry.getKey());
                         team.setMode((byte) 4);
                         team.setPlayers(entry.getValue().toArray(new String[entry.getValue().size()]));
+                        getPlayer().unsafe().sendPacket(team);
                     }
                 }
             }
