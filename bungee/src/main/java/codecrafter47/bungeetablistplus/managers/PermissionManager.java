@@ -149,39 +149,58 @@ public class PermissionManager {
     }
 
     public int comparePlayers(IPlayer p1, IPlayer p2) {
-        {
+        String permissionSource = plugin.getConfigManager().getMainConfig().permissionSource;
+        if (permissionSource.equalsIgnoreCase("BungeePerms")) {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeePerms_Rank);
             Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeePerms_Rank);
-            if (p1Rank.isPresent() || p2Rank.isPresent()) {
-                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-            }
-        }
-
-        {
-            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.PermissionsEx_GroupRank);
-            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.PermissionsEx_GroupRank);
-            if (p1Rank.isPresent() || p2Rank.isPresent()) {
-                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-            }
-        }
-
-        {
+            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+        } else if (permissionSource.equalsIgnoreCase("Bukkit")) {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
             Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
-            if (p1Rank.isPresent() || p2Rank.isPresent()) {
-                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-            }
-        }
-
-        // BungeeCord
-        {
+            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+        } else if (permissionSource.equalsIgnoreCase("BukkitPermissionsEx")) {
+            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.PermissionsEx_GroupRank);
+            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.PermissionsEx_GroupRank);
+            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+        } else if (permissionSource.equalsIgnoreCase("Bungee")) {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeeCord_Rank);
             Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeeCord_Rank);
-            if (p1Rank.isPresent() || p2Rank.isPresent()) {
-                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+        } else {
+            {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeePerms_Rank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeePerms_Rank);
+                if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+                }
             }
+
+            {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.PermissionsEx_GroupRank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.PermissionsEx_GroupRank);
+                if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+                }
+            }
+
+            {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
+                if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+                }
+            }
+
+            // BungeeCord
+            {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeeCord_Rank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeeCord_Rank);
+                if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+                }
+            }
+            return 0;
         }
-        return 0;
     }
 
     int getBungeeCordRank(ProxiedPlayer player) {
