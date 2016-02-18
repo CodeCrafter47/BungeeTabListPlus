@@ -34,11 +34,13 @@ import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.managers.DataManager;
+import codecrafter47.bungeetablistplus.managers.DummySkinManager;
 import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
 import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
 import codecrafter47.bungeetablistplus.managers.RedisPlayerManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.managers.SkinManagerImpl;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
 import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import codecrafter47.bungeetablistplus.packet.LegacyPacketAccessImpl;
@@ -307,7 +309,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 }
             }
 
-            skins = new SkinManager(plugin, headsFolder);
+            skins = new SkinManagerImpl(plugin, headsFolder);
+        } else {
+            skins = new DummySkinManager();
         }
 
         fakePlayerManager = new FakePlayerManager(plugin);
