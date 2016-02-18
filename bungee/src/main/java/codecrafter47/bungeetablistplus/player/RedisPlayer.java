@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class RedisPlayer implements Player {
     private String name;
@@ -69,9 +70,13 @@ public class RedisPlayer implements Player {
 
     @Override
     public Optional<ServerInfo> getServer() {
-        if (server == null || System.currentTimeMillis() - lastServerLookup > 1000) {
-            server = RedisBungee.getApi().getServerFor(uuid);
-            lastServerLookup = System.currentTimeMillis();
+        try {
+            if (server == null || System.currentTimeMillis() - lastServerLookup > 1000) {
+                server = RedisBungee.getApi().getServerFor(uuid);
+                lastServerLookup = System.currentTimeMillis();
+            }
+        } catch (RuntimeException ex) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Error while trying to fetch the server of a player from RedisBungee", ex);
         }
         return Optional.ofNullable(server);
     }
