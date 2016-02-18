@@ -40,25 +40,40 @@ public class UpdateNotifier implements Runnable {
         if (!plugin.getConfigManager().getMainConfig().notifyAdminsIfUpdateAvailable) {
             return;
         }
-        if (!plugin.isUpdateAvailable()) {
+        if (!plugin.isUpdateAvailable() && !plugin.isNewDevBuildAvailable()) {
             return;
         }
         plugin.runInMainThread(() -> {
             for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
                 if (plugin.getPermissionManager().hasPermission(player,
                         "bungeetablistplus.admin")) {
-                    player.sendMessage(getPrefix().append(
-                            "A new version is available. Download ").color(
-                            ChatColor.GOLD).append("here").color(
-                            ChatColor.LIGHT_PURPLE).
-                            underlined(true).event(
-                            new ClickEvent(ClickEvent.Action.OPEN_URL,
-                                    "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
-                            create());
+                    if (plugin.isUpdateAvailable()) {
+                        player.sendMessage(getPrefix().append(
+                                "A new version is available. Download ").color(
+                                ChatColor.GOLD).append("here").color(
+                                ChatColor.LIGHT_PURPLE).
+                                underlined(true).event(
+                                new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                        "http://www.spigotmc.org/resources/bungeetablistplus.313/")).
+                                create());
+                    } else {
+                        player.sendMessage(getPrefix().append(
+                                "A new dev-build is available. Download ").color(
+                                ChatColor.GOLD).append("here").color(
+                                ChatColor.LIGHT_PURPLE).
+                                underlined(true).event(
+                                new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                        "http://ci.codecrafter47.dyndns.eu/job/BungeeTabListPlus/")).
+                                create());
+                    }
                 }
             }
         });
-        plugin.getLogger().info("A new version of BungeeTabListPlus is available. Download from http://www.spigotmc.org/resources/bungeetablistplus.313/");
+        if (plugin.isUpdateAvailable()) {
+            plugin.getLogger().info("A new version of BungeeTabListPlus is available. Download from http://www.spigotmc.org/resources/bungeetablistplus.313/");
+        } else {
+            plugin.getLogger().info("A new dev-build is available at http://ci.codecrafter47.dyndns.eu/job/BungeeTabListPlus/");
+        }
     }
 
     private ComponentBuilder getPrefix() {

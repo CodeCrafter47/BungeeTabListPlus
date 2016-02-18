@@ -694,6 +694,10 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return updateChecker != null && updateChecker.isUpdateAvailable();
     }
 
+    public boolean isNewDevBuildAvailable() {
+        return updateChecker != null && updateChecker.isNewDevBuildAvailable();
+    }
+
     public void reportError(Throwable th) {
         plugin.getLogger().log(Level.SEVERE,
                 ChatColor.RED + "An internal error occurred! Please send the "

@@ -36,6 +36,7 @@ public class UpdateChecker implements Runnable {
     private final Plugin plugin;
 
     private boolean updateAvailable = false;
+    private boolean newDevBuildAvailable = false;
 
     private static final long interval = 120;
 
@@ -101,7 +102,7 @@ public class UpdateChecker implements Runnable {
                 plugin.getLogger().info("A new version of BungeeTabListPlus (" + newVersion + ") is available. Download from http://www.spigotmc.org/resources/bungeetablistplus.313/");
             }
 
-            if (!updateAvailable && runningVersion.endsWith("-SNAPSHOT")) {
+            if (!updateAvailable && !newDevBuildAvailable && runningVersion.endsWith("-SNAPSHOT")) {
                 // Check whether there is a new dev-build available
                 try {
                     Properties current = new Properties();
@@ -115,6 +116,7 @@ public class UpdateChecker implements Runnable {
                         if (!latestVersion.isEmpty() && !latestVersion.equals("unknown")) {
                             int latestBuildNumber = Integer.valueOf(latestVersion);
                             if (latestBuildNumber > buildNumber) {
+                                newDevBuildAvailable = true;
                                 plugin.getLogger().info("A new dev-build is available at http://ci.codecrafter47.dyndns.eu/job/BungeeTabListPlus/");
                             }
                         }
@@ -170,5 +172,9 @@ public class UpdateChecker implements Runnable {
 
     public boolean isUpdateAvailable() {
         return updateAvailable;
+    }
+
+    public boolean isNewDevBuildAvailable() {
+        return newDevBuildAvailable;
     }
 }
