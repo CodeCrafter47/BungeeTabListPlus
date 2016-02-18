@@ -178,7 +178,7 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
     public List<IPlayer> getPlayers() {
         List<IPlayer> bukkitPlayers = new ArrayList<>();
         for (String s : bukkitplayers) {
-            bukkitPlayers.add(new FakePlayer(s, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null, randomServerSwitchEnabled));
+            bukkitPlayers.add(new FakePlayer(s, getPlayer().getServer() != null ? getPlayer().getServer().getInfo() : null, false));
         }
         return bukkitPlayers;
     }
