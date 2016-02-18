@@ -32,6 +32,7 @@ import com.google.common.collect.Sets;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
@@ -284,6 +285,13 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     public void onDisconnect() {
         if (connectedPlayer != null) {
             BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerDisconnected(connectedPlayer);
+
+            // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
+            Server server = getPlayer().getServer();
+            if (server != null) {
+                server.disconnect("Quitting");
+            }
+            ((UserConnection) getPlayer()).setServer(null);
         }
     }
 
