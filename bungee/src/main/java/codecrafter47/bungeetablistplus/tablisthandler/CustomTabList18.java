@@ -428,7 +428,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
         try {
             if (packet.getMode() == 0 || packet.getMode() == 3) {
                 // add players
-                Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches()).collect(Collectors.toSet());
+                Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches() || bukkitplayers.containsKey(player)).collect(Collectors.toSet());
                 if (!humanPlayers.isEmpty()) {
                     teamToPlayerMap.putAll(packet.getName(), humanPlayers);
                     if (!allowTeamPackets) {
@@ -440,7 +440,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                 }
             } else if (packet.getMode() == 4) {
                 // remove players
-                Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches()).collect(Collectors.toSet());
+                Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches() || teamToPlayerMap.containsEntry(packet.getName(), player)).collect(Collectors.toSet());
                 if (!humanPlayers.isEmpty()) {
                     for (String humanPlayer : humanPlayers) {
                         teamToPlayerMap.remove(packet.getName(), humanPlayer);
