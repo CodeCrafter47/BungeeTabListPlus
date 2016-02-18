@@ -25,6 +25,26 @@ public final class FastChat {
     private final static String emptyJsonText = "{\"text\":\"\"}";
 
     public static String legacyTextToJson(String legacyText, char alternateColorChar) {
+        // evil optimizations
+        StringBuilder builder = new StringBuilder(legacyText.length() + 10);
+        builder.append("{\"text\":\"");
+        for (int i = 0; i < legacyText.length(); ++i) {
+            char c = legacyText.charAt(i);
+            if (i + 1 < legacyText.length() && (c == ChatColor.COLOR_CHAR || (c == alternateColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(legacyText.charAt(i + 1)) > -1))) {
+                builder.append(ChatColor.COLOR_CHAR);
+                c = legacyText.charAt(++i);
+            }
+            if (c == '"') {
+                builder.append("\\\"");
+            } else if (c == '\\') {
+                builder.append("\\\\");
+            } else {
+                builder.append(c);
+            }
+        }
+        builder.append("\"}");
+        return new String(builder);
+        /*
         StringBuilder jsonBuilder = new StringBuilder("{\"text\":\"\",\"extra\":[");
         StringBuilder builder = new StringBuilder();
         boolean bold = false;
@@ -143,5 +163,6 @@ public final class FastChat {
 
         jsonBuilder.append("]}");
         return jsonBuilder.toString();
+        */
     }
 }
