@@ -44,11 +44,11 @@ public class ScoreboardTabList implements TabListHandler {
         return String.valueOf(ChatColor.MAGIC) + String.valueOf(alloc) + ChatColor.RESET;
     }
 
-    private final int[] slots_ping = new int[160];
+    private int[] slots_ping = new int[60];
 
     private int sendSlots = 0;
 
-    private final String[] send = new String[160];
+    private String[] send = new String[60];
 
     public ScoreboardTabList(PlayerTablistHandler playerTablistHandler) {
         this.playerTablistHandler = playerTablistHandler;
@@ -85,6 +85,16 @@ public class ScoreboardTabList implements TabListHandler {
     }
 
     private void resize(int size) {
+        if (size > send.length) {
+            String[] send1 = new String[size];
+            System.arraycopy(send, 0, send1, 0, send.length);
+            send = send1;
+        }
+        if (size > slots_ping.length) {
+            int[] slots_ping1 = new int[size];
+            System.arraycopy(slots_ping, 0, slots_ping1, 0, slots_ping.length);
+            slots_ping = slots_ping1;
+        }
         if (size == sendSlots) {
             return;
         }

@@ -37,9 +37,9 @@ public class MyTabList implements TabListHandler {
     /* ======================================================================== */
     private final Collection<String> sentStuff = new HashSet<>();
     /* ======================================================================== */
-    private final String[] sent = new String[160];
-    private final String[] slots = new String[160];
-    private final int[] slots_ping = new int[160];
+    private String[] sent = new String[60];
+    private String[] slots = new String[60];
+    private int[] slots_ping = new int[60];
     private int rowLim;
     private final PlayerTablistHandler playerTablistHandler;
 
@@ -62,6 +62,23 @@ public class MyTabList implements TabListHandler {
 
     @Override
     public void sendTabList(TabList tabList) {
+        int size = tabList.getUsedSlots();
+        if (size > sent.length) {
+            String[] send1 = new String[size];
+            System.arraycopy(sent, 0, send1, 0, sent.length);
+            sent = send1;
+        }
+        if (size > slots.length) {
+            String[] slots1 = new String[size];
+            System.arraycopy(slots, 0, slots1, 0, slots.length);
+            slots = slots1;
+        }
+        if (size > slots_ping.length) {
+            int[] slots_ping1 = new int[size];
+            System.arraycopy(slots_ping, 0, slots_ping1, 0, slots_ping.length);
+            slots_ping = slots_ping1;
+        }
+
         clear();
 
         int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
@@ -152,7 +169,7 @@ public class MyTabList implements TabListHandler {
 
     @Override
     public void unload() {
-        for (int i = 0; i < ConfigManager.getTabSize(); i++) {
+        for (int i = 0; i < sent.length; i++) {
             if (sent[i] != null) {
                 BungeeTabListPlus.getInstance().getLegacyPacketAccess().removePlayer(
                         playerTablistHandler.getPlayer().unsafe(), sent[i]);
