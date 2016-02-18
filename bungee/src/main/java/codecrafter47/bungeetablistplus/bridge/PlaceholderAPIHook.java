@@ -60,14 +60,14 @@ public class PlaceholderAPIHook implements Listener {
     public void askForPlaceholders(ServerInfo server) {
         if (bungeeTabListPlus.getBridge().get(server, BTLPDataKeys.PLACEHOLDERAPI_PRESENT).orElse(false)) {
             for (String placeholder : placeholdersToCheck) {
-                if (!registeredPlaceholders.contains(placeholder)) {
+                if (!registeredPlaceholders.contains(placeholder) && !server.getPlayers().isEmpty()) {
                     try {
                         ByteArrayOutputStream os = new ByteArrayOutputStream();
                         ObjectOutputStream out = new ObjectOutputStream(os);
                         out.writeUTF(Constants.subchannelPlaceholder);
                         out.writeUTF(placeholder);
                         out.close();
-                        server.sendData(Constants.channel, os.toByteArray(), false);
+                        server.sendData(Constants.channel, os.toByteArray());
                     } catch (Throwable th) {
                         bungeeTabListPlus.reportError(th);
                     }

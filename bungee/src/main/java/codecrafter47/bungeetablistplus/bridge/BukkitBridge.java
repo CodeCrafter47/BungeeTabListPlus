@@ -188,7 +188,7 @@ public class BukkitBridge implements Listener {
         Optional<T> value = data.getValue(key);
         if (!value.isPresent()) {
             Set<DataKey> requestedData = data.getRequestedData();
-            if (!requestedData.contains(key)) {
+            if (!requestedData.contains(key) && !server.getPlayers().isEmpty()) {
                 requestedData.add(key);
                 try {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -196,7 +196,7 @@ public class BukkitBridge implements Listener {
                     out.writeUTF(Constants.subchannelRequestServerVariable);
                     out.writeObject(key);
                     out.close();
-                    server.sendData(Constants.channel, os.toByteArray(), false);
+                    server.sendData(Constants.channel, os.toByteArray());
                 } catch (IOException ex) {
                     plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
                 }
