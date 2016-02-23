@@ -221,8 +221,8 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                 }
             }
 
-            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
-                    contains(getPlayer().getServer().getInfo().getName()) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
+            if ((getPlayer().getServer() != null && BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
+                    contains(getPlayer().getServer().getInfo().getName())) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
                 if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
                     // don't send gamemode 3
                     if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.UPDATE_GAMEMODE)) {
