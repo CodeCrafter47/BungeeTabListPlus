@@ -79,7 +79,7 @@ public class TeamPacket extends Team {
         try {
             super.handle(handler);
         } catch (Throwable th) {
-            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "An error has occurred in BungeePerms while handling a scoreboard packet. This is a serious issue and may lead to a client crash.", th);
+            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "An error has occurred while handling a scoreboard packet. This is a serious issue and may lead to a client crash. The issue is caused by one of you bukkit plugins.", th);
         } finally {
             try {
                 if (modified) {
