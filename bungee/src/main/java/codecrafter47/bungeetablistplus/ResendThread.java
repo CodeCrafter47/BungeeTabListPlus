@@ -106,8 +106,9 @@ class ResendThread implements Runnable, Executor {
                             BungeeTabListPlus.getInstance().getLogger().severe("tabListHandler for " + player.getName() + " has been changed. It now is " + tabList.getClass() + " by " + tabList.getClass().getClassLoader());
                         }
                     }
+                } else {
+                    set.clear();
                 }
-                set.clear();
             } catch (InterruptedException ex) {
                 break;
             } catch (Throwable th) {
