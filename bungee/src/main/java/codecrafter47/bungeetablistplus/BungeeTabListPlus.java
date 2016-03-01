@@ -47,7 +47,7 @@ import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import codecrafter47.bungeetablistplus.packet.LegacyPacketAccessImpl;
 import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.packet.PacketAccessImpl;
-import codecrafter47.bungeetablistplus.packet.TeamPacket;
+import codecrafter47.bungeetablistplus.packet.v1_8.TeamPacket;
 import codecrafter47.bungeetablistplus.placeholder.BasicPlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.BukkitPlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.ColorPlaceholder;
@@ -173,6 +173,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private UpdateChecker updateChecker = null;
 
     static private boolean is18 = true;
+
+    static private boolean is19 = true;
 
     static private boolean isAbove995 = false;
 
@@ -415,7 +417,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                     getId.setAccessible(true);
                     registerPacket.setAccessible(true);
                     registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, getId.invoke(Protocol.GAME.TO_CLIENT, Team.class, maxProtocolVersion), TeamPacket.class);
+                    is19 = true;
                 } else {
+                    is19 = false;
                     // 1.8
                     Class<Protocol.DirectionData> clazz = Protocol.DirectionData.class;
                     Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, Class.class);
@@ -788,5 +792,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     protected void removeCustomTabList0(ProxiedPlayer player) {
         Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
         getTabListManager().removeCustomTabList(player);
+    }
+
+    public static boolean isVersion19() {
+        return is19;
     }
 }

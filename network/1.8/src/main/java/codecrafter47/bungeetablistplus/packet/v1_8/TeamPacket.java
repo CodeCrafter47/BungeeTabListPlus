@@ -17,11 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.packet;
+package codecrafter47.bungeetablistplus.packet.v1_8;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
+import codecrafter47.bungeetablistplus.packet.TeamPacketHandler;
+import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.connection.CancelSendSignal;
 import net.md_5.bungee.connection.DownstreamBridge;
 import net.md_5.bungee.protocol.AbstractPacketHandler;
@@ -29,6 +31,7 @@ import net.md_5.bungee.protocol.packet.Team;
 
 import java.lang.reflect.Field;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TeamPacket extends Team {
     private static Field playerField = null;
@@ -42,6 +45,11 @@ public class TeamPacket extends Team {
 
     public TeamPacket(String name, byte mode, String displayName, String prefix, String suffix, String nameTagVisibility, byte color, byte friendlyFire, String[] players) {
         super(name, mode, displayName, prefix, suffix, nameTagVisibility, color, friendlyFire, players);
+    }
+
+    private static Logger getLogger() {
+        Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugin("BungeeTabListPlus");
+        return plugin != null ? plugin.getLogger() : ProxyServer.getInstance().getLogger();
     }
 
     @Override
@@ -59,27 +67,29 @@ public class TeamPacket extends Team {
                             break;
                         } catch (IllegalAccessException ex) {
                             if (i == 4) {
-                                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler", ex);
+                                getLogger().log(Level.SEVERE, "Failed to access player object in TeamPacketHandler", ex);
                             }
                         }
                     }
                     if (player != null) {
-                        Object tabList = BungeeTabListPlus.getTabList(player);
-                        if (tabList instanceof CustomTabList18) {
-                            modified = ((CustomTabList18) tabList).onTeamPacket(this);
+                        Field field = UserConnection.class.getDeclaredField("tabListHandler");
+                        field.setAccessible(true);
+                        Object tabList = field.get(player);
+                        if (tabList instanceof TeamPacketHandler) {
+                            modified = ((TeamPacketHandler) tabList).onTeamPacket(this);
                         }
                     }
                 } else {
-                    BungeeTabListPlus.getInstance().getLogger().severe("Could not get player for " + handler);
+                    getLogger().severe("Could not get player for " + handler);
                 }
             }
         } catch (Throwable th) {
-            BungeeTabListPlus.getInstance().reportError(th);
+            getLogger().log(Level.SEVERE, "Unexpected Exception", th);
         }
         try {
             super.handle(handler);
         } catch (Throwable th) {
-            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "An error has occurred while handling a scoreboard packet. This is a serious issue and may lead to a client crash. The issue is caused by one of you bukkit plugins.", th);
+            getLogger().log(Level.WARNING, "An error has occurred while handling a scoreboard packet. This is a serious issue and may lead to a client crash. The issue is caused by one of you bukkit plugins.", th);
         } finally {
             try {
                 if (modified) {
@@ -87,13 +97,13 @@ public class TeamPacket extends Team {
                         player.unsafe().sendPacket(this);
                         throw CancelSendSignal.INSTANCE;
                     } else {
-                        BungeeTabListPlus.getInstance().getLogger().severe("Packet " + this + " has been modified but player is null");
+                        getLogger().severe("Packet " + this + " has been modified but player is null");
                     }
                 }
             } catch (CancelSendSignal e) {
                 throw e;
             } catch (Throwable th) {
-                BungeeTabListPlus.getInstance().reportError(th);
+                getLogger().log(Level.SEVERE, "Unexpected Exception", th);
             }
         }
     }

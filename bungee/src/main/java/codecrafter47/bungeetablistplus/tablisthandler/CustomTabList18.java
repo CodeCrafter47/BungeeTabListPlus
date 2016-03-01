@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.packet.TeamPacketHandler;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
 /**
  * @author Florian Stober
  */
-public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements PlayerTablistHandler {
+public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements PlayerTablistHandler, TeamPacketHandler {
     protected TabListHandler tabListHandler;
     boolean isExcluded = false;
     private ConnectedPlayer connectedPlayer = null;
@@ -425,12 +426,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
         }
     }
 
-    /**
-     * listener method to team packets sent to the client
-     *
-     * @param packet the packet
-     * @return whether the packet has been modified
-     */
+    @Override
     public boolean onTeamPacket(Team packet) {
         boolean modified = false;
         teamLock.lock();

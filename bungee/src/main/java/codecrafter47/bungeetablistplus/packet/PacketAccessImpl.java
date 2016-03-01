@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.packet;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.packet.v1_8.InjectedTabHeaderPacketAccess;
 import codecrafter47.bungeetablistplus.packet.v1_8.TabHeaderPacketAccess18;
 import net.md_5.bungee.api.connection.Connection;
@@ -93,6 +94,9 @@ public class PacketAccessImpl implements PacketAccess {
             team.setPrefix("");
             team.setSuffix("");
             team.setPlayers(new String[]{player});
+            if (BungeeTabListPlus.isVersion19()) {
+                team.setCollisionRule("always");
+            }
             createdTeams.add(team);
         }
 
