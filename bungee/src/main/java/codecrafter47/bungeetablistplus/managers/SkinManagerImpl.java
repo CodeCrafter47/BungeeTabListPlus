@@ -230,6 +230,7 @@ public class SkinManagerImpl implements SkinManager {
             plugin.getLogger().log(Level.WARNING, "An error occurred while trying to contact skinservice.codecrafter47.dyndns.eu", ex);
             plugin.getLogger().warning("Unable to prepare head " + file.getName());
             fileSkinCache.put(file, missingSkinTexture);
+            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> fileSkinCache.remove(file, missingSkinTexture), 30, TimeUnit.SECONDS);
         }
     }
 
