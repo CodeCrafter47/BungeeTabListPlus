@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import codecrafter47.bungeetablistplus.util.FastChat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -404,7 +405,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                         PlayerListItem.Item item = new PlayerListItem.Item();
                         item.setUuid(entry.getKey());
                         item.setUsername(entry.getValue());
-                        item.setDisplayName(entry.getValue());
+                        item.setDisplayName(FastChat.legacyTextToJson(entry.getValue(), '&'));
                         return item;
                     }).toArray(PlayerListItem.Item[]::new));
             getPlayer().unsafe().sendPacket(packet);
