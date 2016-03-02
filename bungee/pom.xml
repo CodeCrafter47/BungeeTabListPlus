@@ -40,6 +40,12 @@
             <artifactId>BungeePerms</artifactId>
             <version>3.0-alpha-1</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.md-5</groupId>
+                    <artifactId>bungeecord-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.imaginarycode.minecraft</groupId>
