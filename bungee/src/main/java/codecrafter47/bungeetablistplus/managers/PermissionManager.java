@@ -230,7 +230,7 @@ public class PermissionManager {
         }
 
         String prefix = getConfigPrefix(context, player);
-        if (prefix != null) {
+        if (!prefix.isEmpty()) {
             return prefix;
         }
         return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse("")));
