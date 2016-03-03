@@ -25,13 +25,18 @@ import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
+import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
+import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import gnu.trove.set.hash.THashSet;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -103,7 +108,7 @@ class ResendThread implements Runnable, Executor {
                             PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
                             update(tablistHandler);
                         } else {
-                            BungeeTabListPlus.getInstance().getLogger().severe("tabListHandler for " + player.getName() + " has been changed. It now is " + tabList.getClass() + " by " + tabList.getClass().getClassLoader());
+                            BungeeTabListPlus.getInstance().getLogger().severe("tabListHandler for " + player.getName() + " has been changed. It now is " + tabList.getClass() + " by " + tabList.getClass().getClassLoader() + ". More info below:\n" + collectClassLoaderInfo(tabList));
                         }
                     }
                 } else {
@@ -179,4 +184,57 @@ class ResendThread implements Runnable, Executor {
         }
     }
 
+    private String collectClassLoaderInfo(Object object) {
+        StringBuilder info = new StringBuilder();
+        info.append("********************************************************************************\n");
+        info.append("Found: ").append(object.toString()).append("\n");
+        appendClassInfo("  ", object.getClass(), info);
+        info.append("Expected: \n");
+        if (BungeeTabListPlus.isVersion18()) {
+            appendClassInfo("  ", CustomTabList18.class, info);
+        } else {
+            appendClassInfo("  ", CustomTabListHandler.class, info);
+        }
+        info.append("Expected Interface: \n");
+        appendClassInfo("  ", PlayerTablistHandler.class, info);
+        Plugin plugin = BungeeTabListPlus.getInstance().getPlugin();
+        if (plugin != null) {
+            info.append("Plugin instance: ").append(plugin.toString()).append("\n");
+            appendClassInfo("  ", plugin.getClass(), info);
+        }
+        plugin = ProxyServer.getInstance().getPluginManager().getPlugin("BungeeTabListPlus");
+        if (plugin != null) {
+            info.append("Registered Plugin instance: ").append(plugin.toString()).append("\n");
+            appendClassInfo("  ", plugin.getClass(), info);
+        }
+        BungeeTabListPlus bungeeTabListPlus = BungeeTabListPlus.getInstance();
+        if (bungeeTabListPlus != null) {
+            info.append("BungeeTabListPlus instance: ").append(bungeeTabListPlus.toString()).append("\n");
+            appendClassInfo("  ", bungeeTabListPlus.getClass(), info);
+        }
+        info.append("********************************************************************************\n");
+        return info.toString();
+    }
+
+    private void appendClassInfo(String prefix, Class clazz, StringBuilder info) {
+        info.append(prefix).append("type: ").append(clazz).append("\n");
+        info.append(prefix).append("classloader: ").append(clazz.getClassLoader()).append("\n");
+        info.append(prefix).append("file: ").append(getSourceFile(clazz)).append("\n");
+        Class superclass = clazz.getSuperclass();
+        if (superclass != null && !superclass.equals(Object.class)) {
+            info.append(prefix).append("super:").append("\n");
+            appendClassInfo(prefix + "  ", superclass, info);
+        }
+        Class[] interfaces = clazz.getInterfaces();
+        if (interfaces != null) {
+            for (Class anInterface : interfaces) {
+                info.append(prefix).append("interface:").append("\n");
+                appendClassInfo(prefix + "  ", anInterface, info);
+            }
+        }
+    }
+
+    private String getSourceFile(Class clazz) {
+        return Optional.ofNullable(clazz.getProtectionDomain().getCodeSource()).map(cs -> cs.getLocation().toString()).orElse("null");
+    }
 }
