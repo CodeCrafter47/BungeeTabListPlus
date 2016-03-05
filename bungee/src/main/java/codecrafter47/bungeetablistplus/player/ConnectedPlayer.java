@@ -88,9 +88,12 @@ public class ConnectedPlayer implements Player {
             LoginResult loginResult = ((UserConnection) player).
                     getPendingConnection().getLoginProfile();
             if (loginResult != null) {
-                for (LoginResult.Property s : loginResult.getProperties()) {
-                    if (s.getName().equals("textures")) {
-                        skin = new PlayerSkin(player.getUniqueId(), new String[]{s.getName(), s.getValue(), s.getSignature()});
+                LoginResult.Property[] properties = loginResult.getProperties();
+                if (properties != null) {
+                    for (LoginResult.Property s : properties) {
+                        if (s.getName().equals("textures")) {
+                            skin = new PlayerSkin(player.getUniqueId(), new String[]{s.getName(), s.getValue(), s.getSignature()});
+                        }
                     }
                 }
             }
