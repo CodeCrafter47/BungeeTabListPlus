@@ -25,7 +25,7 @@ import java.util.OptionalInt;
 
 public class ColumnSplitSection extends Section {
 
-    private final PlayerColumn[] pc = new PlayerColumn[10];
+    private PlayerColumn[] pc = new PlayerColumn[10];
     private int columns = 10;
 
     @Override
@@ -64,6 +64,11 @@ public class ColumnSplitSection extends Section {
     }
 
     public void addColumn(int i, PlayerColumn column) {
+        if (i >= pc.length) {
+            PlayerColumn[] playerColumns = new PlayerColumn[i + 1];
+            System.arraycopy(pc, 0, playerColumns, 0, pc.length);
+            pc = playerColumns;
+        }
         pc[i] = column;
     }
 
@@ -72,6 +77,9 @@ public class ColumnSplitSection extends Section {
         int column = pos % columns;
         int sizePerCol = size / columns;
         int columnPos = pos / columns;
+        if (column >= pc.length) {
+            return null;
+        }
         PlayerColumn playerColumn = pc[column];
         if (playerColumn != null) {
             int span = 1;
