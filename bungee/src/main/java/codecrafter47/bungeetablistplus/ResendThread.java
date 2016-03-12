@@ -32,6 +32,7 @@ import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Collections;
@@ -124,13 +125,11 @@ class ResendThread implements Runnable, Executor {
 
     private void update(PlayerTablistHandler tablistHandler) {
         try {
-            if (tablistHandler.getPlayer().getServer() != null) {
-                if (BungeeTabListPlus.getInstance().getConfigManager().
-                        getMainConfig().excludeServers.contains(tablistHandler.getPlayer().
-                        getServer().getInfo().getName()) || tablistHandler.isExcluded()) {
-                    tablistHandler.unload();
-                    return;
-                }
+            Server server = tablistHandler.getPlayer().getServer();
+            if (server != null && (BungeeTabListPlus.getInstance().getConfigManager().
+                    getMainConfig().excludeServers.contains(server.getInfo().getName()) || tablistHandler.isExcluded())) {
+                tablistHandler.unload();
+                return;
             }
 
             TabListProvider tlp = BungeeTabListPlus.getInstance().
