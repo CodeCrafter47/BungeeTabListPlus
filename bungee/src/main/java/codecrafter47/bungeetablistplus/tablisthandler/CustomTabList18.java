@@ -337,11 +337,13 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                     LoginResult loginResult = player.getPendingConnection().getLoginProfile();
                     if (loginResult != null) {
                         LoginResult.Property[] properties = loginResult.getProperties();
-                        for (LoginResult.Property property : properties) {
-                            if (property.getSignature() != null) {
-                                loginProperties.putIfAbsent(property.getName(), new String[]{property.getName(), property.getValue(), property.getSignature()});
-                            } else {
-                                loginProperties.putIfAbsent(property.getName(), new String[]{property.getName(), property.getValue()});
+                        if (properties != null) {
+                            for (LoginResult.Property property : properties) {
+                                if (property.getSignature() != null) {
+                                    loginProperties.putIfAbsent(property.getName(), new String[]{property.getName(), property.getValue(), property.getSignature()});
+                                } else {
+                                    loginProperties.putIfAbsent(property.getName(), new String[]{property.getName(), property.getValue()});
+                                }
                             }
                         }
                     }
