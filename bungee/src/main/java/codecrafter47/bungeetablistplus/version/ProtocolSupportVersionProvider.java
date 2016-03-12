@@ -28,6 +28,10 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
     public int getProtocolVersion(ProxiedPlayer player) {
         ProtocolVersion protocolVersion = ProtocolSupportAPI.getProtocolVersion(player);
         switch (protocolVersion) {
+            case MINECRAFT_FUTURE:
+                return Integer.MAX_VALUE;
+            case MINECRAFT_1_9:
+                return 107;
             case MINECRAFT_1_8:
                 return 47;
             case MINECRAFT_1_7_10:
@@ -36,7 +40,11 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
                 return 4;
             case MINECRAFT_1_6_4:
             case MINECRAFT_1_6_2:
+            case MINECRAFT_1_6_1:
             case MINECRAFT_1_5_2:
+            case MINECRAFT_1_5_1:
+            case MINECRAFT_1_4_7:
+            case MINECRAFT_LEGACY:
                 return -1;
             case UNKNOWN:
             default:
