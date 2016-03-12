@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.Player;
+import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -34,14 +35,14 @@ public class BukkitPlaceholders extends PlaceholderProvider {
     public void setup() {
         bind("world").to(context -> {
             Optional<String> world = ((Player) context.getPlayer()).get(DataKeys.World);
-            if (!world.isPresent()) {
-                return "";
+            Optional<ServerInfo> server = context.getPlayer().getServer();
+            if (world.isPresent() && server.isPresent()) {
+                String key = server.get().getName() + ":" + world.get();
+                String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().worldAlias.get(key);
+                if (alias != null) return alias;
+                return world.get();
             }
-            if (!context.getPlayer().getServer().isPresent()) return "";
-            String key = context.getPlayer().getServer().get().getName() + ":" + world.get();
-            String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().worldAlias.get(key);
-            if (alias != null) return alias;
-            return world.get();
+            return "";
         });
         addBukkitBridgePlaceholder("team", DataKeys.Team);
         addBukkitBridgePlaceholder("balance", DataKeys.Vault_Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
