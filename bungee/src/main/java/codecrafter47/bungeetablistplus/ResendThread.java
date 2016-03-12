@@ -29,11 +29,13 @@ import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
 import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.netty.ChannelWrapper;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -107,7 +109,15 @@ class ResendThread implements Runnable, Executor {
                         Object tabList = BungeeTabListPlus.getTabList(player);
                         if (tabList instanceof PlayerTablistHandler) {
                             PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
-                            update(tablistHandler);
+                            ChannelWrapper ch = null;
+                            try {
+                                ch = ReflectionUtil.getChannelWrapper(player);
+                            } catch (NoSuchFieldException | IllegalAccessException e) {
+                                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "failed to get ChannelWrapper for player", e);
+                            }
+                            if (ch != null) {
+                                ch.getHandle().eventLoop().submit(() -> update(tablistHandler)).await();
+                            }
                         } else {
                             BungeeTabListPlus.getInstance().getLogger().severe("tabListHandler for " + player.getName() + " has been changed. It now is " + tabList.getClass() + " by " + tabList.getClass().getClassLoader() + ". More info below:\n" + collectClassLoaderInfo(tabList));
                         }
@@ -127,18 +137,20 @@ class ResendThread implements Runnable, Executor {
         try {
             Server server = tablistHandler.getPlayer().getServer();
             if (server != null && (BungeeTabListPlus.getInstance().getConfigManager().
-                    getMainConfig().excludeServers.contains(server.getInfo().getName()) || tablistHandler.isExcluded())) {
-                tablistHandler.unload();
-                return;
+                    getMainConfig().excludeServers.contains(server.getInfo().getName()))) {
+                tablistHandler.exclude();
             }
 
             TabListProvider tlp = BungeeTabListPlus.getInstance().
                     getTabListManager().getTabListForPlayer(tablistHandler.getPlayer());
             if (tlp == null) {
                 tablistHandler.exclude();
-                tablistHandler.unload();
+            }
+
+            if (tablistHandler.isExcluded()) {
                 return;
             }
+
             TabList tabList;
 
             if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {

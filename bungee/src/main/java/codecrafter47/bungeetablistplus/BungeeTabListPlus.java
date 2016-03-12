@@ -558,7 +558,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * @return an instance of the PlayerManager or null
      */
     public PlayerManager constructPlayerManager(ProxiedPlayer viewer) {
-        failIfNotMainThread();
         return new PlayerManagerImpl(this, playerProviders, viewer);
     }
 

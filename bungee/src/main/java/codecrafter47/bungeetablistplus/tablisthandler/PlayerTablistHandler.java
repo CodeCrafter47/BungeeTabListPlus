@@ -33,8 +33,6 @@ public interface PlayerTablistHandler {
 
     boolean isExcluded();
 
-    void unload();
-
     void exclude();
 
     ProxiedPlayer getPlayer();

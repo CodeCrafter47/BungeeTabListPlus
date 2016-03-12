@@ -136,18 +136,21 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
     }
 
     public void exclude() {
-        isExcluded = true;
-        synchronized (bukkitplayers) {
-            synchronized (usernames) {
-                for (String s : bukkitplayers) {
-                    if (!usernames.contains(s)) {
-                        BungeeTabListPlus.getInstance().getLegacyPacketAccess().
-                                createOrUpdatePlayer(getPlayer().unsafe(), s, 0);
-                        usernames.add(s);
+        if (!isExcluded) {
+            synchronized (bukkitplayers) {
+                synchronized (usernames) {
+                    for (String s : bukkitplayers) {
+                        if (!usernames.contains(s)) {
+                            BungeeTabListPlus.getInstance().getLegacyPacketAccess().
+                                    createOrUpdatePlayer(getPlayer().unsafe(), s, 0);
+                            usernames.add(s);
+                        }
                     }
                 }
             }
+            tabListHandler.unload();
         }
+        isExcluded = true;
     }
 
     @Override
@@ -167,11 +170,6 @@ public class CustomTabListHandler extends TabListAdapter implements PlayerTablis
     @Override
     public boolean isExcluded() {
         return isExcluded;
-    }
-
-    @Override
-    public void unload() {
-        tabListHandler.unload();
     }
 
     @Override

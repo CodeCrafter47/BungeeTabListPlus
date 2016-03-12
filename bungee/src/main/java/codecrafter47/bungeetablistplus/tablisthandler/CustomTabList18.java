@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.util.FastChat;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -37,6 +38,7 @@ import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.connection.LoginResult;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
@@ -52,6 +54,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -70,6 +73,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     private final Multimap<String, String> teamToPlayerMap = MultimapBuilder.hashKeys().arrayListValues().build();
     private final ReentrantLock teamLock = new ReentrantLock();
     private boolean allowTeamPackets = true;
+    private boolean afterServerSwitch = true;
 
     private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
 
@@ -88,8 +92,22 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
         return connectedPlayer;
     }
 
+    public void failIfNotInEventLoop() {
+        ChannelWrapper ch;
+        try {
+            ch = ReflectionUtil.getChannelWrapper(getPlayer());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "failed to get ChannelWrapper for player", e);
+            return;
+        }
+        if (!ch.getHandle().eventLoop().inEventLoop()) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "failed to get ChannelWrapper for player", new IllegalStateException("not in event loop"));
+        }
+    }
+
     @Override
     public void onServerChange() {
+        failIfNotInEventLoop();
         try {
             // remove all those names from the clients tab, he's on another server now
             synchronized (bukkitplayers) {
@@ -130,6 +148,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                 usernames.clear();
             }
             isExcluded = false;
+            afterServerSwitch = true;
             teamLock.lock();
             try {
                 teamToPlayerMap.clear();
@@ -143,28 +162,48 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public void exclude() {
-        isExcluded = true;
-        // only 1.7 clients
-        if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47) {
-            synchronized (bukkitplayers) {
-                synchronized (usernames) {
-                    for (String s : bukkitplayers.keySet()) {
-                        if (!usernames.contains(s)) {
-                            PlayerListItem pli = new PlayerListItem();
-                            pli.setAction(PlayerListItem.Action.ADD_PLAYER);
-                            PlayerListItem.Item item = new PlayerListItem.Item();
-                            item.setPing(0);
-                            item.setUsername(s);
-                            item.setProperties(new String[0][0]);
-                            pli.setItems(new PlayerListItem.Item[]{item});
-                            getPlayer().unsafe().sendPacket(pli);
-                            usernames.add(s);
+        failIfNotInEventLoop();
+        if (!isExcluded()) {
+            // only 1.7 clients
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47) {
+                synchronized (bukkitplayers) {
+                    synchronized (usernames) {
+                        for (String s : bukkitplayers.keySet()) {
+                            if (!usernames.contains(s)) {
+                                PlayerListItem pli = new PlayerListItem();
+                                pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+                                PlayerListItem.Item item = new PlayerListItem.Item();
+                                item.setPing(0);
+                                item.setUsername(s);
+                                item.setProperties(new String[0][0]);
+                                pli.setItems(new PlayerListItem.Item[]{item});
+                                getPlayer().unsafe().sendPacket(pli);
+                                usernames.add(s);
+                            }
                         }
                     }
                 }
             }
+            tabListHandler.unload();
+            if (!afterServerSwitch) {
+                synchronized (usernames) {
+                    // todo save display names sent by the server
+                    PlayerListItem packet = new PlayerListItem();
+                    packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+                    packet.setItems(
+                            uuids.entrySet().stream().map(entry -> {
+                                PlayerListItem.Item item = new PlayerListItem.Item();
+                                item.setUuid(entry.getKey());
+                                item.setUsername(entry.getValue());
+                                item.setDisplayName(FastChat.legacyTextToJson(entry.getValue(), '&'));
+                                return item;
+                            }).toArray(PlayerListItem.Item[]::new));
+                    getPlayer().unsafe().sendPacket(packet);
+                }
+            }
+            setAllowTeamPackets(true);
         }
-        setAllowTeamPackets(true);
+        isExcluded = true;
     }
 
     @Override
@@ -280,6 +319,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public void onConnect() {
+        failIfNotInEventLoop();
         if (connectedPlayer == null) {
             connectedPlayer = new ConnectedPlayer(getPlayer());
             BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerConnected(connectedPlayer);
@@ -288,6 +328,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public void onDisconnect() {
+        failIfNotInEventLoop();
         if (connectedPlayer != null) {
             BungeeTabListPlus.getInstance().getConnectedPlayerManager().onPlayerDisconnected(connectedPlayer);
 
@@ -379,6 +420,8 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public void sendTablist(TabList tabList) {
+        failIfNotInEventLoop();
+        afterServerSwitch = false;
         if (tabListHandler instanceof TabList18) {
             if (tabList.getSize() < 80 || tabList.shouldShrink()) {
                 setTabListHandler(new TabList18v3(this));
@@ -401,25 +444,8 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     }
 
     @Override
-    public void unload() {
-        tabListHandler.unload();
-        synchronized (usernames) {
-            PlayerListItem packet = new PlayerListItem();
-            packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
-            packet.setItems(
-                    uuids.entrySet().stream().map(entry -> {
-                        PlayerListItem.Item item = new PlayerListItem.Item();
-                        item.setUuid(entry.getKey());
-                        item.setUsername(entry.getValue());
-                        item.setDisplayName(FastChat.legacyTextToJson(entry.getValue(), '&'));
-                        return item;
-                    }).toArray(PlayerListItem.Item[]::new));
-            getPlayer().unsafe().sendPacket(packet);
-        }
-    }
-
-    @Override
     public void setTabListHandler(TabListHandler tabListHandler) {
+        failIfNotInEventLoop();
         if (this.tabListHandler != null) {
             this.tabListHandler.unload();
         }
@@ -433,18 +459,30 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
 
     @Override
     public boolean onTeamPacket(Team packet) {
+        failIfNotInEventLoop();
         boolean modified = false;
         teamLock.lock();
         try {
+            Server server = getPlayer().getServer();
+            boolean suppressErrorMessage = false;
+            if (server != null && (BungeeTabListPlus.getInstance().getConfigManager().
+                    getMainConfig().excludeServers.contains(server.getInfo().getName()))) {
+                exclude();
+                suppressErrorMessage = true;
+            }
             if (packet.getMode() == 0 || packet.getMode() == 3) {
                 // add players
                 Set<String> humanPlayers = Arrays.stream(packet.getPlayers()).filter(player -> PATTERN_VALID_USERNAME.matcher(player).matches() || bukkitplayers.containsKey(player)).collect(Collectors.toSet());
                 if (!humanPlayers.isEmpty()) {
                     teamToPlayerMap.putAll(packet.getName(), humanPlayers);
                     if (!allowTeamPackets) {
-                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
+                        if (!suppressErrorMessage) {
+                            BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
+                        }
                         packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
-                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                        if (!suppressErrorMessage) {
+                            BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                        }
                         modified = true;
                     }
                 }
@@ -456,9 +494,13 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                         teamToPlayerMap.remove(packet.getName(), humanPlayer);
                     }
                     if (!allowTeamPackets) {
-                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
+                        if (!suppressErrorMessage) {
+                            BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransforming packet " + packet);
+                        }
                         packet.setPlayers(Arrays.stream(packet.getPlayers()).filter(player -> !humanPlayers.contains(player)).toArray(String[]::new));
-                        BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                        if (!suppressErrorMessage) {
+                            BungeeTabListPlus.getInstance().getLogger().warning("Scoreboard teams don't work with tab_size < 80.\nTransformed packet " + packet);
+                        }
                         modified = true;
                     }
                 }
@@ -472,6 +514,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     }
 
     public void setAllowTeamPackets(boolean allowTeamPackets) {
+        failIfNotInEventLoop();
         teamLock.lock();
         try {
             if (allowTeamPackets != this.allowTeamPackets) {
