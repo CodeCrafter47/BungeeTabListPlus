@@ -27,7 +27,6 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class PlaceholderManagerImpl implements PlaceholderManager {
 
@@ -106,7 +106,7 @@ public final class PlaceholderManagerImpl implements PlaceholderManager {
             placeholderProvider.setup();
         }
         this.placeholders = placeholders;
-        pattern_all = Pattern.compile("(?ims)" + Joiner.on('|').join(Iterables.transform(placeholders, v -> "(?:" + v.getRegex() + ")")));
+        pattern_all = Pattern.compile("(?ims)" + Joiner.on('|').join(placeholders.stream().map(v -> "(?:" + v.getRegex() + ")").collect(Collectors.toList())));
     }
 
     public void reload() {
