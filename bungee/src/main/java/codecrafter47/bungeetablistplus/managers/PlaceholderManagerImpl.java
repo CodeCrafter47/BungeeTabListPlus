@@ -29,6 +29,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import lombok.SneakyThrows;
+import lombok.Synchronized;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -87,11 +88,11 @@ public final class PlaceholderManagerImpl implements PlaceholderManager {
 
     @Override
     public void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
-        BungeeTabListPlus.getInstance().failIfNotMainThread();
         BungeeTabListPlus.getInstance().registerPlaceholderProvider0(placeholderProvider);
     }
 
     @SneakyThrows
+    @Synchronized
     private void update() {
         needsUpdate = false;
         List<Placeholder> placeholders = new ArrayList<>();
@@ -112,6 +113,7 @@ public final class PlaceholderManagerImpl implements PlaceholderManager {
         needsUpdate = true;
     }
 
+    @Synchronized
     public void internalRegisterPlaceholderProvider(PlaceholderProvider placeholderProvider) {
         placeholderProviderList.add(placeholderProvider);
         needsUpdate = true;
