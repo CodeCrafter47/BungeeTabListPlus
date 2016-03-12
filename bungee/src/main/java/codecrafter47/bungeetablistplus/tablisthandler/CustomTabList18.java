@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.util.FastChat;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -71,6 +72,8 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
     private boolean allowTeamPackets = true;
 
     private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
+
+    private final static Set<String> goodProperties = ImmutableSet.of("textures", "skinURL", "skinDigest", "cloakURL", "cloakDigest");
 
     public CustomTabList18(ProxiedPlayer player) {
         super(player);
@@ -351,7 +354,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                     // filter properties
                     for (Iterator<String[]> iterator = loginProperties.values().iterator(); iterator.hasNext(); ) {
                         String[] property = iterator.next();
-                        if (property[0].equals("textures")) {
+                        if (goodProperties.contains(property[0])) {
                             // good
                         } else if (property[0].equals("forgeClient") || property[0].equals("extraData")) {
                             // bad

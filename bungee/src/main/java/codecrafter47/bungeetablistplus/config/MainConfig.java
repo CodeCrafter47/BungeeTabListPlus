@@ -174,7 +174,8 @@ public class MainConfig extends Configuration {
         }
 
         if (map.containsKey("worldAlias")) {
-            worldAlias = (HashMap<String, String>) map.get("worldAlias");
+            Object worldAlias = map.get("worldAlias");
+            this.worldAlias = worldAlias instanceof HashMap ? (HashMap<String, String>) worldAlias : new HashMap<>();
         }
 
         if (map.containsKey("serverPrefixes")) {
