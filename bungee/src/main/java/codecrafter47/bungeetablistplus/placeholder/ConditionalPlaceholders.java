@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvide
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
+import net.md_5.bungee.api.connection.Server;
 
 import java.util.Optional;
 
@@ -37,7 +38,8 @@ public class ConditionalPlaceholders extends PlaceholderProvider {
         bind("insertIfHidden").withTemplateArgs().to((context, args) -> BungeeTabListPlus.isHidden((Player) context.getPlayer()) ? args : SlotTemplate.empty());
         bind("insertIfServersSame").withTemplateArgs().to((context, args) -> {
             Optional<ServerGroup> serverGroup = context.getServerGroup();
-            if (serverGroup.isPresent() && serverGroup.get().getServerNames().contains(context.getViewer().getServer().getInfo().getName()))
+            Server server = context.getViewer().getServer();
+            if (server != null && serverGroup.isPresent() && serverGroup.get().getServerNames().contains(server.getInfo().getName()))
                 return args;
             else return SlotTemplate.empty();
         });
