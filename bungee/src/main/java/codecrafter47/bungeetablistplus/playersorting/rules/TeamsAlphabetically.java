@@ -19,10 +19,8 @@
 
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -33,11 +31,10 @@ import java.util.Optional;
 public class TeamsAlphabetically implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
         Optional<String> team1 = ((Player) player1).get(DataKeys.Team);
         Optional<String> team2 = ((Player) player2).get(DataKeys.Team);
-        if (team1.isPresent() && team2.isPresent()) {
-            return Collator.getInstance().compare(team1.get(), team2.get());
+        if (team1.isPresent() || team2.isPresent()) {
+            return Collator.getInstance().compare(team1.orElse(""), team2.orElse(""));
         }
         return 0;
     }

@@ -36,8 +36,8 @@ public class WorldByName implements SortingRule {
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
         Optional<String> faction1 = ((Player) player1).get(DataKeys.World);
         Optional<String> faction2 = ((Player) player2).get(DataKeys.World);
-        if (faction1.isPresent() && faction2.isPresent()) {
-            return Collator.getInstance().compare(faction1.get(), faction2.get());
+        if (faction1.isPresent() || faction2.isPresent()) {
+            return Collator.getInstance().compare(faction1.orElse(""), faction2.orElse(""));
         }
         return 0;
     }

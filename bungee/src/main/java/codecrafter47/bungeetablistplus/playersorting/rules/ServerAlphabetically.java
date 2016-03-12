@@ -32,8 +32,8 @@ public class ServerAlphabetically implements SortingRule {
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         Optional<ServerInfo> server1 = player1.getServer();
         Optional<ServerInfo> server2 = player2.getServer();
-        if (server1.isPresent() && server2.isPresent()) {
-            return Collator.getInstance().compare(server1.get().getName(), server2.get().getName());
+        if (server1.isPresent() || server2.isPresent()) {
+            return Collator.getInstance().compare(server1.map(ServerInfo::getName).orElse(""), server2.map(ServerInfo::getName).orElse(""));
         }
         return 0;
     }
