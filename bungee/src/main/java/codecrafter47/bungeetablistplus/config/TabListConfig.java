@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.common.Configuration;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,8 +164,9 @@ public class TabListConfig extends Configuration {
             }
         }
 
-        if (player.getServer() != null) {
-            String server = player.getServer().getInfo().getName();
+        Server playerServer = player.getServer();
+        if (playerServer != null) {
+            String server = playerServer.getInfo().getName();
 
             if (s[0].equalsIgnoreCase("server")) {
                 if (s[1].equalsIgnoreCase(server)) {
