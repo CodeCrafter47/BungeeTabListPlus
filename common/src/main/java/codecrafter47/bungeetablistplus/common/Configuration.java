@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,9 @@ public abstract class Configuration {
         BufferedReader bufferedReader = new BufferedReader(reader);
         readHeader(bufferedReader);
         Map<Object, Object> map = (Map<Object, Object>) yaml.get().load(bufferedReader);
+        if (map == null) {
+            map = new HashMap<>();
+        }
         for (Iterator<Map.Entry<Object, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<Object, Object> entry = iterator.next();
             if (entry.getKey() == null || entry.getValue() == null) {
