@@ -127,10 +127,10 @@ public class PermissionManager {
     }
 
     Integer getBungeePermsRank(ProxiedPlayer player) {
-        Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
-        if (p != null) {
-            BungeePerms bp = BungeePerms.getInstance();
-            try {
+        try {
+            Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+            if (p != null) {
+                BungeePerms bp = BungeePerms.getInstance();
                 PermissionsManager pm = bp.getPermissionsManager();
                 if (pm != null) {
                     User user = pm.getUser(player.getName());
@@ -141,9 +141,11 @@ public class PermissionManager {
                         }
                     }
                 }
-            } catch (Throwable th) {
-                BungeeTabListPlus.getInstance().reportError(th);
             }
+        } catch (NullPointerException ex) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occurred while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
         }
         return null;
     }
