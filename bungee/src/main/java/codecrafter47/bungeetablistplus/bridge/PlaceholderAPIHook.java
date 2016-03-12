@@ -35,6 +35,7 @@ import net.md_5.bungee.api.plugin.Listener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.util.ConcurrentModificationException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +55,11 @@ public class PlaceholderAPIHook implements Listener {
     }
 
     public void askServersForPlaceholders() {
-        bungeeTabListPlus.getProxy().getServers().values().stream().filter(Objects::nonNull).forEach(this::askForPlaceholders);
+        try {
+            bungeeTabListPlus.getProxy().getServers().values().stream().filter(Objects::nonNull).forEach(this::askForPlaceholders);
+        } catch (ConcurrentModificationException ignored) {
+
+        }
     }
 
     public void askForPlaceholders(ServerInfo server) {
