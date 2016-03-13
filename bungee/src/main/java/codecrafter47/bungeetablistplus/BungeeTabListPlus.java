@@ -275,6 +275,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             config.getMainConfig().useScoreboardToBypass16CharLimit = false;
         }
 
+        resendThread = new ResendThread();
+
         if (isVersion18()) {
             packetAccess = new PacketAccessImpl(getLogger());
             if (!packetAccess.isTabHeaderFooterSupported()) {
@@ -363,8 +365,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         ProxyServer.getInstance().getPluginManager().registerListener(plugin,
                 listener);
-
-        resendThread = new ResendThread();
         plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
         restartRefreshThread();
 
