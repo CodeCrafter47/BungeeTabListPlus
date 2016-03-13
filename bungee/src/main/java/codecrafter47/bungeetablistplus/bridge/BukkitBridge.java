@@ -100,7 +100,6 @@ public class BukkitBridge implements Listener {
     }
 
     private BukkitData getServerDataCache(String serverName) {
-        plugin.failIfNotMainThread();
         if (!serverInformation.containsKey(serverName)) {
             serverInformation.putIfAbsent(serverName, new BukkitData());
         }
@@ -109,7 +108,6 @@ public class BukkitBridge implements Listener {
 
     @Nullable
     private BukkitData getPlayerDataCache(ProxiedPlayer player) {
-        plugin.failIfNotMainThread();
         return playerInformation.get(player);
     }
 
