@@ -19,36 +19,27 @@
 
 package codecrafter47.bungeetablistplus.version;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import protocolsupport.api.ProtocolSupportAPI;
 import protocolsupport.api.ProtocolVersion;
 
 public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
+
+    private static final boolean psb12 = ProxyServer.getInstance().getPluginManager().getPlugin("ProtocolSupportBungee").getDescription().getVersion().equals("1.2");
+
     @Override
-    public int getProtocolVersion(ProxiedPlayer player) {
+    public boolean has18OrLater(ProxiedPlayer player) {
         ProtocolVersion protocolVersion = ProtocolSupportAPI.getProtocolVersion(player);
-        switch (protocolVersion) {
-            case MINECRAFT_FUTURE:
-                return Integer.MAX_VALUE;
-            case MINECRAFT_1_9:
-                return 107;
-            case MINECRAFT_1_8:
-                return 47;
-            case MINECRAFT_1_7_10:
-                return 5;
-            case MINECRAFT_1_7_5:
-                return 4;
-            case MINECRAFT_1_6_4:
-            case MINECRAFT_1_6_2:
-            case MINECRAFT_1_6_1:
-            case MINECRAFT_1_5_2:
-            case MINECRAFT_1_5_1:
-            case MINECRAFT_1_4_7:
-            case MINECRAFT_LEGACY:
-                return -1;
-            case UNKNOWN:
-            default:
-                throw new IllegalStateException("Protocol version of player " + player.getName() + " is " + protocolVersion.name() + ". Don't know what to do.");
+        if (psb12) {
+            switch (protocolVersion) {
+                case MINECRAFT_1_8:
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            return protocolVersion.isAfterOrEq(ProtocolVersion.MINECRAFT_1_8);
         }
     }
 }

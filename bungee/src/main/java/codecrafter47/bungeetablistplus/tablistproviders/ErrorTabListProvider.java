@@ -58,7 +58,7 @@ public class ErrorTabListProvider implements IConfigTabListProvider {
 
     @SneakyThrows
     public static void constructErrorTabList(ProxiedPlayer player, TabList tabList, String message, Throwable throwable) {
-        boolean is18 = BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47;
+        boolean is18 = BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player);
 
         if (is18) {
             tabList.setHeader("&c&lERROR * ERROR * ERROR * ERROR * ERROR * ERROR * ERROR * ERROR");

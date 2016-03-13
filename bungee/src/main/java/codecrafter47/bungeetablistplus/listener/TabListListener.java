@@ -19,14 +19,12 @@
 package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
 import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18v3;
 import codecrafter47.bungeetablistplus.tablisthandler.TabListHandler;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -61,16 +59,14 @@ public class TabListListener implements Listener {
                 CustomTabList18 customTabList18 = new CustomTabList18(e.getPlayer());
                 customTabList18.onConnect();
                 tab = customTabList18;
-                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(e.getPlayer()) < 47) {
+                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(e.getPlayer())) {
+                    handler = new TabList18(tab);
+                } else {
                     if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
                         handler = new MyTabList(tab);
                     } else {
                         handler = new ScoreboardTabList(tab);
                     }
-                } else if (ConfigManager.getTabSize() >= 80) {
-                    handler = new TabList18(tab);
-                } else {
-                    handler = new TabList18v3((CustomTabList18) tab);
                 }
             }
             tab.setTabListHandler(handler);

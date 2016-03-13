@@ -106,7 +106,7 @@ public class ConnectedPlayer implements Player {
 
     @Override
     public int getGameMode() {
-        return BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47 ? 0 : ((UserConnection) player).getGamemode();
+        return !BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player) ? ((UserConnection) player).getGamemode() : 0;
     }
 
     public ProxiedPlayer getPlayer() {

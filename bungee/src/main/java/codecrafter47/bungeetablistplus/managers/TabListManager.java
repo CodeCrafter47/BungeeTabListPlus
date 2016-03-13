@@ -99,7 +99,7 @@ public class TabListManager implements Listener {
         if (customTabLists.get(player) != null) return customTabLists.get(player);
         TabListProvider provider = null;
         int priority = Integer.MIN_VALUE;
-        for (IConfigTabListProvider tabList : (plugin.getProtocolVersionProvider().getProtocolVersion(player) >= 47 ? tabLists : tabLists17)) {
+        for (IConfigTabListProvider tabList : (plugin.getProtocolVersionProvider().has18OrLater(player) ? tabLists : tabLists17)) {
             if (tabList.appliesTo(player)) {
                 if (tabList.getPriority() > priority) {
                     priority = tabList.getPriority();
@@ -110,10 +110,10 @@ public class TabListManager implements Listener {
         if (provider != null) {
             return provider;
         }
-        if (plugin.getProtocolVersionProvider().getProtocolVersion(player) >= 47 && defaultTab != null && defaultTab.appliesTo(player)) {
+        if (plugin.getProtocolVersionProvider().has18OrLater(player) && defaultTab != null && defaultTab.appliesTo(player)) {
             return defaultTab;
         }
-        if (plugin.getProtocolVersionProvider().getProtocolVersion(player) < 47 && defaultTab17 != null && defaultTab17.appliesTo(player)) {
+        if (!plugin.getProtocolVersionProvider().has18OrLater(player) && defaultTab17 != null && defaultTab17.appliesTo(player)) {
             return defaultTab17;
         }
         return null;

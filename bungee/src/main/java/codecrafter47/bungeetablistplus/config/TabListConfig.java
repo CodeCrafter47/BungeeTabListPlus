@@ -137,11 +137,11 @@ public class TabListConfig extends Configuration {
         }
 
         if (showTo.equalsIgnoreCase("1.8")) {
-            return BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47;
+            return BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player);
         }
 
         if (showTo.equalsIgnoreCase("1.7")) {
-            return BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47;
+            return !BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player);
         }
 
         String[] s = showTo.split(":");

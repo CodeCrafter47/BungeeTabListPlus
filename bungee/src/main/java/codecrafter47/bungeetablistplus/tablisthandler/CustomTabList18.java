@@ -131,7 +131,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                     item.setDisplayName(username);
                 }
                 packet.setItems(items);
-                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) >= 47) {
+                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
                     player.unsafe().sendPacket(packet);
                 } else {
                     // Split up the packet
@@ -165,7 +165,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
         failIfNotInEventLoop();
         if (!isExcluded()) {
             // only 1.7 clients
-            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(player) < 47) {
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
                 synchronized (bukkitplayers) {
                     synchronized (usernames) {
                         for (String s : bukkitplayers.keySet()) {
@@ -266,7 +266,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
             }
 
             if ((getPlayer().getServer() != null && BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().excludeServers.
-                    contains(getPlayer().getServer().getInfo().getName())) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(getPlayer()) >= 47) {
+                    contains(getPlayer().getServer().getInfo().getName())) || isExcluded || BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(getPlayer())) {
                 if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.REMOVE_PLAYER) || pli.getItems()[0].getUuid().equals(getPlayer().getUniqueId())) {
                     // don't send gamemode 3
                     if ((pli.getAction() == PlayerListItem.Action.ADD_PLAYER) || (pli.getAction() == PlayerListItem.Action.UPDATE_GAMEMODE)) {
@@ -371,11 +371,14 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                 item.setUuid(player.getUniqueId());
                 if (playerListItem.getAction() == PlayerListItem.Action.ADD_PLAYER) {
                     Map<String, String[]> loginProperties = new HashMap<>();
-                    for (String[] property : item.getProperties()) {
-                        if (property.length == 3 && property[2] == null) {
-                            loginProperties.put(property[0], new String[]{property[0], property[1]});
-                        } else {
-                            loginProperties.put(property[0], property);
+                    String[][] itemProperties = item.getProperties();
+                    if (itemProperties != null) {
+                        for (String[] property : itemProperties) {
+                            if (property.length == 3 && property[2] == null) {
+                                loginProperties.put(property[0], new String[]{property[0], property[1]});
+                            } else {
+                                loginProperties.put(property[0], property);
+                            }
                         }
                     }
                     LoginResult loginResult = player.getPendingConnection().getLoginProfile();

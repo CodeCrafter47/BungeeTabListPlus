@@ -153,7 +153,7 @@ class ResendThread implements Runnable, Executor {
 
             TabList tabList;
 
-            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(tablistHandler.getPlayer())) {
                 int wishedTabListSize = tlp.getWishedTabListSize();
                 if (wishedTabListSize < 1) {
                     wishedTabListSize = 1;
@@ -180,7 +180,7 @@ class ResendThread implements Runnable, Executor {
             try {
                 BungeeTabListPlus.getInstance().getLogger().log(th instanceof LayoutException ? Level.WARNING : Level.SEVERE, "Error while updating tablist", th);
                 TabList tabList;
-                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().getProtocolVersion(tablistHandler.getPlayer()) >= 47) {
+                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(tablistHandler.getPlayer())) {
                     tabList = new GenericTabList(20, 4);
                 } else {
                     tabList = new GenericTabList();
