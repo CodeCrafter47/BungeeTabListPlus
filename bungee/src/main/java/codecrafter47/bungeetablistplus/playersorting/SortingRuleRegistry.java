@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.playersorting;
 
+import codecrafter47.bungeetablistplus.playersorting.rules.AFKLast;
 import codecrafter47.bungeetablistplus.playersorting.rules.AdminFirst;
 import codecrafter47.bungeetablistplus.playersorting.rules.AdminLast;
 import codecrafter47.bungeetablistplus.playersorting.rules.Alphabet;
@@ -58,6 +59,7 @@ public class SortingRuleRegistry {
             .put("playerworldfirst", new PlayerWorld())
             .put("serveralphabetically", new ServerAlphabetically())
             .put("playerserverfirst", new PlayerServerFirst())
+            .put("afklast", new AFKLast())
             .build();
 
     public static Optional<SortingRule> getRule(String name) {
