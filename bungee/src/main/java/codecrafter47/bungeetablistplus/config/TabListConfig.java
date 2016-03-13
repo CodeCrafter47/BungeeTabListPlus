@@ -343,7 +343,7 @@ public class TabListConfig extends Configuration {
                 "used if no other value is specified using [PING=?]");
         write("defaultPing", defaultPing);
 
-        writeComments("1.8 ONLY",
+        writeComments("1.8 and later versions ONLY",
                 "When enabled the tablist will adjust it's size to the number of players online/ slots used, instead of using",
                 "the static tab_size set in bungee's config.yml.",
                 "WARNING: This is an experimental feature an will most likely cause bugs",
@@ -351,8 +351,8 @@ public class TabListConfig extends Configuration {
                 "WARNING: If this is enabled it is STRONGLY recommended to also enable verticalMode");
         write("autoShrinkTabList", autoShrinkTabList);
 
-        writeComments("1.8 ONLY",
-                "Number of slots in the tab list. Please not that this only affects 1.8 clients",
+        writeComments("1.8 and later versions ONLY",
+                "Number of slots in the tab list.",
                 "tab_size for 1.7 and older clients is configured in bungee's config.yml",
                 "Can be from 1 to 80.");
         write("tab_size", tab_size);
