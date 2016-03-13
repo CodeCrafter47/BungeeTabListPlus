@@ -23,6 +23,7 @@ import java.util.UUID;
 
 public class DataKeys {
     public final static DataKey<String> UserName = DataKey.builder().player().id("minecraft:username").build();
+    public final static DataKey<String> ClientVersion = DataKey.builder().player().id("minecraft:clientversion").build();
     public final static DataKey<UUID> UUID = DataKey.builder().player().id("minecraft:uuid").build();
     public final static DataKey<Double> Health = DataKey.builder().player().id("minecraft:health").build();
     public final static DataKey<Double> MaxHealth = DataKey.builder().player().id("minecraft:maxhealth").build();

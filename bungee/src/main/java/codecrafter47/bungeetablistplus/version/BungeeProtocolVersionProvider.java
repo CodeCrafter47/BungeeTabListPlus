@@ -27,4 +27,20 @@ public class BungeeProtocolVersionProvider implements ProtocolVersionProvider {
     public boolean has18OrLater(ProxiedPlayer player) {
         return player.getPendingConnection().getVersion() >= 47;
     }
+
+    @Override
+    public String getVersionString(ProxiedPlayer player) {
+        switch (player.getPendingConnection().getVersion()) {
+            case 107:
+                return "1.9";
+            case 47:
+                return "1.8";
+            case 5:
+                return "1.7.10";
+            case 4:
+                return "1.7.5";
+            default:
+                return null;
+        }
+    }
 }

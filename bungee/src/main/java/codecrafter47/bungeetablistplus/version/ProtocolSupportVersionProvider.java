@@ -42,4 +42,12 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
             return protocolVersion.isAfterOrEq(ProtocolVersion.MINECRAFT_1_8);
         }
     }
+
+    @Override
+    public String getVersionString(ProxiedPlayer player) {
+        if (!psb12) {
+            return ProtocolSupportAPI.getProtocolVersion(player).getName();
+        }
+        return null;
+    }
 }

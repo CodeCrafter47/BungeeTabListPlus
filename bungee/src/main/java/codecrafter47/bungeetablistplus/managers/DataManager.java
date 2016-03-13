@@ -27,11 +27,12 @@ import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Listener;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class DataManager extends AbstractDataAccess<ProxiedPlayer> {
+public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Listener {
     private final BungeeTabListPlus bungeeTabListPlus;
     private final PermissionManager permissionManager;
 
@@ -50,6 +51,7 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> {
         bind(DataKeys.BungeePerms_DisplayPrefix, permissionManager::getDisplayPrefix);
         bind(DataKeys.BungeePerms_Suffix, permissionManager::getSuffixFromBungeePerms);
         bind(DataKeys.BungeePerms_Rank, permissionManager::getBungeePermsRank);
+        bind(DataKeys.ClientVersion, player1 -> BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersionString(player1));
     }
 
     @SuppressWarnings("unchecked")

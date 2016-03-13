@@ -24,4 +24,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public interface ProtocolVersionProvider {
 
     boolean has18OrLater(ProxiedPlayer player);
+
+    String getVersionString(ProxiedPlayer player);
 }
