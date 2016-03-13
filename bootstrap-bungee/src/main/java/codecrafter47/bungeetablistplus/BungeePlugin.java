@@ -19,7 +19,13 @@
 
 package codecrafter47.bungeetablistplus;
 
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.netty.ChannelWrapper;
+import net.md_5.bungee.tab.TabList;
 
 public class BungeePlugin extends Plugin {
 
@@ -30,6 +36,35 @@ public class BungeePlugin extends Plugin {
             getLogger().severe("Disabling plugin!");
             return;
         }
+        if (!getProxy().getPlayers().isEmpty() && getProxy().getPluginManager().getPlugin("BungeePluginManager") != null) {
+            getLogger().severe("You cannot use BungeePluginManager to reload BungeeTabListPlus. Use /btlp reload instead.");
+            getLogger().severe("Disabling plugin!");
+            throw new RuntimeException("You cannot use BungeePluginManager to reload BungeeTabListPlus. Use /btlp reload instead.");
+        }
         BungeeTabListPlus.getInstance(this).onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        if (BungeeCord.getInstance().isRunning && getProxy().getPluginManager().getPlugin("BungeePluginManager") != null) {
+            getLogger().severe("You cannot use BungeePluginManager to reload BungeeTabListPlus. Use /btlp reload instead.");
+            for (ProxiedPlayer proxiedPlayer : getProxy().getPlayers()) {
+                try {
+                    final TabList tablistHandler = ReflectionUtil.getTablistHandler(proxiedPlayer);
+                    if (tablistHandler instanceof PlayerTablistHandler) {
+                        ChannelWrapper channelWrapper = ReflectionUtil.getChannelWrapper(proxiedPlayer);
+                        channelWrapper.getHandle().eventLoop().submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((PlayerTablistHandler) tablistHandler).exclude();
+                            }
+                        }).await();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            throw new RuntimeException("You cannot use BungeePluginManager to reload BungeeTabListPlus. Use /btlp reload instead.");
+        }
     }
 }

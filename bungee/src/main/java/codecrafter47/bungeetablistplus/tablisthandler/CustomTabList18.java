@@ -165,7 +165,7 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
         failIfNotInEventLoop();
         if (!isExcluded()) {
             // only 1.7 clients
-            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
+            if (!BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
                 synchronized (bukkitplayers) {
                     synchronized (usernames) {
                         for (String s : bukkitplayers.keySet()) {

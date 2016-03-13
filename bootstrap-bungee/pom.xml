@@ -17,6 +17,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-proxy</artifactId>
+            <version>1.8-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>bungee-plugin</artifactId>
             <version>${project.parent.version}</version>
