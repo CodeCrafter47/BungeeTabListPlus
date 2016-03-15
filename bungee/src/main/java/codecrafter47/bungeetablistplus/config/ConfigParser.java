@@ -235,6 +235,14 @@ public class ConfigParser {
             }
         }
 
+        if (config.headerCycleInterval <= 0) {
+            config.headerCycleInterval = 1;
+        }
+
+        if (config.footerCycleInterval <= 0) {
+            config.footerCycleInterval = 1;
+        }
+
         if (config.header.size() > 1) {
             plugin.requireUpdateInterval(config.headerCycleInterval);
         }
