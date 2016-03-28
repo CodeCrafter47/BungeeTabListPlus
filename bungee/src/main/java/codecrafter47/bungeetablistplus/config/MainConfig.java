@@ -252,7 +252,8 @@ public class MainConfig extends Configuration {
                 "BUKKIT      - take information from Bukkit/Vault",
                 "BUKKITPERMISSIONSEX      - take information from Bukkit/PermissionsEx",
                 "BUNGEEPERMS - take information from BungeePerms",
-                "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee");
+                "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee",
+                "CUSTOMPLUGIN     - take group external plugin that hooks into BTLP");
         write("permissionSource", permissionSource);
 
         writeComment("whether to show players in spectator mode");
