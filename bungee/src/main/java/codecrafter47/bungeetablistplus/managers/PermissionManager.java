@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.CustomGroupProvider;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKey;
@@ -41,6 +42,7 @@ import java.util.logging.Level;
 public class PermissionManager {
 
     private final BungeeTabListPlus plugin;
+    public static CustomGroupProvider customGroupProvider = null;
 
     public PermissionManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;
@@ -50,6 +52,8 @@ public class PermissionManager {
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return ((Player) player).get(DataKeys.BungeePerms_PrimaryGroup).orElse("");
+        } else if (mode.equalsIgnoreCase("CustomPlugin")) {
+            return customGroupProvider != null ? customGroupProvider.getMainGroup(player) : "default";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return ((Player) player).get(DataKeys.Vault_PermissionGroup).orElse("");
         } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
@@ -223,6 +227,8 @@ public class PermissionManager {
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElse("");
+        } else if (mode.equalsIgnoreCase("CustomPlugin")) {
+            return customGroupProvider != null ? customGroupProvider.getPrefix(player) : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return ((Player) player).get(DataKeys.Vault_Prefix).orElse("");
         } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
@@ -319,6 +325,8 @@ public class PermissionManager {
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElse("");
+        } else if (mode.equalsIgnoreCase("CustomPlugin")) {
+            return customGroupProvider != null ? customGroupProvider.getSuffix(player) : "";
         } else if (mode.equalsIgnoreCase("Bukkit")) {
             return ((Player) player).get(DataKeys.Vault_Suffix).orElse("");
         } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
