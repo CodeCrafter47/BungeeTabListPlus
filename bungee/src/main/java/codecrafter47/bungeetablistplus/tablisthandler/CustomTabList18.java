@@ -148,13 +148,18 @@ public class CustomTabList18 extends net.md_5.bungee.tab.TabList implements Play
                 usernames.clear();
             }
             isExcluded = false;
-            afterServerSwitch = true;
             teamLock.lock();
             try {
                 teamToPlayerMap.clear();
             } finally {
                 teamLock.unlock();
             }
+            if (tabListHandler instanceof TabList18v3) {
+                setAllowTeamPackets(false);
+            } else {
+                setAllowTeamPackets(true);
+            }
+            afterServerSwitch = true;
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }
