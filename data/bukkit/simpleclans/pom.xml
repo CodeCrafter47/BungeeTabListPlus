@@ -13,7 +13,8 @@
         <repository>
             <id>SacredCoding Artifactory Server</id>
             <name>SacredCoding Artifactory Server-releases</name>
-            <url>http://107.170.92.11/artifactory/plugins-release-local</url>
+            <url>http://104.236.246.108:8081/artifactory/plugins-release-local
+            </url>
         </repository>
     </repositories>
 
