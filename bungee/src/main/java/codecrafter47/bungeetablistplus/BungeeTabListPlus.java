@@ -499,7 +499,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
         failIfNotMainThread();
         try {
-            requestedUpdateInterval = null;
+            // todo requestedUpdateInterval = null;
             config = new ConfigManager(plugin);
             placeholderManager.reload();
             if (reloadTablists()) return false;
@@ -520,6 +520,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (!tabListManager.loadTabLists()) {
             return true;
         }
+        tabListManager.customTabLists = tabLists.customTabLists;
         tabLists = tabListManager;
         return false;
     }

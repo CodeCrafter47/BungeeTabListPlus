@@ -48,7 +48,7 @@ public class TabListManager implements Listener {
     private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
     private final List<IConfigTabListProvider> tabLists17 = new ArrayList<>();
 
-    private final Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
+    public Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
 
     public TabListManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;
