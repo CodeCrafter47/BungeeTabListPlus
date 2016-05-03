@@ -66,8 +66,6 @@ public class PlayerDataAccess extends AbstractBukkitDataAccess<Player> {
     }
 
     protected void init() {
-        bind(DataKeys.UserName, Player::getName);
-        bind(DataKeys.UUID, Player::getUniqueId);
         bind(DataKeys.Health, Damageable::getHealth);
         bind(DataKeys.Level, Player::getLevel);
         bind(DataKeys.MaxHealth, Player::getMaxHealth);

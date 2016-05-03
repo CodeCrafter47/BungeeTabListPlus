@@ -26,6 +26,7 @@ import java.io.Serializable;
 public class DataKey<T> implements Serializable {
     private final String id;
     private final Scope scope;
+    private final boolean bungee;
 
     private static final long serialVersionUID = 1L;
 
@@ -33,9 +34,10 @@ public class DataKey<T> implements Serializable {
         return new DataKeyBuilder();
     }
 
-    protected DataKey(String id, Scope scope) {
+    protected DataKey(String id, Scope scope, boolean bungee) {
         this.id = id;
         this.scope = scope;
+        this.bungee = bungee;
     }
 
     public String getId() {
@@ -44,6 +46,10 @@ public class DataKey<T> implements Serializable {
 
     public Scope getScope() {
         return scope;
+    }
+
+    public boolean isBungee() {
+        return bungee;
     }
 
     @Override
@@ -68,6 +74,7 @@ public class DataKey<T> implements Serializable {
     public static class DataKeyBuilder {
         private String id = null;
         private Scope scope = null;
+        private Boolean bungee = null;
 
         private DataKeyBuilder() {
         }
@@ -90,10 +97,21 @@ public class DataKey<T> implements Serializable {
             return scope(Scope.PLAYER);
         }
 
+        public DataKeyBuilder bukkit() {
+            bungee = false;
+            return this;
+        }
+
+        public DataKeyBuilder bungee() {
+            bungee = true;
+            return this;
+        }
+
         public <T> DataKey<T> build() {
             Preconditions.checkNotNull(id, "id");
             Preconditions.checkNotNull(scope, "scope");
-            return new DataKey<>(id, scope);
+            Preconditions.checkNotNull(bungee, "bungee");
+            return new DataKey<>(id, scope, bungee);
         }
     }
 }

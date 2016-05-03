@@ -32,8 +32,8 @@ public final class BTLPDataKeys {
         return new ThirdPartyVariableDataKey(name);
     }
 
-    public final static DataKey<List<String>> REGISTERED_THIRD_PARTY_VARIABLES = DataKey.builder().server().id("thirdparty-variables").build();
-    public final static DataKey<Boolean> PLACEHOLDERAPI_PRESENT = DataKey.builder().server().id("placeholderapi-present").build();
+    public final static DataKey<List<String>> REGISTERED_THIRD_PARTY_VARIABLES = DataKey.builder().bukkit().server().id("thirdparty-variables").build();
+    public final static DataKey<Boolean> PLACEHOLDERAPI_PRESENT = DataKey.builder().bukkit().server().id("placeholderapi-present").build();
 
     public static class PlaceholderAPIDataKey extends DataKey<String> {
         private final String placeholder;
@@ -41,7 +41,7 @@ public final class BTLPDataKeys {
         private static final long serialVersionUID = 1L;
 
         private PlaceholderAPIDataKey(String placeholder) {
-            super("placeholderAPI", Scope.PLAYER);
+            super("placeholderAPI", Scope.PLAYER, false);
             this.placeholder = placeholder;
         }
 
@@ -71,7 +71,7 @@ public final class BTLPDataKeys {
         private static final long serialVersionUID = 1L;
 
         private ThirdPartyVariableDataKey(String name) {
-            super("thirdparty", Scope.PLAYER);
+            super("thirdparty", Scope.PLAYER, false);
             this.name = name;
         }
 

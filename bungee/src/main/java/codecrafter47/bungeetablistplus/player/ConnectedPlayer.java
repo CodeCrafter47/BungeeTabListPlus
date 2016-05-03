@@ -115,7 +115,7 @@ public class ConnectedPlayer implements Player {
 
     @Override
     public <T> Optional<T> get(DataKey<T> key) {
-        if (BungeeTabListPlus.getInstance().getDataManager().provides(key)) {
+        if (key.isBungee()) {
             return data.getValue(key);
         }
         if (key.getScope() == DataKey.Scope.SERVER) {
@@ -142,7 +142,7 @@ public class ConnectedPlayer implements Player {
     }
 
     public <T> void registerDataChangeListener(DataKey<T> key, Consumer<T> listener) {
-        if (BungeeTabListPlus.getInstance().getDataManager().provides(key)) {
+        if (key.isBungee()) {
             data.registerValueChangeListener(key, listener);
         } else {
             bukkitData.registerValueChangeListener(key, listener);

@@ -25,7 +25,7 @@ public class PermissionDataKey extends DataKey<Boolean> {
     private static final long serialVersionUID = 1L;
 
     PermissionDataKey(String permission) {
-        super("minecraft:permission", Scope.PLAYER);
+        super("minecraft:permission", Scope.PLAYER, false);
         this.permission = permission;
     }
 
