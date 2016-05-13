@@ -196,7 +196,7 @@ public class ConfigParser {
                 } else {
                     filter = Arrays.asList(args.split(","));
                 }
-                if (column[0] == -1) {
+                if (column[0] == -1 || config.verticalMode) {
                     if (config.groupPlayers.equalsIgnoreCase("SERVER") && filter.isEmpty()) {
                         sections.add(parseServerSections(config, prefix, suffix, filter, sortrules, minslots[0], maxplayers[0], playerLines, morePlayerLines));
                     } else {
