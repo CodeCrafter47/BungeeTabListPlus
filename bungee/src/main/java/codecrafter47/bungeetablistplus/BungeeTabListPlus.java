@@ -47,7 +47,6 @@ import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
 import codecrafter47.bungeetablistplus.packet.LegacyPacketAccessImpl;
 import codecrafter47.bungeetablistplus.packet.PacketAccess;
 import codecrafter47.bungeetablistplus.packet.PacketAccessImpl;
-import codecrafter47.bungeetablistplus.packet.v1_8.TeamPacket;
 import codecrafter47.bungeetablistplus.placeholder.BasicPlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.BukkitPlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.ColorPlaceholder;
@@ -59,6 +58,7 @@ import codecrafter47.bungeetablistplus.placeholder.TimePlaceholders;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
+import codecrafter47.bungeetablistplus.protocol.ProtocolManager;
 import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
@@ -76,19 +76,13 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import net.md_5.bungee.protocol.Protocol;
-import net.md_5.bungee.protocol.ProtocolConstants;
-import net.md_5.bungee.protocol.packet.Team;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,7 +95,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -396,40 +389,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             updateChecker = new UpdateChecker(plugin);
         }
 
-        if (isVersion18()) {
-            try {
-                List<Integer> supportedProtocolVersions = Arrays.stream(ProtocolConstants.class.getDeclaredFields()).filter(f -> (f.getModifiers() & 8) != 0).filter(f -> f.getType() == int.class).map(f -> {
-                    try {
-                        f.setAccessible(true);
-                        return f.getInt(null);
-                    } catch (IllegalAccessException e) {
-                        reportError(e);
-                        return 0;
-                    }
-                }).collect(Collectors.toList());
-                // register team packet
-                int maxProtocolVersion = supportedProtocolVersions.stream().mapToInt(Integer::intValue).max().getAsInt();
-                if (maxProtocolVersion > 47) {
-                    // 1.9
-                    Class<Protocol.DirectionData> clazz = Protocol.DirectionData.class;
-                    Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, int.class, Class.class);
-                    Method getId = clazz.getDeclaredMethod("getId", Class.class, int.class);
-                    getId.setAccessible(true);
-                    registerPacket.setAccessible(true);
-                    registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, getId.invoke(Protocol.GAME.TO_CLIENT, Team.class, maxProtocolVersion), TeamPacket.class);
-                    is19 = true;
-                } else {
-                    is19 = false;
-                    // 1.8
-                    Class<Protocol.DirectionData> clazz = Protocol.DirectionData.class;
-                    Method registerPacket = clazz.getDeclaredMethod("registerPacket", int.class, Class.class);
-                    registerPacket.setAccessible(true);
-                    registerPacket.invoke(Protocol.GAME.TO_CLIENT, 62, TeamPacket.class);
-                }
-            } catch (IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException | IllegalAccessException ex) {
-                getLogger().log(Level.SEVERE, "Failed to hook team packet", ex);
-            }
-        }
+        // Start packet listeners
+        ProtocolManager protocolManager = new ProtocolManager(plugin);
+        protocolManager.enable();
 
         int[] serversHash = {getProxy().getServers().hashCode()};
         getProxy().getScheduler().schedule(plugin, () -> {
