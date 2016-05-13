@@ -76,6 +76,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.protocol.packet.Team;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -219,6 +220,14 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
 
         INSTANCE = this;
+
+        try {
+            Team.class.getDeclaredMethod("setCollisionRule", String.class);
+            is19 = true;
+        } catch (NoSuchMethodException e) {
+            is19 = false;
+        }
+
         try {
             config = new ConfigManager(plugin);
         } catch (IOException ex) {
