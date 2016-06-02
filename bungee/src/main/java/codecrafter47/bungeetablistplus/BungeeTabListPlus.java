@@ -280,7 +280,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         resendThread = new ResendThread();
 
         if (isVersion18()) {
-            packetAccess = new PacketAccessImpl(getLogger());
+            packetAccess = new PacketAccessImpl();
             if (!packetAccess.isTabHeaderFooterSupported()) {
                 plugin.getLogger().warning("Your BungeeCord version doesn't support tablist header and footer modification");
             }

@@ -18,88 +18,27 @@
  */
 package codecrafter47.bungeetablistplus.packet;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.packet.v1_6_4.PlayerListPacketAccess16;
-import codecrafter47.bungeetablistplus.packet.v1_6_4.TeamPacketAccess16;
-import codecrafter47.bungeetablistplus.packet.v1_7_10.NewPlayerListPacketAccess;
-import codecrafter47.bungeetablistplus.packet.v1_7_10.NewTeamPacketAccess;
-import codecrafter47.bungeetablistplus.packet.v1_7_2.OldPlayerListPacketAccess;
-import codecrafter47.bungeetablistplus.packet.v1_7_2.OldTeamPacketAccess;
-import codecrafter47.bungeetablistplus.packet.v1_8.legacy.PlayerListPacketAccess18;
-import codecrafter47.bungeetablistplus.packet.v1_8.legacy.TeamPacketAccess18;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.connection.Connection;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.Team;
 
 /**
  * @author Florian Stober
  */
 public class LegacyPacketAccessImpl implements LegacyPacketAccess{
 
-    private TeamPacketAccess teamPacket;
-    private PlayerListPacketAccess playerListPacket;
-
-    public LegacyPacketAccessImpl() {
-        Class clazz;
-
-        if (BungeeTabListPlus.isVersion18()) {
-            teamPacket = new TeamPacketAccess18();
-            playerListPacket = new PlayerListPacketAccess18();
-        } else {
-            try {
-                try {
-                    clazz = Class.forName("net.md_5.bungee.protocol.packet.Team");
-                    if (clazz != null) {
-                        clazz.getMethod("setName", String.class);
-                        clazz.getMethod("setMode", byte.class);
-                        clazz.getMethod("setPrefix", String.class);
-                        clazz.getMethod("setSuffix", String.class);
-                        clazz.getMethod("setDisplayName", String.class);
-                        clazz.getMethod("setPlayers", String[].class);
-                        try {
-                            clazz.getMethod("setPlayerCount", short.class);
-                            teamPacket = new OldTeamPacketAccess();
-                        } catch (NoSuchMethodException ex) {
-                            teamPacket = new NewTeamPacketAccess();
-                        }
-                    }
-                } catch (ClassNotFoundException ex) {
-                    clazz = Class.forName(
-                            "net.md_5.bungee.protocol.packet.PacketD1Team");
-                    teamPacket = new TeamPacketAccess16(BungeeTabListPlus.getInstance().getLogger());
-                }
-            } catch (Throwable th) {
-                teamPacket = null;
-            }
-
-            try {
-                try {
-                    clazz = Class.forName(
-                            "net.md_5.bungee.protocol.packet.PlayerListItem");
-                    if (clazz != null) {
-                        clazz.getMethod("setUsername", String.class);
-                        clazz.getMethod("setOnline", boolean.class);
-                        try {
-                            clazz.getMethod("setPing", short.class);
-                            playerListPacket = new OldPlayerListPacketAccess();
-                        } catch (NoSuchMethodException ex) {
-                            playerListPacket = new NewPlayerListPacketAccess();
-                        }
-                    }
-                } catch (ClassNotFoundException ex) {
-                    clazz = Class.forName(
-                            "net.md_5.bungee.protocol.packet.PacketC9PlayerListItem");
-                    playerListPacket = new PlayerListPacketAccess16();
-                }
-            } catch (Throwable th) {
-                playerListPacket = null;
-            }
-        }
-    }
-
     @Override
     public void createTeam(Connection.Unsafe connection, String player) {
         Preconditions.checkArgument(player.length() <= 13);
-        teamPacket.createTeam(connection, player);
+        Team t = new Team();
+        t.setName("TAB" + player);
+        t.setMode((byte) 0);
+        t.setPrefix(" ");
+        t.setDisplayName(" ");
+        t.setSuffix(" ");
+        t.setPlayers(new String[]{player});
+        connection.sendPacket(t);
     }
 
     @Override
@@ -109,35 +48,58 @@ public class LegacyPacketAccessImpl implements LegacyPacketAccess{
         Preconditions.checkArgument(prefix.length() <= 16);
         Preconditions.checkArgument(displayname.length() <= 16);
         Preconditions.checkArgument(suffix.length() <= 16);
-        teamPacket.updateTeam(connection, player, prefix, displayname, suffix);
+        Team t = new Team();
+        t.setName("TAB" + player);
+        t.setMode((byte) 2);
+        t.setPrefix(prefix);
+        t.setDisplayName(displayname);
+        t.setSuffix(suffix);
+        connection.sendPacket(t);
     }
 
     @Override
     public void removeTeam(Connection.Unsafe connection, String player) {
         Preconditions.checkArgument(player.length() <= 13);
-        teamPacket.removeTeam(connection, player);
+        Team t = new Team();
+        t.setName("TAB" + player);
+        t.setMode((byte) 1);
+        connection.sendPacket(t);
     }
 
     @Override
     public void createOrUpdatePlayer(Connection.Unsafe connection, String player,
                                      int ping) {
         Preconditions.checkArgument(player.length() <= 16);
-        playerListPacket.createOrUpdatePlayer(connection, player, ping);
+        PlayerListItem pli = new PlayerListItem();
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setDisplayName(player);
+        item.setUsername(player);
+        item.setPing(ping);
+        pli.setItems(new PlayerListItem.Item[]{item});
+        pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+        connection.sendPacket(pli);
     }
 
     @Override
     public void removePlayer(Connection.Unsafe connection, String player) {
         Preconditions.checkArgument(player.length() <= 16);
-        playerListPacket.removePlayer(connection, player);
+        PlayerListItem pli = new PlayerListItem();
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setDisplayName(player);
+        item.setUsername(player);
+        item.setPing(9999);
+        pli.setItems(new PlayerListItem.Item[]{item});
+        pli.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+        connection.sendPacket(pli);
     }
 
     @Override
     public boolean isScoreboardSupported() {
-        return teamPacket != null;
+        return true;
     }
 
     @Override
     public boolean isTabModificationSupported() {
-        return playerListPacket != null;
+        return true;
     }
 }

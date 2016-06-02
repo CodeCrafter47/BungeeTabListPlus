@@ -90,36 +90,6 @@
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>network-api</artifactId>
-            <version>2.4.6-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>network-1.6.4</artifactId>
-            <version>2.4.6-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>network-1.7.2</artifactId>
-            <version>2.4.6-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>network-1.7.10</artifactId>
-            <version>2.4.6-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>network-1.8</artifactId>
-            <version>2.4.6-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>bungeetablistplus-api-bungee</artifactId>
             <version>2.4.6-SNAPSHOT</version>
             <scope>compile</scope>

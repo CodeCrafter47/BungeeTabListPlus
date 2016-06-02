@@ -20,50 +20,28 @@
 package codecrafter47.bungeetablistplus.packet;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.packet.v1_8.InjectedTabHeaderPacketAccess;
-import codecrafter47.bungeetablistplus.packet.v1_8.TabHeaderPacketAccess18;
+import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.connection.Connection;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PacketAccessImpl implements PacketAccess {
-    private TabHeaderPacketAccess tabHeaderPacket;
-
-    public PacketAccessImpl(Logger logger) {
-        if (isClassPresent("net.md_5.bungee.protocol.packet.PlayerListHeaderFooter")) {
-            tabHeaderPacket = new TabHeaderPacketAccess18();
-        } else {
-            try {
-                tabHeaderPacket = new InjectedTabHeaderPacketAccess();
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Failed to inject TabHeaderPacket", e);
-            }
-        }
-    }
-
-    private boolean isClassPresent(String name) {
-        try {
-            Class.forName(name);
-            return true;
-        } catch (ClassNotFoundException ignored) {
-            return false;
-        }
-    }
 
     @Override
     public boolean isTabHeaderFooterSupported(){
-        return tabHeaderPacket != null;
+        return true;
     }
 
     @Override
     public void setTabHeaderAndFooter(Connection.Unsafe connection, String header, String footer) {
-        tabHeaderPacket.setTabHeaderFooter(connection, header, footer);
+        Preconditions.checkNotNull(header, "header");
+        Preconditions.checkNotNull(footer, "footer");
+        connection.sendPacket(new PlayerListHeaderFooter(header, footer));
     }
 
     @Override
