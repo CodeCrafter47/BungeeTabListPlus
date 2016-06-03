@@ -87,7 +87,7 @@ public class SkinManagerImpl implements SkinManager {
                         .map(line -> line.split(" "))
                         .forEach(entry -> headCache.put(
                                 Head.of(Base64.getDecoder().decode(entry[0])),
-                                new PlayerSkin(null, new String[]{"textures", entry[1], entry[2]})
+                                new PlayerSkin(null, new String[][]{{"textures", entry[1], entry[2]}})
                         ));
             } catch (Throwable th) {
                 plugin.getLogger().log(Level.WARNING, "Failed to load heads/cache.txt", th);
@@ -201,7 +201,7 @@ public class SkinManagerImpl implements SkinManager {
                 plugin.getLogger().info("Preparing head " + file.getName() + " approx. " + map.get("timeLeft") + " minutes remaining.");
                 ProxyServer.getInstance().getScheduler().schedule(plugin, () -> fetchHeadSkin(file, headArray), 30, TimeUnit.SECONDS);
             } else if (map.get("state").equals("SUCCESS")) {
-                PlayerSkin skin = new PlayerSkin(null, new String[]{"textures", (String) map.get("skin"), (String) map.get("signature")});
+                PlayerSkin skin = new PlayerSkin(null, new String[][]{{"textures", (String) map.get("skin"), (String) map.get("signature")}});
                 fileSkinCache.put(file, skin);
                 headCache.put(Head.of(headArray), skin);
                 plugin.getLogger().info("Head " + file.getName() + " is now ready for use.");
@@ -217,9 +217,9 @@ public class SkinManagerImpl implements SkinManager {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(cacheFile, true));
                 writer.write(Base64.getEncoder().encodeToString(headArray));
                 writer.write(' ');
-                writer.write(skin.toProperty()[1]);
+                writer.write(skin.toProperty()[0][1]);
                 writer.write(' ');
-                writer.write(skin.toProperty()[2]);
+                writer.write(skin.toProperty()[0][2]);
                 writer.newLine();
                 writer.close();
             } else {
@@ -298,8 +298,8 @@ public class SkinManagerImpl implements SkinManager {
                     connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
             if (skin != null && skin.properties != null && !skin.properties.isEmpty()) {
-                return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[]{"textures", skin.properties.get(0).value, skin.properties.
-                        get(0).signature});
+                return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[][]{{"textures", skin.properties.get(0).value, skin.properties.
+                        get(0).signature}});
             }
         } catch (Throwable e) {
             if (e instanceof IOException && e.getMessage().contains("429")) {

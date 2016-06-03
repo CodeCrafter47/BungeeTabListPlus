@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.data.DataKeys;
@@ -223,7 +224,12 @@ public class ConfigParser {
                 SlotTemplate suffix = parseSlot(fillbukkitplayersMatcher.group("suffix"));
                 sections.add(new FillBukkitPlayersSection(startColumn[0], prefix, suffix, sorter, minslots[0], maxplayers[0], playerLines, morePlayerLines));
             } else {
-                SlotTemplate template = parseSlot(line);
+                SlotTemplate template = SlotTemplate.of(new SlotTemplate() {
+                    @Override
+                    public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                        return builder.setSkin(BungeeTabListPlus.getInstance().getSkinManager().getSkin(config.defaultSkin));
+                    }
+                }, parseSlot(line));
                 StaticSection section;
                 if (sections.size() > 0 && sections.get(sections.size() - 1) instanceof StaticSection && startColumn[0] == -1) {
                     section = (StaticSection) sections.get(sections.size() - 1);
@@ -389,7 +395,12 @@ public class ConfigParser {
                     return new FillPlayersSection(startColumn[0], parseFilter(finalFilters), prefix, suffix, sorter, minslots[0], maxplayers[0], playerLines, morePlayerLines);
                 });
             } else {
-                SlotTemplate slotTemplate = SlotTemplate.of(g_prefix, parseSlot(line), g_suffix);
+                SlotTemplate slotTemplate = SlotTemplate.of(new SlotTemplate() {
+                    @Override
+                    public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                        return builder.setSkin(BungeeTabListPlus.getInstance().getSkinManager().getSkin(config.defaultSkin));
+                    }
+                }, g_prefix, parseSlot(line), g_suffix);
                 sections.add(group -> {
                     ServerSection serverSection = new ServerSection(startColumn[0], group);
                     serverSection.add(slotTemplate);

@@ -17,13 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.tablisthandler;
+package codecrafter47.bungeetablistplus.protocol;
 
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.Team;
 
-public interface TabListHandler {
+public interface PacketHandler {
 
-    void sendTabList(TabList tabList);
+    PacketListenerResult onPlayerListPacket(PlayerListItem packet);
 
-    void unload();
+    PacketListenerResult onTeamPacket(Team packet);
+
+    PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet);
+
+    void onServerSwitch();
 }

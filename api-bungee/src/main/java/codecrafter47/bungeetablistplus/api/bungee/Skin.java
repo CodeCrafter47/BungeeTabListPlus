@@ -31,15 +31,13 @@ public interface Skin {
     /**
      * The property associated with the skin.
      * See http://wiki.vg/Mojang_API#UUID_-.3E_Profile_.2B_Skin.2FCape
-     * This is only the "textures" property.
      * <p>
      * If this returns null {@link Skin#getOwner()} must also return null. In that case this is a
      * random Alex/ Steve skin.
      *
      * @return the properties associated with this skin
-     * can be null
      */
-    String[] toProperty();
+    String[][] toProperty();
 
     /**
      * The UUID of the player who's skin is represented by this object

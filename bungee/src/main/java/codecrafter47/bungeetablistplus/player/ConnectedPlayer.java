@@ -25,10 +25,15 @@ import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import codecrafter47.bungeetablistplus.tablisthandler.LegacyTabList;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.RewriteLogic;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -48,6 +53,9 @@ public class ConnectedPlayer implements Player {
 
     private final ProxiedPlayer player;
     private Skin skin = null;
+
+    private PacketHandler packetHandler = null;
+    private PlayerTablistHandler playerTablistHandler = null;
 
     @Setter
     private BukkitBridge.BukkitData bukkitData;
@@ -83,7 +91,6 @@ public class ConnectedPlayer implements Player {
 
     @Override
     public Skin getSkin() {
-        if (!BungeeTabListPlus.isVersion18()) return SkinManager.defaultSkin;
         if (skin == null) {
             LoginResult loginResult = ((UserConnection) player).
                     getPendingConnection().getLoginProfile();
@@ -92,7 +99,7 @@ public class ConnectedPlayer implements Player {
                 if (properties != null) {
                     for (LoginResult.Property s : properties) {
                         if (s.getName().equals("textures")) {
-                            skin = new PlayerSkin(player.getUniqueId(), new String[]{s.getName(), s.getValue(), s.getSignature()});
+                            skin = new PlayerSkin(player.getUniqueId(), new String[][]{{s.getName(), s.getValue(), s.getSignature()}});
                         }
                     }
                 }
@@ -146,6 +153,35 @@ public class ConnectedPlayer implements Player {
             data.registerValueChangeListener(key, listener);
         } else {
             bukkitData.registerValueChangeListener(key, listener);
+        }
+    }
+
+    @Synchronized
+    public PacketHandler getPacketHandler() {
+        if (packetHandler == null) {
+            createTabListHandler();
+        }
+        return packetHandler;
+    }
+
+    @Synchronized
+    public PlayerTablistHandler getPlayerTablistHandler() {
+        if (playerTablistHandler == null) {
+            createTabListHandler();
+        }
+        return playerTablistHandler;
+    }
+
+    private void createTabListHandler() {
+        if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(getPlayer())) {
+            TabListLogic tabListLogic = new TabListLogic(null, getPlayer());
+            playerTablistHandler = PlayerTablistHandler.create(getPlayer(), tabListLogic);
+            packetHandler = new RewriteLogic(tabListLogic);
+            tabListLogic.onConnected();
+        } else {
+            LegacyTabList legacyTabList = new LegacyTabList(getPlayer(), getPlayer().getPendingConnection().getListener().getTabListSize());
+            playerTablistHandler = PlayerTablistHandler.create(getPlayer(), legacyTabList);
+            packetHandler = legacyTabList;
         }
     }
 }

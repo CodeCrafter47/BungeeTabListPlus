@@ -43,7 +43,7 @@ public class AnimatedSkin implements Skin {
     }
 
     @Override
-    public String[] toProperty() {
+    public String[][] toProperty() {
         return getSkin().toProperty();
     }
 

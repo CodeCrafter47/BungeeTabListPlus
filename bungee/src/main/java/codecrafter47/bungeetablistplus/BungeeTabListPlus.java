@@ -35,7 +35,6 @@ import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.managers.DataManager;
-import codecrafter47.bungeetablistplus.managers.DummySkinManager;
 import codecrafter47.bungeetablistplus.managers.PermissionManager;
 import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
 import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
@@ -43,10 +42,6 @@ import codecrafter47.bungeetablistplus.managers.RedisPlayerManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.managers.SkinManagerImpl;
 import codecrafter47.bungeetablistplus.managers.TabListManager;
-import codecrafter47.bungeetablistplus.packet.LegacyPacketAccess;
-import codecrafter47.bungeetablistplus.packet.LegacyPacketAccessImpl;
-import codecrafter47.bungeetablistplus.packet.PacketAccess;
-import codecrafter47.bungeetablistplus.packet.PacketAccessImpl;
 import codecrafter47.bungeetablistplus.placeholder.BasicPlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.BukkitPlaceholders;
 import codecrafter47.bungeetablistplus.placeholder.ColorPlaceholder;
@@ -69,14 +64,12 @@ import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import com.google.common.base.Preconditions;
 import de.sabbertran.proxysuite.ProxySuiteAPI;
 import lombok.Getter;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import net.md_5.bungee.protocol.packet.Team;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -114,7 +107,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private final Plugin plugin;
     private Collection<IPlayerProvider> playerProviders;
     private ResendThread resendThread;
-    private static Field tabListHandlerField;
+
     @Getter
     private RedisPlayerManager redisPlayerManager;
     @Getter
@@ -166,16 +159,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     private UpdateChecker updateChecker = null;
 
-    static private boolean is18 = true;
-
-    static private boolean is19 = true;
-
-    static private boolean isAbove995 = false;
-
-    private LegacyPacketAccess legacyPacketAccess;
-
-    private PacketAccess packetAccess;
-
     private final Map<String, PingTask> serverState = new HashMap<>();
 
     private SkinManager skins;
@@ -212,6 +195,12 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      */
     public void onEnable() {
         try {
+            Class.forName("net.md_5.bungee.api.Title");
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException("You need to run at least BungeeCord version #995");
+        }
+
+        try {
             Field field = BungeeTabListPlusAPI.class.getDeclaredField("instance");
             field.setAccessible(true);
             field.set(null, this);
@@ -220,13 +209,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
 
         INSTANCE = this;
-
-        try {
-            Team.class.getDeclaredMethod("setCollisionRule", String.class);
-            is19 = true;
-        } catch (NoSuchMethodException e) {
-            is19 = false;
-        }
 
         try {
             config = new ConfigManager(plugin);
@@ -242,50 +224,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             bugReportingService.registerLogger(getLogger());
         }
 
-        try {
-            Class.forName("net.md_5.bungee.tab.TabList");
-        } catch (ClassNotFoundException ex) {
-            is18 = false;
-        }
-
-        try {
-            Class.forName("net.md_5.bungee.api.Title");
-            isAbove995 = true;
-        } catch (ClassNotFoundException ex) {
-            isAbove995 = false;
-        }
-
-        try {
-            tabListHandlerField = UserConnection.class.getDeclaredField(isVersion18() ? "tabListHandler" : "tabList");
-        } catch (NoSuchFieldException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to access tabListHandler field", e);
-            plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
-            plugin.getLogger().warning("Disabling Plugin");
-        }
-
-        legacyPacketAccess = new LegacyPacketAccessImpl();
-
-        if (!legacyPacketAccess.isTabModificationSupported()) {
-            plugin.getLogger().warning("Your BungeeCord Version isn't supported yet");
-            plugin.getLogger().warning("Disabling Plugin");
-            return;
-        }
-
-        if ((!legacyPacketAccess.isScoreboardSupported()) && config.getMainConfig().useScoreboardToBypass16CharLimit) {
-            plugin.getLogger().warning("Your BungeeCord Version does not support the following option: 'useScoreboardToBypass16CharLimit'");
-            plugin.getLogger().warning("This option will be disabled");
-            config.getMainConfig().useScoreboardToBypass16CharLimit = false;
-        }
-
         resendThread = new ResendThread();
 
-        if (isVersion18()) {
-            packetAccess = new PacketAccessImpl();
-            if (!packetAccess.isTabHeaderFooterSupported()) {
-                plugin.getLogger().warning("Your BungeeCord version doesn't support tablist header and footer modification");
-            }
-
-            File headsFolder = new File(plugin.getDataFolder(), "heads");
+        File headsFolder = new File(plugin.getDataFolder(), "heads");
 
             if (!headsFolder.exists()) {
                 headsFolder.mkdirs();
@@ -317,9 +258,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             }
 
             skins = new SkinManagerImpl(plugin, headsFolder);
-        } else {
-            skins = new DummySkinManager();
-        }
 
         fakePlayerManager = new FakePlayerManagerImpl(plugin);
 
@@ -537,14 +475,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return skins;
     }
 
-    public LegacyPacketAccess getLegacyPacketAccess() {
-        return legacyPacketAccess;
-    }
-
-    public PacketAccess getPacketAccess() {
-        return packetAccess;
-    }
-
     /**
      * Getter for the PermissionManager. For internal use only.
      *
@@ -687,24 +617,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 th);
     }
 
-    public static boolean isVersion18() {
-        return is18;
-    }
-
-    public static Object getTabList(ProxiedPlayer player) throws IllegalAccessException {
-        tabListHandlerField.setAccessible(true);
-        return tabListHandlerField.get(player);
-    }
-
-    public static void setTabList(ProxiedPlayer player, Object tabList) throws IllegalAccessException {
-        tabListHandlerField.setAccessible(true);
-        tabListHandlerField.set(player, tabList);
-    }
-
-    public static boolean isAbove995() {
-        return isAbove995;
-    }
-
     public Logger getLogger() {
         return plugin.getLogger();
     }
@@ -734,7 +646,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     protected Skin getSkinForPlayer0(String nameOrUUID) {
         if (!PATTERN_VALID_USERNAME.matcher(nameOrUUID).matches()) {
             try {
-                UUID.fromString(nameOrUUID);
+                UUID.fromString(nameOrUUID); // TODO: 02.06.16 this is slow
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException("Given string is neither valid username nor uuid: " + nameOrUUID);
             }
@@ -763,9 +675,5 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     protected void removeCustomTabList0(ProxiedPlayer player) {
         Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
         getTabListManager().removeCustomTabList(player);
-    }
-
-    public static boolean isVersion19() {
-        return is19;
     }
 }

@@ -22,24 +22,18 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.ErrorTabListProvider;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import gnu.trove.set.hash.THashSet;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.netty.ChannelWrapper;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -106,20 +100,10 @@ class ResendThread implements Runnable, Executor {
                     ProxiedPlayer player = queue.poll();
                     set.remove(player);
                     if (player.getServer() != null) {
-                        Object tabList = BungeeTabListPlus.getTabList(player);
-                        if (tabList instanceof PlayerTablistHandler) {
-                            PlayerTablistHandler tablistHandler = (PlayerTablistHandler) tabList;
-                            ChannelWrapper ch = null;
-                            try {
-                                ch = ReflectionUtil.getChannelWrapper(player);
-                            } catch (NoSuchFieldException | IllegalAccessException e) {
-                                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "failed to get ChannelWrapper for player", e);
-                            }
-                            if (ch != null) {
-                                ch.getHandle().eventLoop().submit(() -> update(tablistHandler)).await();
-                            }
-                        } else {
-                            BungeeTabListPlus.getInstance().getLogger().severe("tabListHandler for " + player.getName() + " has been changed. It now is " + tabList.getClass() + " by " + tabList.getClass().getClassLoader() + ". More info below:\n" + collectClassLoaderInfo(tabList));
+                        ConnectedPlayerManager connectedPlayerManager = BungeeTabListPlus.getInstance().getConnectedPlayerManager();
+                        ConnectedPlayer connectedPlayer = connectedPlayerManager.getPlayerIfPresent(player);
+                        if (connectedPlayer != null) {
+                            update(player, connectedPlayer);
                         }
                     }
                 } else {
@@ -133,27 +117,27 @@ class ResendThread implements Runnable, Executor {
         }
     }
 
-    private void update(PlayerTablistHandler tablistHandler) {
+    private void update(ProxiedPlayer player, ConnectedPlayer connectedPlayer) {
+        PlayerTablistHandler tablistHandler = connectedPlayer.getPlayerTablistHandler();
+
         try {
-            Server server = tablistHandler.getPlayer().getServer();
+            Server server = player.getServer();
             if (server != null && (BungeeTabListPlus.getInstance().getConfigManager().
                     getMainConfig().excludeServers.contains(server.getInfo().getName()))) {
-                tablistHandler.exclude();
+                tablistHandler.setPassThrough(true);
+                return;
             }
 
             TabListProvider tlp = BungeeTabListPlus.getInstance().
-                    getTabListManager().getTabListForPlayer(tablistHandler.getPlayer());
+                    getTabListManager().getTabListForPlayer(player);
             if (tlp == null) {
-                tablistHandler.exclude();
-            }
-
-            if (tablistHandler.isExcluded()) {
+                tablistHandler.setPassThrough(true);
                 return;
             }
 
             TabList tabList;
 
-            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(tablistHandler.getPlayer())) {
+            if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
                 int wishedTabListSize = tlp.getWishedTabListSize();
                 if (wishedTabListSize < 1) {
                     wishedTabListSize = 1;
@@ -167,85 +151,29 @@ class ResendThread implements Runnable, Executor {
                 tabList = new GenericTabList();
             }
 
-            TabListContext context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), tablistHandler.getPlayer(), BungeeTabListPlus.getInstance().constructPlayerManager(tablistHandler.getPlayer()));
-            ConnectedPlayer connectedPlayer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(context.getViewer());
-            if (connectedPlayer != null) {
+            TabListContext context = new GenericTabListContext(tabList.getRows(), tabList.getColumns(), player, BungeeTabListPlus.getInstance().constructPlayerManager(player));
+
                 context = context.setPlayer(connectedPlayer);
 
-                tlp.fillTabList(tablistHandler.getPlayer(), tabList, context);
+            tlp.fillTabList(player, tabList, context);
 
-                tablistHandler.sendTablist(tabList);
-            }
+            tablistHandler.sendTabList(tabList);
         } catch (Throwable th) {
             try {
                 BungeeTabListPlus.getInstance().getLogger().log(th instanceof LayoutException ? Level.WARNING : Level.SEVERE, "Error while updating tablist", th);
                 TabList tabList;
-                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(tablistHandler.getPlayer())) {
+                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
                     tabList = new GenericTabList(20, 4);
                 } else {
                     tabList = new GenericTabList();
                 }
 
-                ErrorTabListProvider.constructErrorTabList(tablistHandler.getPlayer(), tabList, "Error while updating tablist", th);
+                ErrorTabListProvider.constructErrorTabList(player, tabList, "Error while updating tablist", th);
 
-                tablistHandler.sendTablist(tabList);
+                tablistHandler.sendTabList(tabList);
             } catch (Throwable th2) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to construct error tab list", th2);
             }
         }
-    }
-
-    private String collectClassLoaderInfo(Object object) {
-        StringBuilder info = new StringBuilder();
-        info.append("********************************************************************************\n");
-        info.append("Found: ").append(object.toString()).append("\n");
-        appendClassInfo("  ", object.getClass(), info);
-        info.append("Expected: \n");
-        if (BungeeTabListPlus.isVersion18()) {
-            appendClassInfo("  ", CustomTabList18.class, info);
-        } else {
-            appendClassInfo("  ", CustomTabListHandler.class, info);
-        }
-        info.append("Expected Interface: \n");
-        appendClassInfo("  ", PlayerTablistHandler.class, info);
-        Plugin plugin = BungeeTabListPlus.getInstance().getPlugin();
-        if (plugin != null) {
-            info.append("Plugin instance: ").append(plugin.toString()).append("\n");
-            appendClassInfo("  ", plugin.getClass(), info);
-        }
-        plugin = ProxyServer.getInstance().getPluginManager().getPlugin("BungeeTabListPlus");
-        if (plugin != null) {
-            info.append("Registered Plugin instance: ").append(plugin.toString()).append("\n");
-            appendClassInfo("  ", plugin.getClass(), info);
-        }
-        BungeeTabListPlus bungeeTabListPlus = BungeeTabListPlus.getInstance();
-        if (bungeeTabListPlus != null) {
-            info.append("BungeeTabListPlus instance: ").append(bungeeTabListPlus.toString()).append("\n");
-            appendClassInfo("  ", bungeeTabListPlus.getClass(), info);
-        }
-        info.append("********************************************************************************\n");
-        return info.toString();
-    }
-
-    private void appendClassInfo(String prefix, Class clazz, StringBuilder info) {
-        info.append(prefix).append("type: ").append(clazz).append("\n");
-        info.append(prefix).append("classloader: ").append(clazz.getClassLoader()).append("\n");
-        info.append(prefix).append("file: ").append(getSourceFile(clazz)).append("\n");
-        Class superclass = clazz.getSuperclass();
-        if (superclass != null && !superclass.equals(Object.class)) {
-            info.append(prefix).append("super:").append("\n");
-            appendClassInfo(prefix + "  ", superclass, info);
-        }
-        Class[] interfaces = clazz.getInterfaces();
-        if (interfaces != null) {
-            for (Class anInterface : interfaces) {
-                info.append(prefix).append("interface:").append("\n");
-                appendClassInfo(prefix + "  ", anInterface, info);
-            }
-        }
-    }
-
-    private String getSourceFile(Class clazz) {
-        return Optional.ofNullable(clazz.getProtectionDomain().getCodeSource()).map(cs -> cs.getLocation().toString()).orElse("null");
     }
 }

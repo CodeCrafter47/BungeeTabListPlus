@@ -36,8 +36,6 @@ public class MainConfig extends Configuration {
 
     public boolean updateOnServerChange = true;
 
-    public boolean useScoreboardToBypass16CharLimit = true;
-
     public int charLimit = -1;
 
     public String permissionSource = "AUTO";
@@ -141,10 +139,6 @@ public class MainConfig extends Configuration {
             updateOnServerChange = parseBoolean(map.get("updateOnServerChange"));
         }
 
-        if (map.containsKey("useScoreboardToBypass16CharLimit")) {
-            useScoreboardToBypass16CharLimit = parseBoolean(map.get("useScoreboardToBypass16CharLimit"));
-        }
-
         if (map.containsKey("charLimit")) {
             charLimit = parseInteger(map.get("charLimit"));
         }
@@ -236,10 +230,6 @@ public class MainConfig extends Configuration {
 
         writeComment("whether tablist should be resend if a player switches the server");
         write("updateOnServerChange", updateOnServerChange);
-
-        writeComments("whether to use scoreboard functions to bypass the 16 character limit",
-                "does NOT conflict if other scoreboard plugins");
-        write("useScoreboardToBypass16CharLimit", useScoreboardToBypass16CharLimit);
 
         writeComments("You can limit the number of characters per slot here",
                 "Color codes do not count as a character; -1 means unlimited");

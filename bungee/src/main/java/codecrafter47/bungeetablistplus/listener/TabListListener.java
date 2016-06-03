@@ -19,18 +19,15 @@
 package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.CustomTabListHandler;
-import codecrafter47.bungeetablistplus.tablisthandler.MyTabList;
-import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
-import codecrafter47.bungeetablistplus.tablisthandler.ScoreboardTabList;
-import codecrafter47.bungeetablistplus.tablisthandler.TabList18;
-import codecrafter47.bungeetablistplus.tablisthandler.TabListHandler;
+import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ProxyReloadEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -46,43 +43,45 @@ public class TabListListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PostLoginEvent e) {
         try {
-            PlayerTablistHandler tab;
-            TabListHandler handler;
-            if (!BungeeTabListPlus.isVersion18()) {
-                tab = new CustomTabListHandler(e.getPlayer());
-                if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
-                    handler = new MyTabList(tab);
-                } else {
-                    handler = new ScoreboardTabList(tab);
-                }
-            } else {
-                CustomTabList18 customTabList18 = new CustomTabList18(e.getPlayer());
-                customTabList18.onConnect();
-                tab = customTabList18;
-                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(e.getPlayer())) {
-                    handler = new TabList18(tab);
-                } else {
-                    if (!plugin.getConfigManager().getMainConfig().useScoreboardToBypass16CharLimit) {
-                        handler = new MyTabList(tab);
-                    } else {
-                        handler = new ScoreboardTabList(tab);
-                    }
-                }
+            ConnectedPlayerManager manager = plugin.getConnectedPlayerManager();
+            ConnectedPlayer connectedPlayer = manager.getPlayerIfPresent(e.getPlayer().getUniqueId());
+            if (connectedPlayer != null) {
+                manager.onPlayerDisconnected(connectedPlayer);
             }
-            tab.setTabListHandler(handler);
-            BungeeTabListPlus.setTabList(e.getPlayer(), tab);
+            connectedPlayer = new ConnectedPlayer(e.getPlayer());
+            manager.onPlayerConnected(connectedPlayer);
 
             if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
                 plugin.resendTabLists();
             }
             plugin.updateTabListForPlayer(e.getPlayer());
+        } catch (Throwable th) {
+            BungeeTabListPlus.getInstance().reportError(th);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerDisconnect(PlayerDisconnectEvent e) {
+        try {
+            ConnectedPlayerManager manager = plugin.getConnectedPlayerManager();
+            ConnectedPlayer connectedPlayer = manager.getPlayerIfPresent(e.getPlayer().getUniqueId());
+            if (connectedPlayer != null && connectedPlayer.getPlayer() == e.getPlayer()) {
+                manager.onPlayerDisconnected(connectedPlayer);
+            }
+
+            // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
+            Server server = e.getPlayer().getServer();
+            if (server != null) {
+                server.disconnect("Quitting");
+            }
+            ((UserConnection) e.getPlayer()).setServer(null);
         } catch (Throwable th){
             BungeeTabListPlus.getInstance().reportError(th);
         }
     }
 
     @EventHandler
-    public void onPlayerJoin(ServerConnectedEvent e) {
+    public void onServerSwitch(ServerSwitchEvent e) {
         plugin.updateTabListForPlayer(e.getPlayer());
         if (plugin.getConfigManager().getMainConfig().updateOnServerChange) {
             plugin.resendTabLists();

@@ -20,10 +20,10 @@
 package codecrafter47.bungeetablistplus.protocol;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.packet.TeamPacketHandler;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -44,18 +44,23 @@ public class ProtocolManager implements Listener {
     }
 
     @EventHandler
-    public void onServerConnected(ServerConnectedEvent event) {
+    public void onServerConnected(ServerSwitchEvent event) {
         try {
             ProxiedPlayer player = event.getPlayer();
 
-            Object tabList = BungeeTabListPlus.getTabList(player);
-
-            if (tabList instanceof TeamPacketHandler) {
-                ServerConnection server = (ServerConnection) event.getServer();
+            ConnectedPlayer connectedPlayer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(player);
+            if (connectedPlayer != null) {
+                ServerConnection server = (ServerConnection) event.getPlayer().getServer();
 
                 ChannelWrapper wrapper = server.getCh();
 
-                wrapper.getHandle().pipeline().addAfter(PipelineUtils.PACKET_DECODER, "btlp-packet-listener", new TeamPacketListener(server, (TeamPacketHandler) tabList, player.getPendingConnection().getVersion()));
+                int version = player.getPendingConnection().getVersion();
+                PacketHandler packetHandler = connectedPlayer.getPacketHandler();
+                PacketListener packetListener = new PacketListener(server, packetHandler, version);
+
+                wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "btlp-packet-listener", packetListener);
+
+                packetHandler.onServerSwitch();
             }
         } catch (Exception ex) {
             plugin.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);

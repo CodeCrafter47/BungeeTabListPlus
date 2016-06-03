@@ -29,10 +29,10 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class PlayerSkin implements Skin {
     UUID player;
-    String[] properties;
+    String[][] properties;
 
     @Override
-    public String[] toProperty() {
+    public String[][] toProperty() {
         return properties;
     }
 

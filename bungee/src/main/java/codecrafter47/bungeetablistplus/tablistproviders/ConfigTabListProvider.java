@@ -113,9 +113,7 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
             tabList.setFooter(footer.buildSlot(context).getText());
         }
 
-        if (BungeeTabListPlus.isVersion18()) {
-            tabList.setDefaultSkin(plugin.getSkinManager().getSkin(config.defaultSkin));
-        }
+        tabList.setDefaultSkin(plugin.getSkinManager().getSkin(config.defaultSkin));
 
         tabList.setDefaultPing(config.defaultPing);
     }

@@ -44,9 +44,7 @@ public class TabListManager implements Listener {
 
     private final BungeeTabListPlus plugin;
     private IConfigTabListProvider defaultTab;
-    private IConfigTabListProvider defaultTab17;
     private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
-    private final List<IConfigTabListProvider> tabLists17 = new ArrayList<>();
 
     public Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
 
@@ -67,7 +65,6 @@ public class TabListManager implements Listener {
             }
             validateShowTo(plugin.getConfigManager().defaultTabList);
             defaultTab = new ConfigParser(plugin, plugin.getConfigManager().defaultTabList.tab_size).parse(plugin.getConfigManager().defaultTabList);
-            defaultTab17 = new ConfigParser(plugin, ConfigManager.getTabSize()).parse(plugin.getConfigManager().defaultTabList);
         } catch (Throwable ex) {
             plugin.getLogger().log(Level.SEVERE, "Could not load default tabList", ex);
             try {
@@ -82,7 +79,6 @@ public class TabListManager implements Listener {
             try {
                 validateShowTo(c);
                 tabLists.add(new ConfigParser(plugin, c.tab_size).parse(c));
-                tabLists17.add(new ConfigParser(plugin, ConfigManager.getTabSize()).parse(c));
             } catch (Throwable ex) {
                 plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getName(), ex);
                 try {
@@ -99,7 +95,7 @@ public class TabListManager implements Listener {
         if (customTabLists.get(player) != null) return customTabLists.get(player);
         TabListProvider provider = null;
         int priority = Integer.MIN_VALUE;
-        for (IConfigTabListProvider tabList : (plugin.getProtocolVersionProvider().has18OrLater(player) ? tabLists : tabLists17)) {
+        for (IConfigTabListProvider tabList : tabLists) {
             if (tabList.appliesTo(player)) {
                 if (tabList.getPriority() > priority) {
                     priority = tabList.getPriority();
@@ -110,11 +106,8 @@ public class TabListManager implements Listener {
         if (provider != null) {
             return provider;
         }
-        if (plugin.getProtocolVersionProvider().has18OrLater(player) && defaultTab != null && defaultTab.appliesTo(player)) {
+        if (defaultTab != null && defaultTab.appliesTo(player)) {
             return defaultTab;
-        }
-        if (!plugin.getProtocolVersionProvider().has18OrLater(player) && defaultTab17 != null && defaultTab17.appliesTo(player)) {
-            return defaultTab17;
         }
         return null;
     }

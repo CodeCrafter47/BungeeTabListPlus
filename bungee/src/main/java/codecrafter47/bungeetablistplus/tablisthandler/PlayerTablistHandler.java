@@ -18,26 +18,171 @@
  */
 package codecrafter47.bungeetablistplus.tablisthandler;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
+import codecrafter47.bungeetablistplus.util.ColorParser;
+import codecrafter47.bungeetablistplus.util.FastChat;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.netty.ChannelWrapper;
 
 import java.util.List;
+import java.util.logging.Level;
+
+import static java.lang.Integer.min;
 
 /**
  * @author Florian Stober
  */
-public interface PlayerTablistHandler {
+public abstract class PlayerTablistHandler {
 
-    void sendTablist(TabList tabList);
+    public abstract void setPassThrough(boolean passThrough);
 
-    boolean isExcluded();
+    public abstract List<IPlayer> getServerTabList();
 
-    void exclude();
+    public abstract void sendTabList(TabList tabList);
 
-    ProxiedPlayer getPlayer();
+    public static PlayerTablistHandler create(ProxiedPlayer player, TabListLogic handle) {
+        return new Default(player, handle);
+    }
 
-    List<IPlayer> getPlayers();
+    public static PlayerTablistHandler create(ProxiedPlayer player, LegacyTabList handle) {
+        return new Legacy(player, handle);
+    }
 
-    void setTabListHandler(TabListHandler tabListHandler);
+    static void runInEventLoop(ProxiedPlayer player, Runnable runnable) {
+        ChannelWrapper ch = null;
+        try {
+            ch = ReflectionUtil.getChannelWrapper(player);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "failed to get ChannelWrapper for player", e);
+        }
+        if (ch != null) {
+            ch.getHandle().eventLoop().submit(runnable);
+        }
+    }
+
+    private static class Default extends PlayerTablistHandler {
+        private final ProxiedPlayer player;
+        private final TabListLogic handle;
+
+        private Default(ProxiedPlayer player, TabListLogic handle) {
+            this.player = player;
+            this.handle = handle;
+        }
+
+        @Override
+        public void setPassThrough(boolean passThrough) {
+            runInEventLoop(player, () -> {
+                handle.setPassTrough(passThrough);
+            });
+        }
+
+        @Override
+        public List<IPlayer> getServerTabList() {
+            return handle.getServerTabList();
+        }
+
+        @Override
+        public void sendTabList(TabList tabList0) {
+            runInEventLoop(player, () -> {
+                TabList tabList = tabList0.flip();
+
+                if (tabList.shouldShrink() && tabList.getUsedSlots() > tabList.flip().getUsedSlots()) {
+                    tabList = tabList.flip();
+                }
+
+                int size = min(80, tabList.shouldShrink() ? tabList.getUsedSlots() : tabList.getSize());
+                handle.setSize(size);
+                handle.setPassTrough(false);
+
+                int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+
+                boolean onlineMode = handle.getPlayer().getPendingConnection().isOnlineMode();
+
+                for (int i = 0; i < size; i++) {
+                    Slot slot = tabList.getSlot(i);
+                    if (slot != null) {
+                        String text = slot.getText();
+
+                        if (charLimit > 0) {
+                            text = ChatColor.translateAlternateColorCodes('&', text);
+                            text = ColorParser.substringIgnoreColors(text, charLimit);
+                            for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
+                                text += ' ';
+                            }
+                        }
+
+                        Skin skin = onlineMode ? slot.getSkin() : SkinManager.defaultSkin;
+                        handle.setSlot(i, skin, FastChat.legacyTextToJson(text, '&'), slot.getPing());
+                    } else {
+                        Skin skin = onlineMode ? tabList.getDefaultSkin() : SkinManager.defaultSkin;
+                        handle.setSlot(i, skin, FastChat.legacyTextToJson("", '&'), tabList.getDefaultPing());
+                    }
+                }
+
+                handle.setHeaderFooter(FastChat.legacyTextToJson(tabList.getHeader(), '&')
+                        , FastChat.legacyTextToJson(tabList.getFooter(), '&'));
+            });
+        }
+    }
+
+    private static class Legacy extends PlayerTablistHandler {
+        private final ProxiedPlayer player;
+        private final LegacyTabList handle;
+
+        private Legacy(ProxiedPlayer player, LegacyTabList handle) {
+            this.player = player;
+            this.handle = handle;
+        }
+
+        @Override
+        public void setPassThrough(boolean passThrough) {
+            runInEventLoop(player, () -> {
+                handle.setPassTrough(passThrough);
+            });
+        }
+
+        @Override
+        public List<IPlayer> getServerTabList() {
+            return handle.getServerTabList();
+        }
+
+        @Override
+        public void sendTabList(TabList tabList) {
+            runInEventLoop(player, () -> {
+                int size = min(handle.getMaxSize(), tabList.getUsedSlots());
+                handle.setSize(size);
+                handle.setPassTrough(false);
+
+                int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+
+                for (int i = 0; i < size; i++) {
+                    Slot slot = tabList.getSlot(i);
+                    if (slot != null) {
+                        String text = slot.getText();
+
+                        text = ChatColor.translateAlternateColorCodes('&', text);
+
+                        if (charLimit > 0) {
+                            text = ColorParser.substringIgnoreColors(text, charLimit);
+                            for (int j = charLimit - ChatColor.stripColor(text).length(); j > 0; j--) {
+                                text += ' ';
+                            }
+                        }
+
+                        handle.setSlot(i, text, slot.getPing());
+                    } else {
+                        handle.setSlot(i, " ", tabList.getDefaultPing());
+                    }
+                }
+            });
+        }
+    }
 }

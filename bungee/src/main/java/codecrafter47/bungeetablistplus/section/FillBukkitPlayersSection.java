@@ -22,8 +22,8 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
-import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -48,8 +48,12 @@ public class FillBukkitPlayersSection extends AbstractFillPlayersSection {
         @Override
         @SneakyThrows
         protected List<IPlayer> getPlayers(ProxiedPlayer player, TabListContext context) {
-            PlayerTablistHandler tabList = (PlayerTablistHandler) BungeeTabListPlus.getTabList(player);
-            return tabList.getPlayers();
+            ConnectedPlayer connectedPlayer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(player);
+            if (connectedPlayer != null) {
+                return connectedPlayer.getPlayerTablistHandler().getServerTabList();
+            } else {
+                return Collections.emptyList();
+            }
         }
     }
 }

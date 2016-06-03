@@ -17,16 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.packet;
+package codecrafter47.bungeetablistplus.protocol;
 
-import net.md_5.bungee.protocol.packet.Team;
-
-public interface TeamPacketHandler {
-    /**
-     * listener method to team packets sent to the client
-     *
-     * @param packet the packet
-     * @return whether the packet has been modified
-     */
-    boolean onTeamPacket(Team packet);
+public enum PacketListenerResult {
+    PASS, MODIFIED, CANCEL;
 }
