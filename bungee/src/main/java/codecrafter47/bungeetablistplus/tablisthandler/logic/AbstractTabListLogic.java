@@ -454,22 +454,24 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         if (packet.getMode() == 1) {
             net.md_5.bungee.api.score.Team team = serverTeams.remove(packet.getName());
-            for (String player : team.getPlayers()) {
-                playerToTeamMap.remove(player, team.getName());
-                if (!passtrough && size != 80 && nameToSlotMap.containsKey(player)) {
-                    Team packet1 = new Team();
-                    packet1.setMode((byte) 2);
-                    packet1.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
-                    packet1.setDisplayName(packet1.getName());
-                    packet1.setPrefix("");
-                    packet1.setSuffix("");
-                    packet1.setFriendlyFire((byte) 1);
-                    packet1.setNameTagVisibility("ALWAYS");
-                    if (teamCollisionRuleSupported) {
-                        packet1.setCollisionRule("ALWAYS");
+            if (team != null) {
+                for (String player : team.getPlayers()) {
+                    playerToTeamMap.remove(player, team.getName());
+                    if (!passtrough && size != 80 && nameToSlotMap.containsKey(player)) {
+                        Team packet1 = new Team();
+                        packet1.setMode((byte) 2);
+                        packet1.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                        packet1.setDisplayName(packet1.getName());
+                        packet1.setPrefix("");
+                        packet1.setSuffix("");
+                        packet1.setFriendlyFire((byte) 1);
+                        packet1.setNameTagVisibility("ALWAYS");
+                        if (teamCollisionRuleSupported) {
+                            packet1.setCollisionRule("ALWAYS");
+                        }
+                        packet1.setColor((byte) 0);
+                        sendPacket(packet1);
                     }
-                    packet1.setColor((byte) 0);
-                    sendPacket(packet1);
                 }
             }
 
@@ -500,7 +502,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     for (String s : packet.getPlayers()) {
                         if (packet.getMode() == 0 || packet.getMode() == 3) {
                             if (playerToTeamMap.containsKey(s)) {
-                                serverTeams.get(playerToTeamMap.get(s)).getPlayers().remove(s);
+                                serverTeams.get(playerToTeamMap.get(s)).removePlayer(s);
                             }
                             t.addPlayer(s);
                             playerToTeamMap.put(s, t.getName());
