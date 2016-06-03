@@ -69,9 +69,9 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         addBukkitBridgePlaceholder("SimpleClans_ClanTag", DataKeys.SimpleClans_ClanTag);
         addBukkitBridgePlaceholder("SimpleClans_ClanTagLabel", DataKeys.SimpleClans_ClanTagLabel);
         addBukkitBridgePlaceholder("SimpleClans_ClanColorTag", DataKeys.SimpleClans_ClanColorTag);
-        addBukkitBridgePlaceholder("permissionsex_group", DataKeys.PermissionsEx_PermissionGroup);
-        addBukkitBridgePlaceholder("permissionsex_prefix", DataKeys.PermissionsEx_Prefix);
-        addBukkitBridgePlaceholder("permissionsex_suffix", DataKeys.PermissionsEx_Suffix);
+        addBukkitBridgePlaceholder("permissionsex_group", DataKeys.Vault_PermissionGroup);
+        addBukkitBridgePlaceholder("permissionsex_prefix", DataKeys.Vault_Prefix);
+        addBukkitBridgePlaceholder("permissionsex_suffix", DataKeys.Vault_Suffix);
         addBukkitBridgePlaceholder("vault_group", DataKeys.Vault_PermissionGroup);
         addBukkitBridgePlaceholder("vault_prefix", DataKeys.Vault_Prefix);
         addBukkitBridgePlaceholder("vault_suffix", DataKeys.Vault_Suffix);

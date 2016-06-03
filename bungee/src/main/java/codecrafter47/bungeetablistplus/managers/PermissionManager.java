@@ -50,10 +50,8 @@ public class PermissionManager {
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return ((Player) player).get(DataKeys.BungeePerms_PrimaryGroup).orElse("");
-        } else if (mode.equalsIgnoreCase("Bukkit")) {
+        } else if (mode.equalsIgnoreCase("Bukkit") || mode.equalsIgnoreCase("BukkitPermissionsEx")) {
             return ((Player) player).get(DataKeys.Vault_PermissionGroup).orElse("");
-        } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return ((Player) player).get(DataKeys.PermissionsEx_PermissionGroup).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
             return ((Player) player).get(DataKeys.BungeeCord_PrimaryGroup).orElse("default");
         } else {
@@ -61,16 +59,11 @@ public class PermissionManager {
             if (group.isPresent()) {
                 return group.get();
             }
-            Optional<String> optional = ((Player) player).get(DataKeys.PermissionsEx_PermissionGroup);
+            Optional<String> optional = ((Player) player).get(DataKeys.Vault_PermissionGroup);
             if (optional.isPresent()) {
                 return optional.get();
             } else {
-                optional = ((Player) player).get(DataKeys.Vault_PermissionGroup);
-                if (optional.isPresent()) {
-                    return optional.get();
-                } else {
-                    return ((Player) player).get(DataKeys.BungeeCord_PrimaryGroup).orElse("default");
-                }
+                return ((Player) player).get(DataKeys.BungeeCord_PrimaryGroup).orElse("default");
             }
         }
     }
@@ -156,13 +149,9 @@ public class PermissionManager {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeePerms_Rank);
             Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeePerms_Rank);
             return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-        } else if (permissionSource.equalsIgnoreCase("Bukkit")) {
-            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
-            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
-            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-        } else if (permissionSource.equalsIgnoreCase("BukkitPermissionsEx")) {
-            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.PermissionsEx_GroupRank);
-            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.PermissionsEx_GroupRank);
+        } else if (permissionSource.equalsIgnoreCase("Bukkit") || permissionSource.equalsIgnoreCase("BukkitPermissionsEx")) {
+            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
+            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
             return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
         } else if (permissionSource.equalsIgnoreCase("Bungee")) {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeeCord_Rank);
@@ -178,16 +167,8 @@ public class PermissionManager {
             }
 
             {
-                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.PermissionsEx_GroupRank);
-                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.PermissionsEx_GroupRank);
-                if (p1Rank.isPresent() || p2Rank.isPresent()) {
-                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-                }
-            }
-
-            {
-                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
-                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
                 if (p1Rank.isPresent() || p2Rank.isPresent()) {
                     return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
                 }
@@ -223,10 +204,8 @@ public class PermissionManager {
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElse("");
-        } else if (mode.equalsIgnoreCase("Bukkit")) {
+        } else if (mode.equalsIgnoreCase("Bukkit") || mode.equalsIgnoreCase("BukkitPermissionsEx")) {
             return ((Player) player).get(DataKeys.Vault_Prefix).orElse("");
-        } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElse("");
         } else if (mode.equalsIgnoreCase("Bungee")) {
             return getConfigPrefix(context, player);
         }
@@ -235,7 +214,7 @@ public class PermissionManager {
         if (!prefix.isEmpty()) {
             return prefix;
         }
-        return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.PermissionsEx_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse("")));
+        return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse(""));
     }
 
     public String getConfigPrefix(TabListContext context, IPlayer player) {
@@ -319,12 +298,10 @@ public class PermissionManager {
         String mode = plugin.getConfigManager().getMainConfig().permissionSource;
         if (mode.equalsIgnoreCase("BungeePerms")) {
             return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElse("");
-        } else if (mode.equalsIgnoreCase("Bukkit")) {
+        } else if (mode.equalsIgnoreCase("Bukkit") || mode.equalsIgnoreCase("BukkitPermissionsEx")) {
             return ((Player) player).get(DataKeys.Vault_Suffix).orElse("");
-        } else if (mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return ((Player) player).get(DataKeys.PermissionsEx_Suffix).orElse("");
         }
-        return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElseGet(() -> ((Player) player).get(DataKeys.PermissionsEx_Suffix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Suffix).orElse("")));
+        return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Suffix).orElse(""));
     }
 
     String getSuffixFromBungeePerms(ProxiedPlayer player) {

@@ -32,10 +32,6 @@ import codecrafter47.bungeetablistplus.data.factions.FactionWhereProvider;
 import codecrafter47.bungeetablistplus.data.factions.FactionsPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.factionsuuid.FactionPlayerPowerProvider;
 import codecrafter47.bungeetablistplus.data.multiverse.MultiverseWorldAliasProvider;
-import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupProvider;
-import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExGroupRankProvider;
-import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExPrefixProvider;
-import codecrafter47.bungeetablistplus.data.permissionsex.PermissionsExSuffixProvider;
 import codecrafter47.bungeetablistplus.data.playerpoints.PlayerPointsProvider;
 import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansClanColorTagProvider;
 import codecrafter47.bungeetablistplus.data.simpleclans.SimpleClansClanNameProvider;
@@ -47,7 +43,7 @@ import codecrafter47.bungeetablistplus.data.supervanish.SuperVanishIsVanishedPro
 import codecrafter47.bungeetablistplus.data.vanishnopacket.VanishNoPacketIsVanishedProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultBalanceProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultGroupProvider;
-import codecrafter47.bungeetablistplus.data.vault.VaultGroupRankProvider;
+import codecrafter47.bungeetablistplus.data.vault.VaultGroupWeightProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultPrefixProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultSuffixProvider;
 import org.bukkit.Bukkit;
@@ -93,16 +89,9 @@ public class PlayerDataAccess extends AbstractBukkitDataAccess<Player> {
         if (Bukkit.getPluginManager().getPlugin("Vault") != null) {
             bind(DataKeys.Vault_Balance, new VaultBalanceProvider(plugin));
             bind(DataKeys.Vault_PermissionGroup, new VaultGroupProvider());
-            bind(DataKeys.Vault_PermissionGroupRank, new VaultGroupRankProvider());
+            bind(DataKeys.Vault_PermissionGroupWeight, new VaultGroupWeightProvider());
             bind(DataKeys.Vault_Prefix, new VaultPrefixProvider());
             bind(DataKeys.Vault_Suffix, new VaultSuffixProvider());
-        }
-        
-        if (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null) {
-			bind(DataKeys.PermissionsEx_PermissionGroup, new PermissionsExGroupProvider());
-			bind(DataKeys.PermissionsEx_Prefix, new PermissionsExPrefixProvider());
-			bind(DataKeys.PermissionsEx_Suffix, new PermissionsExSuffixProvider());
-            bind(DataKeys.PermissionsEx_GroupRank, new PermissionsExGroupRankProvider());
         }
 
         if (Bukkit.getPluginManager().getPlugin("VanishNoPacket") != null) {

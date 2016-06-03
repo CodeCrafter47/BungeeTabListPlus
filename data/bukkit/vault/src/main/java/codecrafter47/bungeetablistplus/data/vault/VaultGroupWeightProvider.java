@@ -24,7 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-public class VaultGroupRankProvider extends VaultDataProvider<Player, Integer> {
+public class VaultGroupWeightProvider extends VaultDataProvider<Player, Integer> {
     public Integer apply0(Player player) {
         RegisteredServiceProvider<Chat> rsp = Bukkit.getServicesManager().getRegistration(Chat.class);
         if (rsp != null) {
@@ -33,9 +33,9 @@ public class VaultGroupRankProvider extends VaultDataProvider<Player, Integer> {
                 try {
                     String primaryGroup = chat.getPrimaryGroup(player);
                     if (primaryGroup != null) {
-                        int rank = chat.getGroupInfoInteger(player.getWorld(), primaryGroup, "rank", Integer.MIN_VALUE);
-                        if (rank != Integer.MIN_VALUE) {
-                            return rank;
+                        int weight = chat.getGroupInfoInteger(player.getWorld(), primaryGroup, "weight", Integer.MIN_VALUE);
+                        if (weight != Integer.MIN_VALUE) {
+                            return weight;
                         }
                     }
                 } catch (UnsupportedOperationException ignored) {
