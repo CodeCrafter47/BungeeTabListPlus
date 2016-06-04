@@ -418,10 +418,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         // dirty hack for citizens compatibility
         if (uuid.version() == 2)
             return;
-        if (nameToSlotMap.get(player) == slot) {
+        if (nameToSlotMap.remove(player, slot)) {
             sendPacket(removePlayer(slot, player));
         }
-        nameToSlotMap.remove(player, slot);
         if (playerToTeamMap.containsKey(player)) {
             Team team = new Team();
             team.setName(playerToTeamMap.get(player));
