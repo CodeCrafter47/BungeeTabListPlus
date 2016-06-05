@@ -562,19 +562,21 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         sendPacket(team);
                     } else if (nameToSlotMap.containsKey(player)) {
                         net.md_5.bungee.api.score.Team serverTeam = serverTeams.get(playerToTeamMap.get(player));
-                        Team team = new Team();
-                        team.setMode((byte) 2);
-                        team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
-                        team.setDisplayName(serverTeam.getDisplayName());
-                        team.setPrefix(serverTeam.getPrefix());
-                        team.setSuffix(serverTeam.getSuffix());
-                        team.setFriendlyFire(serverTeam.getFriendlyFire());
-                        team.setNameTagVisibility(serverTeam.getNameTagVisibility());
-                        if (teamCollisionRuleSupported) {
-                            team.setCollisionRule(serverTeam.getCollisionRule());
+                        if (serverTeam != null) {
+                            Team team = new Team();
+                            team.setMode((byte) 2);
+                            team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                            team.setDisplayName(serverTeam.getDisplayName());
+                            team.setPrefix(serverTeam.getPrefix());
+                            team.setSuffix(serverTeam.getSuffix());
+                            team.setFriendlyFire(serverTeam.getFriendlyFire());
+                            team.setNameTagVisibility(serverTeam.getNameTagVisibility());
+                            if (teamCollisionRuleSupported) {
+                                team.setCollisionRule(serverTeam.getCollisionRule());
+                            }
+                            team.setColor(serverTeam.getColor());
+                            sendPacket(team);
                         }
-                        team.setColor(serverTeam.getColor());
-                        sendPacket(team);
                     }
                 }
             }
