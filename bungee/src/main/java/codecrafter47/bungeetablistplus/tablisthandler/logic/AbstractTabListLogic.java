@@ -519,21 +519,24 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         }
 
         if (packet.getMode() == 2) {
-            for (String player : serverTeams.get(packet.getName()).getPlayers()) {
-                if (nameToSlotMap.containsKey(player)) {
-                    Team team = new Team();
-                    team.setMode((byte) 2);
-                    team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
-                    team.setDisplayName(packet.getDisplayName());
-                    team.setPrefix(packet.getPrefix());
-                    team.setSuffix(packet.getSuffix());
-                    team.setFriendlyFire(packet.getFriendlyFire());
-                    team.setNameTagVisibility(packet.getNameTagVisibility());
-                    if (teamCollisionRuleSupported) {
-                        team.setCollisionRule(packet.getCollisionRule());
+            net.md_5.bungee.api.score.Team serverTeam = serverTeams.get(packet.getName());
+            if (serverTeam != null) {
+                for (String player : serverTeam.getPlayers()) {
+                    if (nameToSlotMap.containsKey(player)) {
+                        Team team = new Team();
+                        team.setMode((byte) 2);
+                        team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                        team.setDisplayName(packet.getDisplayName());
+                        team.setPrefix(packet.getPrefix());
+                        team.setSuffix(packet.getSuffix());
+                        team.setFriendlyFire(packet.getFriendlyFire());
+                        team.setNameTagVisibility(packet.getNameTagVisibility());
+                        if (teamCollisionRuleSupported) {
+                            team.setCollisionRule(packet.getCollisionRule());
+                        }
+                        team.setColor(packet.getColor());
+                        sendPacket(team);
                     }
-                    team.setColor(packet.getColor());
-                    sendPacket(team);
                 }
             }
         }
