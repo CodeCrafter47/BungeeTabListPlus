@@ -178,15 +178,6 @@ public class MainConfig extends YamlConfig {
     })
     public List<String> hiddenPlayers = new ArrayList<>();
 
-    @Comments({
-            "Detects which servers are using a bukkit-side tabList-plugin",
-            "and lets them show it / doesn't show the tablist provided by this plugin on these servers",
-            "This is disabled by default because it could be accidentially triggered by other plugins (Essentials nicknames etc.)",
-            "Warning: This is an experimental feature, it may cause unintended behaviour"
-    })
-    // todo remove
-    public boolean autoExcludeServers = false;
-
     // todo add more examples to comment, people keep asking for this
     @Comments({
             "Time zone to use for the {time} variable",
