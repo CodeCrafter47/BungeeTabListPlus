@@ -50,6 +50,17 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.cubespace.Yamler.Config
+                                    </pattern>
+                                    <shadedPattern>
+                                        codecrafter47.bungeetablistplus.libs.net.cubespace.Yamler.Config
+                                    </shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

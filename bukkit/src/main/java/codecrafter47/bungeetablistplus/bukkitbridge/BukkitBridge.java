@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.api.bukkit.BungeeTabListPlusBukkitAPI;
 import codecrafter47.bungeetablistplus.api.bukkit.Variable;
 import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
-import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataAccess;
 import codecrafter47.bungeetablistplus.data.DataKey;
@@ -35,7 +34,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,7 +47,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -73,8 +70,6 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     private DataAccess<Player> playerDataAccess;
     private DataAccess<Server> serverDataAccess;
 
-    private MainConfig config = new MainConfig();
-
     private PlaceholderAPIHook placeholderAPIHook = null;
 
     private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
@@ -94,24 +89,6 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
             plugin.getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
         }
 
-        try {
-            if (!plugin.getDataFolder().exists()) {
-                plugin.getDataFolder().mkdir();
-            }
-            File file = new File(plugin.getDataFolder(), "config.yml");
-            if (file.exists()) {
-                config.read(file);
-            }
-            config.setHeader(plugin.getDescription().getName() + " " + plugin.getDescription().getVersion());
-            config.write(file);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to load config.yml", e);
-            config.automaticallySendBugReports = false;
-        }
-        if (config.automaticallySendBugReports) {
-            BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, plugin.getDescription().getName(), plugin.getDescription().getVersion(), command -> Bukkit.getScheduler().runTaskAsynchronously(plugin, command));
-            bugReportingService.registerLogger(plugin.getLogger());
-        }
         plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin,
                 Constants.channel);
         plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin,

@@ -149,48 +149,21 @@ public class SuperCommand extends Command {
     }
 
     private void sendNoPermission(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().errorNoPermission;
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
-        } else {
             target.sendMessage(getPrefix().append(
                     "I'm pretty sorry, but the admin doesn't allow you to execute that command").
                     color(ChatColor.RED).create());
-        }
     }
 
     private void sendNeedsPlayer(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().errorNeedsPlayer;
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
-        } else {
             target.sendMessage(getPrefix().append(
                     "This command can only be executed by a player").color(
                     ChatColor.RED).create());
-        }
     }
 
     private void sendReloadComplete(CommandSender target, boolean success) {
         if (success) {
-            if (plugin.getConfigManager().getMessages() != null) {
-                String message = plugin.getConfigManager().getMessages().successReloadComplete;
-                if (message == null || message.isEmpty()) {
-                    return;
-                }
-                message = ChatColor.translateAlternateColorCodes('&', message);
-                target.sendMessage(message);
-            } else {
                 target.sendMessage(getPrefix().append("reload complete").color(
                         ChatColor.GREEN).create());
-            }
         } else {
             target.sendMessage(getPrefix().append("reload failed").color(
                     ChatColor.RED).create());
@@ -198,63 +171,27 @@ public class SuperCommand extends Command {
     }
 
     private void sendPlayerHide(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().successPlayerHide;
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
-        } else {
             target.sendMessage(getPrefix().append(
                     "You have been hidden: Your name won't appear on the tablist").
                     color(ChatColor.GREEN).create());
-        }
     }
 
     private void sendPlayerUnhide(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().successPlayerUnhide;
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
-        } else {
             target.sendMessage(getPrefix().append(
                     "You're not hidden any longer").color(ChatColor.GREEN).
                     create());
-        }
     }
 
     private void sendAlreadyHidden(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().errorAlreadyHidden;
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
-        } else {
             target.sendMessage(getPrefix().append(
                     "Can't hide: You are already hidden").color(ChatColor.RED).
                     create());
-        }
     }
 
     private void sendErrorNotHidden(CommandSender target) {
-        if (plugin.getConfigManager().getMessages() != null) {
-            String message = plugin.getConfigManager().getMessages().errorNotHidden;
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            target.sendMessage(message);
-        } else {
             target.sendMessage(getPrefix().append(
                     "Can't unhide: You are not hidden").color(ChatColor.RED).
                     create());
-        }
     }
 
     private ComponentBuilder getPrefix() {

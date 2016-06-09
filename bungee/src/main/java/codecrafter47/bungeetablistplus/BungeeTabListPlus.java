@@ -26,7 +26,6 @@ import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvide
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
-import codecrafter47.bungeetablistplus.commands.OldSuperCommand;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
@@ -64,6 +63,7 @@ import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import com.google.common.base.Preconditions;
 import de.sabbertran.proxysuite.ProxySuiteAPI;
 import lombok.Getter;
+import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -212,7 +212,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         try {
             config = new ConfigManager(plugin);
-        } catch (IOException ex) {
+        } catch (InvalidConfigurationException ex) {
             plugin.getLogger().warning("Unable to load Config");
             plugin.getLogger().log(Level.WARNING, null, ex);
             plugin.getLogger().warning("Disabling Plugin");
@@ -228,36 +228,36 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         File headsFolder = new File(plugin.getDataFolder(), "heads");
 
-            if (!headsFolder.exists()) {
-                headsFolder.mkdirs();
+        if (!headsFolder.exists()) {
+            headsFolder.mkdirs();
 
-                try {
-                    // copy default heads
-                    ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(plugin.getFile()));
+            try {
+                // copy default heads
+                ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(plugin.getFile()));
 
-                    ZipEntry entry;
-                    while ((entry = zipInputStream.getNextEntry()) != null) {
-                        if (!entry.isDirectory() && entry.getName().startsWith("heads/")) {
-                            try {
-                                File targetFile = new File(plugin.getDataFolder(), entry.getName());
-                                targetFile.getParentFile().mkdirs();
-                                if (!targetFile.exists()) {
-                                    Files.copy(zipInputStream, targetFile.toPath());
-                                    getLogger().info("Extracted " + entry.getName());
-                                }
-                            } catch (IOException ex) {
-                                getLogger().log(Level.SEVERE, "Failed to extract file " + entry.getName(), ex);
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    if (!entry.isDirectory() && entry.getName().startsWith("heads/")) {
+                        try {
+                            File targetFile = new File(plugin.getDataFolder(), entry.getName());
+                            targetFile.getParentFile().mkdirs();
+                            if (!targetFile.exists()) {
+                                Files.copy(zipInputStream, targetFile.toPath());
+                                getLogger().info("Extracted " + entry.getName());
                             }
+                        } catch (IOException ex) {
+                            getLogger().log(Level.SEVERE, "Failed to extract file " + entry.getName(), ex);
                         }
                     }
-
-                    zipInputStream.close();
-                } catch (IOException ex) {
-                    getLogger().log(Level.SEVERE, "Error extracting files", ex);
                 }
-            }
 
-            skins = new SkinManagerImpl(plugin, headsFolder);
+                zipInputStream.close();
+            } catch (IOException ex) {
+                getLogger().log(Level.SEVERE, "Error extracting files", ex);
+            }
+        }
+
+        skins = new SkinManagerImpl(plugin, headsFolder);
 
         fakePlayerManager = new FakePlayerManagerImpl(plugin);
 
@@ -309,19 +309,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         restartRefreshThread();
 
         // register commands and update Notifier
-        try {
-            Thread.currentThread().getContextClassLoader().loadClass(
-                    "net.md_5.bungee.api.chat.ComponentBuilder");
-            ProxyServer.getInstance().getPluginManager().registerCommand(
-                    plugin,
-                    new SuperCommand(this));
-            ProxyServer.getInstance().getScheduler().schedule(plugin,
-                    new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
-        } catch (Exception ex) {
-            ProxyServer.getInstance().getPluginManager().registerCommand(
-                    plugin,
-                    new OldSuperCommand(this));
-        }
+        ProxyServer.getInstance().getPluginManager().registerCommand(
+                plugin,
+                new SuperCommand(this));
+        ProxyServer.getInstance().getScheduler().schedule(plugin,
+                new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
 
         // Start metrics
         try {
@@ -417,7 +409,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             restartRefreshThread();
             placeholderAPIHook.onLoad();
             skins.onReload();
-        } catch (IOException ex) {
+        } catch (InvalidConfigurationException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
         }
         return true;

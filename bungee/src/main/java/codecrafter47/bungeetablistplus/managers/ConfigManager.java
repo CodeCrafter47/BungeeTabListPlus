@@ -20,15 +20,14 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.config.MainConfig;
-import codecrafter47.bungeetablistplus.config.Messages;
 import codecrafter47.bungeetablistplus.config.TabListConfig;
+import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,38 +36,20 @@ import java.util.stream.Collectors;
 public class ConfigManager {
 
     private MainConfig config;
-    private Messages messages;
     public TabListConfig defaultTabList;
     public final List<TabListConfig> tabLists = new ArrayList<>();
 
-    public ConfigManager(Plugin plugin) throws IOException {
+    public ConfigManager(Plugin plugin) throws InvalidConfigurationException {
         loadConfig(plugin);
         checkForInconsistentTabListSize(plugin);
     }
 
-    private void loadConfig(Plugin plugin) throws IOException {
+    private void loadConfig(Plugin plugin) throws InvalidConfigurationException {
         setMainConfig(new MainConfig());
         File file = new File(plugin.getDataFolder(), "config.yml");
-        if (file.exists()) {
-            config.read(file);
-        }
-        config.write(file);
+        config.init(file);
         validateConfig();
-        File messageFile = new File(plugin.getDataFolder(), "messages.yml");
-        if (messageFile.exists()) {
-            messages = new Messages();
-            messages.read(messageFile);
-        }
 
-        try {
-            Class.forName("net.md_5.bungee.api.chat.ComponentBuilder");
-        } catch (Exception ignored) {
-            if (messages == null) {
-                messages = new Messages();
-                messages.read(messageFile);
-                messages.write(messageFile);
-            }
-        }
         // Load default TabList
         defaultTabList = new TabListConfig("default.yml");
         File tabListDir = new File(plugin.getDataFolder(), "tabLists");
@@ -76,10 +57,8 @@ public class ConfigManager {
             tabListDir.mkdir();
         }
         file = new File(tabListDir, "default.yml");
-        if (file.exists()) {
-            defaultTabList.read(file);
-        }
-        defaultTabList.write(file);
+        defaultTabList.init(file);
+
         // Load other TabLists
         for (String s : new File("plugins" + File.separator
                 + plugin.getDescription().getName() + File.separator
@@ -88,10 +67,9 @@ public class ConfigManager {
                 try {
                     file = new File(tabListDir, s);
                     TabListConfig listConfig = new TabListConfig(s);
-                    listConfig.read(file);
-                    listConfig.write(file);
+                    listConfig.load(file);
                     this.tabLists.add(listConfig);
-                } catch (IOException ex) {
+                } catch (InvalidConfigurationException ex) {
                     plugin.getLogger().log(Level.WARNING, "Unable to load " + s, ex);
                 }
             }
@@ -115,10 +93,6 @@ public class ConfigManager {
 
     public MainConfig getMainConfig() {
         return config;
-    }
-
-    public Messages getMessages() {
-        return messages;
     }
 
     private void setMainConfig(MainConfig config) {
