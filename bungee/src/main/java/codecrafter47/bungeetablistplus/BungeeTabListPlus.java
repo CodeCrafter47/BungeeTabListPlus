@@ -82,6 +82,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -220,7 +221,22 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
 
         if (config.getMainConfig().automaticallySendBugReports) {
-            BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), getPlugin().getDescription().getVersion(), command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
+            String revision = "unknown";
+            try {
+                Properties current = new Properties();
+                current.load(getClass().getClassLoader().getResourceAsStream("version.properties"));
+                revision = current.getProperty("revision", revision);
+            } catch (IOException ex) {
+                getLogger().log(Level.SEVERE, "Unexpected exception", ex);
+            }
+
+            String version = getPlugin().getDescription().getVersion();
+
+            if (!"unknown".equals(revision)) {
+                version += "-git-" + revision;
+            }
+
+            BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), version, command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
             bugReportingService.registerLogger(getLogger());
         }
 
