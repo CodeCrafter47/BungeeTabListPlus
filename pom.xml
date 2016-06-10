@@ -16,6 +16,8 @@
         <module>data</module>
         <module>api-bukkit</module>
         <module>api-bungee</module>
+        <module>api-sponge</module>
+        <module>sponge</module>
     </modules>
 
     <properties>
