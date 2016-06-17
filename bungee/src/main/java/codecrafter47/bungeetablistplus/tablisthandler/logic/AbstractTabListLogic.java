@@ -139,7 +139,10 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
     @Override
     public PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
+        return onPlayerListPacketInternal(packet);
+    }
 
+    private PacketListenerResult onPlayerListPacketInternal(PlayerListItem packet) {
         // update server tab list
         switch (packet.getAction()) {
             case ADD_PLAYER:
@@ -623,7 +626,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         }
 
         packet.setItems(items);
-        if (onPlayerListPacket(packet) != PacketListenerResult.CANCEL) {
+        if (onPlayerListPacketInternal(packet) != PacketListenerResult.CANCEL) {
             sendPacket(packet);
         }
 
