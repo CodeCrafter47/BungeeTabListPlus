@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1075,9 +1076,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
     @Override
     public void setHeaderFooter(String header, String footer) {
-        sendPacket(new PlayerListHeaderFooter(header, footer));
-        clientHeader = header;
-        clientFooter = footer;
+        if (!Objects.equals(header, clientHeader) || !Objects.equals(footer, clientFooter)) {
+            sendPacket(new PlayerListHeaderFooter(header, footer));
+            clientHeader = header;
+            clientFooter = footer;
+        }
     }
 
     private static PlayerListItem.Item item(UUID uuid) {
