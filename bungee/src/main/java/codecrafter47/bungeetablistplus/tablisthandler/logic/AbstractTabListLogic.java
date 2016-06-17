@@ -285,7 +285,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 sendPacket(packet);
                 for (PlayerListItem.Item item : packet.getItems()) {
                     // player leaves server
-                    useFakePlayerForSlot(uuidToSlotMap.get(item.getUuid()));
+                    if (uuidToSlotMap.containsKey(item.getUuid())) {
+                        useFakePlayerForSlot(uuidToSlotMap.get(item.getUuid()));
+                    }
                 }
                 break;
             case UPDATE_LATENCY:
@@ -357,7 +359,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         if (change) {
             removePlayerFromTeam(slot, clientUuid[slot], clientUsername[slot]);
-            uuidToSlotMap.remove(clientUuid[slot]);
+            if (uuidToSlotMap.get(clientUuid[slot]) == slot) {
+                uuidToSlotMap.remove(clientUuid[slot]);
+            }
 
             // if there was a fake player on that slot previously remove it from
             // the tab list
@@ -770,6 +774,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     packet.setItems(items);
                     sendPacket(packet);
                 } else {
+                    uuidToSlotMap.clear();
                     rebuildTabList();
                 }
 
@@ -794,6 +799,14 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     private void setSizeInternal(int size) {
         if (size > 80 || size < 0) {
             throw new IllegalArgumentException();
+        }
+
+        if (size < this.size) {
+            for (int index = size; index < this.size; index++) {
+                if (clientSkin[index].getOwner() != null) {
+                    skinUuidToSlotMap.remove(clientSkin[index].getOwner(), index);
+                }
+            }
         }
 
         if (passtrough) {
@@ -886,6 +899,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     }
                 }
                 this.size = size;
+                uuidToSlotMap.clear();
                 rebuildTabList();
             }
         }
@@ -957,16 +971,19 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         PlayerSkin skin = skin0 instanceof PlayerSkin ? (PlayerSkin) skin0 : new PlayerSkin(skin0.getOwner(), skin0.toProperty());
 
+        if (!clientSkin[index].equals(skin)) {
+            if (clientSkin[index].getOwner() != null) {
+                skinUuidToSlotMap.remove(clientSkin[index].getOwner(), index);
+            }
+            if (skin.getOwner() != null) {
+                skinUuidToSlotMap.put(skin.getOwner(), index);
+            }
+        }
+
         if (!passtrough) {
             if (clientSkin[index].equals(skin)) {
                 updatePingInternal(index, ping);
             } else {
-                if (clientSkin[index].getOwner() != null) {
-                    skinUuidToSlotMap.remove(clientSkin[index].getOwner(), index);
-                }
-                if (skin.getOwner() != null) {
-                    skinUuidToSlotMap.put(skin.getOwner(), index);
-                }
                 boolean updated = false;
                 if (skin.getOwner() != null) {
                     if (size < 80
