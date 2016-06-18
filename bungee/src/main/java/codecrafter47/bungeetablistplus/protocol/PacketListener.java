@@ -45,6 +45,7 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, PacketWrapper packetWrapper, List<Object> out) throws Exception {
+        boolean shouldRelease = true;
         try {
             if (!connection.isObsolete()) {
                 if (packetWrapper.packet != null) {
@@ -71,8 +72,13 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                 }
             }
             out.add(packetWrapper);
+            shouldRelease = false;
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
+        } finally {
+            if (shouldRelease) {
+                packetWrapper.trySingleRelease();
+            }
         }
     }
 }
