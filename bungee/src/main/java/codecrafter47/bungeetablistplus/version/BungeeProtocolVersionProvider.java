@@ -31,6 +31,8 @@ public class BungeeProtocolVersionProvider implements ProtocolVersionProvider {
     @Override
     public String getVersionString(ProxiedPlayer player) {
         switch (player.getPendingConnection().getVersion()) {
+            case 210:
+                return "1.10";
             case 110:
                 return "1.9.4";
             case 109:
