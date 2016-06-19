@@ -237,7 +237,13 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 version += "-git-" + revision;
             }
 
-            bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), version, command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
+            String systemInfo = "" +
+                    "System Info\n" +
+                    "===========\n" +
+                    "Bungee: " + getProxy().getVersion() + "\n" +
+                    "Java: " + System.getProperty("java.version") + "\n";
+
+            bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), version, command -> plugin.getProxy().getScheduler().runAsync(plugin, command), systemInfo);
             bugReportingService.registerLogger(getLogger());
         }
 

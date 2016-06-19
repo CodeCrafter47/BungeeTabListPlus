@@ -37,13 +37,15 @@ public class BugReportingService {
     private final String pluginName;
     private final String pluginVersion;
     private final Executor executor;
+    private final String systemInfo;
     private final BugReportFormatter formatter = new BugReportFormatter();
 
-    public BugReportingService(Level level, String pluginName, String pluginVersion, Executor executor) {
+    public BugReportingService(Level level, String pluginName, String pluginVersion, Executor executor, String systemInfo) {
         this.level = level;
         this.pluginName = pluginName;
         this.pluginVersion = pluginVersion;
         this.executor = executor;
+        this.systemInfo = systemInfo;
     }
 
     public void registerLogger(Logger logger) {
@@ -75,7 +77,7 @@ public class BugReportingService {
                                     "http://bugs.codecrafter47.dyndns.eu/?plugin=%s&version=%s&message=%s",
                                     URLEncoder.encode(pluginName, "UTF-8"),
                                     URLEncoder.encode(pluginVersion, "UTF-8"),
-                                    URLEncoder.encode(getFormatter().format(record), "UTF-8"));
+                                    URLEncoder.encode(getFormatter().format(record) + "\n\n" + systemInfo, "UTF-8"));
                             URLConnection connection = new URL(url).openConnection();
                             connection.connect();
                             connection.getInputStream().close();
