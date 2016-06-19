@@ -47,6 +47,7 @@ public class BungeePlugin extends Plugin {
 
     @Override
     public void onDisable() {
+        BungeeTabListPlus.getInstance().onDisable();
         if (BungeeCord.getInstance().isRunning) {
             getLogger().severe("You cannot use BungeePluginManager to reload BungeeTabListPlus. Use /btlp reload instead.");
             if (!getProxy().getPlayers().isEmpty()) {

@@ -113,6 +113,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private RedisPlayerManager redisPlayerManager;
     @Getter
     private DataManager dataManager;
+    private BugReportingService bugReportingService;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -236,7 +237,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 version += "-git-" + revision;
             }
 
-            BugReportingService bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), version, command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
+            bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), version, command -> plugin.getProxy().getScheduler().runAsync(plugin, command));
             bugReportingService.registerLogger(getLogger());
         }
 
@@ -361,6 +362,12 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         placeholderAPIHook = new PlaceholderAPIHook(this);
 
         placeholderAPIHook.onLoad();
+    }
+
+    public void onDisable() {
+        if (bugReportingService != null) {
+            bugReportingService.unregisterLogger(getLogger());
+        }
     }
 
     private Double requestedUpdateInterval = null;

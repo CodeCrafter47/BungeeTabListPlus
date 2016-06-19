@@ -26,7 +26,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.concurrent.Executor;
-import java.util.logging.*;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class BugReportingService {
     private final Level level;
@@ -49,6 +53,14 @@ public class BugReportingService {
         logger.addHandler(handler);
         handler.setLevel(level);
         handler.setFormatter(formatter);
+    }
+
+    public void unregisterLogger(Logger logger) {
+        for (Handler handler : logger.getHandlers()) {
+            if (handler instanceof UploadBugReportHandler) {
+                logger.removeHandler(handler);
+            }
+        }
     }
 
     private class UploadBugReportHandler extends Handler {
