@@ -260,6 +260,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 break;
             case UPDATE_GAMEMODE:
                 for (PlayerListItem.Item item : packet.getItems()) {
+                    if (!serverTabList.containsKey(item.getUuid())) {
+                        continue;
+                    }
                     if (item.getUuid().equals(getUniqueId())) {
                         int slot = uuidToSlotMap.get(item.getUuid());
 
