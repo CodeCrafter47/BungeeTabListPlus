@@ -266,6 +266,51 @@ public class PermissionManager {
         return null;
     }
 
+    String getPrimaryGroupPrefixFromBungeePerms(ProxiedPlayer player) {
+        Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        if (p != null) {
+            BungeePerms bp = BungeePerms.getInstance();
+            try {
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        Group mainGroup = pm.getMainGroup(user);
+                        if (mainGroup != null) {
+                            return mainGroup.getPrefix();
+                        }
+                    }
+                }
+            } catch (NullPointerException ex) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occurred while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
+            } catch (Throwable th) {
+                BungeeTabListPlus.getInstance().reportError(th);
+            }
+        }
+        return null;
+    }
+
+    String getPlayerPrefixFromBungeePerms(ProxiedPlayer player) {
+        Plugin p = plugin.getProxy().getPluginManager().getPlugin("BungeePerms");
+        if (p != null) {
+            BungeePerms bp = BungeePerms.getInstance();
+            try {
+                PermissionsManager pm = bp.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        return user.getPrefix();
+                    }
+                }
+            } catch (NullPointerException ex) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "An error occurred while querying data from BungeePerms. Make sure you have configured BungeePerms to use it's uuidPlayerDB.", ex);
+            } catch (Throwable th) {
+                BungeeTabListPlus.getInstance().reportError(th);
+            }
+        }
+        return null;
+    }
+
     String getDisplayPrefix(ProxiedPlayer player) {
         // BungeePerms
         String display = null;

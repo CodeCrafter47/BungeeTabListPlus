@@ -51,6 +51,8 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
         bind(DataKeys.BungeePerms_DisplayPrefix, permissionManager::getDisplayPrefix);
         bind(DataKeys.BungeePerms_Suffix, permissionManager::getSuffixFromBungeePerms);
         bind(DataKeys.BungeePerms_Rank, permissionManager::getBungeePermsRank);
+        bind(DataKeys.BungeePerms_PrimaryGroupPrefix, permissionManager::getPrimaryGroupPrefixFromBungeePerms);
+        bind(DataKeys.BungeePerms_PlayerPrefix, permissionManager::getPlayerPrefixFromBungeePerms);
         bind(DataKeys.ClientVersion, player1 -> BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersionString(player1));
     }
 

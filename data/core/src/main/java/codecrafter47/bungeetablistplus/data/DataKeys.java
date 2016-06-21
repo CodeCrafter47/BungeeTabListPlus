@@ -39,6 +39,8 @@ public class DataKeys {
     public final static DataKey<Integer> Vault_PermissionGroupRank = DataKey.builder().bukkit().player().id("vault:permgrouprank").build();
     public final static DataKey<Integer> Vault_PermissionGroupWeight = DataKey.builder().bukkit().player().id("vault:permgroupweight").build();
     public final static DataKey<Double> Vault_Balance = DataKey.builder().bukkit().player().id("vault:balance").build();
+    public final static DataKey<String> Vault_PrimaryGroupPrefix = DataKey.builder().bukkit().player().id("vault:primarygroupprefix").build();
+    public final static DataKey<String> Vault_PlayerPrefix = DataKey.builder().bukkit().player().id("vault:playerprefix").build();
     public final static DataKey<Boolean> VanishNoPacket_IsVanished = DataKey.builder().bukkit().player().id("vanishnopacket:isvanished").build();
     public final static DataKey<Integer> PlayerPoints_Points = DataKey.builder().bukkit().player().id("playerpoints:points").build();
     public final static DataKey<String> Factions_FactionName = DataKey.builder().bukkit().player().id("factions:factionname").build();
@@ -71,6 +73,8 @@ public class DataKeys {
     public final static DataKey<String> BungeePerms_DisplayPrefix = DataKey.builder().bungee().player().id("bungeeperms:displayprefix").build();
     public final static DataKey<String> BungeePerms_Suffix = DataKey.builder().bungee().player().id("bungeeperms:suffix").build();
     public final static DataKey<Integer> BungeePerms_Rank = DataKey.builder().bungee().player().id("bungeeperms:rank").build();
+    public final static DataKey<String> BungeePerms_PrimaryGroupPrefix = DataKey.builder().bungee().player().id("bungeeperms:primarygroupprefix").build();
+    public final static DataKey<String> BungeePerms_PlayerPrefix = DataKey.builder().bungee().player().id("bungeeperms:playerprefix").build();
 
     public final static DataKey<String> BungeeCord_PrimaryGroup = DataKey.builder().bungee().player().id("bungeecord:group").build();
     public final static DataKey<Integer> BungeeCord_Rank = DataKey.builder().bungee().player().id("bungeecord:rank").build();

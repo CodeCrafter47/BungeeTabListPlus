@@ -75,6 +75,8 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         addBukkitBridgePlaceholder("vault_group", DataKeys.Vault_PermissionGroup);
         addBukkitBridgePlaceholder("vault_prefix", DataKeys.Vault_Prefix);
         addBukkitBridgePlaceholder("vault_suffix", DataKeys.Vault_Suffix);
+        addBukkitBridgePlaceholder("vault_primary_group_prefix", DataKeys.Vault_PrimaryGroupPrefix);
+        addBukkitBridgePlaceholder("vault_player_prefix", DataKeys.Vault_PlayerPrefix);
         addBukkitBridgePlaceholder("health", DataKeys.Health, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
         addBukkitBridgePlaceholder("maxHealth", DataKeys.MaxHealth, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
         addBukkitBridgePlaceholder("posX", DataKeys.PosX, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
