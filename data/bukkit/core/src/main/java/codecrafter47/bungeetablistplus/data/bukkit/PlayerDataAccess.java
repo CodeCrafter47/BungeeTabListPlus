@@ -43,6 +43,7 @@ import codecrafter47.bungeetablistplus.data.supervanish.SuperVanishIsVanishedPro
 import codecrafter47.bungeetablistplus.data.vanishnopacket.VanishNoPacketIsVanishedProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultBalanceProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultGroupProvider;
+import codecrafter47.bungeetablistplus.data.vault.VaultGroupRankProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultGroupWeightProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultPrefixProvider;
 import codecrafter47.bungeetablistplus.data.vault.VaultSuffixProvider;
@@ -90,6 +91,7 @@ public class PlayerDataAccess extends AbstractBukkitDataAccess<Player> {
             bind(DataKeys.Vault_Balance, new VaultBalanceProvider(plugin));
             bind(DataKeys.Vault_PermissionGroup, new VaultGroupProvider());
             bind(DataKeys.Vault_PermissionGroupWeight, new VaultGroupWeightProvider());
+            bind(DataKeys.Vault_PermissionGroupRank, new VaultGroupRankProvider());
             bind(DataKeys.Vault_Prefix, new VaultPrefixProvider());
             bind(DataKeys.Vault_Suffix, new VaultSuffixProvider());
         }

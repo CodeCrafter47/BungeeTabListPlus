@@ -36,7 +36,8 @@ public class DataKeys {
     public final static DataKey<String> Vault_Prefix = DataKey.builder().bukkit().player().id("vault:prefix").build();
     public final static DataKey<String> Vault_Suffix = DataKey.builder().bukkit().player().id("vault:suffix").build();
     public final static DataKey<String> Vault_PermissionGroup = DataKey.builder().bukkit().player().id("vault:permgroup").build();
-    public final static DataKey<Integer> Vault_PermissionGroupWeight = DataKey.builder().bukkit().player().id("vault:permgrouprank").build();
+    public final static DataKey<Integer> Vault_PermissionGroupRank = DataKey.builder().bukkit().player().id("vault:permgrouprank").build();
+    public final static DataKey<Integer> Vault_PermissionGroupWeight = DataKey.builder().bukkit().player().id("vault:permgroupweight").build();
     public final static DataKey<Double> Vault_Balance = DataKey.builder().bukkit().player().id("vault:balance").build();
     public final static DataKey<Boolean> VanishNoPacket_IsVanished = DataKey.builder().bukkit().player().id("vanishnopacket:isvanished").build();
     public final static DataKey<Integer> PlayerPoints_Points = DataKey.builder().bukkit().player().id("playerpoints:points").build();

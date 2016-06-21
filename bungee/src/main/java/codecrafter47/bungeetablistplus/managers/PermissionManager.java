@@ -152,6 +152,11 @@ public class PermissionManager {
         } else if (permissionSource.equalsIgnoreCase("Bukkit") || permissionSource.equalsIgnoreCase("BukkitPermissionsEx")) {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
             Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
+            if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+            }
+            p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
+            p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
             return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
         } else if (permissionSource.equalsIgnoreCase("Bungee")) {
             Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeeCord_Rank);
@@ -169,6 +174,14 @@ public class PermissionManager {
             {
                 Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
                 Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
+                if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+                }
+            }
+
+            {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
                 if (p1Rank.isPresent() || p2Rank.isPresent()) {
                     return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
                 }
