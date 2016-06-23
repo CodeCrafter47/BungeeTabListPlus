@@ -100,15 +100,15 @@ public class AbstractLegacyTabListTest {
                 for (PlayerListItem.Item item : ((PlayerListItem) packet).getItems()) {
                     switch (((PlayerListItem) packet).getAction()) {
                         case ADD_PLAYER:
-                            if (!clientTabList.ping.containsKey(item.getUsername())) {
-                                clientTabList.players.add(item.getUsername());
+                            if (!clientTabList.ping.containsKey(item.getDisplayName())) {
+                                clientTabList.players.add(item.getDisplayName());
                             }
-                            clientTabList.ping.put(item.getUsername(), item.getPing());
+                            clientTabList.ping.put(item.getDisplayName(), item.getPing());
                             break;
                         case REMOVE_PLAYER:
-                            assertTrue(clientTabList.ping.containsKey(item.getUsername()));
-                            clientTabList.players.remove(item.getUsername());
-                            clientTabList.ping.remove(item.getUsername());
+                            assertTrue(clientTabList.ping.containsKey(item.getDisplayName()));
+                            clientTabList.players.remove(item.getDisplayName());
+                            clientTabList.ping.remove(item.getDisplayName());
                             break;
                         default:
                             fail();
