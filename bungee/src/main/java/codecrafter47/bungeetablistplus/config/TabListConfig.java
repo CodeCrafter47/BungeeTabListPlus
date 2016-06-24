@@ -151,6 +151,7 @@ public class TabListConfig extends YamlConfig {
             "If you have 1.7 or older clients this must match the value in bungee's config.yml",
             "Can be from 1 to 80."
     })
+    @Path("tab_size")
     public int tab_size = 60;
 
     @Comments({
