@@ -45,7 +45,7 @@ public class RewriteLogic extends TabListHandler {
             for (PlayerListItem.Item item : packet.getItems()) {
                 UUID uuid = item.getUuid();
                 UserConnection player = BungeeCord.getInstance().getPlayerByOfflineUUID(uuid);
-                if (player != null && !uuid.equals(player.getUniqueId())) {
+                if (player != null) {
                     rewriteMap.put(uuid, player.getUniqueId());
                 }
             }
