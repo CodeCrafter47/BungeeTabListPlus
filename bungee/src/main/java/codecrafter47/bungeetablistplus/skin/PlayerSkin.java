@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.skin;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class PlayerSkin implements Skin {
     UUID player;
+    @NonNull
     String[][] properties;
 
     @Override
