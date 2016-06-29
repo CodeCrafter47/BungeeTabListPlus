@@ -1003,27 +1003,42 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 updatePingInternal(index, ping);
             } else {
                 boolean updated = false;
-                if (skin.getOwner() != null) {
+                if (size < 80) {
                     int slot;
-                    if (size < 80
-                            && !clientUuid[index].equals(skin.getOwner())
-                            && serverTabList.containsKey(skin.getOwner())
-                            && (!clientUuid[index].equals(getUniqueId())
-                            || serverTabList.get(getUniqueId()).getGamemode() != 3)
-                            && (!skin.getOwner().equals(getUniqueId())
-                            || serverTabList.get(getUniqueId()).getGamemode() != 3)
-                            && (clientSkin[(slot = uuidToSlotMap.getInt(skin.getOwner()))].getOwner() == null
-                            || !clientSkin[slot].getOwner().equals(skin.getOwner()))) {
-                        clientSkin[index] = skin;
-                        clientPing[index] = ping;
-                        if (clientUuid[index] == fakePlayerUUIDs[index]) {
+                    if (!clientUuid[index].equals(skin.getOwner())) {
+                        boolean moveOld = false;
+                        boolean moveNew = false;
+                        if ((!clientUuid[index].equals(getUniqueId()) || serverTabList.get(getUniqueId()).getGamemode() != 3)) {
+                            moveOld = clientUuid[index] != fakePlayerUUIDs[index];
+                            moveNew = skin.getOwner() != null && serverTabList.containsKey(skin.getOwner()) && (!skin.getOwner().equals(getUniqueId()) || serverTabList.get(getUniqueId()).getGamemode() != 3) && (clientSkin[(slot = uuidToSlotMap.getInt(skin.getOwner()))].getOwner() == null || !clientSkin[slot].getOwner().equals(skin.getOwner()));
+                        }
+
+                        UUID oldUuid = clientUuid[index];
+
+                        if (moveOld && !moveNew && serverTabList.size() < size) {
+                            clientSkin[index] = skin;
+                            clientPing[index] = ping;
+                            useFakePlayerForSlot(index);
+                            int target = findSlotForPlayer(oldUuid);
+                            useRealPlayerForSlot(target, oldUuid);
+                            updated = true;
+                        } else if (moveNew && !moveOld && serverTabList.size() < size) {
+                            clientSkin[index] = skin;
+                            clientPing[index] = ping;
+                            slot = uuidToSlotMap.getInt(skin.getOwner());
                             useFakePlayerForSlot(slot);
                             useRealPlayerForSlot(index, skin.getOwner());
-                        } else {
-                            useRealPlayerForSlot(slot, clientUuid[index]);
+                            updated = true;
+                        } else if (moveNew && moveOld) {
+                            clientSkin[index] = skin;
+                            clientPing[index] = ping;
+                            slot = uuidToSlotMap.getInt(skin.getOwner());
+                            useFakePlayerForSlot(slot);
+                            int target = findSlotForPlayer(oldUuid);
+                            useRealPlayerForSlot(target, oldUuid);
                             useRealPlayerForSlot(index, skin.getOwner());
+                            updated = true;
                         }
-                        updated = true;
                     }
                 }
                 if (!updated) {

@@ -406,6 +406,46 @@ public class AbstractTabListLogicTest {
     }
 
     @Test
+    public void testSwapSkinC() {
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(uuids[47]);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(0);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabListHandler.onPlayerListPacket(packet);
+        item.setUsername(usernames[48]);
+        item.setUuid(uuids[48]);
+        tabListHandler.onPlayerListPacket(packet);
+        item.setUsername(usernames[49]);
+        item.setUuid(uuids[49]);
+        tabListHandler.onPlayerListPacket(packet);
+
+        tabListHandler.setPassTrough(false);
+
+        tabListHandler.setSize(20);
+
+        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(6, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
+
+        assertEquals(clientUUID, clientTabList.getVisibleEntries().get(3).getUuid());
+        assertEquals(uuids[48], clientTabList.getVisibleEntries().get(5).getUuid());
+        assertEquals(uuids[49], clientTabList.getVisibleEntries().get(6).getUuid());
+
+        tabListHandler.setSlot(3, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(6, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+
+        assertEquals(clientUUID, clientTabList.getVisibleEntries().get(6).getUuid());
+        assertEquals(uuids[49], clientTabList.getVisibleEntries().get(5).getUuid());
+        assertEquals(uuids[48], clientTabList.getVisibleEntries().get(3).getUuid());
+    }
+
+    @Test
     public void testTeamRestore() {
         PlayerListItem packet = new PlayerListItem();
         packet.setAction(PlayerListItem.Action.ADD_PLAYER);
