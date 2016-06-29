@@ -439,28 +439,29 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         // dirty hack for citizens compatibility
         if (uuid.version() == 2)
             return;
-        if (nameToSlotMap.remove(player, slot)) {
+        if (nameToSlotMap.getInt(player) == slot) {
+            nameToSlotMap.remove(player);
             sendPacket(removePlayer(slot, player));
-        }
-        if (playerToTeamMap.containsKey(player)) {
-            Team team = new Team();
-            team.setName(playerToTeamMap.get(player));
-            team.setMode((byte) 3); // add player
-            team.setPlayers(new String[]{player});
-            sendPacket(team);
-            team = new Team();
-            team.setMode((byte) 2);
-            team.setName(fakePlayerUsernames[slot]);
-            team.setDisplayName(fakePlayerUsernames[slot]);
-            team.setPrefix("");
-            team.setSuffix("");
-            team.setFriendlyFire((byte) 1);
-            team.setNameTagVisibility("always");
-            if (teamCollisionRuleSupported) {
-                team.setCollisionRule("always");
+            if (playerToTeamMap.containsKey(player)) {
+                Team team = new Team();
+                team.setName(playerToTeamMap.get(player));
+                team.setMode((byte) 3); // add player
+                team.setPlayers(new String[]{player});
+                sendPacket(team);
+                team = new Team();
+                team.setMode((byte) 2);
+                team.setName(fakePlayerUsernames[slot]);
+                team.setDisplayName(fakePlayerUsernames[slot]);
+                team.setPrefix("");
+                team.setSuffix("");
+                team.setFriendlyFire((byte) 1);
+                team.setNameTagVisibility("always");
+                if (teamCollisionRuleSupported) {
+                    team.setCollisionRule("always");
+                }
+                team.setColor((byte) 0);
+                sendPacket(team);
             }
-            team.setColor((byte) 0);
-            sendPacket(team);
         }
     }
 
