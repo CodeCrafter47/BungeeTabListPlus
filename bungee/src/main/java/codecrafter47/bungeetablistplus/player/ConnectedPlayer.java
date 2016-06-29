@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.tablisthandler.LegacyTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.LowMemoryTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.RewriteLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
 import lombok.Getter;
@@ -174,7 +175,9 @@ public class ConnectedPlayer implements Player {
 
     private void createTabListHandler() {
         if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(getPlayer())) {
-            TabListLogic tabListLogic = new TabListLogic(null, getPlayer());
+            //TabListLogic tabListLogic = new TabListLogic(null, getPlayer());
+            // TODO: revert this change as soon as the underlying issue is fixed
+            TabListLogic tabListLogic = new LowMemoryTabListLogic(null, getPlayer());
             playerTablistHandler = PlayerTablistHandler.create(getPlayer(), tabListLogic);
             packetHandler = new RewriteLogic(tabListLogic);
             tabListLogic.onConnected();

@@ -423,6 +423,8 @@ public class AbstractTabListLogicTest {
                 net.md_5.bungee.protocol.packet.Team team = new net.md_5.bungee.protocol.packet.Team("Team " + i);
                 team.setPlayers(new String[]{usernames[i]});
                 team.setMode((byte) 0);
+                team.setCollisionRule("always");
+                team.setNameTagVisibility("always");
                 tabListHandler.onTeamPacket(team);
             }
         }
@@ -520,6 +522,8 @@ public class AbstractTabListLogicTest {
             net.md_5.bungee.protocol.packet.Team team = new net.md_5.bungee.protocol.packet.Team("Team " + i);
             team.setPlayers(new String[]{usernames[i]});
             team.setMode((byte) 0);
+            team.setCollisionRule("always");
+            team.setNameTagVisibility("always");
             tabListHandler.onTeamPacket(team);
         }
 
@@ -565,6 +569,8 @@ public class AbstractTabListLogicTest {
                 team.setPlayers(new String[]{usernames[i]});
                 team.setMode((byte) 0);
                 team.setPrefix("prefix " + i);
+                team.setCollisionRule("always");
+                team.setNameTagVisibility("always");
                 tabListHandler.onTeamPacket(team);
             }
         }
@@ -583,6 +589,8 @@ public class AbstractTabListLogicTest {
         net.md_5.bungee.protocol.packet.Team team = new net.md_5.bungee.protocol.packet.Team("Team " + 0);
         team.setMode((byte) 2);
         team.setPrefix("Test");
+        team.setCollisionRule("always");
+        team.setNameTagVisibility("always");
         tabListHandler.onTeamPacket(team);
 
         assertEquals("Test", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[0])).getPrefix());

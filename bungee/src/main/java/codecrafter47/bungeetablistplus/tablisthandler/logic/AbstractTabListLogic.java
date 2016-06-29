@@ -23,13 +23,15 @@ import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.managers.SkinManagerImpl;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import codecrafter47.bungeetablistplus.util.Object2IntHashMultimap;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,7 +41,6 @@ import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -85,12 +86,19 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     protected String serverHeader = null;
     protected String serverFooter = null;
 
-    protected final Map<String, net.md_5.bungee.api.score.Team> serverTeams = new HashMap<>();
-    protected final Map<String, String> playerToTeamMap = new HashMap<>();
-    protected final Map<String, Integer> nameToSlotMap = new HashMap<>();
+    protected final Map<String, TeamData> serverTeams = new Object2ObjectOpenHashMap<>();
+    protected final Map<String, String> playerToTeamMap = new Object2ObjectOpenHashMap<>();
+    protected final Object2IntMap<String> nameToSlotMap;
 
-    protected Multimap<UUID, Integer> skinUuidToSlotMap = MultimapBuilder.hashKeys().linkedListValues().build();
-    protected TObjectIntMap<UUID> uuidToSlotMap = new TObjectIntHashMap<>();
+    protected Object2IntHashMultimap<UUID> skinUuidToSlotMap = new Object2IntHashMultimap<>();
+    protected Object2IntMap<UUID> uuidToSlotMap;
+
+    {
+        uuidToSlotMap = new Object2IntOpenHashMap<>();
+        uuidToSlotMap.defaultReturnValue(-1);
+        nameToSlotMap = new Object2IntOpenHashMap<>();
+        nameToSlotMap.defaultReturnValue(-1);
+    }
 
     protected UUID[] clientUuid = new UUID[80];
     protected String[] clientUsername = new String[80];
@@ -123,9 +131,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             team.setPrefix("");
             team.setSuffix("");
             team.setFriendlyFire((byte) 1);
-            team.setNameTagVisibility("ALWAYS");
+            team.setNameTagVisibility("always");
             if (teamCollisionRuleSupported) {
-                team.setCollisionRule("ALWAYS");
+                team.setCollisionRule("always");
             }
             team.setColor((byte) 0);
             team.setPlayers(new String[0]);
@@ -205,9 +213,8 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 for (PlayerListItem.Item item : packet.getItems()) {
                     if (item.getGamemode() == 3 && item.getUuid().equals(getUniqueId())) {
 
-                        if (uuidToSlotMap.containsKey(item.getUuid())) {
-                            int slot = uuidToSlotMap.get(item.getUuid());
-
+                        int slot = uuidToSlotMap.getInt(item.getUuid());
+                        if (slot != -1) {
                             if (slot != size - 1) {
                                 // player changed to gm 3
                                 useFakePlayerForSlot(slot);
@@ -226,7 +233,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             }
                         } else {
                             // player joined with gm 3
-                            int slot = size - 1;
+                            slot = size - 1;
 
                             if (clientUuid[slot] != fakePlayerUUIDs[slot]) {
                                 // needs to be moved
@@ -239,20 +246,21 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     } else {
                         item.setGamemode(0);
 
-                        if (uuidToSlotMap.containsKey(item.getUuid()) && skinUuidToSlotMap.containsKey(item.getUuid()) && !skinUuidToSlotMap.get(item.getUuid()).contains(uuidToSlotMap.get(item.getUuid()))) {
+                        int slot;
+                        if (-1 != (slot = uuidToSlotMap.getInt(item.getUuid())) && !skinUuidToSlotMap.contains(item.getUuid(), -1)) {
                             // player that was not in correct position updates username + skin
                             // probably changed away from gm 3
                             // move the player slot if he changed await from gm 3
-                            useFakePlayerForSlot(uuidToSlotMap.get(item.getUuid()));
+                            useFakePlayerForSlot(slot);
                         }
 
-                        if (uuidToSlotMap.containsKey(item.getUuid())) {
+                        if (slot != -1) {
                             // player is already in the tab list, just update
                             // skin and user name
-                            useRealPlayerForSlot(uuidToSlotMap.get(item.getUuid()), item.getUuid());
+                            useRealPlayerForSlot(slot, item.getUuid());
                         } else {
                             // player isn't yet in the tab list
-                            int slot = findSlotForPlayer(item.getUuid());
+                            slot = findSlotForPlayer(item.getUuid());
                             useRealPlayerForSlot(slot, item.getUuid());
                         }
                     }
@@ -264,7 +272,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         continue;
                     }
                     if (item.getUuid().equals(getUniqueId())) {
-                        int slot = uuidToSlotMap.get(item.getUuid());
+                        int slot = uuidToSlotMap.getInt(item.getUuid());
 
                         if (item.getGamemode() == 3 && slot != size - 1) {
                             // player changed to gm 3
@@ -289,8 +297,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 sendPacket(packet);
                 for (PlayerListItem.Item item : packet.getItems()) {
                     // player leaves server
-                    if (uuidToSlotMap.containsKey(item.getUuid())) {
-                        useFakePlayerForSlot(uuidToSlotMap.get(item.getUuid()));
+                    int slot = uuidToSlotMap.getInt(item.getUuid());
+                    if (-1 != slot) {
+                        useFakePlayerForSlot(slot);
                     }
                 }
                 break;
@@ -304,7 +313,8 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
     private int findSlotForPlayer(UUID playerUUID) {
         int targetSlot = -1;
-        for (int i : skinUuidToSlotMap.get(playerUUID)) {
+        for (IntIterator iterator = skinUuidToSlotMap.get(playerUUID).iterator(); iterator.hasNext(); ) {
+            int i = iterator.nextInt();
             if (clientUuid[i] == fakePlayerUUIDs[i]) {
                 targetSlot = i;
                 break;
@@ -363,7 +373,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         if (change) {
             removePlayerFromTeam(slot, clientUuid[slot], clientUsername[slot]);
-            if (uuidToSlotMap.get(clientUuid[slot]) == slot) {
+            if (uuidToSlotMap.getInt(clientUuid[slot]) == slot) {
                 uuidToSlotMap.remove(clientUuid[slot]);
             }
 
@@ -408,7 +418,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         sendPacket(addPlayer(slot, player));
         nameToSlotMap.put(player, slot);
         if (playerToTeamMap.containsKey(player)) {
-            net.md_5.bungee.api.score.Team serverTeam = serverTeams.get(playerToTeamMap.get(player));
+            TeamData serverTeam = serverTeams.get(playerToTeamMap.get(player));
             Team team = new Team();
             team.setMode((byte) 2);
             team.setName(fakePlayerUsernames[slot]);
@@ -445,9 +455,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             team.setPrefix("");
             team.setSuffix("");
             team.setFriendlyFire((byte) 1);
-            team.setNameTagVisibility("ALWAYS");
+            team.setNameTagVisibility("always");
             if (teamCollisionRuleSupported) {
-                team.setCollisionRule("ALWAYS");
+                team.setCollisionRule("always");
             }
             team.setColor((byte) 0);
             sendPacket(team);
@@ -463,21 +473,22 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         // update server data
 
         if (packet.getMode() == 1) {
-            net.md_5.bungee.api.score.Team team = serverTeams.remove(packet.getName());
+            TeamData team = serverTeams.remove(packet.getName());
             if (team != null) {
                 for (String player : team.getPlayers()) {
-                    playerToTeamMap.remove(player, team.getName());
-                    if (!passtrough && size != 80 && nameToSlotMap.containsKey(player)) {
+                    playerToTeamMap.remove(player, packet.getName());
+                    int slot;
+                    if (!passtrough && size != 80 && -1 != (slot = nameToSlotMap.getInt(player))) {
                         Team packet1 = new Team();
                         packet1.setMode((byte) 2);
-                        packet1.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                        packet1.setName(fakePlayerUsernames[slot]);
                         packet1.setDisplayName(packet1.getName());
                         packet1.setPrefix("");
                         packet1.setSuffix("");
                         packet1.setFriendlyFire((byte) 1);
-                        packet1.setNameTagVisibility("ALWAYS");
+                        packet1.setNameTagVisibility("always");
                         if (teamCollisionRuleSupported) {
-                            packet1.setCollisionRule("ALWAYS");
+                            packet1.setCollisionRule("always");
                         }
                         packet1.setColor((byte) 0);
                         sendPacket(packet1);
@@ -488,9 +499,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         } else {
 
             // Create or get old team
-            net.md_5.bungee.api.score.Team t;
+            TeamData t;
             if (packet.getMode() == 0) {
-                t = new net.md_5.bungee.api.score.Team(packet.getName());
+                t = new TeamData();
                 serverTeams.put(packet.getName(), t);
             } else {
                 t = serverTeams.get(packet.getName());
@@ -515,10 +526,10 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                                 serverTeams.get(playerToTeamMap.get(s)).removePlayer(s);
                             }
                             t.addPlayer(s);
-                            playerToTeamMap.put(s, t.getName());
+                            playerToTeamMap.put(s, packet.getName());
                         } else {
                             t.removePlayer(s);
-                            playerToTeamMap.remove(s, t.getName());
+                            playerToTeamMap.remove(s, packet.getName());
                         }
                     }
                 }
@@ -530,13 +541,14 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         }
 
         if (packet.getMode() == 2) {
-            net.md_5.bungee.api.score.Team serverTeam = serverTeams.get(packet.getName());
+            TeamData serverTeam = serverTeams.get(packet.getName());
             if (serverTeam != null) {
                 for (String player : serverTeam.getPlayers()) {
-                    if (nameToSlotMap.containsKey(player)) {
+                    int slot;
+                    if (-1 != (slot = nameToSlotMap.getInt(player))) {
                         Team team = new Team();
                         team.setMode((byte) 2);
-                        team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                        team.setName(fakePlayerUsernames[slot]);
                         team.setDisplayName(packet.getDisplayName());
                         team.setPrefix(packet.getPrefix());
                         team.setSuffix(packet.getSuffix());
@@ -557,29 +569,30 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         if (packet.getMode() == 0 || packet.getMode() == 3 || packet.getMode() == 4) {
             int length = 0;
             for (String player : packet.getPlayers()) {
-                if (!nameToSlotMap.containsKey(player)) {
+                int slot;
+                if (-1 == (slot = nameToSlotMap.getInt(player))) {
                     length++;
                 } else {
-                    if (packet.getMode() == 4 && nameToSlotMap.containsKey(player)) {
+                    if (packet.getMode() == 4) {
                         Team team = new Team();
                         team.setMode((byte) 2);
-                        team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                        team.setName(fakePlayerUsernames[slot]);
                         team.setDisplayName(team.getName());
                         team.setPrefix("");
                         team.setSuffix("");
                         team.setFriendlyFire((byte) 1);
-                        team.setNameTagVisibility("ALWAYS");
+                        team.setNameTagVisibility("always");
                         if (teamCollisionRuleSupported) {
-                            team.setCollisionRule("ALWAYS");
+                            team.setCollisionRule("always");
                         }
                         team.setColor((byte) 0);
                         sendPacket(team);
-                    } else if (nameToSlotMap.containsKey(player)) {
-                        net.md_5.bungee.api.score.Team serverTeam = serverTeams.get(playerToTeamMap.get(player));
+                    } else {
+                        TeamData serverTeam = serverTeams.get(playerToTeamMap.get(player));
                         if (serverTeam != null) {
                             Team team = new Team();
                             team.setMode((byte) 2);
-                            team.setName(fakePlayerUsernames[nameToSlotMap.get(player)]);
+                            team.setName(fakePlayerUsernames[slot]);
                             team.setDisplayName(serverTeam.getDisplayName());
                             team.setPrefix(serverTeam.getPrefix());
                             team.setSuffix(serverTeam.getSuffix());
@@ -990,6 +1003,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             } else {
                 boolean updated = false;
                 if (skin.getOwner() != null) {
+                    int slot;
                     if (size < 80
                             && !clientUuid[index].equals(skin.getOwner())
                             && serverTabList.containsKey(skin.getOwner())
@@ -997,11 +1011,10 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             || serverTabList.get(getUniqueId()).getGamemode() != 3)
                             && (!skin.getOwner().equals(getUniqueId())
                             || serverTabList.get(getUniqueId()).getGamemode() != 3)
-                            && (clientSkin[uuidToSlotMap.get(skin.getOwner())].getOwner() == null
-                            || !clientSkin[uuidToSlotMap.get(skin.getOwner())].getOwner().equals(skin.getOwner()))) {
+                            && (clientSkin[(slot = uuidToSlotMap.getInt(skin.getOwner()))].getOwner() == null
+                            || !clientSkin[slot].getOwner().equals(skin.getOwner()))) {
                         clientSkin[index] = skin;
                         clientPing[index] = ping;
-                        int slot = uuidToSlotMap.get(skin.getOwner());
                         if (clientUuid[index] == fakePlayerUUIDs[index]) {
                             useFakePlayerForSlot(slot);
                             useRealPlayerForSlot(index, skin.getOwner());
@@ -1119,6 +1132,34 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         private TabListItem(PlayerListItem.Item item) {
             this(item.getUuid(), item.getProperties(), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
+        }
+    }
+
+    @Data
+    static class TeamData {
+        private String displayName;
+        private String prefix;
+        private String suffix;
+        private byte friendlyFire;
+        private String nameTagVisibility;
+        private String collisionRule;
+        private byte color;
+        private Set<String> players = new ObjectOpenHashSet<>();
+
+        public void addPlayer(String name) {
+            players.add(name);
+        }
+
+        public void removePlayer(String name) {
+            players.remove(name);
+        }
+
+        public void setNameTagVisibility(String nameTagVisibility) {
+            this.nameTagVisibility = nameTagVisibility.intern();
+        }
+
+        public void setCollisionRule(String collisionRule) {
+            this.collisionRule = collisionRule.intern();
         }
     }
 }
