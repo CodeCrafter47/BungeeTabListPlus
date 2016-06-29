@@ -1159,7 +1159,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         }
 
         public void setCollisionRule(String collisionRule) {
-            this.collisionRule = collisionRule.intern();
+            this.collisionRule = collisionRule == null ? null : collisionRule.intern();
         }
     }
 }
