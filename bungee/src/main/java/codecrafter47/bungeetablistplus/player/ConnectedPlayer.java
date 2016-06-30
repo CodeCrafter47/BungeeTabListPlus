@@ -106,7 +106,7 @@ public class ConnectedPlayer implements Player {
                 }
             }
             if (skin == null) {
-                skin = new PlayerSkin(player.getUniqueId(), null);
+                skin = new PlayerSkin(player.getUniqueId(), new String[0][]);
             }
         }
         return skin;
