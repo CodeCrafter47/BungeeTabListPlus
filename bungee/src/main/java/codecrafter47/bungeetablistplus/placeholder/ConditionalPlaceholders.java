@@ -45,7 +45,8 @@ public class ConditionalPlaceholders extends PlaceholderProvider {
         });
         bind("insertIfServersDifferent").withTemplateArgs().to((context, args) -> {
             Optional<ServerGroup> serverGroup = context.getServerGroup();
-            return !serverGroup.isPresent() || !serverGroup.get().getServerNames().contains(context.getViewer().getServer().getInfo().getName()) ? args : SlotTemplate.empty();
+            Server server = context.getViewer().getServer();
+            return server != null && (!serverGroup.isPresent() || !serverGroup.get().getServerNames().contains(server.getInfo().getName())) ? args : SlotTemplate.empty();
         });
     }
 }
