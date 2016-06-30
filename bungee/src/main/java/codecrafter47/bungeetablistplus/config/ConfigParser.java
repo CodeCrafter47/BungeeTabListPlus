@@ -30,14 +30,7 @@ import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 import codecrafter47.bungeetablistplus.playersorting.SortingRuleRegistry;
-import codecrafter47.bungeetablistplus.section.AutoFillPlayers;
-import codecrafter47.bungeetablistplus.section.ColumnSplitSection;
-import codecrafter47.bungeetablistplus.section.FillBukkitPlayersSection;
-import codecrafter47.bungeetablistplus.section.FillPlayersSection;
-import codecrafter47.bungeetablistplus.section.PlayerColumn;
-import codecrafter47.bungeetablistplus.section.Section;
-import codecrafter47.bungeetablistplus.section.ServerSection;
-import codecrafter47.bungeetablistplus.section.StaticSection;
+import codecrafter47.bungeetablistplus.section.*;
 import codecrafter47.bungeetablistplus.tablist.GenericServerGroup;
 import codecrafter47.bungeetablistplus.tablistproviders.ConfigTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.IConfigTabListProvider;
@@ -49,15 +42,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -84,6 +69,9 @@ public class ConfigParser {
     private final int rows;
 
     public ConfigParser(BungeeTabListPlus plugin, int tab_size) {
+        if (tab_size <= 0) {
+            throw new IllegalArgumentException("tab_size is 0");
+        }
         this.plugin = plugin;
         this.tab_size = tab_size;
         columns = (tab_size + 19) / 20;
