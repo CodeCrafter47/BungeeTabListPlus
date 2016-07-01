@@ -32,30 +32,17 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Math.min;
-import static net.md_5.bungee.protocol.packet.PlayerListItem.Action.ADD_PLAYER;
-import static net.md_5.bungee.protocol.packet.PlayerListItem.Action.REMOVE_PLAYER;
-import static net.md_5.bungee.protocol.packet.PlayerListItem.Action.UPDATE_DISPLAY_NAME;
-import static net.md_5.bungee.protocol.packet.PlayerListItem.Action.UPDATE_GAMEMODE;
-import static net.md_5.bungee.protocol.packet.PlayerListItem.Action.UPDATE_LATENCY;
+import static net.md_5.bungee.protocol.packet.PlayerListItem.Action.*;
 
 public abstract class AbstractTabListLogic extends TabListHandler {
 
@@ -109,8 +96,12 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     protected String clientFooter = null;
 
     protected int size = 0;
+    private int requestedSize = 0;
 
     protected boolean passtrough = true;
+
+    @Setter
+    protected ResizePolicy resizePolicy = ResizePolicy.DEFAULT;
 
     public AbstractTabListLogic(TabListHandler parent) {
         super(parent);
@@ -198,7 +189,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         // resize if necessary
         if (serverTabList.size() > size) {
-            setSizeInternal(min(((serverTabList.size() + 19) / 20) * 20, 80));
+            if (resizePolicy.isMod20()) {
+                setSizeInternal(min(((serverTabList.size() + 19) / 20) * 20, 80));
+            } else {
+                setSizeInternal(min(serverTabList.size(), 80));
+            }
         }
 
         // if passthrough is enabled send the packet to the client
@@ -306,6 +301,10 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             case UPDATE_LATENCY:
             case UPDATE_DISPLAY_NAME:
                 break;
+        }
+
+        if (size != requestedSize && serverTabList.size() < requestedSize) {
+            setSizeInternal(requestedSize);
         }
 
         return PacketListenerResult.CANCEL;
@@ -808,10 +807,15 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         // resize if necessary
         if (serverTabList.size() > size) {
-            setSizeInternal(min(((serverTabList.size() + 19) / 20) * 20, 80));
+            if (resizePolicy.isMod20()) {
+                setSizeInternal(min(((serverTabList.size() + 19) / 20) * 20, 80));
+            } else {
+                setSizeInternal(min(serverTabList.size(), 80));
+            }
         } else {
             setSizeInternal(size);
         }
+        requestedSize = size;
     }
 
     private void setSizeInternal(int size) {
@@ -1177,5 +1181,13 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         public void setCollisionRule(String collisionRule) {
             this.collisionRule = collisionRule == null ? null : collisionRule.intern();
         }
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum ResizePolicy {
+        DEFAULT_NO_SHRINK(true, false), DEFAULT(true, true), DYNAMIC(true, true);
+        boolean mod20;
+        boolean reduceSize;
     }
 }

@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.AbstractTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import codecrafter47.bungeetablistplus.util.FastChat;
@@ -98,6 +99,7 @@ public abstract class PlayerTablistHandler {
                     tabList = tabList.flip();
                 }
 
+                handle.setResizePolicy(tabList.shouldShrink() ? AbstractTabListLogic.ResizePolicy.DYNAMIC : AbstractTabListLogic.ResizePolicy.DEFAULT);
                 int size = min(80, tabList.shouldShrink() ? tabList.getUsedSlots() : tabList.getSize());
                 handle.setSize(size);
                 handle.setPassTrough(false);
