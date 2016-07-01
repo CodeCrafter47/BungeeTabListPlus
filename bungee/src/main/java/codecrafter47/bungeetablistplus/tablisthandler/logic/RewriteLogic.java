@@ -66,20 +66,22 @@ public class RewriteLogic extends TabListHandler {
                     modified = true;
                     if (packet.getAction() == PlayerListItem.Action.ADD_PLAYER) {
                         UserConnection player = BungeeCord.getInstance().getPlayerByOfflineUUID(item.getUuid());
-                        LoginResult loginResult = player.getPendingConnection().getLoginProfile();
-                        if (loginResult != null) {
-                            String[][] props = new String[loginResult.getProperties().length][];
-                            for (int i = 0; i < props.length; i++) {
-                                props[i] = new String[]
-                                        {
-                                                loginResult.getProperties()[i].getName(),
-                                                loginResult.getProperties()[i].getValue(),
-                                                loginResult.getProperties()[i].getSignature()
-                                        };
+                        if (player != null) {
+                            LoginResult loginResult = player.getPendingConnection().getLoginProfile();
+                            if (loginResult != null) {
+                                String[][] props = new String[loginResult.getProperties().length][];
+                                for (int i = 0; i < props.length; i++) {
+                                    props[i] = new String[]
+                                            {
+                                                    loginResult.getProperties()[i].getName(),
+                                                    loginResult.getProperties()[i].getValue(),
+                                                    loginResult.getProperties()[i].getSignature()
+                                            };
+                                }
+                                item.setProperties(props);
+                            } else {
+                                item.setProperties(new String[0][0]);
                             }
-                            item.setProperties(props);
-                        } else {
-                            item.setProperties(new String[0][0]);
                         }
                     }
                     item.setUuid(uuid);
