@@ -21,10 +21,11 @@ package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import io.netty.channel.Channel;
 import lombok.Getter;
@@ -101,7 +102,7 @@ public class TabListLogic extends AbstractTabListLogic {
     // Override all methods to add event loop check
 
     @Override
-    public void setResizePolicy(ResizePolicy resizePolicy) {
+    public void setResizePolicy(PlayerTablistHandler.ResizePolicy resizePolicy) {
         failIfNotInEventLoop();
         super.setResizePolicy(resizePolicy);
     }
@@ -143,9 +144,9 @@ public class TabListLogic extends AbstractTabListLogic {
     }
 
     @Override
-    public void setPassTrough(boolean passTrough) {
+    public void setPassThrough(boolean passTrough) {
         failIfNotInEventLoop();
-        super.setPassTrough(passTrough);
+        super.setPassThrough(passTrough);
     }
 
     @Override
@@ -155,7 +156,7 @@ public class TabListLogic extends AbstractTabListLogic {
     }
 
     @Override
-    public void setSlot(int index, Skin skin0, String text, int ping) {
+    public void setSlot(int index, Icon skin0, String text, int ping) {
         failIfNotInEventLoop();
         super.setSlot(index, skin0, text, ping);
     }

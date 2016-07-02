@@ -19,10 +19,9 @@
 
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
-import codecrafter47.bungeetablistplus.managers.SkinManagerImpl;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
-import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.util.Object2IntHashMultimap;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -32,7 +31,10 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -90,7 +92,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
     protected UUID[] clientUuid = new UUID[80];
     protected String[] clientUsername = new String[80];
-    protected PlayerSkin[] clientSkin = new PlayerSkin[80];
+    protected Icon[] clientSkin = new Icon[80];
     protected String[] clientText = new String[80];
     protected int[] clientPing = new int[80];
     protected String clientHeader = null;
@@ -102,7 +104,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     protected boolean passtrough = true;
 
     @Setter
-    protected ResizePolicy resizePolicy = ResizePolicy.DEFAULT;
+    protected PlayerTablistHandler.ResizePolicy resizePolicy = PlayerTablistHandler.ResizePolicy.DEFAULT;
 
     public AbstractTabListLogic(TabListHandler parent) {
         super(parent);
@@ -350,7 +352,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         item.setPing(clientPing[slot]);
         item.setDisplayName(clientText[slot]);
         item.setGamemode(0);
-        item.setProperties(clientSkin[slot].toProperty());
+        item.setProperties(clientSkin[slot].getProperties());
         packet.setItems(new PlayerListItem.Item[]{item});
         sendPacket(packet);
         packet = new PlayerListItem();
@@ -658,7 +660,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     }
 
     @Override
-    public void setPassTrough(boolean passTrough) {
+    public void setPassThrough(boolean passTrough) {
         if (this.passtrough != passTrough) {
             this.passtrough = passTrough;
             if (passTrough) {
@@ -780,7 +782,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         item.setUsername(clientUsername[slot]);
                         item.setPing(clientPing[slot]);
                         item.setDisplayName(clientText[slot]);
-                        item.setProperties(clientSkin[slot].toProperty());
+                        item.setProperties(clientSkin[slot].getProperties());
                         items[slot] = item;
                     }
                     PlayerListItem packet = new PlayerListItem();
@@ -819,6 +821,10 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         requestedSize = size;
     }
 
+    public int getSize() {
+        return requestedSize;
+    }
+
     private void setSizeInternal(int size) {
         if (size > 80 || size < 0) {
             throw new IllegalArgumentException();
@@ -826,8 +832,8 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
         if (size < this.size) {
             for (int index = size; index < this.size; index++) {
-                if (clientSkin[index].getOwner() != null) {
-                    skinUuidToSlotMap.remove(clientSkin[index].getOwner(), index);
+                if (clientSkin[index].getPlayer() != null) {
+                    skinUuidToSlotMap.remove(clientSkin[index].getPlayer(), index);
                 }
             }
         }
@@ -835,7 +841,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         if (passtrough) {
             if (size > this.size) {
                 for (int slot = this.size; slot < size; slot++) {
-                    clientSkin[slot] = SkinManagerImpl.defaultSkin;
+                    clientSkin[slot] = Icon.DEFAULT;
                     clientText[slot] = "{\"text\": \"\"}";
                     clientPing[slot] = 0;
                 }
@@ -846,7 +852,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 for (int slot = this.size; slot < size; slot++) {
                     clientUuid[slot] = fakePlayerUUIDs[slot];
                     clientUsername[slot] = fakePlayerUsernames[slot];
-                    clientSkin[slot] = SkinManagerImpl.defaultSkin;
+                    clientSkin[slot] = Icon.DEFAULT;
                     clientText[slot] = "{\"text\": \"\"}";
                     clientPing[slot] = 0;
                     uuidToSlotMap.put(clientUuid[slot], slot);
@@ -941,7 +947,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         for (int i = 0; i < size; i++) {
             PlayerListItem.Item item = new PlayerListItem.Item();
 
-            UUID skinOwner = clientSkin[i].getOwner();
+            UUID skinOwner = clientSkin[i].getPlayer();
             if (skinOwner != null && realPlayers.contains(skinOwner)) {
                 // use real player
                 TabListItem tabListItem = serverTabList.get(skinOwner);
@@ -952,7 +958,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             } else if (size - i - (isSpectator ? 1 : 0) > realPlayers.size()) {
                 item.setUuid(fakePlayerUUIDs[i]);
                 item.setUsername(fakePlayerUsernames[i]);
-                item.setProperties(clientSkin[i].toProperty());
+                item.setProperties(clientSkin[i].getProperties());
             } else if (!realPlayers.isEmpty()) {
                 UUID uuid = realPlayers.iterator().next();
                 realPlayers.remove(uuid);
@@ -989,17 +995,15 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     }
 
     @Override
-    public void setSlot(int index, Skin skin0, String text, int ping) {
+    public void setSlot(int index, Icon skin, String text, int ping) {
         Preconditions.checkElementIndex(index, size);
 
-        PlayerSkin skin = skin0 instanceof PlayerSkin ? (PlayerSkin) skin0 : new PlayerSkin(skin0.getOwner(), skin0.toProperty());
-
         if (!clientSkin[index].equals(skin)) {
-            if (clientSkin[index].getOwner() != null) {
-                skinUuidToSlotMap.remove(clientSkin[index].getOwner(), index);
+            if (clientSkin[index].getPlayer() != null) {
+                skinUuidToSlotMap.remove(clientSkin[index].getPlayer(), index);
             }
-            if (skin.getOwner() != null) {
-                skinUuidToSlotMap.put(skin.getOwner(), index);
+            if (skin.getPlayer() != null) {
+                skinUuidToSlotMap.put(skin.getPlayer(), index);
             }
         }
 
@@ -1010,12 +1014,12 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 boolean updated = false;
                 if (size < 80) {
                     int slot;
-                    if (!clientUuid[index].equals(skin.getOwner())) {
+                    if (!clientUuid[index].equals(skin.getPlayer())) {
                         boolean moveOld = false;
                         boolean moveNew = false;
                         if ((!clientUuid[index].equals(getUniqueId()) || serverTabList.get(getUniqueId()).getGamemode() != 3)) {
                             moveOld = clientUuid[index] != fakePlayerUUIDs[index];
-                            moveNew = skin.getOwner() != null && serverTabList.containsKey(skin.getOwner()) && (!skin.getOwner().equals(getUniqueId()) || serverTabList.get(getUniqueId()).getGamemode() != 3) && (clientSkin[(slot = uuidToSlotMap.getInt(skin.getOwner()))].getOwner() == null || !clientSkin[slot].getOwner().equals(skin.getOwner()));
+                            moveNew = skin.getPlayer() != null && serverTabList.containsKey(skin.getPlayer()) && (!skin.getPlayer().equals(getUniqueId()) || serverTabList.get(getUniqueId()).getGamemode() != 3) && (clientSkin[(slot = uuidToSlotMap.getInt(skin.getPlayer()))].getPlayer() == null || !clientSkin[slot].getPlayer().equals(skin.getPlayer()));
                         }
 
                         UUID oldUuid = clientUuid[index];
@@ -1044,14 +1048,14 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         } else if (moveNew && !moveOld && serverTabList.size() < size) {
                             clientSkin[index] = skin;
                             clientPing[index] = ping;
-                            slot = uuidToSlotMap.getInt(skin.getOwner());
+                            slot = uuidToSlotMap.getInt(skin.getPlayer());
                             useFakePlayerForSlot(slot);
-                            useRealPlayerForSlot(index, skin.getOwner());
+                            useRealPlayerForSlot(index, skin.getPlayer());
                             updated = true;
                         } else if (moveNew && moveOld) {
                             clientSkin[index] = skin;
                             clientPing[index] = ping;
-                            slot = uuidToSlotMap.getInt(skin.getOwner());
+                            slot = uuidToSlotMap.getInt(skin.getPlayer());
                             useFakePlayerForSlot(slot);
                             if (skinUuidToSlotMap.containsKey(oldUuid)) {
                                 for (IntIterator iterator = skinUuidToSlotMap.get(oldUuid).iterator(); iterator.hasNext(); ) {
@@ -1069,7 +1073,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                                 int target = findSlotForPlayer(oldUuid);
                                 useRealPlayerForSlot(target, oldUuid);
                             }
-                            useRealPlayerForSlot(index, skin.getOwner());
+                            useRealPlayerForSlot(index, skin.getPlayer());
                             updated = true;
                         }
                     }
@@ -1082,7 +1086,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         item.setUsername(clientUsername[index]);
                         item.setPing(ping);
                         item.setDisplayName(text);
-                        item.setProperties(skin.toProperty());
+                        item.setProperties(skin.getProperties());
                         packet.setAction(ADD_PLAYER);
                         packet.setItems(new PlayerListItem.Item[]{item});
                         sendPacket(packet);
@@ -1142,7 +1146,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     @Override
     public void setHeaderFooter(String header, String footer) {
         if (!Objects.equals(header, clientHeader) || !Objects.equals(footer, clientFooter)) {
-            sendPacket(new PlayerListHeaderFooter(header, footer));
+            if (header != null && footer != null) {
+                sendPacket(new PlayerListHeaderFooter(header, footer));
+            }
             clientHeader = header;
             clientFooter = footer;
         }
@@ -1210,13 +1216,5 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         public void setCollisionRule(String collisionRule) {
             this.collisionRule = collisionRule == null ? null : collisionRule.intern();
         }
-    }
-
-    @AllArgsConstructor
-    @Getter
-    public enum ResizePolicy {
-        DEFAULT_NO_SHRINK(true, false), DEFAULT(true, true), DYNAMIC(true, true);
-        boolean mod20;
-        boolean reduceSize;
     }
 }

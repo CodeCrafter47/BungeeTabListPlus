@@ -17,18 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.managers;
+package codecrafter47.bungeetablistplus.tablistproviders;
 
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 
-public class DummySkinManager implements SkinManager {
-    @Override
-    public Skin getSkin(String nameOrUUID) {
-        return SkinManager.defaultSkin;
-    }
+public interface TablistProvider {
 
-    @Override
-    public void onReload() {
+    void onActivated(PlayerTablistHandler tablist);
 
-    }
+    void onDeactivated(PlayerTablistHandler tablist);
 }

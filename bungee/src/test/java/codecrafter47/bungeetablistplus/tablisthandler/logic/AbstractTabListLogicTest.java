@@ -19,10 +19,8 @@
 
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
-import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
@@ -77,19 +75,19 @@ public class AbstractTabListLogicTest {
     @Test
     public void testPassthrough() {
         assertEquals(0, clientTabList.getSize());
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
         assertEquals(0, clientTabList.getSize());
         tabListHandler.setSize(1);
         assertEquals(1, clientTabList.getSize());
-        tabListHandler.setPassTrough(true);
+        tabListHandler.setPassThrough(true);
         assertEquals(0, clientTabList.getSize());
         tabListHandler.setSize(2);
         assertEquals(0, clientTabList.getSize());
-        tabListHandler.setSlot(1, SkinManager.defaultSkin, "Slot", 1);
+        tabListHandler.setSlot(1, Icon.DEFAULT, "Slot", 1);
         assertEquals(0, clientTabList.getSize());
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
         assertEquals(2, clientTabList.getSize());
-        assertArrayEquals("Skin check failed", SkinManager.defaultSkin.toProperty(), clientTabList.getProperties(1));
+        assertArrayEquals("Skin check failed", Icon.DEFAULT.getProperties(), clientTabList.getProperties(1));
         assertEquals("Text check failed", "Slot", clientTabList.getText(1));
         assertEquals("Ping check failed", 1, clientTabList.getPing(1));
     }
@@ -97,27 +95,27 @@ public class AbstractTabListLogicTest {
     @Test
     public void testSimpleTabList() {
         assertEquals(0, clientTabList.getSize());
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
         assertEquals(0, clientTabList.getSize());
 
         for (int size = 1; size <= 80; size++) {
             tabListHandler.setSize(size);
             assertEquals("Size check failed for size " + size, size, clientTabList.getSize());
 
-            tabListHandler.setSlot(size - 1, SkinManager.defaultSkin, "Slot " + (size - 1), size - 1);
+            tabListHandler.setSlot(size - 1, Icon.DEFAULT, "Slot " + (size - 1), size - 1);
 
             for (int i = 0; i < size; i++) {
-                assertArrayEquals("Skin check failed for size " + size + " slot " + i, SkinManager.defaultSkin.toProperty(), clientTabList.getProperties(i));
+                assertArrayEquals("Skin check failed for size " + size + " slot " + i, Icon.DEFAULT.getProperties(), clientTabList.getProperties(i));
                 assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
                 assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
             }
 
-            tabListHandler.setPassTrough(true);
+            tabListHandler.setPassThrough(true);
             assertEquals("passthrough test failed size " + size, 0, clientTabList.getSize());
-            tabListHandler.setPassTrough(false);
+            tabListHandler.setPassThrough(false);
 
             for (int i = 0; i < size; i++) {
-                assertArrayEquals("Skin check failed for size " + size + " slot " + i, SkinManager.defaultSkin.toProperty(), clientTabList.getProperties(i));
+                assertArrayEquals("Skin check failed for size " + size + " slot " + i, Icon.DEFAULT.getProperties(), clientTabList.getProperties(i));
                 assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
                 assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
             }
@@ -127,26 +125,26 @@ public class AbstractTabListLogicTest {
     @Test
     public void testPlayersOnServer() {
         assertEquals(0, clientTabList.getSize());
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
         assertEquals(0, clientTabList.getSize());
 
         for (int size = 1; size <= 80; size++) {
             tabListHandler.setSize(size);
             assertEquals("Size check failed for size " + size, size, clientTabList.getSize());
 
-            tabListHandler.setSlot(size - 1, SkinManager.defaultSkin, "Slot " + (size - 1), size - 1);
+            tabListHandler.setSlot(size - 1, Icon.DEFAULT, "Slot " + (size - 1), size - 1);
 
             for (int i = 0; i < size; i++) {
-                assertArrayEquals("Skin check failed for size " + size + " slot " + i, SkinManager.defaultSkin.toProperty(), clientTabList.getProperties(i));
+                assertArrayEquals("Skin check failed for size " + size + " slot " + i, Icon.DEFAULT.getProperties(), clientTabList.getProperties(i));
                 assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
                 assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
             }
 
             for (int p = 0; p < 160; p++) {
 
-                tabListHandler.setPassTrough(true);
+                tabListHandler.setPassThrough(true);
                 assertEquals("passthrough test failed size " + size + " players " + p, p, clientTabList.entries.size());
-                tabListHandler.setPassTrough(false);
+                tabListHandler.setPassThrough(false);
 
                 for (int i = 0; i < size; i++) {
                     assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
@@ -172,9 +170,9 @@ public class AbstractTabListLogicTest {
 
             for (int p = 0; p < 160; p++) {
 
-                tabListHandler.setPassTrough(true);
+                tabListHandler.setPassThrough(true);
                 assertEquals("passthrough test failed size " + size + " players " + p, 160 - p, clientTabList.entries.size());
-                tabListHandler.setPassTrough(false);
+                tabListHandler.setPassThrough(false);
 
                 for (int i = 0; i < size; i++) {
                     assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
@@ -199,7 +197,7 @@ public class AbstractTabListLogicTest {
     @Test
     public void testSpectatorMode() {
         assertEquals(0, clientTabList.getSize());
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
         assertEquals(0, clientTabList.getSize());
 
         tabListHandler.setSize(20);
@@ -218,7 +216,7 @@ public class AbstractTabListLogicTest {
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
 
-        tabListHandler.setSlot(1, new PlayerSkin(clientUUID, new String[0][]), "Test 1", -1);
+        tabListHandler.setSlot(1, new Icon(clientUUID, new String[0][]), "Test 1", -1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
 
@@ -227,7 +225,7 @@ public class AbstractTabListLogicTest {
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
 
-        tabListHandler.setSlot(2, new PlayerSkin(clientUUID, new String[0][]), "Test 2", -1);
+        tabListHandler.setSlot(2, new Icon(clientUUID, new String[0][]), "Test 2", -1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
 
@@ -236,11 +234,11 @@ public class AbstractTabListLogicTest {
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
 
-        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Test 3", -1);
+        tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Test 3", -1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
 
-        tabListHandler.setSlot(1, new PlayerSkin(clientUUID, new String[0][]), "Test 1", -1);
+        tabListHandler.setSlot(1, new Icon(clientUUID, new String[0][]), "Test 1", -1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
 
@@ -249,7 +247,7 @@ public class AbstractTabListLogicTest {
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
 
-        tabListHandler.setSlot(2, new PlayerSkin(clientUUID, new String[0][]), "Test 2", -1);
+        tabListHandler.setSlot(2, new Icon(clientUUID, new String[0][]), "Test 2", -1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
     }
@@ -267,11 +265,11 @@ public class AbstractTabListLogicTest {
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         tabListHandler.setSize(20);
 
-        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(3).getUuid());
     }
@@ -289,11 +287,11 @@ public class AbstractTabListLogicTest {
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         tabListHandler.setSize(80);
 
-        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Hi", 1);
     }
 
     @Test
@@ -309,16 +307,16 @@ public class AbstractTabListLogicTest {
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         tabListHandler.setSize(20);
 
-        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(3).getUuid());
 
-        tabListHandler.setSlot(3, new PlayerSkin(null, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(5, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(null, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new Icon(clientUUID, new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(5).getUuid());
     }
@@ -339,18 +337,18 @@ public class AbstractTabListLogicTest {
         item.setUuid(uuids[48]);
         tabListHandler.onPlayerListPacket(packet);
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         tabListHandler.setSize(20);
 
-        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(5, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new Icon(uuids[48], new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(3).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(5).getUuid());
 
-        tabListHandler.setSlot(5, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(3, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new Icon(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(uuids[48], new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(5).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(3).getUuid());
@@ -377,20 +375,20 @@ public class AbstractTabListLogicTest {
 
         assertEquals(2, clientTabList.getSize());
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         assertEquals(20, clientTabList.getSize());
 
         tabListHandler.setSize(2);
 
-        tabListHandler.setSlot(0, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(1, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(0, new Icon(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(1, new Icon(uuids[48], new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(0).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(1).getUuid());
 
-        tabListHandler.setSlot(1, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(0, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(1, new Icon(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(0, new Icon(uuids[48], new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(0).getUuid());
@@ -415,21 +413,21 @@ public class AbstractTabListLogicTest {
         item.setUuid(uuids[49]);
         tabListHandler.onPlayerListPacket(packet);
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         tabListHandler.setSize(20);
 
-        tabListHandler.setSlot(3, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(5, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(6, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new Icon(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(6, new Icon(uuids[49], new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(3).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(5).getUuid());
         assertEquals(uuids[49], clientTabList.getVisibleEntries().get(6).getUuid());
 
-        tabListHandler.setSlot(3, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(5, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(6, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(3, new Icon(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(5, new Icon(uuids[49], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(6, new Icon(clientUUID, new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(6).getUuid());
         assertEquals(uuids[49], clientTabList.getVisibleEntries().get(5).getUuid());
@@ -455,21 +453,21 @@ public class AbstractTabListLogicTest {
         item.setUuid(uuids[49]);
         tabListHandler.onPlayerListPacket(packet);
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         tabListHandler.setSize(3);
 
-        tabListHandler.setSlot(0, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(1, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(2, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(0, new Icon(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(1, new Icon(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(2, new Icon(uuids[49], new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(0).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(1).getUuid());
         assertEquals(uuids[49], clientTabList.getVisibleEntries().get(2).getUuid());
 
-        tabListHandler.setSlot(0, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(1, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
-        tabListHandler.setSlot(2, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(0, new Icon(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(1, new Icon(uuids[49], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(2, new Icon(clientUUID, new String[0][]), "Hi", 1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(2).getUuid());
         assertEquals(uuids[49], clientTabList.getVisibleEntries().get(1).getUuid());
@@ -518,7 +516,7 @@ public class AbstractTabListLogicTest {
             assertFalse(clientTabList.playerToTeamMap.containsKey(usernames[i]));
         }
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         assertEquals(60, clientTabList.getSize());
 
@@ -541,7 +539,7 @@ public class AbstractTabListLogicTest {
             assertEquals(0, clientTabList.teams.get("Team " + i).getPlayers().size());
         }
 
-        tabListHandler.setPassTrough(true);
+        tabListHandler.setPassThrough(true);
 
         for (int i = 0; i < 25; i++) {
             assertEquals("Team " + i, clientTabList.playerToTeamMap.get(usernames[i]));
@@ -550,7 +548,7 @@ public class AbstractTabListLogicTest {
             assertFalse(clientTabList.playerToTeamMap.containsKey(usernames[i]));
         }
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         for (int i = 0; i < 25; i++) {
             assertEquals(0, clientTabList.teams.get("Team " + i).getPlayers().size());
@@ -565,7 +563,7 @@ public class AbstractTabListLogicTest {
             assertFalse(clientTabList.playerToTeamMap.containsKey(usernames[i]));
         }
 
-        tabListHandler.setPassTrough(true);
+        tabListHandler.setPassThrough(true);
 
         for (int i = 0; i < 25; i++) {
             assertEquals("Team " + i, clientTabList.playerToTeamMap.get(usernames[i]));
@@ -574,7 +572,7 @@ public class AbstractTabListLogicTest {
             assertFalse(clientTabList.playerToTeamMap.containsKey(usernames[i]));
         }
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         for (int i = 0; i < 25; i++) {
             assertEquals("Team " + i, clientTabList.playerToTeamMap.get(usernames[i]));
@@ -602,13 +600,13 @@ public class AbstractTabListLogicTest {
             assertEquals(0, clientTabList.teams.get("Team " + i).getPlayers().size());
         }
 
-        tabListHandler.setPassTrough(true);
+        tabListHandler.setPassThrough(true);
 
         for (int i = 0; i < 50; i++) {
             assertEquals("Team " + i, clientTabList.playerToTeamMap.get(usernames[i]));
         }
 
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         for (int i = 0; i < 50; i++) {
             assertEquals(0, clientTabList.teams.get("Team " + i).getPlayers().size());
@@ -648,7 +646,7 @@ public class AbstractTabListLogicTest {
         packet.setItems(items);
         tabListHandler.onPlayerListPacket(packet);
         tabListHandler.setSize(60);
-        tabListHandler.setPassTrough(false);
+        tabListHandler.setPassThrough(false);
 
         for (int i = 0; i < 25; i++) {
             assertEquals("prefix " + i, clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
@@ -767,7 +765,7 @@ public class AbstractTabListLogicTest {
                     assertEquals("username", clientUsername[i], clientTabList.getVisibleEntries().get(i).getUsername());
                     assertEquals("text", clientText[i], clientTabList.getText(i));
                     assertEquals("ping", clientPing[i], clientTabList.getPing(i));
-                    assertArrayEquals("skin", clientSkin[i].toProperty(), clientTabList.getProperties(i));
+                    assertArrayEquals("skin", clientSkin[i].getProperties(), clientTabList.getProperties(i));
                 }
                 // real players
                 for (AbstractTabListLogic.TabListItem item : serverTabList.values()) {
@@ -788,7 +786,7 @@ public class AbstractTabListLogicTest {
                     assertEquals("text", clientText[i], clientTabList.getText(i));
                     assertEquals("ping", clientPing[i], clientTabList.getPing(i));
                     if (clientUuid[i] == fakePlayerUUIDs[i]) {
-                        assertArrayEquals("skin", clientSkin[i].toProperty(), clientTabList.getProperties(i));
+                        assertArrayEquals("skin", clientSkin[i].getProperties(), clientTabList.getProperties(i));
                     } else {
                         assertArrayEquals("skin", serverTabList.get(clientUuid[i]).getProperties(), clientTabList.getProperties(i));
                     }
@@ -946,9 +944,9 @@ public class AbstractTabListLogicTest {
         }
 
         @Override
-        public void setPassTrough(boolean passTrough) {
+        public void setPassThrough(boolean passTrough) {
             validateConstraints();
-            super.setPassTrough(passTrough);
+            super.setPassThrough(passTrough);
             validateConstraints();
         }
 
@@ -960,9 +958,9 @@ public class AbstractTabListLogicTest {
         }
 
         @Override
-        public void setSlot(int index, Skin skin, String text, int ping) {
+        public void setSlot(int index, Icon icon, String text, int ping) {
             validateConstraints();
-            super.setSlot(index, skin, text, ping);
+            super.setSlot(index, icon, text, ping);
             validateConstraints();
         }
 

@@ -25,6 +25,9 @@ public final class FastChat {
     private final static String emptyJsonText = "{\"text\":\"\"}";
 
     public static String legacyTextToJson(String legacyText, char alternateColorChar) {
+        if (legacyText == null) {
+            return null;
+        }
         if (legacyText.isEmpty()) {
             return emptyJsonText;
         }

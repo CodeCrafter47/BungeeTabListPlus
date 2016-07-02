@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.common.Constants;
@@ -41,7 +42,6 @@ import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.connection.LoginResult;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -95,21 +95,7 @@ public class ConnectedPlayer implements Player {
     @Override
     public Skin getSkin() {
         if (skin == null) {
-            LoginResult loginResult = ((UserConnection) player).
-                    getPendingConnection().getLoginProfile();
-            if (loginResult != null) {
-                LoginResult.Property[] properties = loginResult.getProperties();
-                if (properties != null) {
-                    for (LoginResult.Property s : properties) {
-                        if (s.getName().equals("textures")) {
-                            skin = new PlayerSkin(player.getUniqueId(), new String[][]{{s.getName(), s.getValue(), s.getSignature()}});
-                        }
-                    }
-                }
-            }
-            if (skin == null) {
-                skin = new PlayerSkin(player.getUniqueId(), new String[0][]);
-            }
+            skin = PlayerSkin.fromIcon(BungeeTabListPlusAPI.getIconFromPlayer(player));
         }
         return skin;
     }

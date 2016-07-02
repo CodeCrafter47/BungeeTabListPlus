@@ -19,10 +19,14 @@
 
 package codecrafter47.bungeetablistplus.managers;
 
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.skin.AnimatedSkin;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import lombok.SneakyThrows;
+
+import java.awt.image.BufferedImage;
+import java.util.function.Consumer;
 
 public interface SkinManager {
     PlayerSkin defaultSkin = new PlayerSkin(null, new String[0][]);
@@ -38,4 +42,6 @@ public interface SkinManager {
     Skin getSkin(String nameOrUUID);
 
     void onReload();
+
+    void createIcon(BufferedImage image, Consumer<Icon> callback);
 }

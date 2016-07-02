@@ -17,34 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.skin;
+package codecrafter47.bungeetablistplus.api.bungee;
 
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+import lombok.Data;
 import lombok.NonNull;
 
 import java.util.UUID;
 
-@AllArgsConstructor
-@EqualsAndHashCode
-public class PlayerSkin implements Skin {
-    UUID player;
+/**
+ * An icon shown in the tab list.
+ */
+@Data
+public class Icon {
+    private final UUID player;
     @NonNull
-    String[][] properties;
+    private final String[][] properties;
 
-    @Override
-    public String[][] toProperty() {
-        return properties;
-    }
-
-    @Override
-    public UUID getOwner() {
-        return player;
-    }
-
-    public static Skin fromIcon(Icon icon) {
-        return new PlayerSkin(icon.getPlayer(), icon.getProperties());
-    }
+    /**
+     * The default icon. The client will show a random Alex/ Steve face when using this.
+     */
+    public static final Icon DEFAULT = new Icon(null, new String[0][]);
 }

@@ -19,7 +19,7 @@
 
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import lombok.AllArgsConstructor;
@@ -65,9 +65,9 @@ public class TabListHandler implements PacketHandler {
         }
     }
 
-    public void setPassTrough(boolean passTrough) {
+    public void setPassThrough(boolean passTrough) {
         if (parent != null) {
-            parent.setPassTrough(passTrough);
+            parent.setPassThrough(passTrough);
         }
     }
 
@@ -77,9 +77,9 @@ public class TabListHandler implements PacketHandler {
         }
     }
 
-    public void setSlot(int index, Skin skin, String text, int ping) {
+    public void setSlot(int index, Icon icon, String text, int ping) {
         if (parent != null) {
-            parent.setSlot(index, skin, text, ping);
+            parent.setSlot(index, icon, text, ping);
         }
     }
 

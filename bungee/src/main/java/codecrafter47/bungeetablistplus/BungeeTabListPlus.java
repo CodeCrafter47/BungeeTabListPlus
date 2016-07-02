@@ -18,10 +18,7 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.api.bungee.FakePlayerManager;
-import codecrafter47.bungeetablistplus.api.bungee.PlayerManager;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.*;
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
@@ -31,29 +28,17 @@ import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
-import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
-import codecrafter47.bungeetablistplus.managers.DataManager;
-import codecrafter47.bungeetablistplus.managers.PermissionManager;
-import codecrafter47.bungeetablistplus.managers.PlaceholderManagerImpl;
-import codecrafter47.bungeetablistplus.managers.PlayerManagerImpl;
-import codecrafter47.bungeetablistplus.managers.RedisPlayerManager;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.managers.SkinManagerImpl;
-import codecrafter47.bungeetablistplus.managers.TabListManager;
-import codecrafter47.bungeetablistplus.placeholder.BasicPlaceholders;
-import codecrafter47.bungeetablistplus.placeholder.BukkitPlaceholders;
-import codecrafter47.bungeetablistplus.placeholder.ColorPlaceholder;
-import codecrafter47.bungeetablistplus.placeholder.ConditionalPlaceholders;
-import codecrafter47.bungeetablistplus.placeholder.OnlineStatePlaceholder;
-import codecrafter47.bungeetablistplus.placeholder.PlayerCountPlaceholder;
-import codecrafter47.bungeetablistplus.placeholder.RedisBungeePlaceholders;
-import codecrafter47.bungeetablistplus.placeholder.TimePlaceholders;
+import codecrafter47.bungeetablistplus.managers.*;
+import codecrafter47.bungeetablistplus.placeholder.*;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.protocol.ProtocolManager;
-import codecrafter47.bungeetablistplus.tablistproviders.CheckedTabListProvider;
+import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
+import codecrafter47.bungeetablistplus.tablistproviders.LegacyTablistProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.PingTask;
@@ -64,29 +49,27 @@ import com.google.common.base.Preconditions;
 import de.sabbertran.proxysuite.ProxySuiteAPI;
 import lombok.Getter;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.connection.LoginResult;
 
+import javax.annotation.Nonnull;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -460,6 +443,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         runInMainThread(this::reloadTablists);
     }
 
+    @Override
+    protected CustomTablist createCustomTablist0() {
+        return new DefaultCustomTablist();
+    }
+
     /**
      * updates the tabList on all connected clients
      */
@@ -693,8 +681,44 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     @Override
+    protected void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist) {
+        ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
+        if (connectedPlayer != null) {
+            connectedPlayer.getPlayerTablistHandler().setTablistProvider((TablistProvider) customTablist);
+        }
+    }
+
+    @Override
     protected void removeCustomTabList0(ProxiedPlayer player) {
         Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
         getTabListManager().removeCustomTabList(player);
+        ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
+        if (connectedPlayer != null) {
+            // todo later there will be more different tab list providers
+            connectedPlayer.getPlayerTablistHandler().setTablistProvider(LegacyTablistProvider.INSTANCE);
+        }
+    }
+
+    @Nonnull
+    @Override
+    protected Icon getIconFromPlayer0(ProxiedPlayer player) {
+        LoginResult loginResult = ((UserConnection) player).
+                getPendingConnection().getLoginProfile();
+        if (loginResult != null) {
+            LoginResult.Property[] properties = loginResult.getProperties();
+            if (properties != null) {
+                for (LoginResult.Property s : properties) {
+                    if (s.getName().equals("textures")) {
+                        return new Icon(player.getUniqueId(), new String[][]{{s.getName(), s.getValue(), s.getSignature()}});
+                    }
+                }
+            }
+        }
+        return new Icon(player.getUniqueId(), new String[0][]);
+    }
+
+    @Override
+    protected void createIcon0(BufferedImage image, Consumer<Icon> callback) {
+        getSkinManager().createIcon(image, callback);
     }
 }

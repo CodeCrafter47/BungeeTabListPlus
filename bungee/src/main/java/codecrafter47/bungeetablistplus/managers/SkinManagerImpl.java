@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
@@ -34,26 +35,14 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -312,6 +301,65 @@ public class SkinManagerImpl implements SkinManager {
         }
         return null;
 
+    }
+
+    @Override
+    public void createIcon(BufferedImage image, Consumer<Icon> callback) {
+        if (image.getWidth() != 8 || image.getHeight() != 8) {
+            throw new IllegalArgumentException("Image must be 8x8 px.");
+        }
+
+        int[] rgb = image.getRGB(0, 0, 8, 8, null, 0, 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(rgb.length * 4);
+        byteBuffer.asIntBuffer().put(rgb);
+        byte[] headArray = byteBuffer.array();
+
+        if (headCache.containsKey(Head.of(headArray))) {
+            Skin skin1 = headCache.get(Head.of(headArray));
+            callback.accept(new Icon(skin1.getOwner(), skin1.toProperty()));
+            return;
+        }
+
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL("http://skinservice.codecrafter47.dyndns.eu/api/customhead").openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            try (DataOutputStream out = new DataOutputStream(connection.
+                    getOutputStream())) {
+                out.write((Base64.getEncoder().encodeToString(headArray)).getBytes(Charsets.UTF_8));
+                out.flush();
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
+            LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
+            if (map.get("state").equals("SUCCESS")) {
+                PlayerSkin skin = new PlayerSkin(null, new String[][]{{"textures", (String) map.get("skin"), (String) map.get("signature")}});
+                headCache.put(Head.of(headArray), skin);
+
+                // save to cache
+                File cacheFile = new File(headsFolder, "cache.txt");
+                if (!cacheFile.exists()) {
+                    cacheFile.createNewFile();
+                }
+                BufferedWriter writer = new BufferedWriter(new FileWriter(cacheFile, true));
+                writer.write(Base64.getEncoder().encodeToString(headArray));
+                writer.write(' ');
+                writer.write(skin.toProperty()[0][1]);
+                writer.write(' ');
+                writer.write(skin.toProperty()[0][2]);
+                writer.newLine();
+                writer.close();
+
+                callback.accept(new Icon(skin.getOwner(), skin.toProperty()));
+            } else {
+                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> createIcon(image, callback), 5, TimeUnit.SECONDS);
+            }
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.WARNING, "An error occurred while trying to contact skinservice.codecrafter47.dyndns.eu", ex);
+            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> createIcon(image, callback), 1, TimeUnit.MINUTES);
+        }
     }
 
     private static class Profile {
