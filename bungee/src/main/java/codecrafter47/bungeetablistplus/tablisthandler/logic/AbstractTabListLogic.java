@@ -1023,8 +1023,22 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             clientSkin[index] = skin;
                             clientPing[index] = ping;
                             useFakePlayerForSlot(index);
-                            int target = findSlotForPlayer(oldUuid);
-                            useRealPlayerForSlot(target, oldUuid);
+                            if (skinUuidToSlotMap.containsKey(oldUuid)) {
+                                for (IntIterator iterator = skinUuidToSlotMap.get(oldUuid).iterator(); iterator.hasNext(); ) {
+                                    int i = iterator.nextInt();
+                                    if (clientUuid[i] != fakePlayerUUIDs[i] && (!getUniqueId().equals(clientUuid[i]) || serverTabList.get(getUniqueId()).getGamemode() != 3)) {
+                                        int target = findSlotForPlayer(clientUuid[i]);
+                                        useRealPlayerForSlot(target, clientUuid[i]);
+                                        useRealPlayerForSlot(i, oldUuid);
+                                        updated = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!updated) {
+                                int target = findSlotForPlayer(oldUuid);
+                                useRealPlayerForSlot(target, oldUuid);
+                            }
                             updated = true;
                         } else if (moveNew && !moveOld && serverTabList.size() < size) {
                             clientSkin[index] = skin;
@@ -1038,8 +1052,22 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             clientPing[index] = ping;
                             slot = uuidToSlotMap.getInt(skin.getOwner());
                             useFakePlayerForSlot(slot);
-                            int target = findSlotForPlayer(oldUuid);
-                            useRealPlayerForSlot(target, oldUuid);
+                            if (skinUuidToSlotMap.containsKey(oldUuid)) {
+                                for (IntIterator iterator = skinUuidToSlotMap.get(oldUuid).iterator(); iterator.hasNext(); ) {
+                                    int i = iterator.nextInt();
+                                    if (clientUuid[i] != fakePlayerUUIDs[i] && (!getUniqueId().equals(clientUuid[i]) || serverTabList.get(getUniqueId()).getGamemode() != 3)) {
+                                        int target = findSlotForPlayer(clientUuid[i]);
+                                        useRealPlayerForSlot(target, clientUuid[i]);
+                                        useRealPlayerForSlot(i, oldUuid);
+                                        updated = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!updated) {
+                                int target = findSlotForPlayer(oldUuid);
+                                useRealPlayerForSlot(target, oldUuid);
+                            }
                             useRealPlayerForSlot(index, skin.getOwner());
                             updated = true;
                         }

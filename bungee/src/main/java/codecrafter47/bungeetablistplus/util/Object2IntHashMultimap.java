@@ -52,4 +52,8 @@ public class Object2IntHashMultimap<T> {
         IntCollection collection = map.computeIfAbsent(key, k -> new IntLinkedOpenHashSet(2, .75f));
         collection.add(value);
     }
+
+    public boolean containsKey(T oldUuid) {
+        return map.containsKey(oldUuid);
+    }
 }

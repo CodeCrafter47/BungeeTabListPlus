@@ -38,18 +38,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AbstractTabListLogicTest {
     private static final String[] usernames = new String[160];
@@ -443,6 +434,46 @@ public class AbstractTabListLogicTest {
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(6).getUuid());
         assertEquals(uuids[49], clientTabList.getVisibleEntries().get(5).getUuid());
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(3).getUuid());
+    }
+
+    @Test
+    public void testSwapSkinD() {
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(uuids[47]);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(0);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabListHandler.onPlayerListPacket(packet);
+        item.setUsername(usernames[48]);
+        item.setUuid(uuids[48]);
+        tabListHandler.onPlayerListPacket(packet);
+        item.setUsername(usernames[49]);
+        item.setUuid(uuids[49]);
+        tabListHandler.onPlayerListPacket(packet);
+
+        tabListHandler.setPassTrough(false);
+
+        tabListHandler.setSize(3);
+
+        tabListHandler.setSlot(0, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(1, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(2, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
+
+        assertEquals(clientUUID, clientTabList.getVisibleEntries().get(0).getUuid());
+        assertEquals(uuids[48], clientTabList.getVisibleEntries().get(1).getUuid());
+        assertEquals(uuids[49], clientTabList.getVisibleEntries().get(2).getUuid());
+
+        tabListHandler.setSlot(0, new PlayerSkin(uuids[48], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(1, new PlayerSkin(uuids[49], new String[0][]), "Hi", 1);
+        tabListHandler.setSlot(2, new PlayerSkin(clientUUID, new String[0][]), "Hi", 1);
+
+        assertEquals(clientUUID, clientTabList.getVisibleEntries().get(2).getUuid());
+        assertEquals(uuids[49], clientTabList.getVisibleEntries().get(1).getUuid());
+        assertEquals(uuids[48], clientTabList.getVisibleEntries().get(0).getUuid());
     }
 
     @Test
