@@ -20,10 +20,8 @@ package codecrafter47.bungeetablistplus.tablisthandler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.AbstractTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
 import codecrafter47.bungeetablistplus.util.ColorParser;
@@ -106,8 +104,6 @@ public abstract class PlayerTablistHandler {
 
                 int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
 
-                boolean onlineMode = handle.getPlayer().getPendingConnection().isOnlineMode();
-
                 for (int i = 0; i < size; i++) {
                     Slot slot = tabList.getSlot(i);
                     if (slot != null) {
@@ -121,11 +117,9 @@ public abstract class PlayerTablistHandler {
                             }
                         }
 
-                        Skin skin = onlineMode ? slot.getSkin() : SkinManager.defaultSkin;
-                        handle.setSlot(i, skin, FastChat.legacyTextToJson(text, '&'), slot.getPing());
+                        handle.setSlot(i, slot.getSkin(), FastChat.legacyTextToJson(text, '&'), slot.getPing());
                     } else {
-                        Skin skin = onlineMode ? tabList.getDefaultSkin() : SkinManager.defaultSkin;
-                        handle.setSlot(i, skin, FastChat.legacyTextToJson("", '&'), tabList.getDefaultPing());
+                        handle.setSlot(i, tabList.getDefaultSkin(), FastChat.legacyTextToJson("", '&'), tabList.getDefaultPing());
                     }
                 }
 
