@@ -32,8 +32,10 @@ import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.LowMemoryTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.RewriteLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.Synchronized;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -173,6 +175,7 @@ public class ConnectedPlayer implements Player {
         return playerTablistHandler;
     }
 
+    @SneakyThrows
     private void createTabListHandler() {
         if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(getPlayer())) {
             //TabListLogic tabListLogic = new TabListLogic(null, getPlayer());
@@ -180,7 +183,11 @@ public class ConnectedPlayer implements Player {
             TabListLogic tabListLogic = new LowMemoryTabListLogic(null, getPlayer());
             playerTablistHandler = PlayerTablistHandler.create(getPlayer(), tabListLogic);
             packetHandler = new RewriteLogic(tabListLogic);
-            tabListLogic.onConnected();
+            if (ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop().inEventLoop()) {
+                tabListLogic.onConnected();
+            } else {
+                ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop().submit(tabListLogic::onConnected);
+            }
         } else {
             LegacyTabList legacyTabList = new LegacyTabList(getPlayer(), getPlayer().getPendingConnection().getListener().getTabListSize());
             playerTablistHandler = PlayerTablistHandler.create(getPlayer(), legacyTabList);

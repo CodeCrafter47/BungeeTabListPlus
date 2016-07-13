@@ -19,12 +19,20 @@
 
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.player.FakePlayer;
+import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
+import io.netty.channel.Channel;
 import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +42,24 @@ public class TabListLogic extends AbstractTabListLogic {
 
     @Getter
     private final ProxiedPlayer player;
+    private final Channel channel;
 
     public TabListLogic(TabListHandler parent, ProxiedPlayer player) {
         super(parent);
         this.player = player;
+        try {
+            channel = ReflectionUtil.getChannelWrapper(player).getHandle();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    @Override
     protected UUID getUniqueId() {
         return player.getUniqueId();
     }
 
+    @Override
     protected void sendPacket(DefinedPacket packet) {
         player.unsafe().sendPacket(packet);
     }
@@ -60,5 +76,93 @@ public class TabListLogic extends AbstractTabListLogic {
         }
 
         return list;
+    }
+
+    private void failIfNotInEventLoop() {
+        if (!channel.eventLoop().inEventLoop()) {
+            RuntimeException ex = new RuntimeException("Not in EventLoop");
+            BungeeTabListPlus.getInstance().reportError(ex);
+            throw ex;
+        }
+    }
+
+    // Override all methods to add event loop check
+
+    @Override
+    public void setResizePolicy(ResizePolicy resizePolicy) {
+        failIfNotInEventLoop();
+        super.setResizePolicy(resizePolicy);
+    }
+
+    @Override
+    public void onConnected() {
+        failIfNotInEventLoop();
+        super.onConnected();
+    }
+
+    @Override
+    public void onDisconnected() {
+        failIfNotInEventLoop();
+        super.onDisconnected();
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
+        failIfNotInEventLoop();
+        return super.onPlayerListPacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onTeamPacket(Team packet) {
+        failIfNotInEventLoop();
+        return super.onTeamPacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet) {
+        failIfNotInEventLoop();
+        return super.onPlayerListHeaderFooterPacket(packet);
+    }
+
+    @Override
+    public void onServerSwitch() {
+        failIfNotInEventLoop();
+        super.onServerSwitch();
+    }
+
+    @Override
+    public void setPassTrough(boolean passTrough) {
+        failIfNotInEventLoop();
+        super.setPassTrough(passTrough);
+    }
+
+    @Override
+    public void setSize(int size) {
+        failIfNotInEventLoop();
+        super.setSize(size);
+    }
+
+    @Override
+    public void setSlot(int index, Skin skin0, String text, int ping) {
+        failIfNotInEventLoop();
+        super.setSlot(index, skin0, text, ping);
+    }
+
+    @Override
+    public void updateText(int index, String text) {
+        failIfNotInEventLoop();
+        super.updateText(index, text);
+    }
+
+    @Override
+    public void updatePing(int index, int ping) {
+        failIfNotInEventLoop();
+        super.updatePing(index, ping);
+    }
+
+    @Override
+    public void setHeaderFooter(String header, String footer) {
+        failIfNotInEventLoop();
+        super.setHeaderFooter(header, footer);
     }
 }
