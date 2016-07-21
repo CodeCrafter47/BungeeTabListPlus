@@ -28,15 +28,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class ConnectedPlayerManager implements IPlayerProvider {
 
@@ -52,7 +44,7 @@ public class ConnectedPlayerManager implements IPlayerProvider {
 
     @Nonnull
     public ConnectedPlayer getPlayer(ProxiedPlayer player) {
-        return Objects.requireNonNull(byName.get(player.getName()));
+        return Objects.requireNonNull(getPlayerIfPresent(player));
     }
 
     @Nonnull
@@ -67,7 +59,8 @@ public class ConnectedPlayerManager implements IPlayerProvider {
 
     @Nullable
     public ConnectedPlayer getPlayerIfPresent(ProxiedPlayer player) {
-        return byName.get(player.getName());
+        ConnectedPlayer connectedPlayer = byName.get(player.getName());
+        return connectedPlayer.getPlayer() == player ? connectedPlayer : null;
     }
 
     @Nullable
