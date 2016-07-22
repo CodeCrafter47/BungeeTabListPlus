@@ -60,7 +60,7 @@ public class ConnectedPlayerManager implements IPlayerProvider {
     @Nullable
     public ConnectedPlayer getPlayerIfPresent(ProxiedPlayer player) {
         ConnectedPlayer connectedPlayer = byName.get(player.getName());
-        return connectedPlayer.getPlayer() == player ? connectedPlayer : null;
+        return connectedPlayer != null && connectedPlayer.getPlayer() == player ? connectedPlayer : null;
     }
 
     @Nullable
