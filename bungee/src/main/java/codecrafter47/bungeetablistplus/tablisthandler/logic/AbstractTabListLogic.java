@@ -48,8 +48,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
     protected static final String[] fakePlayerUsernames = new String[80];
     protected static final UUID[] fakePlayerUUIDs = new UUID[80];
-    private static final Set<String> fakePlayerUsernameSet;
-    private static final Set<UUID> fakePlayerUUIDSet;
+    protected static final Set<String> fakePlayerUsernameSet;
+    protected static final Set<UUID> fakePlayerUUIDSet;
+    protected static final String[][] EMPTY_PROPRTIES = new String[0][];
 
     private static boolean teamCollisionRuleSupported;
 
@@ -854,7 +855,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     item.setUsername(clientUsername[slot]);
                     item.setPing(0);
                     item.setDisplayName("{\"text\": \"\"}");
-                    item.setProperties(new String[0][]);
+                    item.setProperties(EMPTY_PROPRTIES);
                     items[slot - this.size] = item;
                 }
                 PlayerListItem packet = new PlayerListItem();

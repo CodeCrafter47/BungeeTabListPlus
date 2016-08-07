@@ -43,10 +43,12 @@ public class TabListLogic extends AbstractTabListLogic {
     @Getter
     private final ProxiedPlayer player;
     private final Channel channel;
+    private final boolean onlineMode;
 
     public TabListLogic(TabListHandler parent, ProxiedPlayer player) {
         super(parent);
         this.player = player;
+        this.onlineMode = player.getPendingConnection().isOnlineMode();
         try {
             channel = ReflectionUtil.getChannelWrapper(player).getHandle();
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -61,6 +63,16 @@ public class TabListLogic extends AbstractTabListLogic {
 
     @Override
     protected void sendPacket(DefinedPacket packet) {
+        if (!onlineMode && packet instanceof PlayerListItem) {
+            PlayerListItem pli = (PlayerListItem) packet;
+            if (pli.getAction() == PlayerListItem.Action.ADD_PLAYER) {
+                for (PlayerListItem.Item item : pli.getItems()) {
+                    if (fakePlayerUUIDSet.contains(item.getUuid())) {
+                        item.setProperties(EMPTY_PROPRTIES);
+                    }
+                }
+            }
+        }
         player.unsafe().sendPacket(packet);
     }
 
