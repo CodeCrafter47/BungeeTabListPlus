@@ -30,9 +30,13 @@ import static java.lang.String.format;
 public class ExpressionTokenizer {
     private static final Pattern PATTERN_SPACE = Pattern.compile("\\s");
     private static final Pattern PATTERN_NUMBER = Pattern.compile("[-0-9.]");
+    private static final ImmutableMap<String, Token> tokens3 = ImmutableMap.<String, Token>builder()
+            .put("all", BooleanToken.TRUE)
+            .put("and", Token.AND).build();
     private static final ImmutableMap<String, Token> tokens2 = ImmutableMap.<String, Token>builder()
             .put("&&", Token.AND)
             .put("||", Token.OR)
+            .put("or", Token.OR)
             .put("==", Token.EQUAL)
             .put("!=", Token.NOT_EQUAL)
             .put(">=", Token.GREATER_OR_EQUAL_THAN)
@@ -74,9 +78,12 @@ public class ExpressionTokenizer {
             return new BooleanToken(true);
         }
 
-        if (index + 2 < expression.length() && "all".equals(expression.substring(index, index + 3))) {
-            index += 3;
-            return new BooleanToken(true);
+        if (index + 2 < expression.length()) {
+            Token token = tokens3.get(expression.substring(index, index + 3));
+            if (token != null) {
+                index += 3;
+                return token;
+            }
         }
 
         if (index + 1 < expression.length()) {

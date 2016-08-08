@@ -21,6 +21,8 @@ package codecrafter47.bungeetablistplus.expression;
 
 public class BooleanToken extends Token {
 
+    public static final BooleanToken TRUE = new BooleanToken(true);
+    public static final BooleanToken FALSE = new BooleanToken(false);
     private final boolean value;
 
     public BooleanToken(boolean literal) {
