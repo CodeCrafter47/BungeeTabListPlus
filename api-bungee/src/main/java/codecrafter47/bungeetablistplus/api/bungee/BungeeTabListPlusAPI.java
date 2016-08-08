@@ -69,7 +69,7 @@ public abstract class BungeeTabListPlusAPI {
     /**
      * Create a new {@link CustomTablist}
      *
-     * @return
+     * @return thte created {@link CustomTablist}
      */
     public static CustomTablist createCustomTablist() {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
@@ -125,7 +125,8 @@ public abstract class BungeeTabListPlusAPI {
      * Creates an icon from an 8x8 px image. The creation of the icon can take several
      * minutes. When the icon has been created the callback is invoked.
      *
-     * @param image the image
+     * @param image    the image
+     * @param callback called when the icon is ready
      */
     public static void createIcon(BufferedImage image, Consumer<Icon> callback) {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
