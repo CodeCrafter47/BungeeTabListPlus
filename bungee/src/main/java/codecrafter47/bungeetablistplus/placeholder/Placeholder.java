@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
+import codecrafter47.bungeetablistplus.data.PermissionDataKey;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.util.Functions;
 import codecrafter47.bungeetablistplus.util.PingTask;
@@ -142,6 +143,8 @@ public abstract class Placeholder {
             return new PlayerBoundPlaceholder(playerFunction, Player::getName);
         } else if ("server".equals(tokens[0])) {
             return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Functions.composeNullable(p -> p.getServer().orElse(null), playerFunction));
+        } else if ("permission".equals(tokens[0])) {
+            return new PermissionPlaceholder(playerFunction, tokens[1]);
         } else if (playerPlaceholders.containsKey(tokens[0])) {
             return new PlayerBoundPlaceholder(playerFunction, playerPlaceholders.get(tokens[0]));
         } else if (thirdPartyDataKeys.containsKey(tokens[0])) {
@@ -183,6 +186,22 @@ public abstract class Placeholder {
         public String evaluate(Context context) {
             Player player = playerFunction.apply(context);
             return player != null ? function.apply(player) : "";
+        }
+    }
+
+    private static class PermissionPlaceholder extends Placeholder {
+        private final Function<Context, Player> playerFunction;
+        private final PermissionDataKey permissionDataKey;
+
+        private PermissionPlaceholder(Function<Context, Player> playerFunction, String permission) {
+            this.playerFunction = playerFunction;
+            permissionDataKey = DataKeys.permission(permission);
+        }
+
+        @Override
+        public String evaluate(Context context) {
+            Player player = playerFunction.apply(context);
+            return player != null ? player.get(permissionDataKey).orElse(false).toString() : "";
         }
     }
 
