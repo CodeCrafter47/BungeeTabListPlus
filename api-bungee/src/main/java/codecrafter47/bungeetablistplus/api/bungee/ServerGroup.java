@@ -24,6 +24,7 @@ import java.util.Collection;
 /**
  * A group of servers
  */
+@Deprecated
 public interface ServerGroup {
     /**
      * The names of the servers which are part of this group

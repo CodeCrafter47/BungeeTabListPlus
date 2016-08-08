@@ -52,8 +52,7 @@ public class LegacyTablistProvider implements TablistProvider {
             return;
         }
         Server server = player.getServer();
-        if (server != null && (BungeeTabListPlus.getInstance().getConfigManager().
-                getMainConfig().excludeServers.contains(server.getInfo().getName()))) {
+        if (server != null && (BungeeTabListPlus.getInstance().getConfig().excludeServers.contains(server.getInfo().getName()))) {
             playerTablistHandler.runInEventLoop(() -> {
                 playerTablistHandler.setPassThrough(true);
             });

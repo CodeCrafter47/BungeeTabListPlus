@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
-import codecrafter47.bungeetablistplus.config.ConfigParser;
+import codecrafter47.bungeetablistplus.config.old.ConfigParser;
 
 import java.util.Arrays;
 

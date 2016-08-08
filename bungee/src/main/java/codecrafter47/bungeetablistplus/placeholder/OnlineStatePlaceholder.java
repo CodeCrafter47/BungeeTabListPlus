@@ -61,7 +61,7 @@ public class OnlineStatePlaceholder extends PlaceholderProvider {
     }
 
     private MainConfig getMainConfig() {
-        return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig();
+        return BungeeTabListPlus.getInstance().getConfig();
     }
 
     private PlaceholderManager getPlaceholderManager() {

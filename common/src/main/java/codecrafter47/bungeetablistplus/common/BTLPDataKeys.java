@@ -32,6 +32,10 @@ public final class BTLPDataKeys {
         return new ThirdPartyVariableDataKey(name);
     }
 
+    public static DataKey<String> createBungeeThirdPartyVariableDataKey(String name) {
+        return new BungeeThirdPartyVariableDataKey(name);
+    }
+
     public final static DataKey<List<String>> REGISTERED_THIRD_PARTY_VARIABLES = DataKey.builder().bukkit().server().id("thirdparty-variables").build();
     public final static DataKey<Boolean> PLACEHOLDERAPI_PRESENT = DataKey.builder().bukkit().server().id("placeholderapi-present").build();
 
@@ -62,6 +66,36 @@ public final class BTLPDataKeys {
         @Override
         public String toString() {
             return super.toString() + ":" + placeholder;
+        }
+    }
+
+    public static class BungeeThirdPartyVariableDataKey extends DataKey<String> {
+        private final String name;
+
+        private static final long serialVersionUID = 1L;
+
+        private BungeeThirdPartyVariableDataKey(String name) {
+            super("bungee-thirdparty", Scope.PLAYER, true);
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int hashCode() {
+            return super.hashCode() + name.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof ThirdPartyVariableDataKey && ((ThirdPartyVariableDataKey) obj).name.equals(name);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + ":" + name;
         }
     }
 

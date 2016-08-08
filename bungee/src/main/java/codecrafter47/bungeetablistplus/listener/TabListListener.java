@@ -51,7 +51,7 @@ public class TabListListener implements Listener {
             connectedPlayer = new ConnectedPlayer(e.getPlayer());
             manager.onPlayerConnected(connectedPlayer);
 
-            if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
+            if (plugin.getConfig().updateOnPlayerJoinLeave) {
                 plugin.resendTabLists();
             }
             plugin.updateTabListForPlayer(e.getPlayer());
@@ -83,14 +83,14 @@ public class TabListListener implements Listener {
     @EventHandler
     public void onServerSwitch(ServerSwitchEvent e) {
         plugin.updateTabListForPlayer(e.getPlayer());
-        if (plugin.getConfigManager().getMainConfig().updateOnServerChange) {
+        if (plugin.getConfig().updateOnServerChange) {
             plugin.resendTabLists();
         }
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerDisconnectEvent e) {
-        if (plugin.getConfigManager().getMainConfig().updateOnPlayerJoinLeave) {
+        if (plugin.getConfig().updateOnPlayerJoinLeave) {
             plugin.resendTabLists();
         }
     }

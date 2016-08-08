@@ -20,11 +20,16 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
-import codecrafter47.bungeetablistplus.config.ConfigParser;
-import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.config.Config;
+import codecrafter47.bungeetablistplus.config.ITabListConfig;
+import codecrafter47.bungeetablistplus.config.NewConfig;
+import codecrafter47.bungeetablistplus.config.old.ConfigParser;
+import codecrafter47.bungeetablistplus.config.old.TabListConfig;
+import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.legacy.ErrorTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.IConfigTabListProvider;
+import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -32,6 +37,10 @@ import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,8 +52,8 @@ import static net.md_5.bungee.event.EventPriority.HIGHEST;
 public class TabListManager implements Listener {
 
     private final BungeeTabListPlus plugin;
-    private IConfigTabListProvider defaultTab;
     private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
+    private final List<Config> configs = new ArrayList<>();
 
     public Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
 
@@ -55,40 +64,51 @@ public class TabListManager implements Listener {
 
     // returns true on success
     public boolean loadTabLists() {
-        try {
-            if (!plugin.getConfigManager().defaultTabList.showTo.
-                    equalsIgnoreCase("all")) {
-                plugin.getLogger().warning(
-                        "The default tabList is configured not to be shown by default");
-                plugin.getLogger().warning(
-                        "This is not recommended and you should not do this if you're not knowing exactly what you are doing");
-            }
-            validateShowTo(plugin.getConfigManager().defaultTabList);
-            defaultTab = new ConfigParser(plugin, plugin.getConfigManager().defaultTabList.tab_size).parse(plugin.getConfigManager().defaultTabList);
-        } catch (Throwable ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not load default tabList", ex);
+        File tablistFolder = new File(plugin.getPlugin().getDataFolder(), "tabLists");
+        if (!tablistFolder.exists()) {
+            tablistFolder.mkdirs();
             try {
-                defaultTab = new ErrorTabListProvider("Could not load default tabList", ex, plugin.getConfigManager().defaultTabList::appliesTo, plugin.getConfigManager().defaultTabList.priority);
-            } catch (Throwable th) {
-                plugin.getLogger().log(Level.SEVERE, "Disabling plugin", th);
-                return false;
-
+                FileOutputStream outputStream = new FileOutputStream(new File(tablistFolder, "default.yml"));
+                ByteStreams.copy(getClass().getClassLoader().getResourceAsStream("default.yml"), outputStream);
+                outputStream.close();
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Failed to save default config.", e);
             }
         }
-        for (TabListConfig c : plugin.getConfigManager().tabLists) {
-            try {
-                validateShowTo(c);
-                tabLists.add(new ConfigParser(plugin, c.tab_size).parse(c));
-            } catch (Throwable ex) {
-                plugin.getLogger().log(Level.SEVERE, "Could not load " + c.getName(), ex);
+
+        for (File file : tablistFolder.listFiles()) {
+            if (file.isFile() && file.getName().endsWith(".yml")) {
                 try {
-                    tabLists.add(new ErrorTabListProvider("Could not load tabList " + c.getName(), ex, c::appliesTo, c.priority));
-                } catch (Throwable th) {
-                    plugin.getLogger().log(Level.SEVERE, "Failed to construct error tablist", th);
+                    plugin.getLogger().log(Level.INFO, "Loading {0}", file.getName());
+
+                    ITabListConfig tabListConfig = NewConfig.read(new FileInputStream(file));
+
+                    if (tabListConfig instanceof TabListConfig) {
+                        TabListConfig c = (TabListConfig) tabListConfig;
+                        plugin.getPlaceholderAPIHook().searchTabList(c);
+                        validateShowTo(c);
+                        this.tabLists.add(new ConfigParser(plugin, c.tab_size).parse(c));
+                    } else {
+                        configs.add((Config) tabListConfig);
+                    }
+                } catch (Throwable ex) {
+                    plugin.getLogger().log(Level.WARNING, "Failed to load " + file.getName(), ex);
                 }
             }
         }
         return true;
+    }
+
+    public Config getNewConfigForContext(Context context) {
+        Config config = null;
+        int priority = Integer.MIN_VALUE;
+        for (Config config1 : configs) {
+            if (config1.getPriority() > priority && config1.getShowTo().evaluate(context, ExpressionResult.BOOLEAN)) {
+                config = config1;
+                priority = config.getPriority();
+            }
+        }
+        return config;
     }
 
     public TabListProvider getTabListForPlayer(ProxiedPlayer player) {
@@ -105,9 +125,6 @@ public class TabListManager implements Listener {
         }
         if (provider != null) {
             return provider;
-        }
-        if (defaultTab != null && defaultTab.appliesTo(player)) {
-            return defaultTab;
         }
         return null;
     }

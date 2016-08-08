@@ -23,10 +23,47 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.util.Optional;
+import java.util.UUID;
+
 /**
  * Represents a fake player on the tab list.
  */
 public interface FakePlayer extends IPlayer {
+    /**
+     * get the username of the player
+     *
+     * @return the username
+     */
+    String getName();
+
+    /**
+     * get the uuid of the player
+     *
+     * @return the uuid of the player
+     */
+    UUID getUniqueID();
+
+    /**
+     * get the server the player is connected to
+     *
+     * @return the server the player is connected to
+     */
+    Optional<ServerInfo> getServer();
+
+    /**
+     * get the ping of the player
+     *
+     * @return the ping
+     */
+    int getPing();
+
+    /**
+     * get the skin of the player
+     *
+     * @return the skin
+     */
+    Skin getSkin();
 
     /**
      * Change the server

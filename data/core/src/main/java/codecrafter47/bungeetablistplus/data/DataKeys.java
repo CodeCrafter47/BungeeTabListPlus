@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.data;
 
 public class DataKeys {
-    public final static DataKey<String> ClientVersion = DataKey.builder().bungee().player().id("minecraft:clientversion").build();
+    // Bukkit player data keys
     public final static DataKey<Double> Health = DataKey.builder().bukkit().player().id("minecraft:health").build();
     public final static DataKey<Double> MaxHealth = DataKey.builder().bukkit().player().id("minecraft:maxhealth").build();
     public final static DataKey<Integer> Level = DataKey.builder().bukkit().player().id("minecraft:xplevel").build();
@@ -61,6 +61,7 @@ public class DataKeys {
     public final static DataKey<Boolean> Essentials_IsAFK = DataKey.builder().bukkit().player().id("essentials:isafk").build();
     public final static DataKey<String> Multiverse_WorldAlias = DataKey.builder().bukkit().player().id("multiverse:worldalias").build();
 
+    // Bukkit server data keys
     public final static DataKey<String> Vault_CurrencyNameSingular = DataKey.builder().bukkit().server().id("vault:currencynamesingular").build();
     public final static DataKey<String> Vault_CurrencyNamePlural = DataKey.builder().bukkit().server().id("vault:currencynameplural").build();
     public final static DataKey<Double> TPS = DataKey.builder().bukkit().server().id("minecraft:tps").build();
@@ -68,6 +69,9 @@ public class DataKeys {
     public final static DataKey<String> ServerModName = DataKey.builder().bukkit().server().id("bukkit:name").build();
     public final static DataKey<String> ServerModVersion = DataKey.builder().bukkit().server().id("bukkit:version").build();
 
+    // BungeeCord player data keys
+    public final static DataKey<String> BungeeCord_PrimaryGroup = DataKey.builder().bungee().player().id("bungeecord:group").build();
+    public final static DataKey<Integer> BungeeCord_Rank = DataKey.builder().bungee().player().id("bungeecord:rank").build();
     public final static DataKey<String> BungeePerms_PrimaryGroup = DataKey.builder().bungee().player().id("bungeeperms:group").build();
     public final static DataKey<String> BungeePerms_Prefix = DataKey.builder().bungee().player().id("bungeeperms:prefix").build();
     public final static DataKey<String> BungeePerms_DisplayPrefix = DataKey.builder().bungee().player().id("bungeeperms:displayprefix").build();
@@ -75,9 +79,7 @@ public class DataKeys {
     public final static DataKey<Integer> BungeePerms_Rank = DataKey.builder().bungee().player().id("bungeeperms:rank").build();
     public final static DataKey<String> BungeePerms_PrimaryGroupPrefix = DataKey.builder().bungee().player().id("bungeeperms:primarygroupprefix").build();
     public final static DataKey<String> BungeePerms_PlayerPrefix = DataKey.builder().bungee().player().id("bungeeperms:playerprefix").build();
-
-    public final static DataKey<String> BungeeCord_PrimaryGroup = DataKey.builder().bungee().player().id("bungeecord:group").build();
-    public final static DataKey<Integer> BungeeCord_Rank = DataKey.builder().bungee().player().id("bungeecord:rank").build();
+    public final static DataKey<String> ClientVersion = DataKey.builder().bungee().player().id("minecraft:clientversion").build();
 
     public static PermissionDataKey permission(String permission) {
         return new PermissionDataKey(permission);

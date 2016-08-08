@@ -39,7 +39,7 @@ public class BukkitPlaceholders extends PlaceholderProvider {
             Optional<ServerInfo> server = context.getPlayer().getServer();
             if (world.isPresent() && server.isPresent()) {
                 String key = server.get().getName() + ":" + world.get();
-                String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().worldAlias.get(key);
+                String alias = BungeeTabListPlus.getInstance().getConfig().worldAlias.get(key);
                 if (alias != null) return alias;
                 return world.get();
             }

@@ -24,8 +24,11 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.commands.SuperCommand;
+import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.config.MainConfig;
+import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
@@ -66,6 +69,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -89,7 +93,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private static BungeeTabListPlus INSTANCE;
     @Getter
     private final Plugin plugin;
-    private Collection<IPlayerProvider> playerProviders;
+    public Collection<IPlayerProvider> playerProviders;
     private ResendThread resendThread;
 
     @Getter
@@ -119,10 +123,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return INSTANCE;
     }
 
-    /**
-     * provides access to the configuration
-     */
-    private ConfigManager config;
+    @Getter
+    private MainConfig config = new MainConfig();
 
     private FakePlayerManagerImpl fakePlayerManager;
 
@@ -161,7 +163,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
         if (serverInfo != null) {
             // start server ping tasks
-            int delay = config.getMainConfig().pingDelay;
+            int delay = config.pingDelay;
             if (delay <= 0 || delay > 10) {
                 delay = 10;
             }
@@ -174,6 +176,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     @Getter
     private ProtocolVersionProvider protocolVersionProvider;
+
+    private Map<Float, Set<Runnable>> scheduledTasks = new ConcurrentHashMap<>();
 
     /**
      * Called when the plugin is enabled
@@ -196,7 +200,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         INSTANCE = this;
 
         try {
-            config = new ConfigManager(plugin);
+            File file = new File(plugin.getDataFolder(), "config.yml");
+            config.init(file);
         } catch (InvalidConfigurationException ex) {
             plugin.getLogger().warning("Unable to load Config");
             plugin.getLogger().log(Level.WARNING, null, ex);
@@ -204,7 +209,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             return;
         }
 
-        if (config.getMainConfig().automaticallySendBugReports) {
+        if (config.automaticallySendBugReports) {
             String revision = "unknown";
             try {
                 Properties current = new Properties();
@@ -298,21 +303,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
         placeholderManager.internalRegisterPlaceholderProvider(new TimePlaceholders());
 
-        tabLists = new TabListManager(this);
-        if (!tabLists.loadTabLists()) {
-            return;
-        }
-
         if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
             protocolVersionProvider = new ProtocolSupportVersionProvider();
         } else {
             protocolVersionProvider = new BungeeProtocolVersionProvider();
         }
-
-        ProxyServer.getInstance().getPluginManager().registerListener(plugin,
-                listener);
-        plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
-        restartRefreshThread();
 
         // register commands and update Notifier
         ProxyServer.getInstance().getPluginManager().registerCommand(
@@ -330,7 +325,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
 
         // Load updateCheck thread
-        if (config.getMainConfig().checkForUpdates) {
+        if (config.checkForUpdates) {
             updateChecker = new UpdateChecker(plugin);
         }
 
@@ -350,7 +345,15 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         placeholderAPIHook = new PlaceholderAPIHook(this);
 
-        placeholderAPIHook.onLoad();
+        tabLists = new TabListManager(this);
+        if (!tabLists.loadTabLists()) {
+            return;
+        }
+
+        ProxyServer.getInstance().getPluginManager().registerListener(plugin,
+                listener);
+        plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
+        restartRefreshThread();
     }
 
     public void onDisable() {
@@ -365,7 +368,10 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (refreshThread != null) {
             refreshThread.cancel();
         }
-        double updateInterval = config.getMainConfig().tablistUpdateInterval;
+        double updateInterval = config.tablistUpdateInterval;
+        if (updateInterval <= 0 || updateInterval > 2) {
+            updateInterval = 2;
+        }
         if (requestedUpdateInterval != null && (requestedUpdateInterval < updateInterval || updateInterval <= 0)) {
             updateInterval = requestedUpdateInterval;
         }
@@ -413,13 +419,12 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         failIfNotMainThread();
         try {
             // todo requestedUpdateInterval = null;
-            config = new ConfigManager(plugin);
+            config.load();
             placeholderManager.reload();
             if (reloadTablists()) return false;
             fakePlayerManager.reload();
             resendTabLists();
             restartRefreshThread();
-            placeholderAPIHook.onLoad();
             skins.onReload();
         } catch (InvalidConfigurationException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
@@ -436,6 +441,31 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         tabListManager.customTabLists = tabLists.customTabLists;
         tabLists = tabListManager;
         return false;
+    }
+
+    @Override
+    protected void registerVariable0(Plugin plugin, Variable variable) {
+        Preconditions.checkNotNull(plugin, "plugin");
+        Preconditions.checkNotNull(variable, "variable");
+        Preconditions.checkArgument(!Placeholder.thirdPartyDataKeys.containsKey(variable.getName()), "Variable name already registered.");
+        DataKey<String> dataKey = BTLPDataKeys.createBungeeThirdPartyVariableDataKey(variable.getName());
+        Placeholder.thirdPartyDataKeys.put(variable.getName(), dataKey);
+        getProxy().getScheduler().schedule(plugin, () -> {
+            for (ConnectedPlayer player : connectedPlayerManager.getPlayers()) {
+                try {
+                    String replacement = variable.getReplacement(player.getPlayer());
+                    if (!Objects.equals(replacement, player.getData().getRawValue(dataKey))) {
+                        runInMainThread(() -> {
+                            player.getData().updateValue(dataKey, replacement);
+                        });
+                    }
+                } catch (Throwable th) {
+                    getLogger().log(Level.WARNING, "Failed to resolve Placeholder " + variable.getName(), th);
+                }
+            }
+
+        }, 1, 1, TimeUnit.SECONDS);
+        runInMainThread(this::reloadTablists);
     }
 
     public void registerPlaceholderProvider0(PlaceholderProvider placeholderProvider) {
@@ -493,15 +523,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return pm;
     }
 
-    /**
-     * Getter for the ConfigManager. For internal use only.
-     *
-     * @return an instance of the ConfigManager or null
-     */
-    public ConfigManager getConfigManager() {
-        return config;
-    }
-
     public PlaceholderManagerImpl getPlaceholderManager0() {
         return placeholderManager;
     }
@@ -533,7 +554,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             String name = player.getName();
             hidden[0] = hiddenPlayers.contains(name);
         }
-        List<String> permanentlyHiddenPlayers = getInstance().getConfigManager().getMainConfig().hiddenPlayers;
+        List<String> permanentlyHiddenPlayers = getInstance().config.hiddenPlayers;
         if (permanentlyHiddenPlayers.contains(player.getName())) {
             hidden[0] = true;
         }
@@ -591,7 +612,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     public static boolean isHiddenServer(ServerInfo server) {
         if (server == null)
             return false;
-        return getInstance().config.getMainConfig().hiddenServers.contains(server.getName());
+        return getInstance().config.hiddenServers.contains(server.getName());
     }
 
     /**
@@ -684,6 +705,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     protected void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist) {
         ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
         if (connectedPlayer != null) {
+            // todo lock
             connectedPlayer.getPlayerTablistHandler().setTablistProvider((TablistProvider) customTablist);
         }
     }
@@ -720,5 +742,17 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     @Override
     protected void createIcon0(BufferedImage image, Consumer<Icon> callback) {
         getSkinManager().createIcon(image, callback);
+    }
+
+    public void registerTask(float interval, Runnable task) {
+        boolean first = !scheduledTasks.containsKey(interval);
+        scheduledTasks.computeIfAbsent(interval, f -> Collections.newSetFromMap(new ConcurrentHashMap<>())).add(task);
+        if (first) {
+            getProxy().getScheduler().schedule(getPlugin(), () -> scheduledTasks.get(interval).forEach(Runnable::run), (long) (interval * 1000), (long) (interval * 1000), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    public void unregisterTask(float interval, Runnable task) {
+        scheduledTasks.get(interval).remove(task);
     }
 }

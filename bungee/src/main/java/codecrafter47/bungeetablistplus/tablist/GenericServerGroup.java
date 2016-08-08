@@ -39,7 +39,7 @@ public class GenericServerGroup implements ServerGroup {
     }
 
     public static ServerGroup of(String serverName) {
-        return new GenericServerGroup(Collections.singleton(serverName), BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getServerAlias(serverName));
+        return new GenericServerGroup(Collections.singleton(serverName), BungeeTabListPlus.getInstance().getConfig().getServerAlias(serverName));
     }
 
 

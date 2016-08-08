@@ -23,13 +23,15 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.config.TabListConfig;
+import codecrafter47.bungeetablistplus.config.old.TabListConfig;
 import codecrafter47.bungeetablistplus.layout.Layout;
 import codecrafter47.bungeetablistplus.layout.TablistLayoutManager;
+import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.section.Section;
 import codecrafter47.bungeetablistplus.tablist.GenericTabListContext;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -131,7 +133,79 @@ public class ConfigTabListProvider implements IConfigTabListProvider {
 
     @Override
     public boolean appliesTo(ProxiedPlayer player) {
-        return config.appliesTo(player);
+        if (config.showTo.equalsIgnoreCase("ALL")) {
+            return true;
+        }
+
+        if (config.showTo.equalsIgnoreCase("1.8")) {
+            return BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player);
+        }
+
+        if (config.showTo.equalsIgnoreCase("1.7")) {
+            return !BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player);
+        }
+
+        String[] s = config.showTo.split(":");
+
+        if (s.length != 2) {
+            return false;
+        }
+
+        if (s[0].equalsIgnoreCase("player")) {
+            if (s[1].equalsIgnoreCase(player.getName()) || s[1].equalsIgnoreCase(player.getUniqueId().toString())) {
+                return true;
+            }
+        }
+
+        if (s[0].equalsIgnoreCase("players")) {
+            for (String p : s[1].split(",")) {
+                if (p.equalsIgnoreCase(player.getName()) || p.equalsIgnoreCase(player.getUniqueId().toString())) {
+                    return true;
+                }
+            }
+        }
+
+        Server playerServer = player.getServer();
+        if (playerServer != null) {
+            String server = playerServer.getInfo().getName();
+
+            if (s[0].equalsIgnoreCase("server")) {
+                if (s[1].equalsIgnoreCase(server)) {
+                    return true;
+                }
+            }
+
+            if (s[0].equalsIgnoreCase("servers")) {
+                for (String sv : s[1].split(",")) {
+                    if (sv.equalsIgnoreCase(server)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        ConnectedPlayer connectedPlayer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(player);
+        if (connectedPlayer != null) {
+            String group = BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(connectedPlayer);
+
+            if (group != null) {
+                if (s[0].equalsIgnoreCase("group")) {
+                    if (s[1].equalsIgnoreCase(group)) {
+                        return true;
+                    }
+                }
+
+                if (s[0].equals("groups")) {
+                    for (String sv : s[1].split(",")) {
+                        if (sv.equalsIgnoreCase(group)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

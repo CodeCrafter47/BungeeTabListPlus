@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.tablist;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
 import codecrafter47.bungeetablistplus.managers.SkinManager;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,7 +77,7 @@ public class GenericTabList implements TabList {
     }
 
     public GenericTabList() {
-        this(ConfigManager.getRows(), ConfigManager.getCols());
+        this(4, 20);
     }
 
     @Override

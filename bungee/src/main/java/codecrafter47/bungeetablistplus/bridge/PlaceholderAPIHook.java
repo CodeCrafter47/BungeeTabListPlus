@@ -26,8 +26,8 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
-import codecrafter47.bungeetablistplus.config.TabListConfig;
-import codecrafter47.bungeetablistplus.managers.ConfigManager;
+import codecrafter47.bungeetablistplus.config.old.TabListConfig;
+import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Sets;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -52,6 +52,10 @@ public class PlaceholderAPIHook implements Listener {
     public PlaceholderAPIHook(BungeeTabListPlus bungeeTabListPlus) {
         this.bungeeTabListPlus = bungeeTabListPlus;
         bungeeTabListPlus.getPlugin().getProxy().getScheduler().schedule(bungeeTabListPlus.getPlugin(), () -> bungeeTabListPlus.runInMainThread(this::askServersForPlaceholders), 2, 2, TimeUnit.SECONDS);
+    }
+
+    public void addMaybePlaceholder(String s) {
+        placeholdersToCheck.add("%" + s + "%");
     }
 
     public void askServersForPlaceholders() {
@@ -84,6 +88,8 @@ public class PlaceholderAPIHook implements Listener {
     public void onPlaceholderConfirmed(String placeholder) {
         if (!registeredPlaceholders.contains(placeholder)) {
             registeredPlaceholders.add(placeholder);
+            Placeholder.placeholderAPIDataKeys.put(placeholder.substring(1, placeholder.length() - 1), BTLPDataKeys.createPlaceholderAPIDataKey(placeholder));
+            // this implicitly causes a reload
             bungeeTabListPlus.registerPlaceholderProvider0(new PlaceholderProvider() {
                 @Override
                 public void setup() {
@@ -98,15 +104,7 @@ public class PlaceholderAPIHook implements Listener {
         }
     }
 
-    public void onLoad() {
-        ConfigManager configManager = bungeeTabListPlus.getConfigManager();
-        if (configManager != null) {
-            searchTabList(configManager.defaultTabList);
-            configManager.tabLists.forEach(this::searchTabList);
-        }
-    }
-
-    private void searchTabList(TabListConfig config) {
+    public void searchTabList(TabListConfig config) {
         config.header.stream().filter(Objects::nonNull).forEach(this::searchString);
         config.footer.stream().filter(Objects::nonNull).forEach(this::searchString);
         config.playerLines.stream().filter(Objects::nonNull).forEach(this::searchString);

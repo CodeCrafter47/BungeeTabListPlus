@@ -73,5 +73,6 @@ public interface IPlayer {
      * 3 is spectator
      * @return the gamemode
      */
+    @Deprecated
     int getGameMode();
 }

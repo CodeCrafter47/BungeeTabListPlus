@@ -91,7 +91,7 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
         String header = getHeader();
         String footer = getFooter();
         for (PlayerTablistHandler handler : handlers) {
-            handler.runInEventLoop(() -> handler.setHeaderFooter(header, footer));
+            handler.runInEventLoop(() -> handler.setHeaderFooter(FastChat.legacyTextToJson(header, '&'), FastChat.legacyTextToJson(footer, '&')));
         }
     }
 }

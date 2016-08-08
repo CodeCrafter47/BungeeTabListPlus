@@ -19,11 +19,14 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
+import codecrafter47.bungeetablistplus.config.Config;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.tablistproviders.ConfigTablistProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.LegacyTablistProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.ErrorTabListProvider;
@@ -120,8 +123,17 @@ class ResendThread implements Runnable, Executor {
 
         try {
             TablistProvider tablistProvider = tablistHandler.getTablistProvider();
+            Context context = new Context().setViewer(connectedPlayer);
+            Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
+            if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
+                tablistHandler.setTablistProvider(new ConfigTablistProvider(config, context));
+                tablistProvider = tablistHandler.getTablistProvider();
+            }
+
             if (tablistProvider instanceof LegacyTablistProvider) {
                 ((LegacyTablistProvider) tablistProvider).update(tablistHandler);
+            } else if (tablistProvider instanceof ConfigTablistProvider) {
+                ((ConfigTablistProvider) tablistProvider).update();
             }
         } catch (Throwable th) {
             try {
@@ -135,6 +147,7 @@ class ResendThread implements Runnable, Executor {
 
                 ErrorTabListProvider.constructErrorTabList(player, tabList, "Error while updating tablist", th);
 
+                tablistHandler.setTablistProvider(LegacyTablistProvider.INSTANCE);
                 tablistHandler.sendTabList(tabList);
             } catch (Throwable th2) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to construct error tab list", th2);

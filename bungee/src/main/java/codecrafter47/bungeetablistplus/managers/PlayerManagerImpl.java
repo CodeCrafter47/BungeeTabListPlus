@@ -44,7 +44,7 @@ public class PlayerManagerImpl implements PlayerManager {
     public PlayerManagerImpl(BungeeTabListPlus plugin, Collection<IPlayerProvider> playerProviders, ProxiedPlayer viewer) {
         this.viewer = viewer;
         this.players = ImmutableList.copyOf(Iterables.concat(Collections2.transform(playerProviders, IPlayerProvider::getPlayers)));
-        includeSpectators = plugin.getConfigManager().getMainConfig().showPlayersInGamemode3;
+        includeSpectators = plugin.getConfig().showPlayersInGamemode3;
         canSeeHiddenPlayers = plugin.getPermissionManager().hasPermission(viewer, "bungeetablistplus.seevanished");
     }
 

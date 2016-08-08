@@ -139,9 +139,9 @@ public class BasicPlaceholders extends PlaceholderProvider {
         bind("internalServerName").to(context -> context.getServer().map(ServerInfo::getName).orElse(""));
         bind("serverPrefix").withArgs().to((context, args) -> {
             if (args != null && !args.isEmpty()) {
-                return BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(args);
+                return BungeeTabListPlus.getInstance().getConfig().serverPrefixes.get(args);
             } else {
-                return context.getServer().map(s -> BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverPrefixes.get(s.getName())).orElse("");
+                return context.getServer().map(s -> BungeeTabListPlus.getInstance().getConfig().serverPrefixes.get(s.getName())).orElse("");
             }
         });
         bind("other_count").to(context -> {

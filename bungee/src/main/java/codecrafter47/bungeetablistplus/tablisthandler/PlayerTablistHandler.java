@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.Slot;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
-import codecrafter47.bungeetablistplus.tablisthandler.logic.AbstractTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
 import codecrafter47.bungeetablistplus.tablistproviders.LegacyTablistProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
@@ -53,14 +52,19 @@ public abstract class PlayerTablistHandler {
 
     protected PlayerTablistHandler(ProxiedPlayer player) {
         this.player = player;
+        this.tablistProvider.onActivated(this);
     }
 
     public void setTablistProvider(TablistProvider provider) {
         if (provider != this.tablistProvider) {
             this.tablistProvider.onDeactivated(this);
             this.tablistProvider = provider;
-            this.tablistProvider.onActivated(this);
+            provider.onActivated(this);
         }
+    }
+
+    public void onDisconnect() {
+        this.tablistProvider.onDeactivated(this);
     }
 
     public abstract void setPassThrough(boolean passThrough);
@@ -136,7 +140,7 @@ public abstract class PlayerTablistHandler {
             handle.setSize(size);
             handle.setPassThrough(false);
 
-            int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+            int charLimit = BungeeTabListPlus.getInstance().getConfig().charLimit;
 
                 for (int i = 0; i < size; i++) {
                     Slot slot = tabList.getSlot(i);
@@ -215,7 +219,7 @@ public abstract class PlayerTablistHandler {
             handle.setSize(size);
             handle.setPassTrough(false);
 
-            int charLimit = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().charLimit;
+            int charLimit = BungeeTabListPlus.getInstance().getConfig().charLimit;
 
             for (int i = 0; i < size; i++) {
                 Slot slot = tabList.getSlot(i);

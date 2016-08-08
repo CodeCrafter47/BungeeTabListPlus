@@ -25,10 +25,7 @@ import net.cubespace.Yamler.Config.ConfigSection;
 import net.cubespace.Yamler.Config.Path;
 import net.cubespace.Yamler.Config.YamlConfig;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 public class MainConfig extends YamlConfig {
 
@@ -70,7 +67,11 @@ public class MainConfig extends YamlConfig {
             "BUNGEEPERMS - take information from BungeePerms",
             "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
     })
-    public String permissionSource = "AUTO";
+    private String permissionSource = PermissionSource.AUTO.toString();
+
+    public PermissionSource getPermissionSource() {
+        return PermissionSource.valueOf(permissionSource);
+    }
 
     @Comments({
             "whether to show players in spectator mode"
@@ -213,6 +214,14 @@ public class MainConfig extends YamlConfig {
         if (section.has("offline.text") && !section.has("offline-text")) {
             section.set("offline-text", section.get("offline.text"));
             section.remove("offline.text");
+        }
+        if (section.has("permissionSource")) {
+            String permissionSource = section.get("permissionSource");
+            permissionSource = permissionSource.toLowerCase(Locale.ROOT);
+            if (permissionSource.equals("BUKKITPERMISSIONSEX")) {
+                permissionSource = "BUKKIT";
+            }
+            section.set("permissionSource", permissionSource);
         }
     }
 }

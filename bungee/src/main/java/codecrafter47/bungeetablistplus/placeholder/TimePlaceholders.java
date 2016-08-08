@@ -57,7 +57,7 @@ public class TimePlaceholders extends PlaceholderProvider {
 
     private SimpleDateFormat getFormat(String pattern) {
         SimpleDateFormat format = new SimpleDateFormat(pattern);
-        format.setTimeZone(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().getTimeZone());
+        format.setTimeZone(BungeeTabListPlus.getInstance().getConfig().getTimeZone());
         return format;
     }
 }

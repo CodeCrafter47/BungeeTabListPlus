@@ -1,0 +1,122 @@
+# Draft for new tablist.yml design
+
+showTo: "true"
+
+priority: 20
+
+type: FIXED_SIZE
+
+showHeaderFooter: true
+
+header:
+  - |-
+    &6Hello ${viewer name}
+    &eLine 2
+  - |-
+    &eHello ${viewer name}
+    &6Line 2
+
+headerAnimationUpdateInterval: 0.5
+
+footer:
+  - |-
+    &6Line 1
+    &eLine 2
+  - |-
+    &eLine 1
+    &6Line 2
+
+footerAnimationUpdateInterval: 0.5
+
+defaultIcon: colors/dark_gray.png
+defaultPing: 1000
+size: 60
+playerSets:
+  global:
+    filter: "true"
+components:
+- {text: "&cServer: &6${viewer server}", icon: "default/server.png", ping: 0}
+- {text: "&cRank: &6${viewer vault_primary_group}", icon: "default/rank.png", ping: 0}
+# Show ping in different colors depending on how good/ bad it is
+- !conditional
+  condition: |-
+    ${viewer ping} < 50
+  true: {text: "&cPing: &a${viewer ping}ms", icon: "default/ping.png", ping: 0}
+  false: !conditional
+    condition: |-
+      ${viewer ping} < 150
+    true: {text: "&cPing: &e${viewer ping}ms", icon: "default/ping.png", ping: 0}
+    false: {text: "&cPing: &c${viewer ping}ms", icon: "default/ping.png", ping: 0}
+- !players_by_server
+  playerSet: global
+  serverHeader:
+  - {text: "", icon: "colors/dark_gray.png", ping: 1000}
+  - {text: "", icon: "colors/dark_gray.png", ping: 1000}
+  - {text: "", icon: "colors/dark_gray.png", ping: 1000}
+  - {text: "&e&n${server}&f&o (${server_player_count}):", icon: "colors/yellow.png", ping: 0}
+  includeEmptyServers: true
+  playerComponent: {text: "${player name}", icon: "${player skin}", ping: "${player ping}"}
+  morePlayersComponent: {text: "&7... and &e${other_count} &7others", icon: "colors/gray.png", ping: 0}
+  minSize: 48
+  maxSize: 48
+- {text: "", icon: "colors/dark_gray.png", ping: 1000}
+- {text: "", icon: "colors/dark_gray.png", ping: 1000}
+- {text: "", icon: "colors/dark_gray.png", ping: 1000}
+# Nice animations at the bottom
+- !animated
+  interval: 0.2
+  components:
+  - {text: "&6&c=&6==============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=&c=&6=============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==&c=&6============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6===&c=&6===========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6====&c=&6==========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=====&c=&6=========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6======&c=&6========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=======&c=&6=======", icon: "colors/gold.png", ping: 0}
+  - {text: "&6========&c=&6======", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=========&c=&6=====", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==========&c=&6====", icon: "colors/gold.png", ping: 0}
+  - {text: "&6===========&c=&6===", icon: "colors/gold.png", ping: 0}
+  - {text: "&6============&c=&6==", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=============&c=&6=", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==============&c=&6", icon: "colors/gold.png", ping: 0}
+- !animated
+  interval: 0.2
+  components:
+  - {text: "&6&c=&6==============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=&c=&6=============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==&c=&6============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6===&c=&6===========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6====&c=&6==========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=====&c=&6=========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6======&c=&6========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=======&c=&6=======", icon: "colors/gold.png", ping: 0}
+  - {text: "&6========&c=&6======", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=========&c=&6=====", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==========&c=&6====", icon: "colors/gold.png", ping: 0}
+  - {text: "&6===========&c=&6===", icon: "colors/gold.png", ping: 0}
+  - {text: "&6============&c=&6==", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=============&c=&6=", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==============&c=&6", icon: "colors/gold.png", ping: 0}
+- !animated
+  interval: 0.2
+  components:
+  - {text: "&6&c=&6==============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=&c=&6=============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==&c=&6============", icon: "colors/gold.png", ping: 0}
+  - {text: "&6===&c=&6===========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6====&c=&6==========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=====&c=&6=========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6======&c=&6========", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=======&c=&6=======", icon: "colors/gold.png", ping: 0}
+  - {text: "&6========&c=&6======", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=========&c=&6=====", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==========&c=&6====", icon: "colors/gold.png", ping: 0}
+  - {text: "&6===========&c=&6===", icon: "colors/gold.png", ping: 0}
+  - {text: "&6============&c=&6==", icon: "colors/gold.png", ping: 0}
+  - {text: "&6=============&c=&6=", icon: "colors/gold.png", ping: 0}
+  - {text: "&6==============&c=&6", icon: "colors/gold.png", ping: 0}
+- {text: "&cTime: &6${time H:mm:ss}", icon: "default/clock.png", ping: 0}
+- {text: "&cPlayers: &6${playerset:global size}", icon: "default/players.png", ping: 0}
+- {text: "&cBalance: &6${viewer vault_balance}", icon: "default/balance.png", ping: 0}

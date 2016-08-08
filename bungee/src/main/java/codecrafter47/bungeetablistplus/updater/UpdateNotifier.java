@@ -37,7 +37,7 @@ public class UpdateNotifier implements Runnable {
 
     @Override
     public void run() {
-        if (!plugin.getConfigManager().getMainConfig().notifyAdminsIfUpdateAvailable) {
+        if (!plugin.getConfig().notifyAdminsIfUpdateAvailable) {
             return;
         }
         if (!plugin.isUpdateAvailable() && !plugin.isNewDevBuildAvailable()) {

@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvide
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
@@ -33,12 +34,31 @@ public abstract class BungeeTabListPlusAPI {
     private static BungeeTabListPlusAPI instance = null;
 
     /**
+     * Registers a custom variable
+     * <p>
+     * You cannot use this to replace existing variables. If registering a variable which already
+     * exists there may be an exception thrown but there is no guarantee that an exception
+     * is thrown in that case.
+     *
+     * @param plugin   your plugin
+     * @param variable your variable
+     */
+    public static void registerVariable(Plugin plugin, Variable variable) {
+        Preconditions.checkState(instance != null, "instance is null, is the plugin enabled?");
+        instance.registerVariable0(plugin, variable);
+    }
+
+    protected abstract void registerVariable0(Plugin plugin, Variable variable);
+
+    /**
      * Registers a PlaceholderProvider
      * <p>
      * A PlaceholderProvider can add multiple placeholders
      *
      * @param placeholderProvider the PlaceholderProvider
+     * @deprecated Use {@link #registerVariable(Plugin, Variable)} instead.
      */
+    @Deprecated
     public static void registerPlaceholderProvider(PlaceholderProvider placeholderProvider) {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
         instance.registerPlaceholderProvider0(placeholderProvider);

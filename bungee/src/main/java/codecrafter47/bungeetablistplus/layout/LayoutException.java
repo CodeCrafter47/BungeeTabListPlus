@@ -23,9 +23,4 @@ public class LayoutException extends Exception {
     public LayoutException(String message) {
         super(message);
     }
-
-    @Override
-    public String toString() {
-        return getLocalizedMessage() != null ? getLocalizedMessage() : "LayoutException";
-    }
 }

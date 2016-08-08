@@ -61,6 +61,10 @@ public class DataCache {
         listeners.put(key, listener);
     }
 
+    public <T> void unregisterValueChangeListener(DataKey<T> key, Consumer<T> listener) {
+        listeners.remove(key, listener);
+    }
+
     public Map<DataKey<?>, Object> getMap() {
         return cache;
     }

@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Sets;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -35,20 +36,9 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import javax.annotation.Nullable;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -76,6 +66,8 @@ public class BukkitBridge implements Listener {
                     try {
                         for (String variable : variables) {
                             if (!registeredThirdPartyVariables.contains(variable)) {
+                                Placeholder.remoteThirdPartyDataKeys.put(variable, BTLPDataKeys.createThirdPartyVariableDataKey(variable));
+                                // this implicitly causes a reload
                                 plugin.registerPlaceholderProvider0(new PlaceholderProvider() {
                                     @Override
                                     public void setup() {

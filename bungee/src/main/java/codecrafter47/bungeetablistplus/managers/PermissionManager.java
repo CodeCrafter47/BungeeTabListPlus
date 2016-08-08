@@ -47,24 +47,25 @@ public class PermissionManager {
     }
 
     public String getMainGroup(IPlayer player) {
-        String mode = plugin.getConfigManager().getMainConfig().permissionSource;
-        if (mode.equalsIgnoreCase("BungeePerms")) {
-            return ((Player) player).get(DataKeys.BungeePerms_PrimaryGroup).orElse("");
-        } else if (mode.equalsIgnoreCase("Bukkit") || mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return ((Player) player).get(DataKeys.Vault_PermissionGroup).orElse("");
-        } else if (mode.equalsIgnoreCase("Bungee")) {
-            return ((Player) player).get(DataKeys.BungeeCord_PrimaryGroup).orElse("default");
-        } else {
-            Optional<String> group = ((Player) player).get(DataKeys.BungeePerms_PrimaryGroup);
-            if (group.isPresent()) {
-                return group.get();
-            }
-            Optional<String> optional = ((Player) player).get(DataKeys.Vault_PermissionGroup);
-            if (optional.isPresent()) {
-                return optional.get();
-            } else {
+        switch (plugin.getConfig().getPermissionSource()) {
+            case BUKKIT:
+                return ((Player) player).get(DataKeys.Vault_PermissionGroup).orElse("");
+            case BUNGEE:
                 return ((Player) player).get(DataKeys.BungeeCord_PrimaryGroup).orElse("default");
-            }
+            case BUNGEEPERMS:
+                return ((Player) player).get(DataKeys.BungeePerms_PrimaryGroup).orElse("");
+            case AUTO:
+            default:
+                Optional<String> group = ((Player) player).get(DataKeys.BungeePerms_PrimaryGroup);
+                if (group.isPresent()) {
+                    return group.get();
+                }
+                Optional<String> optional = ((Player) player).get(DataKeys.Vault_PermissionGroup);
+                if (optional.isPresent()) {
+                    return optional.get();
+                } else {
+                    return ((Player) player).get(DataKeys.BungeeCord_PrimaryGroup).orElse("default");
+                }
         }
     }
 
@@ -144,26 +145,29 @@ public class PermissionManager {
     }
 
     public int comparePlayers(IPlayer p1, IPlayer p2) {
-        String permissionSource = plugin.getConfigManager().getMainConfig().permissionSource;
-        if (permissionSource.equalsIgnoreCase("BungeePerms")) {
-            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeePerms_Rank);
-            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeePerms_Rank);
-            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-        } else if (permissionSource.equalsIgnoreCase("Bukkit") || permissionSource.equalsIgnoreCase("BukkitPermissionsEx")) {
-            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
-            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
-            if (p1Rank.isPresent() || p2Rank.isPresent()) {
+        switch (plugin.getConfig().getPermissionSource()) {
+            case BUKKIT: {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
+                if (p1Rank.isPresent() || p2Rank.isPresent()) {
+                    return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+                }
+                p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
+                p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
-            p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupRank);
-            p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupRank);
-            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-        } else if (permissionSource.equalsIgnoreCase("Bungee")) {
-            Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeeCord_Rank);
-            Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeeCord_Rank);
-            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
-        } else {
-            {
+            case BUNGEE: {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeeCord_Rank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeeCord_Rank);
+                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+            }
+            case BUNGEEPERMS: {
+                Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeePerms_Rank);
+                Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeePerms_Rank);
+                return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+            }
+            case AUTO:
+            default: {
                 Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.BungeePerms_Rank);
                 Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.BungeePerms_Rank);
                 if (p1Rank.isPresent() || p2Rank.isPresent()) {
@@ -214,24 +218,25 @@ public class PermissionManager {
 
     public String getPrefix(TabListContext context) {
         IPlayer player = context.getPlayer();
-        String mode = plugin.getConfigManager().getMainConfig().permissionSource;
-        if (mode.equalsIgnoreCase("BungeePerms")) {
-            return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElse("");
-        } else if (mode.equalsIgnoreCase("Bukkit") || mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return ((Player) player).get(DataKeys.Vault_Prefix).orElse("");
-        } else if (mode.equalsIgnoreCase("Bungee")) {
-            return getConfigPrefix(context, player);
+        switch (plugin.getConfig().getPermissionSource()) {
+            case BUKKIT:
+                return ((Player) player).get(DataKeys.Vault_Prefix).orElse("");
+            case BUNGEE:
+                return getConfigPrefix(context, player);
+            case BUNGEEPERMS:
+                return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElse("");
+            case AUTO:
+            default:
+                String prefix = getConfigPrefix(context, player);
+                if (!prefix.isEmpty()) {
+                    return prefix;
+                }
+                return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse(""));
         }
-
-        String prefix = getConfigPrefix(context, player);
-        if (!prefix.isEmpty()) {
-            return prefix;
-        }
-        return ((Player) player).get(DataKeys.BungeePerms_Prefix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Prefix).orElse(""));
     }
 
     public String getConfigPrefix(TabListContext context, IPlayer player) {
-        String prefix = plugin.getConfigManager().getMainConfig().prefixes.get(getMainGroup(player));
+        String prefix = plugin.getConfig().prefixes.get(getMainGroup(player));
         if (prefix != null) {
             prefix = BungeeTabListPlus.getInstance().getPlaceholderManager0().parseSlot(prefix).buildSlot(context).getText();
         }
@@ -355,13 +360,16 @@ public class PermissionManager {
     }
 
     public String getSuffix(IPlayer player) {
-        String mode = plugin.getConfigManager().getMainConfig().permissionSource;
-        if (mode.equalsIgnoreCase("BungeePerms")) {
-            return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElse("");
-        } else if (mode.equalsIgnoreCase("Bukkit") || mode.equalsIgnoreCase("BukkitPermissionsEx")) {
-            return ((Player) player).get(DataKeys.Vault_Suffix).orElse("");
+        switch (plugin.getConfig().getPermissionSource()) {
+            case BUKKIT:
+                return ((Player) player).get(DataKeys.Vault_Suffix).orElse("");
+            case BUNGEE:
+            case BUNGEEPERMS:
+                return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElse("");
+            case AUTO:
+            default:
+                return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Suffix).orElse(""));
         }
-        return ((Player) player).get(DataKeys.BungeePerms_Suffix).orElseGet(() -> ((Player) player).get(DataKeys.Vault_Suffix).orElse(""));
     }
 
     String getSuffixFromBungeePerms(ProxiedPlayer player) {

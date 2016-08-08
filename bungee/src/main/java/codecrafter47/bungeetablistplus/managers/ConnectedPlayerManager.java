@@ -89,5 +89,6 @@ public class ConnectedPlayerManager implements IPlayerProvider {
         byUUID.remove(player.getUniqueID(), player);
         BungeeTabListPlus.getInstance().getBridge().onDisconnected(player.getPlayer());
         playerList = ImmutableList.copyOf((Iterable<? extends ConnectedPlayer>) players);
+        player.getPlayerTablistHandler().onDisconnect();
     }
 }

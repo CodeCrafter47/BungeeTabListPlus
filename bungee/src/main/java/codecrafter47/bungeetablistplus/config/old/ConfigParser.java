@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.bungeetablistplus.config;
+package codecrafter47.bungeetablistplus.config.old;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
@@ -229,31 +229,31 @@ public class ConfigParser {
             }
         }
 
-        if (config.headerCycleInterval <= 0) {
-            config.headerCycleInterval = 1;
+        if (config.headerAnimationUpdateInterval <= 0) {
+            config.headerAnimationUpdateInterval = 1;
         }
 
-        if (config.footerCycleInterval <= 0) {
-            config.footerCycleInterval = 1;
+        if (config.footerAnimationUpdateInterval <= 0) {
+            config.footerAnimationUpdateInterval = 1;
         }
 
         if (config.header.size() > 1) {
-            plugin.requireUpdateInterval(config.headerCycleInterval);
+            plugin.requireUpdateInterval(config.headerAnimationUpdateInterval);
         }
 
         if (config.footer.size() > 1) {
-            plugin.requireUpdateInterval(config.footerCycleInterval);
+            plugin.requireUpdateInterval(config.footerAnimationUpdateInterval);
         }
 
         SlotTemplate header;
         if (!config.header.isEmpty()) {
-            header = SlotTemplate.animate(config.header.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.headerCycleInterval);
+            header = SlotTemplate.animate(config.header.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.headerAnimationUpdateInterval);
         } else {
             header = SlotTemplate.empty();
         }
         SlotTemplate footer;
         if (!config.footer.isEmpty()) {
-            footer = SlotTemplate.animate(config.footer.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.footerCycleInterval);
+            footer = SlotTemplate.animate(config.footer.stream().filter(s -> s != null).map(this::parseSlot).collect(Collectors.toList()), config.footerAnimationUpdateInterval);
         } else {
             footer = SlotTemplate.empty();
         }
@@ -273,7 +273,7 @@ public class ConfigParser {
         }
 
         HashMultimap<String, String> aliasToServerMap = HashMultimap.create();
-        for (Map.Entry<String, String> entry : BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.entrySet()) {
+        for (Map.Entry<String, String> entry : BungeeTabListPlus.getInstance().getConfig().serverAlias.entrySet()) {
             if (ProxyServer.getInstance().getServerInfo(entry.getKey()) == null) {
                 BungeeTabListPlus.getInstance().getLogger().warning("Configuration Error: Server \"" + entry.getKey() + "\" used in the alias map does not exist.");
                 continue;
@@ -284,7 +284,7 @@ public class ConfigParser {
         List<ServerGroup> list = new ArrayList<>();
         while (!serverSet.isEmpty()) {
             String server = serverSet.iterator().next();
-            String alias = BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().serverAlias.get(server);
+            String alias = BungeeTabListPlus.getInstance().getConfig().serverAlias.get(server);
             if (alias != null) {
                 Set<String> strings = aliasToServerMap.get(alias);
                 serverSet.removeAll(strings);

@@ -25,12 +25,7 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -44,8 +39,8 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
 
     public FakePlayerManagerImpl(final Plugin plugin) {
         this.plugin = plugin;
-        if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers.size() > 0) {
-            offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers);
+        if (BungeeTabListPlus.getInstance().getConfig().fakePlayers.size() > 0) {
+            offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
             sanitazeFakePlayerNames();
             plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
                 @Override
@@ -83,7 +78,7 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
     }
 
     public void reload() {
-        offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers);
+        offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
         sanitazeFakePlayerNames();
         online = new CopyOnWriteArrayList<>();
         for (int i = offline.size(); i > 0; i--) {
@@ -132,7 +127,7 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
     public void removeFakePlayer(codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer fakePlayer) {
         FakePlayer player = (FakePlayer) fakePlayer;
         if (online.remove(player)) {
-            if (BungeeTabListPlus.getInstance().getConfigManager().getMainConfig().fakePlayers.contains(player.getName())) {
+            if (BungeeTabListPlus.getInstance().getConfig().fakePlayers.contains(player.getName())) {
                 offline.add(player.getName());
             }
         }
