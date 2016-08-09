@@ -70,7 +70,7 @@ public class MainConfig extends YamlConfig {
     private String permissionSource = PermissionSource.AUTO.toString();
 
     public PermissionSource getPermissionSource() {
-        return PermissionSource.valueOf(permissionSource);
+        return PermissionSource.valueOf(permissionSource.toUpperCase(Locale.ROOT));
     }
 
     @Comments({
