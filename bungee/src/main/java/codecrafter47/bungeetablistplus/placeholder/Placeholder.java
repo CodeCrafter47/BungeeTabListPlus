@@ -73,7 +73,7 @@ public abstract class Placeholder {
         playerPlaceholders.put("faction_at_current_location", player -> player.get(DataKeys.Factions_FactionsWhere).orElse(""));
         playerPlaceholders.put("faction_power", player -> player.get(DataKeys.Factions_FactionPower).map(n -> Integer.toString(n)).orElse(""));
         playerPlaceholders.put("faction_player_power", player -> player.get(DataKeys.Factions_PlayerPower).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("faction_renk", player -> player.get(DataKeys.Factions_FactionsRank).orElse(""));
+        playerPlaceholders.put("faction_rank", player -> player.get(DataKeys.Factions_FactionsRank).orElse(""));
         playerPlaceholders.put("SimpleClans_ClanName", player -> player.get(DataKeys.SimpleClans_ClanName).orElse(""));
         playerPlaceholders.put("SimpleClans_ClanMembers", player -> player.get(DataKeys.SimpleClans_ClanMembers).map(n -> Integer.toString(n)).orElse(""));
         playerPlaceholders.put("SimpleClans_OnlineClanMembers", player -> player.get(DataKeys.SimpleClans_OnlineClanMembers).map(n -> Integer.toString(n)).orElse(""));
