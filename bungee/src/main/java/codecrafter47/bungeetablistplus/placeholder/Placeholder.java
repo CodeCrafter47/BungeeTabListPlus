@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.util.Functions;
 import codecrafter47.bungeetablistplus.util.PingTask;
 import lombok.AllArgsConstructor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.text.SimpleDateFormat;
@@ -127,6 +128,9 @@ public abstract class Placeholder {
                     return Integer.toString(context.getPlayers(playerSet).size());
                 }
             };
+        } else if (tokens[0].startsWith("server:")) {
+            String server = tokens[0].split(":")[1];
+            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), context -> ProxyServer.getInstance().getServerInfo(server));
         } else if ("time".equals(tokens[0])) {
             return new TimePlaceholder(new SimpleDateFormat(tokens[1]));
         } else if ("server_player_count".equals(tokens[0])) {
