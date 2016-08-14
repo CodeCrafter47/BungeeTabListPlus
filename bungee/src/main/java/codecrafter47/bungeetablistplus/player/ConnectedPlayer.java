@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
+import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.common.Constants;
@@ -65,6 +66,10 @@ public class ConnectedPlayer implements Player {
 
     @Getter
     private DataCache data = new DataCache();
+
+    @Getter
+    @Setter
+    private CustomTablist customTablist = null;
 
     public ConnectedPlayer(ProxiedPlayer player) {
         this.player = player;

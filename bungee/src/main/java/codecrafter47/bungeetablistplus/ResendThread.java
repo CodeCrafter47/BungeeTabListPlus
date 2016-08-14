@@ -122,18 +122,22 @@ class ResendThread implements Runnable, Executor {
         PlayerTablistHandler tablistHandler = connectedPlayer.getPlayerTablistHandler();
 
         try {
-            TablistProvider tablistProvider = tablistHandler.getTablistProvider();
-            Context context = new Context().setViewer(connectedPlayer);
-            Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
-            if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
-                tablistHandler.setTablistProvider(new ConfigTablistProvider(config, context));
-                tablistProvider = tablistHandler.getTablistProvider();
-            }
+            if (connectedPlayer.getCustomTablist() != null) {
+                tablistHandler.setTablistProvider((TablistProvider) connectedPlayer.getCustomTablist());
+            } else {
+                TablistProvider tablistProvider = tablistHandler.getTablistProvider();
+                Context context = new Context().setViewer(connectedPlayer);
+                Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
+                if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
+                    tablistHandler.setTablistProvider(new ConfigTablistProvider(config, context));
+                    tablistProvider = tablistHandler.getTablistProvider();
+                }
 
-            if (tablistProvider instanceof LegacyTablistProvider) {
-                ((LegacyTablistProvider) tablistProvider).update(tablistHandler);
-            } else if (tablistProvider instanceof ConfigTablistProvider) {
-                ((ConfigTablistProvider) tablistProvider).update();
+                if (tablistProvider instanceof LegacyTablistProvider) {
+                    ((LegacyTablistProvider) tablistProvider).update(tablistHandler);
+                } else if (tablistProvider instanceof ConfigTablistProvider) {
+                    ((ConfigTablistProvider) tablistProvider).update();
+                }
             }
         } catch (Throwable th) {
             try {

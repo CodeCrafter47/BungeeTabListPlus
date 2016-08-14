@@ -39,8 +39,6 @@ import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.protocol.ProtocolManager;
 import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
-import codecrafter47.bungeetablistplus.tablistproviders.LegacyTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
@@ -705,8 +703,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     protected void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist) {
         ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
         if (connectedPlayer != null) {
-            // todo lock
-            connectedPlayer.getPlayerTablistHandler().setTablistProvider((TablistProvider) customTablist);
+            connectedPlayer.setCustomTablist(customTablist);
         }
     }
 
@@ -716,9 +713,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         getTabListManager().removeCustomTabList(player);
         ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
         if (connectedPlayer != null) {
-            // todo later there will be more different tab list providers
-            connectedPlayer.getPlayerTablistHandler().setTablistProvider(LegacyTablistProvider.INSTANCE);
+            connectedPlayer.setCustomTablist(null);
         }
+        updateTabListForPlayer(player);
     }
 
     @Nonnull
