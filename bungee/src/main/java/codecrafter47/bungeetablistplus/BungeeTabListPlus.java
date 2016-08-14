@@ -705,6 +705,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (connectedPlayer != null) {
             connectedPlayer.setCustomTablist(customTablist);
         }
+        updateTabListForPlayer(player);
     }
 
     @Override
