@@ -21,12 +21,9 @@ package codecrafter47.bungeetablistplus.tablistproviders;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.config.Config;
 import codecrafter47.bungeetablistplus.config.PlayerSet;
 import codecrafter47.bungeetablistplus.config.PlayerVisibility;
-import codecrafter47.bungeetablistplus.config.components.Component;
-import codecrafter47.bungeetablistplus.config.components.ListComponent;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.context.PlayerSets;
 import codecrafter47.bungeetablistplus.data.DataKeys;
@@ -38,38 +35,27 @@ import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import lombok.NonNull;
 
-import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ConfigTablistProvider extends DefaultCustomTablist {
-    public final Config config;
-    private final Context context;
+public abstract class ConfigTablistProvider<C extends Config> extends DefaultCustomTablist {
+    public final C config;
+    protected final Context context;
 
     private int headerIndex;
     private int footerIndex;
 
-    private Component.Instance content;
-
     private Runnable headerUpdater;
     private Runnable footerUpdater;
-
-    private boolean[] marks;
 
     private PlayerSets playerSets;
 
     private boolean active = false;
 
-    public ConfigTablistProvider(Config config, Context context) {
+    public ConfigTablistProvider(C config, Context context) {
         this.config = config;
-
-        // Set custom tab list size
-        setSize(config.getSize());
-        marks = new boolean[config.getSize()];
 
         // Create context
         this.context = context;
@@ -85,15 +71,11 @@ public class ConfigTablistProvider extends DefaultCustomTablist {
             headerIndex = 0;
             footerIndex = 0;
         }
-
-        // Tab overlay
-        content = new ListComponent(config.getComponents()).toInstance(context);
     }
 
     @Override
     public synchronized void onActivated(PlayerTablistHandler handler) {
         super.onActivated(handler);
-        content.activate();
         active = true;
 
         // register a header/ footer update task here
@@ -107,19 +89,12 @@ public class ConfigTablistProvider extends DefaultCustomTablist {
 
     @Override
     public synchronized void onDeactivated(PlayerTablistHandler handler) {
-        content.deactivate();
         active = false;
         if (config.isShowHeaderFooter()) {
             BungeeTabListPlus.getInstance().unregisterTask(config.getHeaderAnimationUpdateInterval(), headerUpdater);
             BungeeTabListPlus.getInstance().unregisterTask(config.getFooterAnimationUpdateInterval(), footerUpdater);
         }
         super.onDeactivated(handler);
-    }
-
-    @Override
-    public synchronized void setSlot(int row, int column, @Nonnull @NonNull Icon icon, @Nonnull @NonNull String text, int ping) {
-        super.setSlot(row, column, icon, text, ping);
-        marks[row * getColumns() + column] = true;
     }
 
     public synchronized void update() {
@@ -141,18 +116,6 @@ public class ConfigTablistProvider extends DefaultCustomTablist {
                     .filter(player -> !BungeeTabListPlus.isHidden(player) || (hiddenPlayers == PlayerVisibility.VISIBLE_TO_ADMINS && canSeeHiddenPlayers) || hiddenPlayers == PlayerVisibility.VISIBLE)
                     .collect(Collectors.toList());
             playerSets.put(entry.getKey(), players);
-        }
-
-        // Tab overlay
-        Arrays.fill(marks, false);
-        content.setPosition(0, 0, getSize());
-        content.update1stStep();
-        content.update2ndStep();
-        for (int i = 0; i < marks.length; i++) {
-            boolean mark = marks[i];
-            if (!mark) {
-                setSlot(i / getColumns(), i % getColumns(), config.getDefaultIcon().evaluate(context), "", config.getDefaultPing());
-            }
         }
 
         // Header & Footer

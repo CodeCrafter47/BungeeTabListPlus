@@ -104,7 +104,7 @@ public abstract class PlayerTablistHandler {
     @AllArgsConstructor
     @Getter
     public enum ResizePolicy {
-        DEFAULT_NO_SHRINK(true, false), DEFAULT(true, true), DYNAMIC(true, true);
+        DEFAULT_NO_SHRINK(true, false), DEFAULT(true, true), DYNAMIC(false, true);
         boolean mod20;
         boolean reduceSize;
     }

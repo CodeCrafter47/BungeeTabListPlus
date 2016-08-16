@@ -34,12 +34,12 @@ public class ListComponent extends Component {
     }
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return list.stream().allMatch(Component::hasConstantSize);
     }
 
     @Override
-    protected int getSize() {
+    public int getSize() {
         return list.stream().mapToInt(Component::getSize).sum();
     }
 

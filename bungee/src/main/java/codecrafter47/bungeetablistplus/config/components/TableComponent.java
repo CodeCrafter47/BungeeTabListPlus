@@ -59,12 +59,12 @@ public class TableComponent extends Component {
     }
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return size != -1;
     }
 
     @Override
-    protected int getSize() {
+    public int getSize() {
         return size;
     }
 

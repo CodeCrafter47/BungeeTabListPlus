@@ -19,32 +19,24 @@
 
 package codecrafter47.bungeetablistplus.config;
 
-import codecrafter47.bungeetablistplus.template.TextTemplate;
+import codecrafter47.bungeetablistplus.config.components.Component;
+import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-
 @Getter
 @Setter
-public class Config implements ITabListConfig {
+public class DynamicSizeConfig extends Config {
 
-    private String type;
+    private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
 
-    private Expression showTo;
+    private String playerSet;
 
-    private int priority;
+    private Component playerComponent;
 
-    private boolean showHeaderFooter;
-
-    private List<TextTemplate> header;
-
-    private float headerAnimationUpdateInterval;
-
-    private List<TextTemplate> footer;
-
-    private float footerAnimationUpdateInterval;
-
-    private Map<String, PlayerSet> playerSets;
+    public void setPlayerComponent(Component playerComponent) {
+        Preconditions.checkArgument(playerComponent.hasConstantSize(), "playerComponent needs to have a fixed size.");
+        this.playerComponent = playerComponent;
+    }
 }

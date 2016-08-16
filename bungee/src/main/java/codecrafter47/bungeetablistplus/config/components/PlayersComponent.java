@@ -41,7 +41,7 @@ public class PlayersComponent extends Component {
     int maxSize = Integer.MAX_VALUE;
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return false;
     }
 

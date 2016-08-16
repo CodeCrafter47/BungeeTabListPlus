@@ -33,12 +33,12 @@ public class BasicComponent extends Component {
     private PingTemplate ping;
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return true;
     }
 
     @Override
-    protected int getSize() {
+    public int getSize() {
         return 1;
     }
 

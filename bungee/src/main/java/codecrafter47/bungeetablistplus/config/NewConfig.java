@@ -62,8 +62,13 @@ public class NewConfig {
                             if (tuple.getValueNode() instanceof ScalarNode) {
                                 tuple.getValueNode().setType(String.class);
                                 String value = (String) constructObject(tuple.getValueNode());
-                                node.setType(Config.class);
-                                node.setTag(new Tag(Config.class));
+                                if (value.equalsIgnoreCase("DYNAMIC_SIZE")) {
+                                    node.setType(DynamicSizeConfig.class);
+                                    node.setTag(new Tag(DynamicSizeConfig.class));
+                                } else {
+                                    node.setType(FixedSizeConfig.class);
+                                    node.setTag(new Tag(FixedSizeConfig.class));
+                                }
                                 set = true;
                             }
                         }

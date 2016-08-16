@@ -52,7 +52,7 @@ public abstract class AbstractCustomTablist implements CustomTablist {
      */
     public AbstractCustomTablist() {
         this.size = 0;
-        this.columns = 0;
+        this.columns = 1;
         this.rows = 0;
         this.icon = EMPTY_ICON_ARRAY;
         this.text = EMPTY_STRING_ARRAY;
@@ -85,18 +85,27 @@ public abstract class AbstractCustomTablist implements CustomTablist {
         if (size < 0) {
             throw new IllegalArgumentException("size is negative");
         } else if (size == 0) {
-            this.size = 0;
-            this.columns = 0;
-            this.rows = 0;
-            this.icon = EMPTY_ICON_ARRAY;
-            this.text = EMPTY_STRING_ARRAY;
-            this.ping = EMPTY_INT_ARRAY;
+            setSize(0, 0);
         } else {
             int columns = (size + 19) / 20;
             int rows = size / columns;
             if (columns * rows != size) {
                 throw new IllegalArgumentException("size is not rectangular");
             }
+            setSize(columns, rows);
+        }
+    }
+
+    protected void setSize(int columns, int rows) {
+        int size = columns * rows;
+        if (size == 0) {
+            this.size = 0;
+            this.columns = 1;
+            this.rows = 0;
+            this.icon = EMPTY_ICON_ARRAY;
+            this.text = EMPTY_STRING_ARRAY;
+            this.ping = EMPTY_INT_ARRAY;
+        } else {
             Icon[] icon = new Icon[size];
             String[] text = new String[size];
             int[] ping = new int[size];

@@ -19,32 +19,22 @@
 
 package codecrafter47.bungeetablistplus.config;
 
-import codecrafter47.bungeetablistplus.template.TextTemplate;
+import codecrafter47.bungeetablistplus.config.components.Component;
+import codecrafter47.bungeetablistplus.template.IconTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
-public class Config implements ITabListConfig {
+public class FixedSizeConfig extends Config {
 
-    private String type;
+    private int size;
 
-    private Expression showTo;
+    private IconTemplate defaultIcon;
 
-    private int priority;
+    private int defaultPing;
 
-    private boolean showHeaderFooter;
-
-    private List<TextTemplate> header;
-
-    private float headerAnimationUpdateInterval;
-
-    private List<TextTemplate> footer;
-
-    private float footerAnimationUpdateInterval;
-
-    private Map<String, PlayerSet> playerSets;
+    private List<Component> components;
 }

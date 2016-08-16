@@ -20,15 +20,15 @@ package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.config.Config;
+import codecrafter47.bungeetablistplus.config.DynamicSizeConfig;
+import codecrafter47.bungeetablistplus.config.FixedSizeConfig;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
-import codecrafter47.bungeetablistplus.tablistproviders.ConfigTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.LegacyTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.*;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.ErrorTabListProvider;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -129,7 +129,7 @@ class ResendThread implements Runnable, Executor {
                 Context context = new Context().setViewer(connectedPlayer);
                 Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
                 if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
-                    tablistHandler.setTablistProvider(new ConfigTablistProvider(config, context));
+                    tablistHandler.setTablistProvider(createTablistProvider(context, config));
                     tablistProvider = tablistHandler.getTablistProvider();
                 }
 
@@ -156,6 +156,16 @@ class ResendThread implements Runnable, Executor {
             } catch (Throwable th2) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to construct error tab list", th2);
             }
+        }
+    }
+
+    private ConfigTablistProvider createTablistProvider(Context context, Config config) {
+        if (config instanceof FixedSizeConfig) {
+            return new FixedSizeConfigTablistProvider((FixedSizeConfig) config, context);
+        } else if (config instanceof DynamicSizeConfig) {
+            return new DynamicSizeConfigTablistProvider((DynamicSizeConfig) config, context);
+        } else {
+            throw new RuntimeException("Unknown tab list config type: " + config.getClass());
         }
     }
 }

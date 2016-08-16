@@ -53,12 +53,12 @@ public class ConditionalComponent extends Component {
     }
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return trueReplacement.hasConstantSize() && falseReplacement.hasConstantSize() && trueReplacement.getSize() == falseReplacement.getSize();
     }
 
     @Override
-    protected int getSize() {
+    public int getSize() {
         return trueReplacement.getSize();
     }
 

@@ -25,14 +25,14 @@ import com.google.common.base.Preconditions;
 
 public abstract class Component {
 
-    protected abstract boolean hasConstantSize();
+    public abstract boolean hasConstantSize();
 
     /**
      * Must be implemented when hasConstantSize returns true
      *
      * @return
      */
-    protected int getSize() {
+    public int getSize() {
         return 0;
     }
 

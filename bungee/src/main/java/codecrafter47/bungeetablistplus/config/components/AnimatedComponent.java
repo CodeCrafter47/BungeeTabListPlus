@@ -45,12 +45,12 @@ public class AnimatedComponent extends Component {
     }
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return true;
     }
 
     @Override
-    protected int getSize() {
+    public int getSize() {
         return components.get(0).getSize();
     }
 

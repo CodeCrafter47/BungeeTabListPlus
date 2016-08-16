@@ -81,7 +81,7 @@ public class PlayersByServerComponent extends Component {
     }
 
     @Override
-    protected boolean hasConstantSize() {
+    public boolean hasConstantSize() {
         return false;
     }
 
