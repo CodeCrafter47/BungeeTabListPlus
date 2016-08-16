@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.config.ITabListConfig;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ToString
@@ -30,39 +31,39 @@ public class TabListConfig implements ITabListConfig {
     @Getter
     private transient String name;
 
-    public String showTo;
+    public String showTo = "all";
 
-    public int priority;
+    public int priority = 0;
 
-    public List<String> header;
+    public List<String> header = new ArrayList<>();
 
-    public double headerAnimationUpdateInterval;
+    public double headerAnimationUpdateInterval = 1;
 
-    public List<String> footer;
+    public List<String> footer = new ArrayList<>();
 
-    public double footerAnimationUpdateInterval;
+    public double footerAnimationUpdateInterval = 1;
 
-    public boolean shownFooterHeader;
+    public boolean shownFooterHeader = false;
 
-    public String defaultSkin;
+    public String defaultSkin = "colors/dark_gray.png";
 
-    public int defaultPing;
+    public int defaultPing = 1000;
 
-    public boolean autoShrinkTabList;
+    public boolean autoShrinkTabList = false;
 
-    public int tab_size;
+    public int tab_size = 80;
 
-    public String groupPlayers;
+    public String groupPlayers = "SERVER";
 
-    public boolean showEmptyGroups;
+    public boolean showEmptyGroups = false;
 
-    public boolean verticalMode;
+    public boolean verticalMode = false;
 
-    public List<String> groupLines;
+    public List<String> groupLines = new ArrayList<>();
 
-    public List<String> playerLines;
+    public List<String> playerLines = new ArrayList<>();
 
-    public List<String> morePlayersLines;
+    public List<String> morePlayersLines = new ArrayList<>();
 
-    public List<String> tabList;
+    public List<String> tabList = new ArrayList<>();
 }
