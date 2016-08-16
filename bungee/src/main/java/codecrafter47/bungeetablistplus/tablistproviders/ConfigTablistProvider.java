@@ -24,10 +24,12 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.config.Config;
 import codecrafter47.bungeetablistplus.config.PlayerSet;
+import codecrafter47.bungeetablistplus.config.PlayerVisibility;
 import codecrafter47.bungeetablistplus.config.components.Component;
 import codecrafter47.bungeetablistplus.config.components.ListComponent;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.context.PlayerSets;
+import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
@@ -40,6 +42,7 @@ import lombok.NonNull;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -124,10 +127,20 @@ public class ConfigTablistProvider extends DefaultCustomTablist {
             return;
         }
 
+        BungeeTabListPlus plugin = BungeeTabListPlus.getInstance();
+        boolean canSeeHiddenPlayers = context.getViewer().get(DataKeys.permission("bungeetablistplus.seevanished")).orElse(false);
+
         // PlayerSets
-        ImmutableList<? extends IPlayer> all = ImmutableList.copyOf(Iterables.concat(Collections2.transform(BungeeTabListPlus.getInstance().playerProviders, IPlayerProvider::getPlayers)));
+        ImmutableList<? extends IPlayer> all = ImmutableList.copyOf(Iterables.concat(Collections2.transform(plugin.playerProviders, IPlayerProvider::getPlayers)));
         for (Map.Entry<String, PlayerSet> entry : config.getPlayerSets().entrySet()) {
-            playerSets.put(entry.getKey(), all.stream().map(p -> ((Player) p)).filter(player -> entry.getValue().getFilter().evaluate(context.derived().setPlayer(player), ExpressionResult.BOOLEAN)).collect(Collectors.toList()));
+            PlayerVisibility hiddenPlayers = entry.getValue().getHiddenPlayers();
+            List<Player> players = all
+                    .stream()
+                    .map(p -> ((Player) p))
+                    .filter(player -> entry.getValue().getFilter().evaluate(context.derived().setPlayer(player), ExpressionResult.BOOLEAN))
+                    .filter(player -> !BungeeTabListPlus.isHidden(player) || (hiddenPlayers == PlayerVisibility.VISIBLE_TO_ADMINS && canSeeHiddenPlayers) || hiddenPlayers == PlayerVisibility.VISIBLE)
+                    .collect(Collectors.toList());
+            playerSets.put(entry.getKey(), players);
         }
 
         // Tab overlay

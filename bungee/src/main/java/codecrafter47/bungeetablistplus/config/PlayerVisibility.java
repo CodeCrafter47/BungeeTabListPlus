@@ -19,10 +19,6 @@
 
 package codecrafter47.bungeetablistplus.config;
 
-import lombok.Data;
-
-@Data
-public class PlayerSet {
-    private Expression filter;
-    private PlayerVisibility hiddenPlayers = PlayerVisibility.VISIBLE_TO_ADMINS;
+public enum PlayerVisibility {
+    VISIBLE, VISIBLE_TO_ADMINS, INVISIBLE
 }
