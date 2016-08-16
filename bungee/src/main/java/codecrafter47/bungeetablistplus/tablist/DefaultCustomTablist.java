@@ -43,11 +43,9 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
                 handler.setSize(size);
                 handler.setPassThrough(false);
 
-                boolean onlineMode = handler.getPlayer().getPendingConnection().isOnlineMode();
-
                 for (int column = 0; column < getColumns(); column++) {
                     for (int row = 0; row < getRows(); row++) {
-                        Icon icon = onlineMode ? getIcon(row, column) : Icon.DEFAULT;
+                        Icon icon = getIcon(row, column);
                         String text = getText(row, column);
                         int ping = getPing(row, column);
 
