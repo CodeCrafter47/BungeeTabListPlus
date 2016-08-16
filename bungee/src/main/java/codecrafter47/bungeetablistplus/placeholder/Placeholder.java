@@ -132,7 +132,7 @@ public abstract class Placeholder {
             String server = tokens[0].split(":")[1];
             return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), context -> ProxyServer.getInstance().getServerInfo(server));
         } else if ("time".equals(tokens[0])) {
-            return new TimePlaceholder(new SimpleDateFormat(tokens[1]));
+            return new TimePlaceholder(TimePlaceholders.getFormat(tokens[1]));
         } else if ("server_player_count".equals(tokens[0])) {
             return SERVER_PLAYER_COUNT_PLACEHOLDER;
         } else if ("other_count".equals(tokens[0])) {
