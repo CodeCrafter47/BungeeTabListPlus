@@ -47,6 +47,8 @@ import net.md_5.bungee.api.connection.Server;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -70,6 +72,9 @@ public class ConnectedPlayer implements Player {
     @Getter
     @Setter
     private CustomTablist customTablist = null;
+
+    @Getter
+    private final LocalDateTime timePointJoined = LocalDateTime.now();
 
     public ConnectedPlayer(ProxiedPlayer player) {
         this.player = player;
@@ -184,5 +189,9 @@ public class ConnectedPlayer implements Player {
             playerTablistHandler = PlayerTablistHandler.create(getPlayer(), legacyTabList);
             packetHandler = legacyTabList;
         }
+    }
+
+    public Duration getCurrentSessionDuration() {
+        return Duration.between(getTimePointJoined(), LocalDateTime.now());
     }
 }

@@ -19,6 +19,8 @@
 
 package codecrafter47.bungeetablistplus.data;
 
+import java.time.Duration;
+
 public class DataKeys {
     // Bukkit player data keys
     public final static DataKey<Double> Health = DataKey.builder().bukkit().player().id("minecraft:health").build();
@@ -80,6 +82,7 @@ public class DataKeys {
     public final static DataKey<String> BungeePerms_PrimaryGroupPrefix = DataKey.builder().bungee().player().id("bungeeperms:primarygroupprefix").build();
     public final static DataKey<String> BungeePerms_PlayerPrefix = DataKey.builder().bungee().player().id("bungeeperms:playerprefix").build();
     public final static DataKey<String> ClientVersion = DataKey.builder().bungee().player().id("minecraft:clientversion").build();
+    public final static DataKey<Duration> BungeeCord_SessionDuration = DataKey.builder().bungee().player().id("minecraft:sessionduration").build();
 
     public static PermissionDataKey permission(String permission) {
         return new PermissionDataKey(permission);

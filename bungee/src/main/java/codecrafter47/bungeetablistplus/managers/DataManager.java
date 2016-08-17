@@ -40,7 +40,7 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
         this.bungeeTabListPlus = bungeeTabListPlus;
         this.permissionManager = permissionManager;
         init();
-        ProxyServer.getInstance().getScheduler().schedule(bungeeTabListPlus.getPlugin(), this::updateData, 2, 2, TimeUnit.SECONDS);
+        ProxyServer.getInstance().getScheduler().schedule(bungeeTabListPlus.getPlugin(), this::updateData, 1, 1, TimeUnit.SECONDS);
     }
 
     private void init() {
@@ -54,6 +54,7 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
         bind(DataKeys.BungeePerms_PrimaryGroupPrefix, permissionManager::getPrimaryGroupPrefixFromBungeePerms);
         bind(DataKeys.BungeePerms_PlayerPrefix, permissionManager::getPlayerPrefixFromBungeePerms);
         bind(DataKeys.ClientVersion, player1 -> BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersionString(player1));
+        bind(DataKeys.BungeeCord_SessionDuration, p -> bungeeTabListPlus.getConnectedPlayerManager().getPlayer(p).getCurrentSessionDuration());
     }
 
     @SuppressWarnings("unchecked")

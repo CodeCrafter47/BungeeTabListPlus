@@ -98,6 +98,9 @@ public abstract class Placeholder {
         playerPlaceholders.put("vault_currency_plural", player -> player.get(DataKeys.Vault_CurrencyNamePlural).orElse(""));
         playerPlaceholders.put("tab_name", player -> player.get(DataKeys.PlayerListName).orElse(player.getName()));
         playerPlaceholders.put("display_name", player -> player.get(DataKeys.DisplayName).orElse(player.getName()));
+        playerPlaceholders.put("session_duration_seconds", player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> duration.getSeconds() % 60).map(Object::toString).orElse("00"));
+        playerPlaceholders.put("session_duration_minutes", player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (duration.getSeconds() % 3600) / 60).map(Object::toString).orElse("00"));
+        playerPlaceholders.put("session_duration_hours", player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> duration.getSeconds() / 3600).map(Object::toString).orElse("00"));
 
         // Server
         serverPlaceholders.put("tps", serverInfo -> BungeeTabListPlus.getInstance().getBridge().get(serverInfo, DataKeys.TPS).map(d -> String.format("%1.1f", d)).orElse(""));
