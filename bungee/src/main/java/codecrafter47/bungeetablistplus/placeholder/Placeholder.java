@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class Placeholder {
@@ -44,7 +45,7 @@ public abstract class Placeholder {
     private static final Placeholder NULL_PLACEHOLDER = new NullPlaceholder();
     private static final Placeholder OTHER_COUNT_PLACEHOLDER = new OtherCountPlaceholder();
     private static final Placeholder SERVER_PLAYER_COUNT_PLACEHOLDER = new ServerPlayerCountPlaceholder();
-    private static final Map<String, Function<Player, String>> playerPlaceholders = new HashMap<>();
+    private static final Map<String, BiFunction<String[], Function<Context, Player>, Placeholder>> playerPlaceholders = new HashMap<>();
     private static final Map<String, Function<ServerInfo, String>> serverPlaceholders = new HashMap<>();
 
     public static final Map<String, DataKey<String>> placeholderAPIDataKeys = Collections.synchronizedMap(new HashMap<>());
@@ -52,55 +53,55 @@ public abstract class Placeholder {
     public static final Map<String, DataKey<String>> thirdPartyDataKeys = Collections.synchronizedMap(new HashMap<>());
 
     static {
-        playerPlaceholders.put("name", IPlayer::getName);
-        playerPlaceholders.put("ping", player -> Integer.toString(player.getPing()));
-        playerPlaceholders.put("skin", IPlayer::getName); // todo change this
-        playerPlaceholders.put("bungeeperms_display", player -> player.get(DataKeys.BungeePerms_DisplayPrefix).orElse(""));
-        playerPlaceholders.put("bungeeperms_prefix", player -> player.get(DataKeys.BungeePerms_Prefix).orElse(""));
-        playerPlaceholders.put("bungeeperms_suffix", player -> player.get(DataKeys.BungeePerms_Suffix).orElse(""));
-        playerPlaceholders.put("bungeeperms_primary_group", player -> player.get(DataKeys.BungeePerms_PrimaryGroup).orElse(""));
-        playerPlaceholders.put("bungeeperms_primary_group_prefix", player -> player.get(DataKeys.BungeePerms_PrimaryGroupPrefix).orElse(""));
-        playerPlaceholders.put("bungeeperms_user_prefix", player -> player.get(DataKeys.BungeePerms_PlayerPrefix).orElse(""));
-        playerPlaceholders.put("client_version", player -> player.get(DataKeys.ClientVersion).orElse(""));
-        playerPlaceholders.put("uuid", player -> player.getUniqueID().toString());
-        playerPlaceholders.put("world", player -> player.get(DataKeys.World).orElse(""));
-        playerPlaceholders.put("team", player -> player.get(DataKeys.Team).orElse(""));
-        playerPlaceholders.put("vault_balance", player -> player.get(DataKeys.Vault_Balance).map(d -> String.format("%1.2f", d)).orElse(""));
-        playerPlaceholders.put("multiverse_world_alias", player -> player.get(DataKeys.Multiverse_WorldAlias).orElse(""));
-        playerPlaceholders.put("faction_name", player -> player.get(DataKeys.Factions_FactionName).orElse(""));
-        playerPlaceholders.put("faction_member_count", player -> player.get(DataKeys.Factions_FactionMembers).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("faction_online_member_count", player -> player.get(DataKeys.Factions_OnlineFactionMembers).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("faction_at_current_location", player -> player.get(DataKeys.Factions_FactionsWhere).orElse(""));
-        playerPlaceholders.put("faction_power", player -> player.get(DataKeys.Factions_FactionPower).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("faction_player_power", player -> player.get(DataKeys.Factions_PlayerPower).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("faction_rank", player -> player.get(DataKeys.Factions_FactionsRank).orElse(""));
-        playerPlaceholders.put("SimpleClans_ClanName", player -> player.get(DataKeys.SimpleClans_ClanName).orElse(""));
-        playerPlaceholders.put("SimpleClans_ClanMembers", player -> player.get(DataKeys.SimpleClans_ClanMembers).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("SimpleClans_OnlineClanMembers", player -> player.get(DataKeys.SimpleClans_OnlineClanMembers).map(n -> Integer.toString(n)).orElse(""));
-        playerPlaceholders.put("SimpleClans_ClanTag", player -> player.get(DataKeys.SimpleClans_ClanTag).orElse(""));
-        playerPlaceholders.put("SimpleClans_ClanTagLabel", player -> player.get(DataKeys.SimpleClans_ClanTagLabel).orElse(""));
-        playerPlaceholders.put("SimpleClans_ClanColorTag", player -> player.get(DataKeys.SimpleClans_ClanColorTag).orElse(""));
-        playerPlaceholders.put("vault_primary_group", player -> player.get(DataKeys.Vault_PermissionGroup).orElse(""));
-        playerPlaceholders.put("vault_prefix", player -> player.get(DataKeys.Vault_Prefix).orElse(""));
-        playerPlaceholders.put("vault_suffix", player -> player.get(DataKeys.Vault_Suffix).orElse(""));
-        playerPlaceholders.put("vault_primary_group_prefix", player -> player.get(DataKeys.Vault_PrimaryGroupPrefix).orElse(""));
-        playerPlaceholders.put("vault_player_prefix", player -> player.get(DataKeys.Vault_PlayerPrefix).orElse(""));
-        playerPlaceholders.put("health", player -> player.get(DataKeys.Health).map(h -> String.format("%1.1f", h)).orElse(""));
-        playerPlaceholders.put("max_health", player -> player.get(DataKeys.MaxHealth).map(h -> String.format("%1.1f", h)).orElse(""));
-        playerPlaceholders.put("location_x", player -> player.get(DataKeys.PosX).map(d -> String.format("%1.0f", d)).orElse(""));
-        playerPlaceholders.put("location_y", player -> player.get(DataKeys.PosY).map(d -> String.format("%1.0f", d)).orElse(""));
-        playerPlaceholders.put("location_z", player -> player.get(DataKeys.PosZ).map(d -> String.format("%1.0f", d)).orElse(""));
-        playerPlaceholders.put("xp", player -> player.get(DataKeys.XP).map(d -> String.format("%1.2f", d)).orElse(""));
-        playerPlaceholders.put("total_xp", player -> player.get(DataKeys.TotalXP).map(d -> Integer.toString(d)).orElse(""));
-        playerPlaceholders.put("level", player -> player.get(DataKeys.Level).map(d -> Integer.toString(d)).orElse(""));
-        playerPlaceholders.put("player_points", player -> player.get(DataKeys.PlayerPoints_Points).map(Object::toString).orElse(""));
-        playerPlaceholders.put("vault_currency", player -> player.get(DataKeys.Vault_CurrencyNameSingular).orElse(""));
-        playerPlaceholders.put("vault_currency_plural", player -> player.get(DataKeys.Vault_CurrencyNamePlural).orElse(""));
-        playerPlaceholders.put("tab_name", player -> player.get(DataKeys.PlayerListName).orElse(player.getName()));
-        playerPlaceholders.put("display_name", player -> player.get(DataKeys.DisplayName).orElse(player.getName()));
-        playerPlaceholders.put("session_duration_seconds", player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> duration.getSeconds() % 60).map(Object::toString).orElse("00"));
-        playerPlaceholders.put("session_duration_minutes", player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (duration.getSeconds() % 3600) / 60).map(Object::toString).orElse("00"));
-        playerPlaceholders.put("session_duration_hours", player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> duration.getSeconds() / 3600).map(Object::toString).orElse("00"));
+        playerPlaceholders.put("name", ofFunction(IPlayer::getName));
+        playerPlaceholders.put("ping", ofFunction(player -> Integer.toString(player.getPing())));
+        playerPlaceholders.put("skin", ofFunction(IPlayer::getName)); // todo change this
+        playerPlaceholders.put("bungeeperms_display", ofStringData(DataKeys.BungeePerms_DisplayPrefix));
+        playerPlaceholders.put("bungeeperms_prefix", ofStringData(DataKeys.BungeePerms_Prefix));
+        playerPlaceholders.put("bungeeperms_suffix", ofStringData(DataKeys.BungeePerms_Suffix));
+        playerPlaceholders.put("bungeeperms_primary_group", ofStringData(DataKeys.BungeePerms_PrimaryGroup));
+        playerPlaceholders.put("bungeeperms_primary_group_prefix", ofStringData(DataKeys.BungeePerms_PrimaryGroupPrefix));
+        playerPlaceholders.put("bungeeperms_user_prefix", ofStringData(DataKeys.BungeePerms_PlayerPrefix));
+        playerPlaceholders.put("client_version", ofStringData(DataKeys.ClientVersion));
+        playerPlaceholders.put("uuid", ofFunction(player -> player.getUniqueID().toString()));
+        playerPlaceholders.put("world", ofStringData(DataKeys.World));
+        playerPlaceholders.put("team", ofStringData(DataKeys.Team));
+        playerPlaceholders.put("vault_balance", ofDoubleData(DataKeys.Vault_Balance));
+        playerPlaceholders.put("multiverse_world_alias", ofStringData(DataKeys.Multiverse_WorldAlias));
+        playerPlaceholders.put("faction_name", ofStringData(DataKeys.Factions_FactionName));
+        playerPlaceholders.put("faction_member_count", ofIntData(DataKeys.Factions_FactionMembers));
+        playerPlaceholders.put("faction_online_member_count", ofIntData(DataKeys.Factions_OnlineFactionMembers));
+        playerPlaceholders.put("faction_at_current_location", ofStringData(DataKeys.Factions_FactionsWhere));
+        playerPlaceholders.put("faction_power", ofIntData(DataKeys.Factions_FactionPower));
+        playerPlaceholders.put("faction_player_power", ofIntData(DataKeys.Factions_PlayerPower));
+        playerPlaceholders.put("faction_rank", ofStringData(DataKeys.Factions_FactionsRank));
+        playerPlaceholders.put("SimpleClans_ClanName", ofStringData(DataKeys.SimpleClans_ClanName));
+        playerPlaceholders.put("SimpleClans_ClanMembers", ofIntData(DataKeys.SimpleClans_ClanMembers));
+        playerPlaceholders.put("SimpleClans_OnlineClanMembers", ofIntData(DataKeys.SimpleClans_OnlineClanMembers));
+        playerPlaceholders.put("SimpleClans_ClanTag", ofStringData(DataKeys.SimpleClans_ClanTag));
+        playerPlaceholders.put("SimpleClans_ClanTagLabel", ofStringData(DataKeys.SimpleClans_ClanTagLabel));
+        playerPlaceholders.put("SimpleClans_ClanColorTag", ofStringData(DataKeys.SimpleClans_ClanColorTag));
+        playerPlaceholders.put("vault_primary_group", ofStringData(DataKeys.Vault_PermissionGroup));
+        playerPlaceholders.put("vault_prefix", ofStringData(DataKeys.Vault_Prefix));
+        playerPlaceholders.put("vault_suffix", ofStringData(DataKeys.Vault_Suffix));
+        playerPlaceholders.put("vault_primary_group_prefix", ofStringData(DataKeys.Vault_PrimaryGroupPrefix));
+        playerPlaceholders.put("vault_player_prefix", ofStringData(DataKeys.Vault_PlayerPrefix));
+        playerPlaceholders.put("health", ofDoubleData(DataKeys.Health));
+        playerPlaceholders.put("max_health", ofDoubleData(DataKeys.MaxHealth));
+        playerPlaceholders.put("location_x", ofDoubleData(DataKeys.PosX));
+        playerPlaceholders.put("location_y", ofDoubleData(DataKeys.PosY));
+        playerPlaceholders.put("location_z", ofDoubleData(DataKeys.PosZ));
+        playerPlaceholders.put("xp", ofFloatData(DataKeys.XP));
+        playerPlaceholders.put("total_xp", ofIntData(DataKeys.TotalXP));
+        playerPlaceholders.put("level", ofIntData(DataKeys.Level));
+        playerPlaceholders.put("player_points", ofIntData(DataKeys.PlayerPoints_Points));
+        playerPlaceholders.put("vault_currency", ofStringData(DataKeys.Vault_CurrencyNameSingular));
+        playerPlaceholders.put("vault_currency_plural", ofStringData(DataKeys.Vault_CurrencyNamePlural));
+        playerPlaceholders.put("tab_name", ofFunction(player -> player.get(DataKeys.PlayerListName).orElse(player.getName())));
+        playerPlaceholders.put("display_name", ofFunction(player -> player.get(DataKeys.DisplayName).orElse(player.getName())));
+        playerPlaceholders.put("session_duration_seconds", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
+        playerPlaceholders.put("session_duration_minutes", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
+        playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
 
         // Server
         serverPlaceholders.put("tps", serverInfo -> BungeeTabListPlus.getInstance().getBridge().get(serverInfo, DataKeys.TPS).map(d -> String.format("%1.1f", d)).orElse(""));
@@ -153,7 +154,7 @@ public abstract class Placeholder {
         } else if ("permission".equals(tokens[0])) {
             return new PermissionPlaceholder(playerFunction, tokens[1]);
         } else if (playerPlaceholders.containsKey(tokens[0])) {
-            return new PlayerBoundPlaceholder(playerFunction, playerPlaceholders.get(tokens[0]));
+            return playerPlaceholders.get(tokens[0]).apply(Arrays.copyOfRange(tokens, 1, tokens.length), playerFunction);
         } else if (thirdPartyDataKeys.containsKey(tokens[0])) {
             return new PlayerBoundPlaceholder(playerFunction, player -> player.get(thirdPartyDataKeys.get(tokens[0])).orElse(""));
         } else if (remoteThirdPartyDataKeys.containsKey(tokens[0])) {
@@ -253,5 +254,57 @@ public abstract class Placeholder {
         public String evaluate(Context context) {
             return format.format(System.currentTimeMillis());
         }
+    }
+
+    private static BiFunction<String[], Function<Context, Player>, Placeholder> ofFunction(Function<Player, String> function) {
+        return (tokens, playerFunction) -> new PlayerBoundPlaceholder(playerFunction, function::apply);
+    }
+
+    private static BiFunction<String[], Function<Context, Player>, Placeholder> ofStringData(DataKey<String> dataKey) {
+        return (tokens, playerFunction) -> new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).orElse(""));
+    }
+
+    private static BiFunction<String[], Function<Context, Player>, Placeholder> ofIntData(DataKey<Integer> dataKey) {
+        return (tokens, playerFunction) -> {
+            if (tokens.length == 0) {
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(Object::toString).orElse(""));
+            } else {
+                String format = "%0" + tokens[0] + "d";
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(i -> String.format(format, i)).orElse(""));
+            }
+        };
+    }
+
+    private static BiFunction<String[], Function<Context, Player>, Placeholder> ofIntFunction(Function<Player, Integer> function) {
+        return (tokens, playerFunction) -> {
+            if (tokens.length == 0) {
+                return new PlayerBoundPlaceholder(playerFunction, player -> function.apply(player).toString());
+            } else {
+                String format = "%0" + tokens[0] + "d";
+                return new PlayerBoundPlaceholder(playerFunction, player -> String.format(format, function.apply(player)));
+            }
+        };
+    }
+
+    private static BiFunction<String[], Function<Context, Player>, Placeholder> ofDoubleData(DataKey<Double> dataKey) {
+        return (tokens, playerFunction) -> {
+            if (tokens.length == 0) {
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(Object::toString).orElse(""));
+            } else {
+                String format = "%0" + tokens[0] + "f";
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(i -> String.format(format, i)).orElse(""));
+            }
+        };
+    }
+
+    private static BiFunction<String[], Function<Context, Player>, Placeholder> ofFloatData(DataKey<Float> dataKey) {
+        return (tokens, playerFunction) -> {
+            if (tokens.length == 0) {
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(Object::toString).orElse(""));
+            } else {
+                String format = "%0" + tokens[0] + "f";
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(i -> String.format(format, i)).orElse(""));
+            }
+        };
     }
 }
