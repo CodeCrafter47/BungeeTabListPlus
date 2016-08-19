@@ -19,6 +19,7 @@
         <module>api-sponge</module>
         <module>sponge</module>
         <module>example</module>
+        <module>bootstrap-bungee-debug</module>
     </modules>
 
     <properties>

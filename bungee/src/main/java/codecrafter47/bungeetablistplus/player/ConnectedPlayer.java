@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.Options;
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
@@ -30,6 +31,7 @@ import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.tablisthandler.LegacyTabList;
+import codecrafter47.bungeetablistplus.tablisthandler.LoggingTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.LowMemoryTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.RewriteLogic;
@@ -174,9 +176,14 @@ public class ConnectedPlayer implements Player {
     @SneakyThrows
     private void createTabListHandler() {
         if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(getPlayer())) {
-            //TabListLogic tabListLogic = new TabListLogic(null, getPlayer());
-            // TODO: revert this change as soon as the underlying issue is fixed
-            TabListLogic tabListLogic = new LowMemoryTabListLogic(null, getPlayer());
+            TabListLogic tabListLogic;
+            if (Options.DEBUG) {
+                tabListLogic = new LoggingTabListLogic(null, getPlayer());
+            } else {
+                //TabListLogic tabListLogic = new TabListLogic(null, getPlayer());
+                // TODO: revert this change as soon as the underlying issue is fixed
+                tabListLogic = new LowMemoryTabListLogic(null, getPlayer());
+            }
             playerTablistHandler = PlayerTablistHandler.create(getPlayer(), tabListLogic);
             packetHandler = new RewriteLogic(tabListLogic);
             if (ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop().inEventLoop()) {

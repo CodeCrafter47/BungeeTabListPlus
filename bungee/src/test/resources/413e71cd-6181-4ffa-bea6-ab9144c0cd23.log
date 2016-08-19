@@ -1,0 +1,277 @@
+connect "d9935dff-9702-404b-9d44-8efd35b0928d"
+serverSwitch null
+pli {"action":"REMOVE_PLAYER","items":[]}
+size 60
+passThrough false
+set {"index":0,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":1,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"vault: \"}","ping":1000}
+set {"index":2,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":3,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":4,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":5,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":6,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":7,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":8,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":9,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":10,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":11,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":12,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":13,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":14,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":15,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":16,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":17,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":18,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§cTime: §601:42:03\"}","ping":0}
+set {"index":20,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§cRank: §6default\"}","ping":0}
+set {"index":21,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"pex: \"}","ping":1000}
+set {"index":22,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":23,"skin":{"owner":"d9935dff-9702-404b-9d44-8efd35b0928d","skin":"Skin-1"},"text":"{\"text\":\"CodeCrafter47\"}","ping":0}
+set {"index":24,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":25,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":26,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":27,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":28,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":29,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":30,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":31,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":32,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":33,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":34,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":35,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":36,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":37,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":38,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":39,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§cPing: §6100ms\"}","ping":0}
+set {"index":41,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":42,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":43,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":44,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":45,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":46,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":47,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":48,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":49,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":50,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":51,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":52,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":53,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":54,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":55,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":56,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":57,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":58,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":59,"skin":{"owner":"null","skin":"Skin-0"},"text":"{\"text\":\"§cBalance: §6-\"}","ping":0}
+set {"index":18,"skin":{"owner":"null","skin":"Skin-2"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":20,"skin":{"owner":"null","skin":"Skin-3"},"text":"{\"text\":\"§cRank: §6default\"}","ping":0}
+set {"index":38,"skin":{"owner":"null","skin":"Skin-2"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":58,"skin":{"owner":"null","skin":"Skin-2"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":0,"skin":{"owner":"null","skin":"Skin-4"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":1,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"vault: \"}","ping":1000}
+set {"index":2,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":3,"skin":{"owner":"null","skin":"Skin-6"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":4,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":5,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":6,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":7,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":8,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":9,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":10,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":11,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":12,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":13,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":14,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":15,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":16,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":17,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:03\"}","ping":0}
+set {"index":21,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"pex: \"}","ping":1000}
+set {"index":22,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":24,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":25,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":26,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":27,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":28,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":29,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":30,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":31,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":32,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":33,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":34,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":35,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":36,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":37,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":39,"skin":{"owner":"null","skin":"Skin-8"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §6100ms\"}","ping":0}
+set {"index":41,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":42,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":43,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":44,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":45,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":46,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":47,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":48,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":49,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":50,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":51,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":52,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":53,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":54,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":55,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":56,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":57,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":59,"skin":{"owner":"null","skin":"Skin-10"},"text":"{\"text\":\"§cBalance: §6-\"}","ping":0}
+team {"name":"2b59f6d4-e5ab-28","mode":0,"displayName":"2b59f6d4-e5ab-28","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"always","color":-1,"friendlyFire":3,"players":["CodeCrafter47"]}
+team {"name":"9c202c85-1fd8-2a","mode":0,"displayName":"9c202c85-1fd8-2a","prefix":"","suffix":"","nameTagVisibility":"never","collisionRule":"always","color":-1,"friendlyFire":3,"players":[]}
+team {"name":"c5054646-5e81-22","mode":0,"displayName":"c5054646-5e81-22","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"always","color":-1,"friendlyFire":3,"players":["CodeCrafter"]}
+team {"name":"2b59f6d4-e5ab-28","mode":1,"color":0,"friendlyFire":0}
+team {"name":"9c202c85-1fd8-2a","mode":1,"color":0,"friendlyFire":0}
+team {"name":"c5054646-5e81-22","mode":1,"color":0,"friendlyFire":0}
+pli {"action":"ADD_PLAYER","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","username":"CodeCrafter47","ping":0,"gamemode":1,"properties":"Skin-1"}]}
+pli {"action":"ADD_PLAYER","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","username":"CodeCrafter47","ping":0,"gamemode":1,"properties":"Skin-1"}]}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:04\"}","ping":0}
+set {"index":1,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"vault: a\"}","ping":1000}
+set {"index":20,"skin":{"owner":"null","skin":"Skin-3"},"text":"{\"text\":\"§cRank: §6a\"}","ping":0}
+set {"index":21,"skin":{"owner":"null","skin":"Skin-5"},"text":"{\"text\":\"pex: a\"}","ping":1000}
+set {"index":59,"skin":{"owner":"null","skin":"Skin-10"},"text":"{\"text\":\"§cBalance: §60,00\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:05\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §633ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:06\"}","ping":0}
+pli {"action":"UPDATE_LATENCY","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","ping":8,"gamemode":0,"properties":"Skin-11"}]}
+team {"name":"EmojiUtils0","mode":0,"displayName":"EmojiUtils0","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"always","color":-1,"friendlyFire":3,"players":[]}
+team {"name":"EmojiUtils0","mode":3,"color":0,"friendlyFire":0,"players":["CodeCrafter47"]}
+team {"name":"EmojiUtils0","mode":2,"displayName":"EmojiUtils0","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"never","color":-1,"friendlyFire":3}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:07\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:08\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:09\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:10\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:11\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:12\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:13\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:14\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:15\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:16\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:17\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:18\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:19\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:20\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:21\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:22\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:23\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:24\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:25\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:26\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:27\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:28\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:29\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:30\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §618ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:31\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:32\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:33\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:34\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:35\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:36\"}","ping":0}
+pli {"action":"UPDATE_LATENCY","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","ping":2,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:37\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:38\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:39\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:40\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:41\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:42\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:43\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:44\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:45\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:46\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:47\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:48\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:49\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:50\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:51\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:52\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:53\"}","ping":0}
+pli {"action":"UPDATE_DISPLAY_NAME","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","displayName":"{\"extra\":[{\"color\":\"gray\",\"text\":\"CodeCrafter47\"}],\"text\":\"\"}","ping":0,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":23,"skin":{"owner":"d9935dff-9702-404b-9d44-8efd35b0928d","skin":"Skin-1"},"text":"{\"text\":\"§7CodeCrafter47\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:54\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:55\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:56\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:57\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:58\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:42:59\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:00\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:01\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:02\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:03\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:04\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:05\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:06\"}","ping":0}
+pli {"action":"UPDATE_LATENCY","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","ping":0,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:07\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:08\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:09\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:10\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:11\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:12\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:13\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:14\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:15\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:16\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:17\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:18\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:19\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:20\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:21\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:22\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:23\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:24\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:25\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:26\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:27\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:28\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:29\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:30\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:31\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:32\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:33\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:34\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:35\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:36\"}","ping":0}
+pli {"action":"UPDATE_LATENCY","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","ping":0,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:37\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:38\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:39\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:40\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:41\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:42\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:43\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:44\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:45\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:46\"}","ping":0}
+set {"index":40,"skin":{"owner":"null","skin":"Skin-9"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:47\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:48\"}","ping":0}
+set {"index":19,"skin":{"owner":"null","skin":"Skin-7"},"text":"{\"text\":\"§cTime: §601:43:49\"}","ping":0}
+disconnect null

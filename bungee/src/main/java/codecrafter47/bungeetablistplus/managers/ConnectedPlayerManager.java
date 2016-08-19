@@ -22,6 +22,8 @@ package codecrafter47.bungeetablistplus.managers;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import codecrafter47.bungeetablistplus.protocol.PacketHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListHandler;
 import com.google.common.collect.ImmutableList;
 import lombok.Synchronized;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -90,5 +92,9 @@ public class ConnectedPlayerManager implements IPlayerProvider {
         BungeeTabListPlus.getInstance().getBridge().onDisconnected(player.getPlayer());
         playerList = ImmutableList.copyOf((Iterable<? extends ConnectedPlayer>) players);
         player.getPlayerTablistHandler().onDisconnect();
+        PacketHandler packetHandler = player.getPacketHandler();
+        if (packetHandler instanceof TabListHandler) {
+            ((TabListHandler) packetHandler).onDisconnected();
+        }
     }
 }

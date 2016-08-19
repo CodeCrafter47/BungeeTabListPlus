@@ -1,0 +1,358 @@
+connect "d9935dff-9702-404b-9d44-8efd35b0928d"
+serverSwitch null
+pli {"action":"REMOVE_PLAYER","items":[]}
+team {"name":"2b59f6d4-e5ab-28","mode":0,"displayName":"2b59f6d4-e5ab-28","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"always","color":-1,"friendlyFire":3,"players":["CodeCrafter47"]}
+team {"name":"9c202c85-1fd8-2a","mode":0,"displayName":"9c202c85-1fd8-2a","prefix":"","suffix":"","nameTagVisibility":"never","collisionRule":"always","color":-1,"friendlyFire":3,"players":[]}
+team {"name":"c5054646-5e81-22","mode":0,"displayName":"c5054646-5e81-22","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"always","color":-1,"friendlyFire":3,"players":["CodeCrafter"]}
+team {"name":"2b59f6d4-e5ab-28","mode":1,"color":0,"friendlyFire":0}
+team {"name":"9c202c85-1fd8-2a","mode":1,"color":0,"friendlyFire":0}
+team {"name":"c5054646-5e81-22","mode":1,"color":0,"friendlyFire":0}
+pli {"action":"ADD_PLAYER","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","username":"CodeCrafter47","ping":0,"gamemode":1,"properties":"Skin-0"}]}
+pli {"action":"ADD_PLAYER","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","username":"CodeCrafter47","ping":0,"gamemode":1,"properties":"Skin-0"}]}
+size 60
+passThrough false
+set {"index":0,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"vault: \"}","ping":1000}
+set {"index":2,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":3,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":4,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":5,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":6,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":7,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":8,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":9,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":10,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":11,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":12,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":13,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":14,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":15,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":16,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":17,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":18,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cTime: §601:54:14\"}","ping":0}
+set {"index":20,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cRank: §6default\"}","ping":0}
+set {"index":21,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"pex: \"}","ping":1000}
+set {"index":22,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":23,"skin":{"owner":"d9935dff-9702-404b-9d44-8efd35b0928d","skin":"Skin-0"},"text":"{\"text\":\"CodeCrafter47\"}","ping":0}
+set {"index":24,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":25,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":26,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":27,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":28,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":29,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":30,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":31,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":32,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":33,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":34,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":35,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":36,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":37,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":38,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cPing: §6100ms\"}","ping":0}
+set {"index":41,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":42,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":43,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":44,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":45,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":46,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":47,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":48,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":49,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":50,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":51,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":52,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":53,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":54,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":55,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":56,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":57,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":58,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":59,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cBalance: §6-\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"vault: \"}","ping":1000}
+set {"index":2,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":4,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":18,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:14\"}","ping":0}
+set {"index":21,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"pex: \"}","ping":1000}
+set {"index":22,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":38,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-5"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §6100ms\"}","ping":0}
+set {"index":41,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":42,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":58,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":59,"skin":{"skin":"Skin-7"},"text":"{\"text\":\"§cBalance: §6-\"}","ping":0}
+set {"index":0,"skin":{"skin":"Skin-8"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":20,"skin":{"skin":"Skin-9"},"text":"{\"text\":\"§cRank: §6default\"}","ping":0}
+set {"index":3,"skin":{"skin":"Skin-10"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"vault: a\"}","ping":1000}
+set {"index":20,"skin":{"skin":"Skin-9"},"text":"{\"text\":\"§cRank: §6a\"}","ping":0}
+set {"index":21,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"pex: a\"}","ping":1000}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:15\"}","ping":0}
+set {"index":59,"skin":{"skin":"Skin-7"},"text":"{\"text\":\"§cBalance: §60,00\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:16\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+team {"name":"EmojiUtils0","mode":0,"displayName":"EmojiUtils0","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"always","color":-1,"friendlyFire":3,"players":[]}
+team {"name":"EmojiUtils0","mode":3,"color":0,"friendlyFire":0,"players":["CodeCrafter47"]}
+team {"name":"EmojiUtils0","mode":2,"displayName":"EmojiUtils0","prefix":"","suffix":"","nameTagVisibility":"always","collisionRule":"never","color":-1,"friendlyFire":3}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:17\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:18\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:19\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:20\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:21\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:22\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:23\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:24\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:25\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:26\"}","ping":0}
+pli {"action":"UPDATE_DISPLAY_NAME","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","displayName":"{\"extra\":[{\"color\":\"gray\",\"text\":\"CodeCrafter47\"}],\"text\":\"\"}","ping":0,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:27\"}","ping":0}
+set {"index":23,"skin":{"owner":"d9935dff-9702-404b-9d44-8efd35b0928d","skin":"Skin-0"},"text":"{\"text\":\"§7CodeCrafter47\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:28\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:29\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:30\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:31\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:32\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:33\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:34\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:35\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:36\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:37\"}","ping":0}
+pli {"action":"UPDATE_LATENCY","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","ping":0,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:38\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:39\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:40\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:41\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:42\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:43\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:44\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:45\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:46\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:47\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:48\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:49\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:50\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:51\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:52\"}","ping":0}
+size 80
+set {"index":0,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"pex: a\"}","ping":1000}
+set {"index":2,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":3,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":4,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":18,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":19,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":20,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§cRank: §6a\"}","ping":0}
+set {"index":21,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":38,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":39,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§cTime: §601:54:52\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":41,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":58,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":59,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":60,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"vault: a\"}","ping":1000}
+set {"index":61,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":62,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":63,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":64,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":65,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":66,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":67,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":68,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":69,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":70,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":71,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":72,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":73,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":74,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":75,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":76,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":77,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":78,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":79,"skin":{"skin":"Skin-12"},"text":"{\"text\":\"§cBalance: §60,00\"}","ping":0}
+set {"index":0,"skin":{"skin":"Skin-8"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"pex: a\"}","ping":1000}
+set {"index":2,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":3,"skin":{"skin":"Skin-10"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":4,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":20,"skin":{"skin":"Skin-9"},"text":"{\"text\":\"§cRank: §6a\"}","ping":0}
+set {"index":21,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":41,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":59,"skin":{"skin":"Skin-5"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":60,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"vault: a\"}","ping":1000}
+set {"index":61,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":19,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:52\"}","ping":0}
+set {"index":58,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":78,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":79,"skin":{"skin":"Skin-7"},"text":"{\"text\":\"§cBalance: §60,00\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:53\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:54\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:55\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:56\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:57\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:58\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:54:59\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:00\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:01\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:02\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:03\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:04\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:05\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:06\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:07\"}","ping":0}
+pli {"action":"UPDATE_LATENCY","items":[{"uuid":"d9935dff-9702-404b-9d44-8efd35b0928d","ping":0,"gamemode":0,"properties":"Skin-11"}]}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:08\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:09\"}","ping":0}
+set {"index":40,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:10\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:11\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:12\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:13\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:14\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:15\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:16\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:17\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:18\"}","ping":0}
+size 57
+set {"index":0,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"vault: a\"}","ping":1000}
+set {"index":2,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":3,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":4,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":5,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":6,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":7,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":8,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":9,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":10,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":11,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":12,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":13,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":14,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":15,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":16,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":17,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cTime: §601:55:18\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cRank: §6a\"}","ping":0}
+set {"index":20,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"pex: a\"}","ping":1000}
+set {"index":21,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":22,"skin":{"owner":"d9935dff-9702-404b-9d44-8efd35b0928d","skin":"Skin-0"},"text":"{\"text\":\"§7CodeCrafter47\"}","ping":0}
+set {"index":23,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":24,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":25,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":26,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":27,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":28,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":29,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":30,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":31,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":32,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":33,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":34,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":35,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":36,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":37,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":38,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":39,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":40,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":41,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":42,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":43,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":44,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":45,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":46,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":47,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":48,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":49,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":50,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":51,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":52,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":53,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":54,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":55,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":56,"skin":{"skin":"Skin-1"},"text":"{\"text\":\"§cBalance: §60,00\"}","ping":0}
+set {"index":1,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"vault: a\"}","ping":1000}
+set {"index":2,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":4,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":5,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":6,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":7,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":8,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":9,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":10,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":11,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":12,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":13,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":14,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":15,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":16,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:18\"}","ping":0}
+set {"index":20,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"pex: a\"}","ping":1000}
+set {"index":21,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":23,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":24,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":25,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":26,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":27,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":28,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":29,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":30,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":31,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":32,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":33,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":34,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":35,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":39,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":40,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":41,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":42,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":43,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":44,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":45,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":46,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":47,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":48,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":49,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":50,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":51,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":52,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":53,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":54,"skin":{"skin":"Skin-2"},"text":"{\"text\":\"\"}","ping":1000}
+set {"index":56,"skin":{"skin":"Skin-7"},"text":"{\"text\":\"§cBalance: §60,00\"}","ping":0}
+set {"index":3,"skin":{"skin":"Skin-10"},"text":"{\"text\":\"§e§ncreative§f§o (1):\"}","ping":0}
+set {"index":0,"skin":{"skin":"Skin-8"},"text":"{\"text\":\"§cServer: §6creative\"}","ping":0}
+set {"index":17,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":19,"skin":{"skin":"Skin-9"},"text":"{\"text\":\"§cRank: §6a\"}","ping":0}
+set {"index":36,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":37,"skin":{"skin":"Skin-5"},"text":"{\"text\":\"§cPlayers: §61\"}","ping":0}
+set {"index":38,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §60ms\"}","ping":0}
+set {"index":55,"skin":{"skin":"Skin-3"},"text":"{\"text\":\"§6\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:19\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:20\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:21\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:22\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:23\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:24\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:25\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:26\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:27\"}","ping":0}
+set {"index":38,"skin":{"skin":"Skin-6"},"text":"{\"text\":\"§cPing: §61ms\"}","ping":0}
+set {"index":18,"skin":{"skin":"Skin-4"},"text":"{\"text\":\"§cTime: §601:55:28\"}","ping":0}
+disconnect null

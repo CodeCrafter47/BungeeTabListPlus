@@ -38,9 +38,6 @@ manifest.mf
 *.iws
 .idea/
 
-# other files
-*.log*
-
 # delombok
 */src/main/lombok
 

@@ -32,7 +32,6 @@ import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,7 +39,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class AbstractTabListLogicTest {
+public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
     private static final String[] usernames = new String[160];
     private static final UUID[] uuids = new UUID[160];
 
@@ -53,23 +52,9 @@ public class AbstractTabListLogicTest {
         assertEquals(ImmutableSet.copyOf(usernames).size(), usernames.length);
     }
 
-    private final static UUID clientUUID = uuids[47];
-
-    private ClientTabList clientTabList;
-    private AbstractTabListLogic tabListHandler;
-
     @Before
-    public void setUp() throws Exception {
-        clientTabList = new ClientTabList();
-        tabListHandler = new MockTabListLogic(clientTabList);
-        tabListHandler.onConnected();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        tabListHandler.onDisconnected();
-        tabListHandler = null;
-        clientTabList = null;
+    public void setClientUUID() {
+        clientUUID = uuids[47];
     }
 
     @Test
@@ -687,7 +672,7 @@ public class AbstractTabListLogicTest {
         }
     }
 
-    private static class ClientTabList {
+    private class ClientTabList {
         private final Map<UUID, TabListEntry> entries = new HashMap<>();
         private final Map<String, Team> teams = new HashMap<>();
         private final Map<String, String> playerToTeamMap = new HashMap<>();
@@ -733,7 +718,7 @@ public class AbstractTabListLogicTest {
         }
     }
 
-    private static class MockTabListLogic extends AbstractTabListLogic {
+    private class MockTabListLogic extends AbstractTabListLogic {
         private final ClientTabList clientTabList;
 
         public MockTabListLogic(ClientTabList clientTabList) {
