@@ -30,6 +30,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Listener {
@@ -54,7 +55,7 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
         bind(DataKeys.BungeePerms_PrimaryGroupPrefix, permissionManager::getPrimaryGroupPrefixFromBungeePerms);
         bind(DataKeys.BungeePerms_PlayerPrefix, permissionManager::getPlayerPrefixFromBungeePerms);
         bind(DataKeys.ClientVersion, player1 -> BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersionString(player1));
-        bind(DataKeys.BungeeCord_SessionDuration, p -> bungeeTabListPlus.getConnectedPlayerManager().getPlayer(p).getCurrentSessionDuration());
+        bind(DataKeys.BungeeCord_SessionDuration, p -> Optional.ofNullable(bungeeTabListPlus.getConnectedPlayerManager().getPlayerIfPresent(p)).map(ConnectedPlayer::getCurrentSessionDuration).orElse(null));
     }
 
     @SuppressWarnings("unchecked")
