@@ -656,6 +656,53 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[0])).getPrefix());
     }
 
+    @Test
+    public void testTeamPropertyPassthroughServerSwitch() {
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item[] items = new PlayerListItem.Item[50];
+        for (int i = 0; i < 50; i++) {
+            PlayerListItem.Item item = new PlayerListItem.Item();
+            item.setUsername(usernames[i]);
+            item.setUuid(uuids[i]);
+            item.setPing(15);
+            item.setProperties(new String[0][]);
+            item.setGamemode(0);
+            items[i] = item;
+
+            if (i < 25) {
+                net.md_5.bungee.protocol.packet.Team team = new net.md_5.bungee.protocol.packet.Team("Team " + i);
+                team.setPlayers(new String[]{usernames[i]});
+                team.setMode((byte) 0);
+                team.setPrefix("prefix " + i);
+                team.setCollisionRule("always");
+                team.setNameTagVisibility("always");
+                tabListHandler.onTeamPacket(team);
+            }
+        }
+        packet.setItems(items);
+        tabListHandler.onPlayerListPacket(packet);
+        tabListHandler.setSize(60);
+        tabListHandler.setPassThrough(false);
+
+        for (int i = 0; i < 25; i++) {
+            assertEquals("prefix " + i, clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
+        }
+        for (int i = 25; i < 50; i++) {
+            assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
+        }
+
+        tabListHandler.onServerSwitch();
+
+        tabListHandler.onPlayerListPacket(packet);
+        tabListHandler.setSize(60);
+        tabListHandler.setPassThrough(false);
+
+        for (int i = 0; i < 50; i++) {
+            assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
+        }
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

@@ -637,9 +637,6 @@ public abstract class AbstractTabListLogic extends TabListHandler {
 
     @Override
     public void onServerSwitch() {
-        serverTeams.clear();
-        playerToTeamMap.clear();
-
         PlayerListItem packet = new PlayerListItem();
         packet.setAction(REMOVE_PLAYER);
 
@@ -653,6 +650,9 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         if (onPlayerListPacketInternal(packet) != PacketListenerResult.CANCEL) {
             sendPacket(packet);
         }
+
+        serverTeams.clear();
+        playerToTeamMap.clear();
 
         serverTabList.clear();
         serverHeader = null;
