@@ -25,6 +25,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableSet;
+import it.unimi.dsi.fastutil.ints.IntCollection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -833,6 +834,16 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
                     //assertEquals("ping passthrough", item.getPing(), entry.getPing());
                     //assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
                     assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
+                    IntCollection collection = skinUuidToSlotMap.get(item.getUuid());
+                    if (!collection.isEmpty()) {
+                        int match = 0;
+                        for (Integer i : collection) {
+                            if (clientTabList.getVisibleEntries().get(i) == entry) {
+                                match++;
+                            }
+                        }
+                        assertTrue(match == 1);
+                    }
                 }
             }
         }
