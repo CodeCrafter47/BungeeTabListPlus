@@ -20,6 +20,7 @@
         <module>sponge</module>
         <module>example</module>
         <module>bootstrap-bungee-debug</module>
+        <module>yaml-config</module>
     </modules>
 
     <properties>

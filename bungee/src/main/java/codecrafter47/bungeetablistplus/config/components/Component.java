@@ -21,9 +21,24 @@ package codecrafter47.bungeetablistplus.config.components;
 
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.yamlconfig.Factory;
+import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
 import com.google.common.base.Preconditions;
 
+import java.util.List;
+
+@Subtype(type = AnimatedComponent.class, tag = "!animated")
+@Subtype(type = ConditionalComponent.class, tag = "!conditional")
+@Subtype(type = TableComponent.class, tag = "!table")
+@Subtype(type = PlayersByServerComponent.class, tag = "!players_by_server")
+@Subtype(type = PlayersComponent.class, tag = "!players")
+@Subtype(type = BasicComponent.class)
 public abstract class Component {
+
+    @Factory
+    public static Component fromList(List<Component> list) {
+        return new ListComponent(list);
+    }
 
     public abstract boolean hasConstantSize();
 

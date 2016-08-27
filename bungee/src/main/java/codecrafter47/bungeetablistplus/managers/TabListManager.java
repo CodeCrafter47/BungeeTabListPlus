@@ -22,13 +22,13 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.config.Config;
 import codecrafter47.bungeetablistplus.config.ITabListConfig;
-import codecrafter47.bungeetablistplus.config.NewConfig;
 import codecrafter47.bungeetablistplus.config.old.ConfigParser;
 import codecrafter47.bungeetablistplus.config.old.TabListConfig;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.IConfigTabListProvider;
+import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -81,7 +81,7 @@ public class TabListManager implements Listener {
                 try {
                     plugin.getLogger().log(Level.INFO, "Loading {0}", file.getName());
 
-                    ITabListConfig tabListConfig = NewConfig.read(new FileInputStream(file));
+                    ITabListConfig tabListConfig = YamlConfig.read(new FileInputStream(file), ITabListConfig.class);
 
                     if (tabListConfig instanceof TabListConfig) {
                         TabListConfig c = (TabListConfig) tabListConfig;

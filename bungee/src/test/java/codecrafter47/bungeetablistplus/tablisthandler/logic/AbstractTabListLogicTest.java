@@ -846,6 +846,16 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
                     }
                 }
             }
+            for (Map.Entry<String, String> entry : playerToTeamMap.entrySet()) {
+                String s = clientTabList.playerToTeamMap.get(entry.getKey());
+                assertNotNull(s);
+                Team team = clientTabList.teams.get(s);
+                assertNotNull(team);
+                TeamData serverTeam = serverTeams.get(entry.getValue());
+                assertEquals(serverTeam.getPrefix(), team.getPrefix());
+                assertEquals(serverTeam.getSuffix(), team.getSuffix());
+            }
+
         }
 
         @Override

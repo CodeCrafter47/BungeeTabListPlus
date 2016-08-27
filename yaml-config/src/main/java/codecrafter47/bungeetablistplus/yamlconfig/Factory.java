@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.config;
+package codecrafter47.bungeetablistplus.yamlconfig;
 
-import codecrafter47.bungeetablistplus.config.old.TabListConfig;
-import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Subtype(type = FixedSizeConfig.class, property = "type", value = "FIXED_SIZE")
-@Subtype(type = DynamicSizeConfig.class, property = "type", value = "DYNAMIC_SIZE")
-@Subtype(type = TabListConfig.class)
-public interface ITabListConfig {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Factory {
 }
