@@ -20,12 +20,14 @@
 package codecrafter47.bungeetablistplus.context;
 
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
+import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
 import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 public class Context {
 
@@ -41,6 +43,7 @@ public class Context {
     private int columns = -1;
     private ServerInfo server;
     private PlayerSets playerSets = null;
+    private Map<String, CustomPlaceholder> customPlaceholders = null;
 
     // Constructor
     public Context() {
@@ -129,6 +132,15 @@ public class Context {
 
     public Context setServerPlayerCount(int serverPlayerCount) {
         this.serverPlayerCount = serverPlayerCount;
+        return this;
+    }
+
+    public Map<String, CustomPlaceholder> getCustomPlaceholders() {
+        return customPlaceholders != null ? customPlaceholders : parent != null ? parent.getCustomPlaceholders() : null;
+    }
+
+    public Context setCustomPlaceholders(Map<String, CustomPlaceholder> customPlaceholders) {
+        this.customPlaceholders = customPlaceholders;
         return this;
     }
 }

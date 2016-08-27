@@ -61,6 +61,7 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
         this.context = context;
         this.context.setColumns(getColumns());
         this.context.setPlayerSets(playerSets = new PlayerSets());
+        this.context.setCustomPlaceholders(config.getCustomPlaceholders());
         this.context.setTablist(this);
         init();
     }

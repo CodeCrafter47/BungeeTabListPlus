@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.template.TextTemplate;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,8 @@ public class Config implements ITabListConfig {
     private List<TextTemplate> footer;
 
     private float footerAnimationUpdateInterval;
+
+    private Map<String, CustomPlaceholder> customPlaceholders = new HashMap<>();
 
     private Map<String, PlayerSet> playerSets;
 }

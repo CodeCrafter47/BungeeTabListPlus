@@ -102,6 +102,7 @@ public abstract class Placeholder {
         playerPlaceholders.put("session_duration_seconds", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
         playerPlaceholders.put("session_duration_minutes", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
         playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
+        playerPlaceholders.put("essentials_afk", ofFunction(p -> p.get(DataKeys.Essentials_IsAFK).orElse(false).toString()));
 
         // Server
         serverPlaceholders.put("tps", serverInfo -> BungeeTabListPlus.getInstance().getBridge().get(serverInfo, DataKeys.TPS).map(d -> String.format("%1.1f", d)).orElse(""));
@@ -142,7 +143,7 @@ public abstract class Placeholder {
         } else if ("other_count".equals(tokens[0])) {
             return OTHER_COUNT_PLACEHOLDER;
         } else {
-            return NULL_PLACEHOLDER;
+            return new CustomPlaceholder(tokens[0]);
         }
     }
 
@@ -253,6 +254,20 @@ public abstract class Placeholder {
         @Override
         public String evaluate(Context context) {
             return format.format(System.currentTimeMillis());
+        }
+    }
+
+    @AllArgsConstructor
+    private static class CustomPlaceholder extends Placeholder {
+        String id;
+
+        @Override
+        public String evaluate(Context context) {
+            if (context.getCustomPlaceholders().containsKey(id)) {
+                return context.getCustomPlaceholders().get(id).evaluate(context);
+            } else {
+                return "";
+            }
         }
     }
 
