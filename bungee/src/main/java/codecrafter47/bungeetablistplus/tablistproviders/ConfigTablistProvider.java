@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.tablistproviders;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.config.Config;
+import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
 import codecrafter47.bungeetablistplus.config.PlayerSet;
 import codecrafter47.bungeetablistplus.config.PlayerVisibility;
 import codecrafter47.bungeetablistplus.context.Context;
@@ -36,6 +37,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,7 +63,10 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
         this.context = context;
         this.context.setColumns(getColumns());
         this.context.setPlayerSets(playerSets = new PlayerSets());
-        this.context.setCustomPlaceholders(config.getCustomPlaceholders());
+        Map<String, CustomPlaceholder> customPlaceholderMap = new HashMap<>();
+        customPlaceholderMap.putAll(BungeeTabListPlus.getInstance().getConfig().customPlaceholders);
+        customPlaceholderMap.putAll(config.getCustomPlaceholders());
+        this.context.setCustomPlaceholders(customPlaceholderMap);
         this.context.setTablist(this);
         init();
     }

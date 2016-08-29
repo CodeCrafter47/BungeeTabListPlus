@@ -185,6 +185,9 @@ public class MainConfig implements UpdatableConfig {
     @Path("time-zone")
     public String timezone = TimeZone.getDefault().getID();
 
+    @Comment("Custom placeholders")
+    public Map<String, CustomPlaceholder> customPlaceholders = new HashMap<>();
+
     public TimeZone getTimeZone() {
         return TimeZone.getTimeZone(timezone);
     }
