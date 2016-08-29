@@ -53,6 +53,10 @@
                         <configuration>
                             <relocations>
                                 <relocation>
+                                    <pattern>codecrafter47.util</pattern>
+                                    <shadedPattern>codecrafter47.bungeetablistplus.util</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>it.unimi.dsi.fastutil</pattern>
                                     <shadedPattern>
                                         codecrafter47.bungeetablistplus.libs.fastutil

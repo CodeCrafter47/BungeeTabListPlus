@@ -28,7 +28,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class UpdateChecker implements Runnable {
@@ -38,19 +37,12 @@ public class UpdateChecker implements Runnable {
     private boolean updateAvailable = false;
     private boolean newDevBuildAvailable = false;
 
-    private static final long interval = 120;
+    public static final long interval = 120;
 
     private boolean error = false;
 
     public UpdateChecker(Plugin plugin) {
         this.plugin = plugin;
-        enable();
-    }
-
-    private void enable() {
-        plugin.getLogger().info("Starting UpdateChecker Task");
-        plugin.getProxy().getScheduler().schedule(plugin, this, 0,
-                interval, TimeUnit.MINUTES).getId();
     }
 
     @Override

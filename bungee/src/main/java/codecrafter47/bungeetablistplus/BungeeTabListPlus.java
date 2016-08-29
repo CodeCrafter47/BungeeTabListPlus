@@ -23,7 +23,7 @@ import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvide
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
-import codecrafter47.bungeetablistplus.commands.SuperCommand;
+import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.Constants;
@@ -322,7 +322,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         // register commands and update Notifier
         ProxyServer.getInstance().getPluginManager().registerCommand(
                 plugin,
-                new SuperCommand(this));
+                new CommandBungeeTabListPlus());
         ProxyServer.getInstance().getScheduler().schedule(plugin,
                 new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
 
@@ -337,6 +337,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         // Load updateCheck thread
         if (config.checkForUpdates) {
             updateChecker = new UpdateChecker(plugin);
+            plugin.getLogger().info("Starting UpdateChecker Task");
+            plugin.getProxy().getScheduler().schedule(plugin, updateChecker, 0,
+                    UpdateChecker.interval, TimeUnit.MINUTES).getId();
         }
 
         // Start packet listeners

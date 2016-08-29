@@ -33,15 +33,16 @@ import java.util.logging.Level;
 
 public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager {
     private List<FakePlayer> online = new CopyOnWriteArrayList<>();
-    private List<String> offline;
+    private List<String> offline = new ArrayList<>();
     private final Plugin plugin;
-    private boolean randomJoinLeaveEventsEnabled = true;
+    private boolean randomJoinLeaveEventsEnabled = false;
 
     public FakePlayerManagerImpl(final Plugin plugin) {
         this.plugin = plugin;
         if (BungeeTabListPlus.getInstance().getConfig().fakePlayers.size() > 0) {
+            randomJoinLeaveEventsEnabled = true;
             offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
-            sanitazeFakePlayerNames();
+            sanitizeFakePlayerNames();
             plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -79,14 +80,14 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
 
     public void reload() {
         offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
-        sanitazeFakePlayerNames();
+        sanitizeFakePlayerNames();
         online = new CopyOnWriteArrayList<>();
         for (int i = offline.size(); i > 0; i--) {
             triggerRandomEvent();
         }
     }
 
-    private void sanitazeFakePlayerNames() {
+    private void sanitizeFakePlayerNames() {
         for (Iterator<?> iterator = offline.iterator(); iterator.hasNext(); ) {
             Object name = iterator.next();
             if (name == null || !(name instanceof String)) {
