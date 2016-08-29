@@ -20,20 +20,25 @@
 package codecrafter47.bungeetablistplus.yamlconfig;
 
 import lombok.SneakyThrows;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
+import org.yaml.snakeyaml.introspector.BeanAccess;
+import org.yaml.snakeyaml.introspector.FieldProperty;
 import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.nodes.*;
 import org.yaml.snakeyaml.reader.UnicodeReader;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.beans.IntrospectionException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.io.Writer;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,7 +63,11 @@ public class YamlConfig {
     private static final ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() {
         @Override
         protected Yaml initialValue() {
-            return new Yaml(new MyConstructor());
+            MyConstructor constructor = new MyConstructor();
+            constructor.setPropertyUtils(new MyPropertyUtils());
+            DumperOptions dumperOptions = new DumperOptions();
+            dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            return new Yaml(constructor, new Representer(), dumperOptions);
         }
     };
 
@@ -70,7 +79,69 @@ public class YamlConfig {
         return yaml.get().loadAs(reader, type);
     }
 
-    private static class MyConstructor extends Constructor {
+    public static void writeWithComments(Writer writer, Object object, String... header) throws IOException {
+        for (String line : header) {
+            writeCommentLine(writer, line);
+        }
+
+        Yaml yaml = YamlConfig.yaml.get();
+
+        String ser = yaml.dumpAs(object, Tag.MAP, null);
+
+        Map<String, String[]> comments = new HashMap<>();
+        for (Class<?> c = object.getClass(); c != null; c = c.getSuperclass()) {
+            for (Field field : c.getDeclaredFields()) {
+                Comment comment = field.getAnnotation(Comment.class);
+                if (comment != null) {
+                    int modifiers = field.getModifiers();
+                    if (!Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers)) {
+                        if (Modifier.isPublic(modifiers)) {
+                            Path path = field.getAnnotation(Path.class);
+                            comments.put(path != null ? path.value() : field.getName(), comment.value());
+                        }
+                    }
+                }
+            }
+        }
+
+        ArrayList<String> lines = new ArrayList<>(Arrays.asList(ser.split("\n")));
+
+        ListIterator<String> iterator = lines.listIterator();
+
+        while (iterator.hasNext()) {
+            String line = iterator.next();
+            for (Map.Entry<String, String[]> entry : comments.entrySet()) {
+                if (line.startsWith(entry.getKey())) {
+                    String[] value = entry.getValue();
+                    iterator.previous();
+                    iterator.add("");
+                    for (String comment : value) {
+                        iterator.add("# " + comment);
+                    }
+                    iterator.next();
+                }
+            }
+        }
+
+        for (String line : lines) {
+            writer.write(line);
+            writer.write("\n");
+        }
+
+        writer.close();
+    }
+
+    private static void writeCommentLine(Writer writer, String comment) throws IOException {
+        writer.write("# " + comment + "\n");
+    }
+
+    private static class MyConstructor extends CustomClassLoaderConstructor {
+
+        public MyConstructor() {
+            super(YamlConfig.class.getClassLoader());
+            yamlClassConstructors.put(NodeId.mapping, new ConstructMapping());
+        }
+
         @Override
         @SneakyThrows
         protected Object constructObject(Node node) {
@@ -111,7 +182,6 @@ public class YamlConfig {
             for (Subtype subtype : subtypes) {
                 if (!subtype.tag().isEmpty()) {
                     if (subtype.tag().equals(node.getTag().getValue())) {
-                        ensureTypeDefinitionPresent(subtype.type());
                         node.setType(subtype.type());
                         node.setTag(new Tag(subtype.type()));
                         defaultType = null;
@@ -125,7 +195,6 @@ public class YamlConfig {
                             if (subtype.property().equals(key)) {
                                 if (tuple.getValueNode() instanceof ScalarNode) {
                                     if (((ScalarNode) tuple.getValueNode()).getValue().equals(subtype.value())) {
-                                        ensureTypeDefinitionPresent(subtype.type());
                                         node.setType(subtype.type());
                                         node.setTag(new Tag(subtype.type()));
                                         defaultType = null;
@@ -140,9 +209,11 @@ public class YamlConfig {
                 }
             }
             if (defaultType != null) {
-                ensureTypeDefinitionPresent(defaultType);
                 node.setType(defaultType);
                 node.setTag(new Tag(defaultType));
+            }
+            if (node.getNodeId() == NodeId.mapping && node.getType() != null) {
+                ensureTypeDefinitionPresent(node.getType());
             }
             return super.constructObject(node);
         }
@@ -178,6 +249,73 @@ public class YamlConfig {
                 }
             }
             return typeDescription;
+        }
+
+        private class ConstructMapping extends Constructor.ConstructMapping {
+            @Override
+            protected Object createEmptyJavaBean(MappingNode node) {
+                Object javaBean = super.createEmptyJavaBean(node);
+                if (javaBean instanceof UpdatableConfig) {
+                    ((UpdatableConfig) javaBean).update(node);
+                }
+                return javaBean;
+            }
+        }
+    }
+
+    private static class MyPropertyUtils extends PropertyUtils {
+        @Override
+        protected Map<String, Property> getPropertiesMap(Class<?> type, BeanAccess bAccess) throws IntrospectionException {
+            Map<String, Property> newPropertyMap = new LinkedHashMap<>();
+            Map<String, Property> propertiesMap = super.getPropertiesMap(type, bAccess);
+            for (Iterator<Map.Entry<String, Property>> iterator = propertiesMap.entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<String, Property> entry = iterator.next();
+                boolean updated = false;
+                if (entry.getValue() instanceof FieldProperty) {
+                    try {
+                        Field field = type.getDeclaredField(entry.getValue().getName());
+                        Path path = field.getAnnotation(Path.class);
+                        if (path != null) {
+                            newPropertyMap.put(path.value(), new CustomNameFieldProperty(field, path.value()));
+                            updated = true;
+                        }
+                    } catch (NoSuchFieldException ignored) {
+                    }
+                }
+                if (!updated) {
+                    newPropertyMap.put(entry.getKey(), entry.getValue());
+                }
+            }
+
+            return newPropertyMap;
+        }
+
+        @Override
+        protected Set<Property> createPropertySet(Class<? extends Object> type, BeanAccess bAccess)
+                throws IntrospectionException {
+            Set<Property> properties = new LinkedHashSet<>();
+            Collection<Property> props = getPropertiesMap(type, bAccess).values();
+            for (Property property : props) {
+                if (property.isReadable() && property.isWritable()) {
+                    properties.add(property);
+                }
+            }
+            return properties;
+        }
+    }
+
+    private static class CustomNameFieldProperty extends FieldProperty {
+
+        private final String customName;
+
+        public CustomNameFieldProperty(Field field, String customName) {
+            super(field);
+            this.customName = customName;
+        }
+
+        @Override
+        public String getName() {
+            return customName;
         }
     }
 }

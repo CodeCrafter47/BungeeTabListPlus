@@ -18,47 +18,44 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
+import codecrafter47.bungeetablistplus.yamlconfig.Comment;
+import codecrafter47.bungeetablistplus.yamlconfig.Path;
+import codecrafter47.bungeetablistplus.yamlconfig.UpdatableConfig;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.cubespace.Yamler.Config.Comments;
-import net.cubespace.Yamler.Config.ConfigSection;
-import net.cubespace.Yamler.Config.Path;
-import net.cubespace.Yamler.Config.YamlConfig;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import java.util.*;
 
-public class MainConfig extends YamlConfig {
+import static codecrafter47.bungeetablistplus.yamlconfig.YamlUtil.*;
 
-    public MainConfig() {
-        CONFIG_HEADER = new String[]{
-                "This is the Config File of BungeeTabListPlus",
-                "You can find more detailed information on the wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"
-        };
-    }
+public class MainConfig implements UpdatableConfig {
 
-    @Comments({
+    @Comment({
             "time in seconds after which the tabList will be resend to all players",
             "set this to -1 to disable scheduled update of the tabList"
     })
     public double tablistUpdateInterval = 1;
 
-    @Comments({
+    @Comment({
             "whether tabList should be resend if a player joins or leaves the server"
     })
     public boolean updateOnPlayerJoinLeave = true;
 
-    @Comments({
+    @Comment({
             "whether tablist should be resend if a player switches the server"
     })
     public boolean updateOnServerChange = true;
 
-    @Comments({
+    @Comment({
             "You can limit the number of characters per slot here",
             "Color codes do not count as a character; -1 means unlimited"
     })
     public int charLimit = -1;
 
-    @Comments({
+    @Comment({
             "Decide from where BungeeTabListPlus takes information like permissions,",
             "prefix, suffix and group.",
             "Possible values:",
@@ -67,38 +64,38 @@ public class MainConfig extends YamlConfig {
             "BUNGEEPERMS - take information from BungeePerms",
             "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
     })
-    private String permissionSource = PermissionSource.AUTO.toString();
+    public String permissionSource = PermissionSource.AUTO.toString();
 
-    public PermissionSource getPermissionSource() {
+    public PermissionSource permissionSourceValue() {
         return PermissionSource.valueOf(permissionSource.toUpperCase(Locale.ROOT));
     }
 
-    @Comments({
+    @Comment({
             "whether to show players in spectator mode"
     })
     public boolean showPlayersInGamemode3 = true;
 
-    @Comments({
+    @Comment({
             "if enabled the plugin checks for new versions automatically.",
             "Use /BTLP to see whether a new version is available",
             "this does NOT automatically install an update"
     })
     public boolean checkForUpdates = true;
 
-    @Comments({
+    @Comment({
             "this notifies admins (everyone with the permission `bungeetablistplus.admin`) if an update is available"
     })
 
     public boolean notifyAdminsIfUpdateAvailable = true;
 
-    @Comments({
+    @Comment({
             "If this is set to true and the plugin encounters an issue a bug report is sent automatically",
             "Bug reports do not contain any sensitive or identifying information",
             "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log"
     })
     public boolean automaticallySendBugReports = true;
 
-    @Comments({
+    @Comment({
             "server Alias fo the {server} Variable"
     })
     public HashMap<String, String> serverAlias = Maps.newHashMap(ImmutableMap.<String, String>builder()
@@ -108,7 +105,7 @@ public class MainConfig extends YamlConfig {
             .put("sg", "Survival Games")
             .build());
 
-    @Comments({
+    @Comment({
             "Alias fo the {world} Variable. Match 'server:world' to an alias"
     })
     public HashMap<String, String> worldAlias = Maps.newHashMap(ImmutableMap.<String, String>builder()
@@ -117,7 +114,7 @@ public class MainConfig extends YamlConfig {
             .put("factions:world_end", "The End")
             .build());
 
-    @Comments({
+    @Comment({
             "list servers you wish to create custom prefixes for.",
             "to use the custom prefixes use the {serverPrefix} variable"
     })
@@ -126,7 +123,7 @@ public class MainConfig extends YamlConfig {
             .put("SkyBlock", "&8(&dS&8) ")
             .build());
 
-    @Comments({
+    @Comment({
             "the prefixes used for the {prefix} variable, based upon permission groups",
             "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
     })
@@ -135,36 +132,36 @@ public class MainConfig extends YamlConfig {
             .put("admin", "&c[A] ")
             .build());
 
-    @Comments({
+    @Comment({
             "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
             "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
             "setting this to -1 disables this feature"
     })
     public int pingDelay = -1;
 
-    @Comments({
+    @Comment({
             "replacement for the {onlineState} variable if the server is online"
     })
     @Path("online-text")
     public String online_text = "&2 ON";
 
-    @Comments({
+    @Comment({
             "replacement for the {onlineState} variable if the server is offline"
     })
     @Path("offline-text")
     public String offline_text = "&c OFF";
 
-    @Comments({
+    @Comment({
             "those fakeplayers will randomly appear on the tablist. If you don't put any names there then no fakeplayers will appear"
     })
     public List<String> fakePlayers = new ArrayList<>();
 
-    @Comments({
+    @Comment({
             "servers which you wish to show their own tabList (The one provided by bukkit)"
     })
     public List<String> excludeServers = new ArrayList<>();
 
-    @Comments({
+    @Comment({
             "servers which you wish to hide from the global tabList",
             "Note that this is different from excludeServers above: this hides all players on the hidden servers from appearing",
             "on the tablist, whereas excluded servers' players are still on the BungeeTabListPlus tablist, but they do not see",
@@ -172,7 +169,7 @@ public class MainConfig extends YamlConfig {
     })
     public List<String> hiddenServers = new ArrayList<>();
 
-    @Comments({
+    @Comment({
             "players which are permanently hidden from the tab list",
             "you can either put your username or your uuid (with dashes) here",
             "don't use this. you have absolutely no reason to hide from anyone. on your own server."
@@ -180,7 +177,7 @@ public class MainConfig extends YamlConfig {
     public List<String> hiddenPlayers = new ArrayList<>();
 
     // todo add more examples to comment, people keep asking for this
-    @Comments({
+    @Comment({
             "Time zone to use for the {time} variable",
             "Can be full name like \"America/Los_Angeles\"",
             "or custom id like \"GMT+8\""
@@ -200,28 +197,41 @@ public class MainConfig extends YamlConfig {
     }
 
     @Override
-    public void update(ConfigSection section) {
-        if (section.has("tablistUpdateIntervall") && !section.has("tablistUpdateInterval")) {
-            section.set("tablistUpdateInterval", section.get("tablistUpdateIntervall"));
-            section.remove("tablistUpdateIntervall");
+    public void update(MappingNode section) {
+        if (contains(section, "tablistUpdateIntervall") && !contains(section, "tablistUpdateInterval")) {
+            put(section, "tablistUpdateInterval", get(section, "tablistUpdateIntervall"));
+            remove(section, "tablistUpdateIntervall");
         }
 
-        if (section.has("online.text") && !section.has("online-text")) {
-            section.set("online-text", section.get("online.text"));
-            section.remove("online.text");
-        }
-
-        if (section.has("offline.text") && !section.has("offline-text")) {
-            section.set("offline-text", section.get("offline.text"));
-            section.remove("offline.text");
-        }
-        if (section.has("permissionSource")) {
-            String permissionSource = section.get("permissionSource");
-            permissionSource = permissionSource.toLowerCase(Locale.ROOT);
-            if (permissionSource.equals("BUKKITPERMISSIONSEX")) {
-                permissionSource = "BUKKIT";
+        if (!contains(section, "offline-text") && contains(section, "offline") && get(section, "offline") instanceof MappingNode) {
+            MappingNode subsection = (MappingNode) get(section, "offline");
+            if (contains(subsection, "text")) {
+                put(section, "offline-text", get(subsection, "text"));
             }
-            section.set("permissionSource", permissionSource);
+            remove(section, "offline");
         }
+
+        if (!contains(section, "online-text") && contains(section, "online") && get(section, "online") instanceof MappingNode) {
+            MappingNode subsection = (MappingNode) get(section, "online");
+            if (contains(subsection, "text")) {
+                put(section, "online-text", get(subsection, "text"));
+            }
+            remove(section, "online");
+        }
+
+        if (contains(section, "permissionSource")) {
+            Node permissionSource = get(section, "permissionSource");
+            if (permissionSource instanceof ScalarNode) {
+                String value = ((ScalarNode) permissionSource).getValue().toUpperCase(Locale.ROOT);
+                if (value.equals("BUKKITPERMISSIONSEX")) {
+                    value = "BUKKIT";
+                }
+                put(section, "permissionSource", new ScalarNode(permissionSource.getTag(), permissionSource.isResolved(), value, permissionSource.getStartMark(), permissionSource.getEndMark(), ((ScalarNode) permissionSource).getStyle()));
+            }
+        }
+
+        remove(section, "useScoreboardToBypass16CharLimit");
+
+        remove(section, "autoExcludeServers");
     }
 }

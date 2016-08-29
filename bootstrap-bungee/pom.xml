@@ -53,13 +53,6 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.cubespace.Yamler.Config
-                                    </pattern>
-                                    <shadedPattern>
-                                        codecrafter47.bungeetablistplus.libs.Yamler
-                                    </shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>it.unimi.dsi.fastutil</pattern>
                                     <shadedPattern>
                                         codecrafter47.bungeetablistplus.libs.fastutil

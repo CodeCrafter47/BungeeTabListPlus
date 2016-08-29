@@ -46,10 +46,10 @@ import codecrafter47.bungeetablistplus.util.PingTask;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
+import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
 import com.google.common.base.Preconditions;
 import de.sabbertran.proxysuite.ProxySuiteAPI;
 import lombok.Getter;
-import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -58,13 +58,13 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.connection.LoginResult;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -122,7 +122,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     @Getter
-    private MainConfig config = new MainConfig();
+    private MainConfig config;
 
     private FakePlayerManagerImpl fakePlayerManager;
 
@@ -181,6 +181,10 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * Called when the plugin is enabled
      */
     public void onEnable() {
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdirs();
+        }
+
         try {
             Class.forName("net.md_5.bungee.api.Title");
         } catch (ClassNotFoundException ex) {
@@ -199,8 +203,16 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         try {
             File file = new File(plugin.getDataFolder(), "config.yml");
-            config.init(file);
-        } catch (InvalidConfigurationException ex) {
+            if (!file.exists()) {
+                config = new MainConfig();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+                YamlConfig.writeWithComments(writer, config,
+                        "This is the configuration file of BungeeTabListPlus",
+                        "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
+            } else {
+                config = YamlConfig.read(new FileInputStream(file), MainConfig.class);
+            }
+        } catch (IOException | YAMLException ex) {
             plugin.getLogger().warning("Unable to load Config");
             plugin.getLogger().log(Level.WARNING, null, ex);
             plugin.getLogger().warning("Disabling Plugin");
@@ -417,14 +429,14 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         failIfNotMainThread();
         try {
             // todo requestedUpdateInterval = null;
-            config.load();
+            config = YamlConfig.read(new FileInputStream(new File(plugin.getDataFolder(), "config.yml")), MainConfig.class);
             placeholderManager.reload();
             if (reloadTablists()) return false;
             fakePlayerManager.reload();
             resendTabLists();
             restartRefreshThread();
             skins.onReload();
-        } catch (InvalidConfigurationException ex) {
+        } catch (IOException | YAMLException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
         }
         return true;

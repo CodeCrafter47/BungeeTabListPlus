@@ -47,7 +47,7 @@ public class PermissionManager {
     }
 
     public String getMainGroup(IPlayer player) {
-        switch (plugin.getConfig().getPermissionSource()) {
+        switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT:
                 return ((Player) player).get(DataKeys.Vault_PermissionGroup).orElse("");
             case BUNGEE:
@@ -145,7 +145,7 @@ public class PermissionManager {
     }
 
     public int comparePlayers(IPlayer p1, IPlayer p2) {
-        switch (plugin.getConfig().getPermissionSource()) {
+        switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT: {
                 Optional<Integer> p1Rank = ((Player) p1).get(DataKeys.Vault_PermissionGroupWeight);
                 Optional<Integer> p2Rank = ((Player) p2).get(DataKeys.Vault_PermissionGroupWeight);
@@ -218,7 +218,7 @@ public class PermissionManager {
 
     public String getPrefix(TabListContext context) {
         IPlayer player = context.getPlayer();
-        switch (plugin.getConfig().getPermissionSource()) {
+        switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT:
                 return ((Player) player).get(DataKeys.Vault_Prefix).orElse("");
             case BUNGEE:
@@ -360,7 +360,7 @@ public class PermissionManager {
     }
 
     public String getSuffix(IPlayer player) {
-        switch (plugin.getConfig().getPermissionSource()) {
+        switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT:
                 return ((Player) player).get(DataKeys.Vault_Suffix).orElse("");
             case BUNGEE:
