@@ -37,8 +37,7 @@ import org.junit.Before;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AbstractTabListLogicTestBase {
     UUID clientUUID;
@@ -129,6 +128,7 @@ public class AbstractTabListLogicTestBase {
         }
 
         private void validateConstraints() {
+            boolean isCitizensDisordered = false;
             // validate client tab list
             if (passtrough) {
                 Assert.assertEquals("server client tab size mismatch", serverTabList.size(), clientTabList.entries.size());
@@ -173,21 +173,21 @@ public class AbstractTabListLogicTestBase {
                 }
 
                 for (TabListItem item : serverTabList.values()) {
-                    assertTrue("uuidToSlotMap doesn't contain " + item.getUuid(), uuidToSlotMap.containsKey(item.getUuid()));
+                    assertTrue("uuidToSlotMap is missing an entry", uuidToSlotMap.containsKey(item.getUuid()));
                 }
 
                 Assert.assertEquals("server client tab size mismatch", size, clientTabList.getSize());
-                boolean isCitizensDisordered = serverTabList.keySet().stream().anyMatch(u -> u.version() == 2);
+                isCitizensDisordered = serverTabList.keySet().stream().anyMatch(u -> u.version() == 2);
                 if (!isCitizensDisordered) {
                     // validate inner constraints
                     for (Map.Entry<String, Integer> entry : nameToSlotMap.entrySet()) {
                         assertEquals("nameToSlotMap constraint violation", clientUsername[entry.getValue()], entry.getKey());
-                        assertTrue("team doesn't exist: " + fakePlayerUsernames[entry.getValue()], clientTabList.teams.containsKey(fakePlayerUsernames[entry.getValue()]));
-                        assertTrue("player not in team: " + entry.getKey() + " in " + fakePlayerUsernames[entry.getValue()], clientTabList.teams.get(fakePlayerUsernames[entry.getValue()]).getPlayers().contains(entry.getKey()));
+                        assertTrue("missing team", clientTabList.teams.containsKey(fakePlayerUsernames[entry.getValue()]));
+                        assertTrue("missing player in team", clientTabList.teams.get(fakePlayerUsernames[entry.getValue()]).getPlayers().contains(entry.getKey()));
                     }
 
                     for (TabListItem item : serverTabList.values()) {
-                        assertTrue("nameToSlotMap doesn't contain " + item.getUsername(), nameToSlotMap.containsKey(item.getUsername()));
+                        assertTrue("nameToSlotMap constraint violation", nameToSlotMap.containsKey(item.getUsername()));
                     }
 
                     // validate client view
@@ -201,12 +201,12 @@ public class AbstractTabListLogicTestBase {
                         } else {
                             Assert.assertArrayEquals("skin", serverTabList.get(clientUuid[i]).getProperties(), clientTabList.getProperties(i));
                         }
-                        assertEquals("nameToSlotMap:" + i, i, nameToSlotMap.getInt(clientUsername[i]));
+                        assertEquals("nameToSlotMap", i, nameToSlotMap.getInt(clientUsername[i]));
                     }
                 }
                 // real players
                 for (TabListItem item : serverTabList.values()) {
-                    assertTrue("Missing player " + item, clientTabList.entries.containsKey(item.getUuid()));
+                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
                     TabListEntry entry = clientTabList.entries.get(item.getUuid());
                     Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
                     Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
@@ -214,6 +214,17 @@ public class AbstractTabListLogicTestBase {
                     //assertEquals("ping passthrough", item.getPing(), entry.getPing());
                     //assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
                     Assert.assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
+                }
+            }
+            if (!isCitizensDisordered) {
+                for (Map.Entry<String, String> entry : playerToTeamMap.entrySet()) {
+                    String s = clientTabList.playerToTeamMap.get(entry.getKey());
+                    assertNotNull(s);
+                    Team team = clientTabList.teams.get(s);
+                    assertNotNull(team);
+                    TeamData serverTeam = serverTeams.get(entry.getValue());
+                    assertEquals(serverTeam.getPrefix(), team.getPrefix());
+                    assertEquals(serverTeam.getSuffix(), team.getSuffix());
                 }
             }
         }
@@ -292,7 +303,8 @@ public class AbstractTabListLogicTestBase {
                                     clientTabList.playerToTeamMap.put(s, t.getName());
                                 } else {
                                     t.removePlayer(s);
-                                    assertTrue("Tried to remove player not in team.", clientTabList.playerToTeamMap.remove(s, t.getName()));
+                                    clientTabList.playerToTeamMap.remove(s, t.getName());
+                                    //assertTrue("Tried to remove player not in team.", clientTabList.playerToTeamMap.remove(s, t.getName()));
                                 }
                             }
                         }

@@ -474,6 +474,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         }
 
         // update server data
+        List<String> invalid = null;
 
         if (packet.getMode() == 1) {
             TeamData team = serverTeams.remove(packet.getName());
@@ -532,7 +533,12 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             playerToTeamMap.put(s, packet.getName());
                         } else {
                             t.removePlayer(s);
-                            playerToTeamMap.remove(s, packet.getName());
+                            if (!playerToTeamMap.remove(s, packet.getName())) {
+                                if (invalid == null) {
+                                    invalid = new ArrayList<>();
+                                }
+                                invalid.add(s);
+                            }
                         }
                     }
                 }
@@ -577,19 +583,21 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     length++;
                 } else {
                     if (packet.getMode() == 4) {
-                        Team team = new Team();
-                        team.setMode((byte) 2);
-                        team.setName(fakePlayerUsernames[slot]);
-                        team.setDisplayName(team.getName());
-                        team.setPrefix("");
-                        team.setSuffix("");
-                        team.setFriendlyFire((byte) 1);
-                        team.setNameTagVisibility("always");
-                        if (teamCollisionRuleSupported) {
-                            team.setCollisionRule("always");
+                        if (invalid == null || !invalid.contains(player)) {
+                            Team team = new Team();
+                            team.setMode((byte) 2);
+                            team.setName(fakePlayerUsernames[slot]);
+                            team.setDisplayName(team.getName());
+                            team.setPrefix("");
+                            team.setSuffix("");
+                            team.setFriendlyFire((byte) 1);
+                            team.setNameTagVisibility("always");
+                            if (teamCollisionRuleSupported) {
+                                team.setCollisionRule("always");
+                            }
+                            team.setColor((byte) 0);
+                            sendPacket(team);
                         }
-                        team.setColor((byte) 0);
-                        sendPacket(team);
                     } else {
                         TeamData serverTeam = serverTeams.get(playerToTeamMap.get(player));
                         if (serverTeam != null) {

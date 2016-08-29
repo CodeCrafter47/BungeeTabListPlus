@@ -45,6 +45,7 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
     @Parameterized.Parameters(name = "{0}")
     public static Collection testData() {
         return Arrays.asList(
+                "00ea3262-465a-42e8-a5e2-0893b2a5daa1.log",
                 "014c4747-7354-4f48-88e8-12baa0e73ef8.log",
                 "02405540-f3ab-4e39-897e-08349a216b63.log",
                 "0927aced-5296-4f98-80af-3f3521f8f6c4.log",
