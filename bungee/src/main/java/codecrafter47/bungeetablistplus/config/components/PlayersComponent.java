@@ -23,15 +23,18 @@ import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import com.google.common.base.Preconditions;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 
-@Data
+@Getter
+@Setter
 public class PlayersComponent extends Component {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
     private String playerSet;
@@ -97,10 +100,10 @@ public class PlayersComponent extends Component {
             activeComponents.forEach(Component.Instance::deactivate);
             activeComponents.clear();
             super.update2ndStep();
-            boolean allFit = super.size >= getMaxSize();
+            boolean allFit = super.size >= players.size() * playerComponent.getSize();
             int pos = 0;
             int i;
-            for (i = 0; (allFit || pos + morePlayersComponent.getSize() < super.size) && i < players.size(); i++) {
+            for (i = 0; (allFit || pos + playerComponent.getSize() + morePlayersComponent.getSize() <= super.size) && i < players.size(); i++) {
                 Player player = players.get(i);
                 Component.Instance component = playerComponent.toInstance(context.derived().setPlayer(player));
                 component.activate();
@@ -127,7 +130,7 @@ public class PlayersComponent extends Component {
 
         @Override
         public int getMaxSize() {
-            return min(maxSize, players.size() * playerComponent.getSize());
+            return max(minSize, min(maxSize, players.size() * playerComponent.getSize()));
         }
 
         @Override
