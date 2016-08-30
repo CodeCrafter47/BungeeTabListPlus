@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.util.Functions;
 import codecrafter47.bungeetablistplus.util.PingTask;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -143,7 +144,7 @@ public abstract class Placeholder {
         } else if ("other_count".equals(tokens[0])) {
             return OTHER_COUNT_PLACEHOLDER;
         } else {
-            return new CustomPlaceholder(tokens[0]);
+            return new CustomPlaceholder(tokens[0], Arrays.copyOfRange(tokens, 1, tokens.length));
         }
     }
 
@@ -257,22 +258,27 @@ public abstract class Placeholder {
         }
     }
 
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     private static class CustomPlaceholder extends Placeholder {
-        String id;
+        private final String id;
+        private final String[] parameters;
+        private Placeholder instance = null;
 
         @Override
         public String evaluate(Context context) {
-            if (context.getCustomPlaceholders().containsKey(id)) {
-                return context.getCustomPlaceholders().get(id).evaluate(context);
-            } else {
-                return "";
+            if (instance == null) {
+                if (context.getCustomPlaceholders().containsKey(id)) {
+                    instance = context.getCustomPlaceholders().get(id).instantiate(parameters);
+                } else {
+                    return "";
+                }
             }
+            return instance.evaluate(context);
         }
     }
 
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofFunction(Function<Player, String> function) {
-        return (tokens, playerFunction) -> new PlayerBoundPlaceholder(playerFunction, function::apply);
+        return (tokens, playerFunction) -> new PlayerBoundPlaceholder(playerFunction, function);
     }
 
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofStringData(DataKey<String> dataKey) {

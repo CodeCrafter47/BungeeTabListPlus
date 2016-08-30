@@ -21,70 +21,126 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
+import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
+import com.google.common.collect.Maps;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Subtype(type = CustomPlaceholder.Conditional.class, tag = "!conditional")
 @Subtype(type = CustomPlaceholder.Switch.class, tag = "!switch")
+@Getter
+@Setter
 public abstract class CustomPlaceholder {
 
-    public abstract String evaluate(Context context);
+    private int parameters = 0;
+
+    protected String replaceParameters(String template, String[] args) {
+        for (int i = 0; i < parameters; i++) {
+            String replacement;
+            if (i < args.length) {
+                replacement = args[i];
+                if (i == parameters - 1) {
+                    for (int j = i + 1; j < args.length; j++) {
+                        replacement += " " + args[j];
+                    }
+                }
+            } else {
+                replacement = "";
+            }
+            template = template.replace("%" + i, replacement);
+        }
+        return template;
+    }
+
+    public abstract Placeholder instantiate(String[] args);
 
     public static class Conditional extends CustomPlaceholder {
-        private Expression condition;
-        private TextTemplate trueReplacement;
-        private TextTemplate falseReplacement;
+        private String condition;
+        private String trueReplacement;
+        private String falseReplacement;
 
-        public Expression getCondition() {
+        public String getCondition() {
             return condition;
         }
 
-        public void setCondition(Expression condition) {
+        public void setCondition(String condition) {
             this.condition = condition;
         }
 
-        public TextTemplate getTrue() {
+        public String getTrue() {
             return trueReplacement;
         }
 
-        public void setTrue(TextTemplate trueReplacement) {
+        public void setTrue(String trueReplacement) {
             this.trueReplacement = trueReplacement;
         }
 
-        public TextTemplate getFalse() {
+        public String getFalse() {
             return falseReplacement;
         }
 
-        public void setFalse(TextTemplate falseReplacement) {
+        public void setFalse(String falseReplacement) {
             this.falseReplacement = falseReplacement;
         }
 
         @Override
-        public String evaluate(Context context) {
-            return condition.evaluate(context, ExpressionResult.BOOLEAN) ? trueReplacement.evaluate(context) : falseReplacement.evaluate(context);
+        public Placeholder instantiate(String[] args) {
+            Expression condition = new Expression(replaceParameters(this.condition, args));
+            TextTemplate trueReplacement = new TextTemplate(replaceParameters(this.trueReplacement, args));
+            TextTemplate falseReplacement = new TextTemplate(replaceParameters(this.falseReplacement, args));
+            return new Instance(condition, trueReplacement, falseReplacement);
+        }
+
+        @AllArgsConstructor
+        private static class Instance extends Placeholder {
+            private final Expression condition;
+            private final TextTemplate trueReplacement;
+            private final TextTemplate falseReplacement;
+
+            @Override
+            public String evaluate(Context context) {
+                return condition.evaluate(context, ExpressionResult.BOOLEAN) ? trueReplacement.evaluate(context) : falseReplacement.evaluate(context);
+            }
         }
     }
 
     @Getter
     @Setter
     public static class Switch extends CustomPlaceholder {
-        private Expression expression;
-        private Map<String, TextTemplate> replacements;
-        private TextTemplate defaultReplacement;
+        private String expression;
+        private Map<String, String> replacements;
+        private String defaultReplacement;
 
         @Override
-        public String evaluate(Context context) {
-            TextTemplate replacement = replacements.get(expression.evaluate(context, ExpressionResult.STRING));
-            if (replacement != null) {
-                return replacement.evaluate(context);
-            } else if (defaultReplacement != null) {
-                return defaultReplacement.evaluate(context);
-            } else {
-                return "";
+        public Placeholder instantiate(String[] args) {
+            Expression expression = new Expression(replaceParameters(this.expression, args));
+            Map<String, TextTemplate> replacements = new HashMap<>(Maps.transformValues(this.replacements, template -> new TextTemplate(replaceParameters(template, args))));
+            TextTemplate defaultReplacement = new TextTemplate(replaceParameters(this.defaultReplacement, args));
+            return new Instance(expression, replacements, defaultReplacement);
+        }
+
+        @AllArgsConstructor
+        private static class Instance extends Placeholder {
+            private final Expression expression;
+            private final Map<String, TextTemplate> replacements;
+            private final TextTemplate defaultReplacement;
+
+            @Override
+            public String evaluate(Context context) {
+                TextTemplate replacement = replacements.get(expression.evaluate(context, ExpressionResult.STRING));
+                if (replacement != null) {
+                    return replacement.evaluate(context);
+                } else if (defaultReplacement != null) {
+                    return defaultReplacement.evaluate(context);
+                } else {
+                    return "";
+                }
             }
         }
     }
