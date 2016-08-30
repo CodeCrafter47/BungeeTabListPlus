@@ -38,7 +38,7 @@ public class PlayersComponent extends Component {
     private Component playerComponent;
     private Component morePlayersComponent;
     int minSize = 0;
-    int maxSize = Integer.MAX_VALUE;
+    int maxSize = 200;
 
     @Override
     public boolean hasConstantSize() {

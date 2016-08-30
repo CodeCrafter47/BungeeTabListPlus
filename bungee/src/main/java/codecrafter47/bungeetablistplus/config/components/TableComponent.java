@@ -20,14 +20,15 @@
 package codecrafter47.bungeetablistplus.config.components;
 
 import codecrafter47.bungeetablistplus.context.Context;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
 import static java.lang.Integer.max;
-import static java.lang.Integer.min;
 
-@Data
+@Getter
+@Setter
 public class TableComponent extends Component {
     private Map<String, Component> columns;
     private int size = -1;
@@ -127,8 +128,8 @@ public class TableComponent extends Component {
             maxSize = Integer.MAX_VALUE;
             for (Component.Instance component : columns) {
                 component.update1stStep();
-                minSize = max(minSize, component.getMinSize() / component.context.getColumns() * context.getColumns());
-                maxSize = min(minSize, component.getMaxSize() / component.context.getColumns() * context.getColumns());
+                minSize = max(minSize, (component.getMinSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
+                maxSize = max(maxSize, (component.getMaxSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
             }
         }
 

@@ -41,9 +41,9 @@ public class PlayersByServerComponent extends Component {
     private Component playerComponent;
     private Component morePlayersComponent;
     int minSizePerServer = 0;
-    int maxSizePerServer = Integer.MAX_VALUE;
+    int maxSizePerServer = 200;
     int minSize = 0;
-    int maxSize = Integer.MAX_VALUE;
+    int maxSize = 200;
 
     public void setServerHeader(Component serverHeader) {
         Preconditions.checkArgument(serverHeader.hasConstantSize(), "serverHeader needs to have a fixed size.");
