@@ -85,6 +85,9 @@ import java.util.zip.ZipInputStream;
  */
 public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
+    public static DataKey<Integer> DATA_KEY_GAMEMODE = DataKey.builder().id("btlp:gamemode").bungee().player().build();
+    public static DataKey<String> DATA_KEY_SERVER = DataKey.builder().id("btlp:server").bungee().player().build();
+
     /**
      * Holds an INSTANCE of itself if the plugin is enabled
      */
@@ -561,7 +564,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * @return true if the player is hidden, false otherwise
      */
     public static boolean isHidden(Player player) {
-        if (isHiddenServer(player.getServer().orElse(null))) return true;
+        if (player.get(DATA_KEY_SERVER).map(BungeeTabListPlus::isHiddenServer).orElse(false)) {
+            return true;
+        }
         final boolean[] hidden = new boolean[1];
         synchronized (hiddenPlayers) {
             String name = player.getName();
@@ -622,10 +627,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
     }
 
-    public static boolean isHiddenServer(ServerInfo server) {
-        if (server == null)
-            return false;
-        return getInstance().config.hiddenServers.contains(server.getName());
+    public static boolean isHiddenServer(String serverName) {
+        return getInstance().config.hiddenServers.contains(serverName);
     }
 
     /**

@@ -30,8 +30,6 @@ import codecrafter47.bungeetablistplus.util.Functions;
 import codecrafter47.bungeetablistplus.util.PingTask;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -47,7 +45,7 @@ public abstract class Placeholder {
     private static final Placeholder OTHER_COUNT_PLACEHOLDER = new OtherCountPlaceholder();
     private static final Placeholder SERVER_PLAYER_COUNT_PLACEHOLDER = new ServerPlayerCountPlaceholder();
     private static final Map<String, BiFunction<String[], Function<Context, Player>, Placeholder>> playerPlaceholders = new HashMap<>();
-    private static final Map<String, Function<ServerInfo, String>> serverPlaceholders = new HashMap<>();
+    private static final Map<String, Function<String, String>> serverPlaceholders = new HashMap<>();
 
     public static final Map<String, DataKey<String>> placeholderAPIDataKeys = Collections.synchronizedMap(new HashMap<>());
     public static final Map<String, DataKey<String>> remoteThirdPartyDataKeys = Collections.synchronizedMap(new HashMap<>());
@@ -105,11 +103,12 @@ public abstract class Placeholder {
         playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
         playerPlaceholders.put("essentials_afk", ofFunction(p -> p.get(DataKeys.Essentials_IsAFK).orElse(false).toString()));
         playerPlaceholders.put("is_hidden", ofFunction(p -> Boolean.toString(BungeeTabListPlus.isHidden(p))));
+        playerPlaceholders.put("gamemode", ofIntData(BungeeTabListPlus.DATA_KEY_GAMEMODE));
 
         // Server
         serverPlaceholders.put("tps", serverInfo -> BungeeTabListPlus.getInstance().getBridge().get(serverInfo, DataKeys.TPS).map(d -> String.format("%1.1f", d)).orElse(""));
-        serverPlaceholders.put("online", serverInfo -> {
-            PingTask serverState = BungeeTabListPlus.getInstance().getServerState(serverInfo.getName());
+        serverPlaceholders.put("online", serverName -> {
+            PingTask serverState = BungeeTabListPlus.getInstance().getServerState(serverName);
             return serverState != null ? Boolean.toString(serverState.isOnline()) : "false";
         });
     }
@@ -137,7 +136,7 @@ public abstract class Placeholder {
             };
         } else if (tokens[0].startsWith("server:")) {
             String server = tokens[0].split(":")[1];
-            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), context -> ProxyServer.getInstance().getServerInfo(server));
+            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), context -> server);
         } else if ("time".equals(tokens[0])) {
             return new TimePlaceholder(TimePlaceholders.getFormat(tokens[1]));
         } else if ("server_player_count".equals(tokens[0])) {
@@ -153,7 +152,7 @@ public abstract class Placeholder {
         if (tokens.length == 0) {
             return new PlayerBoundPlaceholder(playerFunction, Player::getName);
         } else if ("server".equals(tokens[0])) {
-            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Functions.composeNullable(p -> p.getServer().orElse(null), playerFunction));
+            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Functions.composeNullable(p -> p.get(BungeeTabListPlus.DATA_KEY_SERVER).orElse(null), playerFunction));
         } else if ("permission".equals(tokens[0])) {
             return new PermissionPlaceholder(playerFunction, tokens[1]);
         } else if (playerPlaceholders.containsKey(tokens[0])) {
@@ -170,9 +169,9 @@ public abstract class Placeholder {
         }
     }
 
-    private static Placeholder parseServerPlaceholder(String[] tokens, Function<Context, ServerInfo> serverFunction) {
+    private static Placeholder parseServerPlaceholder(String[] tokens, Function<Context, String> serverFunction) {
         if (tokens.length == 0) {
-            return new ServerBoundPlaceholder(serverFunction, ServerInfo::getName);
+            return new ServerBoundPlaceholder(serverFunction, o -> o);
         } else if (serverPlaceholders.containsKey(tokens[0])) {
             return new ServerBoundPlaceholder(serverFunction, serverPlaceholders.get(tokens[0]));
         } else {
@@ -218,13 +217,13 @@ public abstract class Placeholder {
 
     @AllArgsConstructor
     private static class ServerBoundPlaceholder extends Placeholder {
-        private final Function<Context, ServerInfo> serverFunction;
-        private final Function<ServerInfo, String> function;
+        private final Function<Context, String> serverFunction;
+        private final Function<String, String> function;
 
         @Override
         public String evaluate(Context context) {
-            ServerInfo serverInfo = serverFunction.apply(context);
-            return serverInfo != null ? function.apply(serverInfo) : "";
+            String serverName = serverFunction.apply(context);
+            return serverName != null ? function.apply(serverName) : "";
         }
     }
 

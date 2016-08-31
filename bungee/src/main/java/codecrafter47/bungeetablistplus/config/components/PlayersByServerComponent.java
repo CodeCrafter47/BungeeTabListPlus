@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
@@ -27,7 +28,6 @@ import lombok.Data;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.text.Collator;
 import java.util.*;
 
 import static java.lang.Math.min;
@@ -93,7 +93,7 @@ public class PlayersByServerComponent extends Component {
     public class Instance extends Component.Instance {
 
         private List<Component.Instance> activeComponents = new ArrayList<>();
-        private Map<ServerInfo, List<Player>> playersByServer = new LinkedHashMap<>();
+        private Map<String, List<Player>> playersByServer = new LinkedHashMap<>();
         private int maxSize;
 
         protected Instance(Context context) {
@@ -113,11 +113,11 @@ public class PlayersByServerComponent extends Component {
             playersByServer.clear();
             if (includeEmptyServers) {
                 for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
-                    playersByServer.put(server, new ArrayList<>());
+                    playersByServer.put(server.getName(), new ArrayList<>());
                 }
             }
             for (Player player : context.getPlayers(playerSet)) {
-                Optional<ServerInfo> server = player.getServer();
+                Optional<String> server = player.get(BungeeTabListPlus.DATA_KEY_SERVER);
                 if (server.isPresent()) {
                     playersByServer.computeIfAbsent(server.get(), s -> new ArrayList<>()).add(player);
                 }
@@ -144,9 +144,9 @@ public class PlayersByServerComponent extends Component {
             int rows = size / context.getColumns();
             int minRowsPerServer = (minSizePerServer + context.getColumns() - 1) / context.getColumns();
             int maxRowsPerServer = maxSizePerServer / context.getColumns();
-            List<ServerInfo> servers = new ArrayList<>(playersByServer.keySet());
+            List<String> servers = new ArrayList<>(playersByServer.keySet());
             // todo make server order configurable
-            Collections.sort(servers, (o1, o2) -> Collator.getInstance().compare(o1.getName(), o2.getName()));
+            Collections.sort(servers);
             int[] serverRows = new int[servers.size()];
             Arrays.fill(serverRows, minRowsPerServer);
             rows -= minRowsPerServer * servers.size();
@@ -155,7 +155,7 @@ public class PlayersByServerComponent extends Component {
                 change = false;
                 for (int i = 0; i < servers.size(); i++) {
                     if (rows > 0 && serverRows[i] < maxRowsPerServer) {
-                        ServerInfo server = servers.get(i);
+                        String server = servers.get(i);
                         int serverSize = serverHeader.getSize() + playersByServer.get(server).size() * playerComponent.getSize();
                         if (min(serverSize, maxRowsPerServer) > serverRows[i] * context.getColumns()) {
                             serverRows[i]++;
@@ -168,7 +168,7 @@ public class PlayersByServerComponent extends Component {
             // create the components
             int pos = 0;
             for (int i = 0; i < servers.size() && pos < size; i++) {
-                ServerInfo server = servers.get(i);
+                String server = servers.get(i);
                 pos = ((pos + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
                 List<Player> players = playersByServer.get(server);
                 // Header

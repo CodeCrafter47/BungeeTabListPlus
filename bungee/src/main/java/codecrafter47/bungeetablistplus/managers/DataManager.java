@@ -25,8 +25,10 @@ import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Listener;
 
 import java.util.Objects;
@@ -56,6 +58,11 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
         bind(DataKeys.BungeePerms_PlayerPrefix, permissionManager::getPlayerPrefixFromBungeePerms);
         bind(DataKeys.ClientVersion, player1 -> BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersionString(player1));
         bind(DataKeys.BungeeCord_SessionDuration, p -> Optional.ofNullable(bungeeTabListPlus.getConnectedPlayerManager().getPlayerIfPresent(p)).map(ConnectedPlayer::getCurrentSessionDuration).orElse(null));
+        bind(BungeeTabListPlus.DATA_KEY_GAMEMODE, p -> ((UserConnection) p).getGamemode());
+        bind(BungeeTabListPlus.DATA_KEY_SERVER, p -> {
+            Server server = p.getServer();
+            return server != null ? server.getInfo().getName() : null;
+        });
     }
 
     @SuppressWarnings("unchecked")

@@ -112,6 +112,12 @@ public class FakePlayer implements Player, codecrafter47.bungeetablistplus.api.b
         if (player != null) {
             return player.get(key);
         }
+        if (key.equals(BungeeTabListPlus.DATA_KEY_GAMEMODE)) {
+            return (Optional<T>) Optional.of(gamemode);
+        }
+        if (key.equals(BungeeTabListPlus.DATA_KEY_SERVER)) {
+            return (Optional<T>) Optional.of(server.getName());
+        }
         return Optional.empty();
     }
 }

@@ -19,10 +19,11 @@
 
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.Server;
 
 import java.util.Optional;
@@ -32,13 +33,15 @@ public class PlayerServerFirst implements SortingRule {
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         Server server = context.getViewer().getServer();
         if (server != null) {
-            ServerInfo info = server.getInfo();
-            Optional<ServerInfo> server1 = player1.getServer();
-            Optional<ServerInfo> server2 = player2.getServer();
+            String name = server.getInfo().getName();
+            Optional<String> server1 = ((Player) player1).get(BungeeTabListPlus.DATA_KEY_SERVER);
+            Optional<String> server2 = ((Player) player2).get(BungeeTabListPlus.DATA_KEY_SERVER);
             if (!server1.equals(server2)) {
-                if (server1.isPresent() && server1.get().equals(info))
+                if (server1.isPresent() && server1.get().equals(name)) {
                     return -1;
-                if (server2.isPresent() && server2.get().equals(info)) return 1;
+                } else if (server2.isPresent() && server2.get().equals(name)) {
+                    return 1;
+                }
             }
         }
         return 0;

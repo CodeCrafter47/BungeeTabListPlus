@@ -33,6 +33,7 @@ import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.tablisthandler.LegacyTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.LoggingTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.tablisthandler.logic.GetGamemodeLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.LowMemoryTabListLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.RewriteLogic;
 import codecrafter47.bungeetablistplus.tablisthandler.logic.TabListLogic;
@@ -114,7 +115,8 @@ public class ConnectedPlayer implements Player {
 
     @Override
     public int getGameMode() {
-        return !BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player) ? ((UserConnection) player).getGamemode() : 0;
+        Integer gamemode = data.getRawValue(BungeeTabListPlus.DATA_KEY_GAMEMODE);
+        return gamemode != null ? gamemode : 0;
     }
 
     public ProxiedPlayer getPlayer() {
@@ -185,7 +187,7 @@ public class ConnectedPlayer implements Player {
                 tabListLogic = new LowMemoryTabListLogic(null, getPlayer());
             }
             playerTablistHandler = PlayerTablistHandler.create(getPlayer(), tabListLogic);
-            packetHandler = new RewriteLogic(tabListLogic);
+            packetHandler = new RewriteLogic(new GetGamemodeLogic(tabListLogic, ((UserConnection) getPlayer())));
             if (ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop().inEventLoop()) {
                 tabListLogic.onConnected();
             } else {

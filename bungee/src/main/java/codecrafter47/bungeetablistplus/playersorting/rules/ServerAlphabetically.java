@@ -19,10 +19,11 @@
 
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
-import net.md_5.bungee.api.config.ServerInfo;
 
 import java.text.Collator;
 import java.util.Optional;
@@ -30,10 +31,10 @@ import java.util.Optional;
 public class ServerAlphabetically implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        Optional<ServerInfo> server1 = player1.getServer();
-        Optional<ServerInfo> server2 = player2.getServer();
+        Optional<String> server1 = ((Player) player1).get(BungeeTabListPlus.DATA_KEY_SERVER);
+        Optional<String> server2 = ((Player) player2).get(BungeeTabListPlus.DATA_KEY_SERVER);
         if (server1.isPresent() || server2.isPresent()) {
-            return Collator.getInstance().compare(server1.map(ServerInfo::getName).orElse(""), server2.map(ServerInfo::getName).orElse(""));
+            return Collator.getInstance().compare(server1.orElse(""), server2.orElse(""));
         }
         return 0;
     }

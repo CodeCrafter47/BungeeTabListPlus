@@ -94,8 +94,7 @@ public class RedisPlayer implements Player {
 
     @Override
     public int getGameMode() {
-        // we don't know -> survival mode
-        return 0;
+        return get(BungeeTabListPlus.DATA_KEY_GAMEMODE).orElse(0);
     }
 
     @Override

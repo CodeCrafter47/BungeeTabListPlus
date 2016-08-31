@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.data.DataKey;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Sets;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -174,11 +175,16 @@ public class BukkitBridge implements Listener {
     }
 
     public <T> Optional<T> get(ServerInfo server, DataKey<T> key) {
-        BukkitData data = getServerDataCache(server.getName());
+        return get(server.getName(), key);
+    }
+
+    public <T> Optional<T> get(String serverName, DataKey<T> key) {
+        BukkitData data = getServerDataCache(serverName);
         Optional<T> value = data.getValue(key);
         if (!value.isPresent()) {
             Set<DataKey> requestedData = data.getRequestedData();
-            if (!requestedData.contains(key) && !server.getPlayers().isEmpty()) {
+            ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
+            if (serverInfo != null && !requestedData.contains(key) && !serverInfo.getPlayers().isEmpty()) {
                 requestedData.add(key);
                 try {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -186,7 +192,7 @@ public class BukkitBridge implements Listener {
                     out.writeUTF(Constants.subchannelRequestServerVariable);
                     out.writeObject(key);
                     out.close();
-                    server.sendData(Constants.channel, os.toByteArray());
+                    serverInfo.sendData(Constants.channel, os.toByteArray());
                 } catch (IOException ex) {
                     plugin.getLogger().log(Level.SEVERE, "Error while requesting data from bukkit", ex);
                 }
