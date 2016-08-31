@@ -19,10 +19,30 @@
 
 package codecrafter47.bungeetablistplus.util;
 
+import codecrafter47.util.chat.ChatUtil;
 import net.md_5.bungee.api.ChatColor;
 
 public final class FastChat {
     private final static String emptyJsonText = "{\"text\":\"\"}";
+
+    public static int legacyTextLength(String legacyText, char alternateColorChar) {
+        double length = 0;
+        boolean bold = false;
+        for (int i = 0; i < legacyText.length(); ++i) {
+            char c = legacyText.charAt(i);
+            if (i + 1 < legacyText.length() && (c == ChatColor.COLOR_CHAR || (c == alternateColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(legacyText.charAt(i + 1)) > -1))) {
+                c = legacyText.charAt(++i);
+                if ("0123456789AaBbCcDdEeFf".indexOf(c) > -1) {
+                    bold = false;
+                } else if ("Ll".indexOf(c) > -1) {
+                    bold = true;
+                }
+            } else {
+                length += ChatUtil.getCharWidth(c, bold);
+            }
+        }
+        return (int) Math.ceil(length);
+    }
 
     public static String legacyTextToJson(String legacyText, char alternateColorChar) {
         if (legacyText == null) {

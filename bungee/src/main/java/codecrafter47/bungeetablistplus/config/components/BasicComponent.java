@@ -19,18 +19,25 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
+import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
-import lombok.Data;
+import codecrafter47.bungeetablistplus.util.FastChat;
+import codecrafter47.util.chat.ChatUtil;
+import com.google.common.base.Strings;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class BasicComponent extends Component {
 
     private TextTemplate text;
     private IconTemplate icon;
     private PingTemplate ping;
+    private Alignment alignment = Alignment.LEFT;
 
     @Override
     public boolean hasConstantSize() {
@@ -56,7 +63,30 @@ public class BasicComponent extends Component {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            context.getTablist().setSlot(row, column, getIcon().evaluate(context), getText().evaluate(context), getPing().evaluate(context));
+            CustomTablist tablist = context.getTablist();
+            String text = getText().evaluate(context);
+
+            if (alignment != Alignment.LEFT) {
+                int slotWidth = 80;
+                if (tablist.getSize() <= 60) {
+                    slotWidth = 110;
+                } else if (tablist.getSize() <= 40) {
+                    slotWidth = 180;
+                } else if (tablist.getSize() <= 20) {
+                    slotWidth = 360;
+                }
+                int textLength = FastChat.legacyTextLength(text, '&');
+                int space = slotWidth - textLength;
+                if (space > 0) {
+                    int spaces = (int) (space / ChatUtil.getCharWidth(' ', false));
+                    if (alignment == Alignment.CENTER) {
+                        spaces >>= 1;
+                    }
+                    text = Strings.repeat(" ", spaces) + text;
+                }
+            }
+
+            tablist.setSlot(row, column, getIcon().evaluate(context), text, getPing().evaluate(context));
         }
 
         @Override
@@ -73,5 +103,9 @@ public class BasicComponent extends Component {
         public boolean isBlockAligned() {
             return false;
         }
+    }
+
+    public enum Alignment {
+        LEFT, CENTER, RIGHT
     }
 }
