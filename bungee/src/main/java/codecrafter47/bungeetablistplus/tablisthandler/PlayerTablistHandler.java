@@ -37,6 +37,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.netty.ChannelWrapper;
 
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 
 import static java.lang.Integer.min;
@@ -91,7 +92,11 @@ public abstract class PlayerTablistHandler {
             BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "failed to get ChannelWrapper for player", e);
         }
         if (ch != null) {
-            ch.getHandle().eventLoop().submit(runnable);
+            try {
+                ch.getHandle().eventLoop().submit(runnable);
+            } catch (RejectedExecutionException ignored) {
+                // The player has disconnected. Nothing to worry about.
+            }
         }
     }
 
