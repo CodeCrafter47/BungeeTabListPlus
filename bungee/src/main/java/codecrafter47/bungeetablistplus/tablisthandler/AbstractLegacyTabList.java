@@ -218,14 +218,24 @@ public abstract class AbstractLegacyTabList implements PacketHandler {
     public PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
         if (packet.getAction() == PlayerListItem.Action.ADD_PLAYER) {
             for (PlayerListItem.Item item : packet.getItems()) {
-                serverTabList.put(item.getDisplayName(), item.getPing());
+                serverTabList.put(getName(item), item.getPing());
             }
         } else {
             for (PlayerListItem.Item item : packet.getItems()) {
-                serverTabList.remove(item.getDisplayName());
+                serverTabList.remove(getName(item));
             }
         }
         return passThrough ? PacketListenerResult.PASS : PacketListenerResult.CANCEL;
+    }
+
+    private String getName(PlayerListItem.Item item) {
+        if (item.getDisplayName() != null) {
+            return item.getDisplayName();
+        } else if (item.getUsername() != null) {
+            return item.getUsername();
+        } else {
+            throw new AssertionError("DisplayName and Username are null");
+        }
     }
 
     @Override
