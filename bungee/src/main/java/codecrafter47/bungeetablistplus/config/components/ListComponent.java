@@ -19,11 +19,14 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.layout.LayoutException;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 @Data
 public class ListComponent extends Component {
@@ -110,14 +113,19 @@ public class ListComponent extends Component {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            updateLayout();
+            try {
+                updateLayout();
+            } catch (LayoutException e) {
+                BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Config error.", e);
+                return;
+            }
             for (int i = 0; i < components.size(); i++) {
                 Component.Instance component = components.get(i);
                 component.update2ndStep();
             }
         }
 
-        void updateLayout() {
+        void updateLayout() throws LayoutException {
             int[] sectionSize = new int[components.size()];
             for (int i = 0; i < components.size(); i++) {
                 sectionSize[i] = components.get(i).getMinSize();
@@ -132,7 +140,7 @@ public class ListComponent extends Component {
                 sizeNeeded += sectionSize[i];
             }
             if (sizeNeeded > size) {
-                throw new RuntimeException(String.format("Minimum size the given layout would need is %d but tab_size is only %d", sizeNeeded, size));
+                throw new LayoutException(String.format("Minimum size the given layout would need is %d but tab_size is only %d", sizeNeeded, size));
             }
 
             boolean repeat;
