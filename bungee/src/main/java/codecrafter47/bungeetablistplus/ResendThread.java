@@ -18,7 +18,6 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabList;
 import codecrafter47.bungeetablistplus.config.Config;
 import codecrafter47.bungeetablistplus.config.DynamicSizeConfig;
 import codecrafter47.bungeetablistplus.config.FixedSizeConfig;
@@ -26,10 +25,8 @@ import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
-import codecrafter47.bungeetablistplus.tablist.GenericTabList;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.*;
-import codecrafter47.bungeetablistplus.tablistproviders.legacy.ErrorTabListProvider;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -140,22 +137,7 @@ class ResendThread implements Runnable, Executor {
                 }
             }
         } catch (Throwable th) {
-            try {
-                BungeeTabListPlus.getInstance().getLogger().log(th instanceof LayoutException ? Level.WARNING : Level.SEVERE, "Error while updating tablist", th);
-                TabList tabList;
-                if (BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player)) {
-                    tabList = new GenericTabList(20, 4);
-                } else {
-                    tabList = new GenericTabList();
-                }
-
-                ErrorTabListProvider.constructErrorTabList(player, tabList, "Error while updating tablist", th);
-
-                tablistHandler.setTablistProvider(LegacyTablistProvider.INSTANCE);
-                tablistHandler.sendTabList(tabList);
-            } catch (Throwable th2) {
-                BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to construct error tab list", th2);
-            }
+            BungeeTabListPlus.getInstance().getLogger().log(th instanceof LayoutException ? Level.WARNING : Level.SEVERE, "Error while updating tablist", th);
         }
     }
 
