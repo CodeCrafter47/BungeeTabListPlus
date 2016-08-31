@@ -86,7 +86,9 @@ public class ConnectedPlayerManager implements IPlayerProvider {
 
     @Synchronized
     public void onPlayerDisconnected(ConnectedPlayer player) {
-        players.remove(player);
+        if (!players.remove(player)) {
+            return;
+        }
         byName.remove(player.getName(), player);
         byUUID.remove(player.getUniqueID(), player);
         BungeeTabListPlus.getInstance().getBridge().onDisconnected(player.getPlayer());
