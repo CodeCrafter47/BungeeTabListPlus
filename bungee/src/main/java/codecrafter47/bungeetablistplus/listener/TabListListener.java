@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.listener;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.Server;
@@ -31,6 +32,7 @@ import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import net.md_5.bungee.netty.ChannelWrapper;
 
 public class TabListListener implements Listener {
 
@@ -44,11 +46,12 @@ public class TabListListener implements Listener {
     public void onPlayerJoin(PostLoginEvent e) {
         try {
             ConnectedPlayerManager manager = plugin.getConnectedPlayerManager();
-            ConnectedPlayer connectedPlayer = manager.getPlayerIfPresent(e.getPlayer().getUniqueId());
-            if (connectedPlayer != null) {
-                manager.onPlayerDisconnected(connectedPlayer);
+            ConnectedPlayer oldConnectedPlayer = manager.getPlayerIfPresent(e.getPlayer().getUniqueId());
+            if (oldConnectedPlayer != null) {
+                ChannelWrapper channelWrapper = ReflectionUtil.getChannelWrapper(oldConnectedPlayer.getPlayer());
+                channelWrapper.getHandle().eventLoop().execute(() -> manager.onPlayerDisconnected(oldConnectedPlayer));
             }
-            connectedPlayer = new ConnectedPlayer(e.getPlayer());
+            ConnectedPlayer connectedPlayer = new ConnectedPlayer(e.getPlayer());
             manager.onPlayerConnected(connectedPlayer);
 
             if (plugin.getConfig().updateOnPlayerJoinLeave) {
