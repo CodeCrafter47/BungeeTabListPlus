@@ -30,6 +30,7 @@ import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -80,12 +81,15 @@ public class TabListLogic extends AbstractTabListLogic {
     public List<IPlayer> getServerTabList() {
         List<IPlayer> list = new ArrayList<>(serverTabList.size());
 
-        for (TabListItem item : serverTabList.values()) {
-            FakePlayer fakePlayer = new FakePlayer(item.getUsername(), player.getServer().getInfo(), false);
-            fakePlayer.setPing(item.getPing());
-            fakePlayer.setGamemode(item.getGamemode());
-            fakePlayer.setSkin(new PlayerSkin(item.getUuid(), item.getProperties()));
-            list.add(fakePlayer);
+        Server server = player.getServer();
+        if (server != null) {
+            for (TabListItem item : serverTabList.values()) {
+                FakePlayer fakePlayer = new FakePlayer(item.getUsername(), server.getInfo(), false);
+                fakePlayer.setPing(item.getPing());
+                fakePlayer.setGamemode(item.getGamemode());
+                fakePlayer.setSkin(new PlayerSkin(item.getUuid(), item.getProperties()));
+                list.add(fakePlayer);
+            }
         }
 
         return list;
