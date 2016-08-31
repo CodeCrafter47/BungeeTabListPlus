@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.context.Context;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.Map;
 
 import static java.lang.Integer.max;
@@ -30,7 +31,7 @@ import static java.lang.Integer.max;
 @Getter
 @Setter
 public class TableComponent extends Component {
-    private Map<String, Component> columns;
+    private Map<String, Component> columns = Collections.emptyMap();
     private int size = -1;
 
     public void setColumns(Map<String, Component> columns) {
@@ -80,6 +81,7 @@ public class TableComponent extends Component {
         int[] start;
         int[] width;
         int minSize;
+        int preferredSize;
         int maxSize;
 
         protected Instance(Context context) {
@@ -125,10 +127,12 @@ public class TableComponent extends Component {
         public void update1stStep() {
             super.update1stStep();
             minSize = 0;
-            maxSize = Integer.MAX_VALUE;
+            preferredSize = 0;
+            maxSize = 0;
             for (Component.Instance component : columns) {
                 component.update1stStep();
                 minSize = max(minSize, (component.getMinSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
+                preferredSize = max(preferredSize, (component.getPreferredSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
                 maxSize = max(maxSize, (component.getMaxSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
             }
         }
@@ -148,6 +152,11 @@ public class TableComponent extends Component {
         @Override
         public int getMinSize() {
             return TableComponent.this.size != -1 ? TableComponent.this.size : minSize;
+        }
+
+        @Override
+        public int getPreferredSize() {
+            return preferredSize;
         }
 
         @Override

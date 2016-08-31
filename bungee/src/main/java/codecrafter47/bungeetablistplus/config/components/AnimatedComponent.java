@@ -136,6 +136,11 @@ public class AnimatedComponent extends Component {
         }
 
         @Override
+        public int getPreferredSize() {
+            return getSize();
+        }
+
+        @Override
         public int getMaxSize() {
             return getSize();
         }

@@ -102,6 +102,8 @@ public abstract class Component {
 
         public abstract int getMinSize();
 
+        public abstract int getPreferredSize();
+
         public abstract int getMaxSize();
 
         public abstract boolean isBlockAligned();

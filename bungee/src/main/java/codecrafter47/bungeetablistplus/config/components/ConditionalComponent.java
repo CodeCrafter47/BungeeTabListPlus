@@ -111,6 +111,11 @@ public class ConditionalComponent extends Component {
         }
 
         @Override
+        public int getPreferredSize() {
+            return component.getPreferredSize();
+        }
+
+        @Override
         public int getMaxSize() {
             return component.getMaxSize();
         }

@@ -43,7 +43,7 @@ public class PlayersByServerComponent extends Component {
     int minSizePerServer = 0;
     int maxSizePerServer = 200;
     int minSize = 0;
-    int maxSize = 200;
+    int maxSize = -1;
 
     public void setServerHeader(Component serverHeader) {
         Preconditions.checkArgument(serverHeader.hasConstantSize(), "serverHeader needs to have a fixed size.");
@@ -71,7 +71,7 @@ public class PlayersByServerComponent extends Component {
     }
 
     public void setMinSize(int minSize) {
-        Preconditions.checkArgument(minSize <= maxSize, "minSize needs to be smaller than maxSize.");
+        Preconditions.checkArgument(maxSize == -1 || minSize <= maxSize, "minSize needs to be smaller than maxSize.");
         this.minSize = minSize;
     }
 
@@ -94,7 +94,7 @@ public class PlayersByServerComponent extends Component {
 
         private List<Component.Instance> activeComponents = new ArrayList<>();
         private Map<String, List<Player>> playersByServer = new LinkedHashMap<>();
-        private int maxSize;
+        private int preferredSize;
 
         protected Instance(Context context) {
             super(context);
@@ -126,13 +126,15 @@ public class PlayersByServerComponent extends Component {
                 playerOrder.sort(context, list);
             }
 
-            maxSize = 0;
+            preferredSize = 0;
             for (List<Player> list : playersByServer.values()) {
                 int serverSize = serverHeader.getSize() + list.size() * playerComponent.getSize();
                 serverSize = ((serverSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
-                maxSize += min(serverSize, maxSizePerServer);
+                preferredSize += min(serverSize, maxSizePerServer);
             }
-            maxSize = min(maxSize, PlayersByServerComponent.this.maxSize);
+            if (maxSize != -1) {
+                preferredSize = min(preferredSize, PlayersByServerComponent.this.maxSize);
+            }
         }
 
         @Override
@@ -215,8 +217,13 @@ public class PlayersByServerComponent extends Component {
         }
 
         @Override
+        public int getPreferredSize() {
+            return preferredSize;
+        }
+
+        @Override
         public int getMaxSize() {
-            return maxSize;
+            return maxSize == -1 ? preferredSize : maxSize;
         }
 
         @Override

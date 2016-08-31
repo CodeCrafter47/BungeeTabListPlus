@@ -98,6 +98,11 @@ public class BasicComponent extends Component {
         }
 
         @Override
+        public int getPreferredSize() {
+            return 1;
+        }
+
+        @Override
         public int getMaxSize() {
             return 1;
         }

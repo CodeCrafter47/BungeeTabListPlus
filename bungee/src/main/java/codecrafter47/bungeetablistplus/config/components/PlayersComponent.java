@@ -41,7 +41,7 @@ public class PlayersComponent extends Component {
     private Component playerComponent;
     private Component morePlayersComponent;
     int minSize = 0;
-    int maxSize = 200;
+    int maxSize = -1;
 
     @Override
     public boolean hasConstantSize() {
@@ -59,7 +59,7 @@ public class PlayersComponent extends Component {
     }
 
     public void setMinSize(int minSize) {
-        Preconditions.checkArgument(minSize <= maxSize, "minSize needs to be smaller than maxSize.");
+        Preconditions.checkArgument(maxSize == -1 || minSize <= maxSize, "minSize needs to be smaller than maxSize.");
         this.minSize = minSize;
     }
 
@@ -129,8 +129,17 @@ public class PlayersComponent extends Component {
         }
 
         @Override
+        public int getPreferredSize() {
+            int size = players.size() * playerComponent.getSize();
+            if (maxSize != -1) {
+                size = min(maxSize, size);
+            }
+            return max(minSize, size);
+        }
+
+        @Override
         public int getMaxSize() {
-            return max(minSize, min(maxSize, players.size() * playerComponent.getSize()));
+            return maxSize == -1 ? getPreferredSize() : maxSize;
         }
 
         @Override

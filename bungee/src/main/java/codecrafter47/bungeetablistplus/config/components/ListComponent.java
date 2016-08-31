@@ -54,6 +54,7 @@ public class ListComponent extends Component {
     public static class Instance extends Component.Instance {
         private final List<Component.Instance> components;
         private int minSize;
+        private int preferredSize;
         private int maxSize;
         private boolean blockAlignment;
 
@@ -91,6 +92,14 @@ public class ListComponent extends Component {
                     minSize = ((minSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
                 }
                 minSize += component.getMinSize();
+            }
+            preferredSize = 0;
+            for (int i = 0; i < components.size(); i++) {
+                Component.Instance component = components.get(i);
+                if (component.isBlockAligned()) {
+                    preferredSize = ((preferredSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                }
+                preferredSize += component.getPreferredSize();
             }
             maxSize = 0;
             for (int i = 0; i < components.size(); i++) {
@@ -144,13 +153,14 @@ public class ListComponent extends Component {
             }
 
             boolean repeat;
+            boolean max = false;
             do {
                 repeat = false;
 
                 for (int i = 0; i < components.size(); i++) {
                     Component.Instance component = components.get(i);
                     int oldSectionSize = sectionSize[i];
-                    if (oldSectionSize >= component.getMaxSize()) {
+                    if (oldSectionSize >= (max ? component.getMaxSize() : component.getPreferredSize())) {
                         continue;
                     }
                     sectionSize[i] += component.isBlockAligned() ? context.getColumns() : 1;
@@ -170,6 +180,11 @@ public class ListComponent extends Component {
                         sectionSize[i] = oldSectionSize;
                     }
                 }
+
+                if (!repeat && !max) {
+                    max = true;
+                    repeat = true;
+                }
             } while (repeat);
 
             int pos = 0;
@@ -186,6 +201,11 @@ public class ListComponent extends Component {
         @Override
         public int getMinSize() {
             return minSize;
+        }
+
+        @Override
+        public int getPreferredSize() {
+            return preferredSize;
         }
 
         @Override
