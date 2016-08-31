@@ -79,10 +79,13 @@ public class BasicComponent extends Component {
                 int space = slotWidth - textLength;
                 if (space > 0) {
                     int spaces = (int) (space / ChatUtil.getCharWidth(' ', false));
+                    int spacesBefore = spaces;
+                    int spacesBehind = 0;
                     if (alignment == Alignment.CENTER) {
-                        spaces >>= 1;
+                        spacesBefore = spaces >> 1;
+                        spacesBehind = spaces - spacesBefore;
                     }
-                    text = Strings.repeat(" ", spaces) + text;
+                    text = Strings.repeat(" ", spacesBefore) + text + "&r" + Strings.repeat(" ", spacesBehind);
                 }
             }
 
