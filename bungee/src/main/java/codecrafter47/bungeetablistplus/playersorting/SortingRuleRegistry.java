@@ -19,19 +19,7 @@
 
 package codecrafter47.bungeetablistplus.playersorting;
 
-import codecrafter47.bungeetablistplus.playersorting.rules.AFKLast;
-import codecrafter47.bungeetablistplus.playersorting.rules.AdminFirst;
-import codecrafter47.bungeetablistplus.playersorting.rules.AdminLast;
-import codecrafter47.bungeetablistplus.playersorting.rules.Alphabet;
-import codecrafter47.bungeetablistplus.playersorting.rules.FactionFirst;
-import codecrafter47.bungeetablistplus.playersorting.rules.FactionsAlphabetically;
-import codecrafter47.bungeetablistplus.playersorting.rules.PlayerServerFirst;
-import codecrafter47.bungeetablistplus.playersorting.rules.PlayerWorld;
-import codecrafter47.bungeetablistplus.playersorting.rules.ServerAlphabetically;
-import codecrafter47.bungeetablistplus.playersorting.rules.TeamFirst;
-import codecrafter47.bungeetablistplus.playersorting.rules.TeamsAlphabetically;
-import codecrafter47.bungeetablistplus.playersorting.rules.WorldByName;
-import codecrafter47.bungeetablistplus.playersorting.rules.YouFirst;
+import codecrafter47.bungeetablistplus.playersorting.rules.*;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Optional;
@@ -60,6 +48,12 @@ public class SortingRuleRegistry {
             .put("serveralphabetically", new ServerAlphabetically())
             .put("playerserverfirst", new PlayerServerFirst())
             .put("afklast", new AFKLast())
+            .put("vaultGroupInfo", new VaultGroupInfo())
+            .put("vaultGroupInfoReversed", new ReverseOrder(new VaultGroupInfo()))
+            .put("bungeePermsGroupInfo", new BungeePermsGroupInfo())
+            .put("bungeePermsGroupInfoReversed", new ReverseOrder(new BungeePermsGroupInfo()))
+            .put("bungeeCordGroups", new BungeeCordGroups())
+            .put("bungeeCordGroupsReversed", new ReverseOrder(new BungeeCordGroups()))
             .build();
 
     public static Optional<SortingRule> getRule(String name) {
