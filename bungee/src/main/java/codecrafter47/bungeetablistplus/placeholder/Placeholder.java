@@ -104,6 +104,7 @@ public abstract class Placeholder {
         playerPlaceholders.put("session_duration_minutes", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
         playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
         playerPlaceholders.put("essentials_afk", ofFunction(p -> p.get(DataKeys.Essentials_IsAFK).orElse(false).toString()));
+        playerPlaceholders.put("is_hidden", ofFunction(p -> Boolean.toString(BungeeTabListPlus.isHidden(p))));
 
         // Server
         serverPlaceholders.put("tps", serverInfo -> BungeeTabListPlus.getInstance().getBridge().get(serverInfo, DataKeys.TPS).map(d -> String.format("%1.1f", d)).orElse(""));
