@@ -32,6 +32,7 @@ import java.util.List;
 @Subtype(type = TableComponent.class, tag = "!table")
 @Subtype(type = PlayersByServerComponent.class, tag = "!players_by_server")
 @Subtype(type = PlayersComponent.class, tag = "!players")
+@Subtype(type = SpacerComponent.class, tag = "!spacer")
 @Subtype(type = BasicComponent.class)
 public abstract class Component {
 

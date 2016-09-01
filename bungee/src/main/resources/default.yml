@@ -57,8 +57,8 @@ components:
   includeEmptyServers: true
   playerComponent: {text: "${player name}", icon: "${player skin}", ping: "${player ping}"}
   morePlayersComponent: {text: "&7... and &e${other_count} &7others", icon: "colors/gray.png", ping: 0}
-  minSize: 48
-  maxSize: 48
+# We want to components below to be at the very bottom of the tab list
+- !spacer {}
 - {text: "", icon: "colors/dark_gray.png", ping: 1000}
 - {text: "", icon: "colors/dark_gray.png", ping: 1000}
 - {text: "", icon: "colors/dark_gray.png", ping: 1000}

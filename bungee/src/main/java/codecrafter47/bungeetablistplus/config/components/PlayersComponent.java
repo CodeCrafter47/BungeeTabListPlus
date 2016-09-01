@@ -139,7 +139,7 @@ public class PlayersComponent extends Component {
 
         @Override
         public int getMaxSize() {
-            return maxSize == -1 ? getPreferredSize() : maxSize;
+            return getPreferredSize();
         }
 
         @Override
