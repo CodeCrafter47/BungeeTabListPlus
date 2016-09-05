@@ -32,15 +32,15 @@ public class Context {
 
     private static int nextId = 0;
 
-    public static final ImmutableContextKey<CustomTablist> KEY_TAB_LIST = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<Player> KEY_VIEWER = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<Player> KEY_PLAYER = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<String> KEY_SERVER = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<Integer> KEY_OTHER_PLAYERS_COUNT = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<Integer> KEY_SERVER_PLAYER_COUNT = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<Integer> KEY_COLUMNS = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<PlayerSets> KEY_PLAYER_SETS = new ImmutableContextKey<>();
-    public static final ImmutableContextKey<Map<String, CustomPlaceholder>> KEY_CUSTOM_PLACEHOLDERS = new ImmutableContextKey<>();
+    public static final ContextKey<CustomTablist> KEY_TAB_LIST = new ContextKey<>();
+    public static final ContextKey<Player> KEY_VIEWER = new ContextKey<>();
+    public static final ContextKey<Player> KEY_PLAYER = new ContextKey<>();
+    public static final ContextKey<String> KEY_SERVER = new ContextKey<>();
+    public static final ContextKey<Integer> KEY_OTHER_PLAYERS_COUNT = new ContextKey<>();
+    public static final ContextKey<Integer> KEY_SERVER_PLAYER_COUNT = new ContextKey<>();
+    public static final ContextKey<Integer> KEY_COLUMNS = new ContextKey<>();
+    public static final ContextKey<PlayerSets> KEY_PLAYER_SETS = new ContextKey<>();
+    public static final ContextKey<Map<String, CustomPlaceholder>> KEY_CUSTOM_PLACEHOLDERS = new ContextKey<>();
 
     // Parent
     private final Object[] elements;
@@ -56,14 +56,11 @@ public class Context {
 
     @SuppressWarnings("unchecked")
     @Nullable
-    public <T> T get(@Nonnull ImmutableContextKey<T> key) {
+    public <T> T get(@Nonnull ContextKey<T> key) {
         return (T) elements[key.index];
     }
 
-    public <T> Context put(@Nonnull ImmutableContextKey<T> key, @Nonnull T element) {
-        if (elements[key.index] != null) {
-            throw new IllegalStateException("Cannot change immutable value.");
-        }
+    public <T> Context put(@Nonnull ContextKey<T> key, @Nonnull T element) {
         elements[key.index] = element;
         return this;
     }
@@ -72,10 +69,10 @@ public class Context {
         return new Context(this);
     }
 
-    public static class ImmutableContextKey<T> {
+    public static class ContextKey<T> {
         private final int index;
 
-        private ImmutableContextKey() {
+        private ContextKey() {
             this.index = nextId++;
         }
     }
