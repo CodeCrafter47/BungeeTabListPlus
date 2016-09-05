@@ -128,6 +128,8 @@ class ResendThread implements Runnable, Executor {
                 if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
                     tablistHandler.setTablistProvider(createTablistProvider(context, config));
                     tablistProvider = tablistHandler.getTablistProvider();
+                } else if (config == null && tablistProvider instanceof ConfigTablistProvider) {
+                    tablistHandler.setTablistProvider(tablistProvider = LegacyTablistProvider.INSTANCE);
                 }
 
                 if (tablistProvider instanceof LegacyTablistProvider) {
