@@ -89,7 +89,7 @@ public class ListComponent extends Component {
             for (int i = 0; i < components.size(); i++) {
                 Component.Instance component = components.get(i);
                 if (component.isBlockAligned()) {
-                    minSize = ((minSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                    minSize = ((minSize + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
                 minSize += component.getMinSize();
             }
@@ -97,7 +97,7 @@ public class ListComponent extends Component {
             for (int i = 0; i < components.size(); i++) {
                 Component.Instance component = components.get(i);
                 if (component.isBlockAligned()) {
-                    preferredSize = ((preferredSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                    preferredSize = ((preferredSize + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
                 preferredSize += component.getPreferredSize();
             }
@@ -105,7 +105,7 @@ public class ListComponent extends Component {
             for (int i = 0; i < components.size(); i++) {
                 Component.Instance component = components.get(i);
                 if (component.isBlockAligned()) {
-                    maxSize = ((maxSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                    maxSize = ((maxSize + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
                 maxSize += component.getMaxSize();
             }
@@ -144,7 +144,7 @@ public class ListComponent extends Component {
             for (int i = 0; i < components.size(); i++) {
                 Component.Instance component = components.get(i);
                 if (component.isBlockAligned()) {
-                    sizeNeeded = ((sizeNeeded + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                    sizeNeeded = ((sizeNeeded + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
                 sizeNeeded += sectionSize[i];
             }
@@ -163,13 +163,13 @@ public class ListComponent extends Component {
                     if (oldSectionSize >= (max ? component.getMaxSize() : component.getPreferredSize())) {
                         continue;
                     }
-                    sectionSize[i] += component.isBlockAligned() ? context.getColumns() : 1;
+                    sectionSize[i] += component.isBlockAligned() ? context.get(Context.KEY_COLUMNS) : 1;
 
                     sizeNeeded = 0;
                     for (int j = 0; j < components.size(); j++) {
                         Component.Instance component1 = components.get(j);
                         if (component1.isBlockAligned()) {
-                            sizeNeeded = ((sizeNeeded + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                            sizeNeeded = ((sizeNeeded + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                         }
                         sizeNeeded += sectionSize[j];
                     }
@@ -191,9 +191,9 @@ public class ListComponent extends Component {
             for (int i = 0; i < components.size(); i++) {
                 Component.Instance component = components.get(i);
                 if (component.isBlockAligned()) {
-                    pos = ((pos + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                    pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
-                component.setPosition(row + (pos / context.getColumns()), column + (pos % context.getColumns()), sectionSize[i]);
+                component.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), sectionSize[i]);
                 pos += sectionSize[i];
             }
         }

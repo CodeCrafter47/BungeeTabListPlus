@@ -121,17 +121,17 @@ public abstract class Placeholder {
         if (tokens.length == 0) {
             return NULL_PLACEHOLDER;
         } else if ("player".equals(tokens[0])) {
-            return parsePlayerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Context::getPlayer);
+            return parsePlayerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), (context) -> context.get(Context.KEY_PLAYER));
         } else if ("viewer".equals(tokens[0])) {
-            return parsePlayerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Context::getViewer);
+            return parsePlayerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), (context) -> context.get(Context.KEY_VIEWER));
         } else if ("server".equals(tokens[0])) {
-            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Context::getServer);
+            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), (context) -> context.get(Context.KEY_SERVER));
         } else if (tokens[0].startsWith("playerset:")) {
             String playerSet = tokens[0].split(":")[1];
             return new Placeholder() {
                 @Override
                 public String evaluate(Context context) {
-                    return Integer.toString(context.getPlayers(playerSet).size());
+                    return Integer.toString(context.get(Context.KEY_PLAYER_SETS).get(playerSet).size());
                 }
             };
         } else if (tokens[0].startsWith("server:")) {
@@ -231,8 +231,8 @@ public abstract class Placeholder {
 
         @Override
         public String evaluate(Context context) {
-            int n;
-            return -1 != (n = context.getOtherPlayersCount()) ? Integer.toString(n) : "";
+            Integer n;
+            return null != (n = context.get(Context.KEY_OTHER_PLAYERS_COUNT)) ? n.toString() : "";
         }
     }
 
@@ -240,8 +240,8 @@ public abstract class Placeholder {
 
         @Override
         public String evaluate(Context context) {
-            int n;
-            return -1 != (n = context.getServerPlayerCount()) ? Integer.toString(n) : "";
+            Integer n;
+            return null != (n = context.get(Context.KEY_SERVER_PLAYER_COUNT)) ? n.toString() : "";
         }
     }
 
@@ -267,8 +267,8 @@ public abstract class Placeholder {
         @Override
         public String evaluate(Context context) {
             if (instance == null) {
-                if (context.getCustomPlaceholders().containsKey(id)) {
-                    instance = context.getCustomPlaceholders().get(id).instantiate(parameters);
+                if (context.get(Context.KEY_CUSTOM_PLACEHOLDERS).containsKey(id)) {
+                    instance = context.get(Context.KEY_CUSTOM_PLACEHOLDERS).get(id).instantiate(parameters);
                 } else {
                     return "";
                 }

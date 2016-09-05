@@ -90,14 +90,14 @@ public abstract class Component {
         }
 
         protected void setSlot(int row, int column, Icon icon, String text, int ping) {
-            if (active && hasValidPosition && row * context.getColumns() + column < size) {
-                context.getTablist().setSlot(this.row + row, this.column + column, icon, text, ping);
+            if (active && hasValidPosition && row * context.get(Context.KEY_COLUMNS) + column < size) {
+                context.get(Context.KEY_TAB_LIST).setSlot(this.row + row, this.column + column, icon, text, ping);
             }
         }
 
         protected void setSlot(int n, Icon icon, String text, int ping) {
             if (active && hasValidPosition && n < size) {
-                context.getTablist().setSlot(row + n / context.getColumns(), column + n % context.getColumns(), icon, text, ping);
+                context.get(Context.KEY_TAB_LIST).setSlot(row + n / context.get(Context.KEY_COLUMNS), column + n % context.get(Context.KEY_COLUMNS), icon, text, ping);
             }
         }
 

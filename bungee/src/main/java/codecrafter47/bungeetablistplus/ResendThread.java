@@ -123,7 +123,7 @@ class ResendThread implements Runnable, Executor {
                 tablistHandler.setTablistProvider((TablistProvider) connectedPlayer.getCustomTablist());
             } else {
                 TablistProvider tablistProvider = tablistHandler.getTablistProvider();
-                Context context = new Context().setViewer(connectedPlayer);
+                Context context = new Context().put(Context.KEY_VIEWER, connectedPlayer);
                 Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
                 if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
                     tablistHandler.setTablistProvider(createTablistProvider(context, config));

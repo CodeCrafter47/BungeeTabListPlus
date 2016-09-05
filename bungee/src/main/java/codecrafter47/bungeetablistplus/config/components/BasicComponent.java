@@ -63,7 +63,7 @@ public class BasicComponent extends Component {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            CustomTablist tablist = context.getTablist();
+            CustomTablist tablist = context.get(Context.KEY_TAB_LIST);
             String text = getText().evaluate(context);
 
             if (alignment != Alignment.LEFT) {

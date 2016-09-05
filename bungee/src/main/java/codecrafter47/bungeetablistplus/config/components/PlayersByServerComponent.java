@@ -116,7 +116,7 @@ public class PlayersByServerComponent extends Component {
                     playersByServer.put(server.getName(), new ArrayList<>());
                 }
             }
-            for (Player player : context.getPlayers(playerSet)) {
+            for (Player player : context.get(Context.KEY_PLAYER_SETS).get(playerSet)) {
                 Optional<String> server = player.get(BungeeTabListPlus.DATA_KEY_SERVER);
                 if (server.isPresent()) {
                     playersByServer.computeIfAbsent(server.get(), s -> new ArrayList<>()).add(player);
@@ -129,7 +129,7 @@ public class PlayersByServerComponent extends Component {
             preferredSize = 0;
             for (List<Player> list : playersByServer.values()) {
                 int serverSize = serverHeader.getSize() + list.size() * playerComponent.getSize();
-                serverSize = ((serverSize + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                serverSize = ((serverSize + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 preferredSize += min(serverSize, maxSizePerServer);
             }
             if (maxSize != -1) {
@@ -143,9 +143,9 @@ public class PlayersByServerComponent extends Component {
             activeComponents.clear();
             super.update2ndStep();
             // figure out how much space each server gets
-            int rows = size / context.getColumns();
-            int minRowsPerServer = (minSizePerServer + context.getColumns() - 1) / context.getColumns();
-            int maxRowsPerServer = maxSizePerServer / context.getColumns();
+            int rows = size / context.get(Context.KEY_COLUMNS);
+            int minRowsPerServer = (minSizePerServer + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS);
+            int maxRowsPerServer = maxSizePerServer / context.get(Context.KEY_COLUMNS);
             List<String> servers = new ArrayList<>(playersByServer.keySet());
             // todo make server order configurable
             Collections.sort(servers);
@@ -159,7 +159,7 @@ public class PlayersByServerComponent extends Component {
                     if (rows > 0 && serverRows[i] < maxRowsPerServer) {
                         String server = servers.get(i);
                         int serverSize = serverHeader.getSize() + playersByServer.get(server).size() * playerComponent.getSize();
-                        if (min(serverSize, maxRowsPerServer) > serverRows[i] * context.getColumns()) {
+                        if (min(serverSize, maxRowsPerServer) > serverRows[i] * context.get(Context.KEY_COLUMNS)) {
                             serverRows[i]++;
                             change = true;
                             rows--;
@@ -171,38 +171,38 @@ public class PlayersByServerComponent extends Component {
             int pos = 0;
             for (int i = 0; i < servers.size() && pos < size; i++) {
                 String server = servers.get(i);
-                pos = ((pos + context.getColumns() - 1) / context.getColumns()) * context.getColumns();
+                pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 List<Player> players = playersByServer.get(server);
                 // Header
-                Context serverContext = context.derived().setServer(server).setServerPlayerCount(players.size());
+                Context serverContext = context.derived().put(Context.KEY_SERVER, server).put(Context.KEY_SERVER_PLAYER_COUNT, players.size());
                 Component.Instance header = serverHeader.toInstance(serverContext);
                 header.activate();
                 header.update1stStep();
-                header.setPosition(row + (pos / context.getColumns()), column, serverHeader.getSize());
+                header.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column, serverHeader.getSize());
                 header.update2ndStep();
                 activeComponents.add(header);
                 pos += serverHeader.getSize();
                 // Players
                 int playersMaxSize = playersByServer.get(server).size() * playerComponent.getSize();
-                int serverSize = min(serverRows[i] * context.getColumns() - serverHeader.getSize(), playersMaxSize);
+                int serverSize = min(serverRows[i] * context.get(Context.KEY_COLUMNS) - serverHeader.getSize(), playersMaxSize);
                 boolean allFit = serverSize >= playersMaxSize;
                 int j;
                 int pos2 = 0;
                 for (j = 0; (allFit || pos2 + morePlayersComponent.getSize() < serverSize) && j < players.size(); j++) {
                     Player player = players.get(j);
-                    Component.Instance component = playerComponent.toInstance(serverContext.derived().setPlayer(player));
+                    Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player));
                     component.activate();
                     component.update1stStep();
-                    component.setPosition(row + ((pos + pos2) / context.getColumns()), column + ((pos + pos2) % context.getColumns()), playerComponent.getSize());
+                    component.setPosition(row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), column + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
                     component.update2ndStep();
                     activeComponents.add(component);
                     pos2 += playerComponent.getSize();
                 }
                 if (!allFit) {
-                    Component.Instance component = morePlayersComponent.toInstance(serverContext.derived().setOtherPlayersCount(players.size() - j));
+                    Component.Instance component = morePlayersComponent.toInstance(serverContext.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - j));
                     component.activate();
                     component.update1stStep();
-                    component.setPosition(row + ((pos + pos2) / context.getColumns()), column + ((pos + pos2) % context.getColumns()), morePlayersComponent.getSize());
+                    component.setPosition(row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), column + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
                     component.update2ndStep();
                     activeComponents.add(component);
                     pos2 += morePlayersComponent.getSize();

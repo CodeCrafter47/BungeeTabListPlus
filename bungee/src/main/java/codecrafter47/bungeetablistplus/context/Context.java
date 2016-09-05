@@ -22,124 +22,61 @@ package codecrafter47.bungeetablistplus.context;
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
 import codecrafter47.bungeetablistplus.player.Player;
-import com.google.common.base.Preconditions;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
 public class Context {
 
-    // Parent
-    private Context parent;
+    private static int nextId = 0;
 
-    // Attributes
-    private CustomTablist tablist;
-    private Player player;
-    private Player viewer;
-    private int otherPlayersCount = -1;
-    private int serverPlayerCount = -1;
-    private int columns = -1;
-    private String server;
-    private PlayerSets playerSets = null;
-    private Map<String, CustomPlaceholder> customPlaceholders = null;
+    public static final ImmutableContextKey<CustomTablist> KEY_TAB_LIST = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<Player> KEY_VIEWER = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<Player> KEY_PLAYER = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<String> KEY_SERVER = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<Integer> KEY_OTHER_PLAYERS_COUNT = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<Integer> KEY_SERVER_PLAYER_COUNT = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<Integer> KEY_COLUMNS = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<PlayerSets> KEY_PLAYER_SETS = new ImmutableContextKey<>();
+    public static final ImmutableContextKey<Map<String, CustomPlaceholder>> KEY_CUSTOM_PLACEHOLDERS = new ImmutableContextKey<>();
+
+    // Parent
+    private final Object[] elements;
 
     // Constructor
     public Context() {
-        this(null);
+        elements = new Object[nextId];
     }
 
-    private Context(Context parent) {
-        this.parent = parent;
+    private Context(@Nonnull Context parent) {
+        elements = Arrays.copyOf(parent.elements, nextId);
     }
 
-    public List<Player> getPlayers(String playerSet) {
-        return playerSets != null ? playerSets.get(playerSet) : parent.getPlayers(playerSet);
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public <T> T get(@Nonnull ImmutableContextKey<T> key) {
+        return (T) elements[key.index];
+    }
+
+    public <T> Context put(@Nonnull ImmutableContextKey<T> key, @Nonnull T element) {
+        if (elements[key.index] != null) {
+            throw new IllegalStateException("Cannot change immutable value.");
+        }
+        elements[key.index] = element;
+        return this;
     }
 
     public Context derived() {
         return new Context(this);
     }
 
-    public Context setPlayer(Player player) {
-        this.player = player;
-        return this;
-    }
+    public static class ImmutableContextKey<T> {
+        private final int index;
 
-    public CustomTablist getTablist() {
-        return tablist != null ? tablist : parent.getTablist();
-    }
-
-    public void setTablist(CustomTablist tablist) {
-        this.tablist = tablist;
-    }
-
-    @Nullable
-    public Player getPlayer() {
-        return player != null ? player : parent != null ? parent.getPlayer() : null;
-    }
-
-    public int getOtherPlayersCount() {
-        return otherPlayersCount != -1 ? otherPlayersCount : parent != null ? parent.getOtherPlayersCount() : -1;
-    }
-
-    public Context setOtherPlayersCount(int otherPlayersCount) {
-        this.otherPlayersCount = otherPlayersCount;
-        return this;
-    }
-
-    public int getColumns() {
-        return columns != -1 ? columns : parent.getColumns();
-    }
-
-    public Context setColumns(int columns) {
-        Preconditions.checkArgument(columns > 0);
-        this.columns = columns;
-        return this;
-    }
-
-    public Context setServer(String server) {
-        this.server = server;
-        return this;
-    }
-
-    @Nullable
-    public String getServer() {
-        return server != null ? server : parent != null ? parent.getServer() : null;
-    }
-
-    public Player getViewer() {
-        return viewer != null ? viewer : parent.getViewer();
-    }
-
-    public Context setViewer(Player viewer) {
-        this.viewer = viewer;
-        return this;
-    }
-
-    public void setPlayerSets(PlayerSets playerSets) {
-        this.playerSets = playerSets;
-    }
-
-    public PlayerSets getPlayerSets() {
-        return playerSets != null ? playerSets : parent.getPlayerSets();
-    }
-
-    public int getServerPlayerCount() {
-        return serverPlayerCount != -1 ? serverPlayerCount : parent != null ? parent.getServerPlayerCount() : -1;
-    }
-
-    public Context setServerPlayerCount(int serverPlayerCount) {
-        this.serverPlayerCount = serverPlayerCount;
-        return this;
-    }
-
-    public Map<String, CustomPlaceholder> getCustomPlaceholders() {
-        return customPlaceholders != null ? customPlaceholders : parent != null ? parent.getCustomPlaceholders() : null;
-    }
-
-    public Context setCustomPlaceholders(Map<String, CustomPlaceholder> customPlaceholders) {
-        this.customPlaceholders = customPlaceholders;
-        return this;
+        private ImmutableContextKey() {
+            this.index = nextId++;
+        }
     }
 }

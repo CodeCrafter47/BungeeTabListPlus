@@ -36,6 +36,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
 
     public DynamicSizeConfigTablistProvider(DynamicSizeConfig config, Context context) {
         super(config, context);
+        this.context.put(Context.KEY_COLUMNS, 1);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
         super.update();
 
         // get players
-        List<Player> players = context.getPlayers(config.getPlayerSet());
+        List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(config.getPlayerSet());
         config.getPlayerOrder().sort(context, players);
 
         // deactivate old components
@@ -68,7 +69,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
         int i;
         for (i = 0; pos < size; i++) {
             Player player = players.get(i);
-            Component.Instance component = config.getPlayerComponent().toInstance(context.derived().setPlayer(player));
+            Component.Instance component = config.getPlayerComponent().toInstance(context.derived().put(Context.KEY_PLAYER, player));
             component.activate();
             component.update1stStep();
             component.setPosition(pos, 0, config.getPlayerComponent().getSize());

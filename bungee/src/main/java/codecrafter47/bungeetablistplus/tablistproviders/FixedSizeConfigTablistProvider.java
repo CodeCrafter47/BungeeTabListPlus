@@ -44,7 +44,7 @@ public class FixedSizeConfigTablistProvider extends ConfigTablistProvider<FixedS
         marks = new boolean[config.getSize()];
 
         // update context
-        context.setColumns(getColumns());
+        context.put(Context.KEY_COLUMNS, getColumns());
 
         // Tab overlay
         content = new ListComponent(config.getComponents()).toInstance(context);

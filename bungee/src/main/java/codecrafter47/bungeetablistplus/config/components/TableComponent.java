@@ -102,7 +102,7 @@ public class TableComponent extends Component {
                     start[j] = i;
                     width[j] = 1;
                 }
-                columns[j] = s.getValue().toInstance(context.derived().setColumns(width[j]));
+                columns[j] = s.getValue().toInstance(context.derived().put(Context.KEY_COLUMNS, width[j]));
                 j += 1;
             }
         }
@@ -131,9 +131,9 @@ public class TableComponent extends Component {
             maxSize = 0;
             for (Component.Instance component : columns) {
                 component.update1stStep();
-                minSize = max(minSize, (component.getMinSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
-                preferredSize = max(preferredSize, (component.getPreferredSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
-                maxSize = max(maxSize, (component.getMaxSize() + component.context.getColumns() - 1) / component.context.getColumns() * context.getColumns());
+                minSize = max(minSize, (component.getMinSize() + component.context.get(Context.KEY_COLUMNS) - 1) / component.context.get(Context.KEY_COLUMNS) * context.get(Context.KEY_COLUMNS));
+                preferredSize = max(preferredSize, (component.getPreferredSize() + component.context.get(Context.KEY_COLUMNS) - 1) / component.context.get(Context.KEY_COLUMNS) * context.get(Context.KEY_COLUMNS));
+                maxSize = max(maxSize, (component.getMaxSize() + component.context.get(Context.KEY_COLUMNS) - 1) / component.context.get(Context.KEY_COLUMNS) * context.get(Context.KEY_COLUMNS));
             }
         }
 
@@ -141,9 +141,9 @@ public class TableComponent extends Component {
         public void update2ndStep() {
             super.update2ndStep();
             for (int i = 0; i < columns.length; i++) {
-                if (start[i] < context.getColumns()) {
+                if (start[i] < context.get(Context.KEY_COLUMNS)) {
                     Component.Instance component = columns[i];
-                    component.setPosition(row, column + start[i], size / context.getColumns() * width[i]);
+                    component.setPosition(row, column + start[i], size / context.get(Context.KEY_COLUMNS) * width[i]);
                     component.update2ndStep();
                 }
             }

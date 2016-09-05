@@ -81,7 +81,7 @@ public class AnimatedComponent extends Component {
         @Override
         public void deactivate() {
             super.deactivate();
-            synchronized (context.getTablist()) {
+            synchronized (context.get(Context.KEY_TAB_LIST)) {
                 BungeeTabListPlus.getInstance().unregisterTask(getInterval(), this);
                 activeComponent = -1;
             }
@@ -95,7 +95,7 @@ public class AnimatedComponent extends Component {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            synchronized (context.getTablist()) {
+            synchronized (context.get(Context.KEY_TAB_LIST)) {
                 if (activeComponent == -1) {
                     activeComponent = 0;
                     Component.Instance component = frames.get(0);
@@ -115,7 +115,7 @@ public class AnimatedComponent extends Component {
         @Override
         public void run() {
             if (activeComponent != -1) {
-                synchronized (context.getTablist()) {
+                synchronized (context.get(Context.KEY_TAB_LIST)) {
                     frames.get(activeComponent).deactivate();
                     activeComponent++;
                     if (activeComponent >= frames.size()) {

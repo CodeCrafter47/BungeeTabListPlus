@@ -73,7 +73,7 @@ public class PlayerSorter {
 
             @Override
             public ProxiedPlayer getViewer() {
-                return ((ConnectedPlayer) context.getViewer()).getPlayer();
+                return ((ConnectedPlayer) context.get(Context.KEY_VIEWER)).getPlayer();
             }
 
             @Override
@@ -83,12 +83,12 @@ public class PlayerSorter {
 
             @Override
             public IPlayer getPlayer() {
-                return context.getPlayer();
+                return context.get(Context.KEY_PLAYER);
             }
 
             @Override
             public Optional<ServerInfo> getServer() {
-                return context.getPlayer().getServer();
+                return context.get(Context.KEY_PLAYER).getServer();
             }
 
             @Override
@@ -98,7 +98,7 @@ public class PlayerSorter {
 
             @Override
             public int getOtherPlayerCount() {
-                return context.getOtherPlayersCount();
+                return -1;
             }
 
             @Override

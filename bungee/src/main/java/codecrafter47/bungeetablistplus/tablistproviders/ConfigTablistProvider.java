@@ -61,13 +61,13 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
 
         // Create context
         this.context = context;
-        this.context.setColumns(getColumns());
-        this.context.setPlayerSets(playerSets = new PlayerSets());
+        this.playerSets = new PlayerSets();
+        this.context.put(Context.KEY_PLAYER_SETS, playerSets);
         Map<String, CustomPlaceholder> customPlaceholderMap = new HashMap<>();
         customPlaceholderMap.putAll(BungeeTabListPlus.getInstance().getConfig().customPlaceholders);
         customPlaceholderMap.putAll(config.getCustomPlaceholders());
-        this.context.setCustomPlaceholders(customPlaceholderMap);
-        this.context.setTablist(this);
+        this.context.put(Context.KEY_CUSTOM_PLACEHOLDERS, customPlaceholderMap);
+        this.context.put(Context.KEY_TAB_LIST, this);
         init();
     }
 
@@ -109,7 +109,7 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
         }
 
         BungeeTabListPlus plugin = BungeeTabListPlus.getInstance();
-        boolean canSeeHiddenPlayers = context.getViewer().get(DataKeys.permission("bungeetablistplus.seevanished")).orElse(false);
+        boolean canSeeHiddenPlayers = context.get(Context.KEY_VIEWER).get(DataKeys.permission("bungeetablistplus.seevanished")).orElse(false);
 
         // PlayerSets
         ImmutableList<? extends IPlayer> all = ImmutableList.copyOf(Iterables.concat(Collections2.transform(plugin.playerProviders, IPlayerProvider::getPlayers)));
@@ -118,7 +118,7 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
             List<Player> players = all
                     .stream()
                     .map(p -> ((Player) p))
-                    .filter(player -> entry.getValue().getFilter().evaluate(context.derived().setPlayer(player), ExpressionResult.BOOLEAN))
+                    .filter(player -> entry.getValue().getFilter().evaluate(context.derived().put(Context.KEY_PLAYER, player), ExpressionResult.BOOLEAN))
                     .filter(player -> !BungeeTabListPlus.isHidden(player) || (hiddenPlayers == PlayerVisibility.VISIBLE_TO_ADMINS && canSeeHiddenPlayers) || hiddenPlayers == PlayerVisibility.VISIBLE)
                     .collect(Collectors.toList());
             playerSets.put(entry.getKey(), players);
