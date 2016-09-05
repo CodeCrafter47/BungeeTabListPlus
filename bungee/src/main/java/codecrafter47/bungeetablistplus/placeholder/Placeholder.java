@@ -282,7 +282,14 @@ public abstract class Placeholder {
     }
 
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofStringData(DataKey<String> dataKey) {
-        return (tokens, playerFunction) -> new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).orElse(""));
+        return (tokens, playerFunction) -> {
+            if (tokens.length == 0) {
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).orElse(""));
+            } else {
+                int length = Integer.valueOf(tokens[0]);
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(s -> (s.length() > length ? s.substring(0, length) : s)).orElse(""));
+            }
+        };
     }
 
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofIntData(DataKey<Integer> dataKey) {
