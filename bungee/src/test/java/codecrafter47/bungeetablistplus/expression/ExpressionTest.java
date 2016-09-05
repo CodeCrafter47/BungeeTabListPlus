@@ -17,9 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.config;
+package codecrafter47.bungeetablistplus.expression;
 
-import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,6 +63,9 @@ public class ExpressionTest {
         Assert.assertFalse(expression.evaluate(null, ExpressionResult.BOOLEAN));
         Assert.assertEquals(0, expression.evaluate(null, ExpressionResult.NUMBER), 0.001);
         Assert.assertEquals("false", expression.evaluate(null, ExpressionResult.STRING));
+
+        expression = new Expression("\"A\" . \"B\"");
+        Assert.assertEquals("AB", expression.evaluate(null, ExpressionResult.STRING));
     }
 
     @Test

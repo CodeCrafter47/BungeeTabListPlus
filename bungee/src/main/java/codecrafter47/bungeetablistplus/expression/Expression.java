@@ -17,10 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.config;
+package codecrafter47.bungeetablistplus.expression;
 
 import codecrafter47.bungeetablistplus.context.Context;
-import codecrafter47.bungeetablistplus.expression.*;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
@@ -30,6 +29,7 @@ import java.util.*;
 
 public class Expression {
     private static final Map<Token, Integer> OPERATORS = ImmutableMap.<Token, Integer>builder()
+            .put(Token.CONCAT_STRING, 25)
             .put(Token.AND, 15)
             .put(Token.OR, 10)
             .put(Token.EQUAL, 5)
@@ -94,7 +94,9 @@ public class Expression {
             }
 
             Part replacement;
-            if (operators.get(start) == Token.AND) {
+            if (operators.get(start) == Token.CONCAT_STRING) {
+                replacement = new ConcatStringPart(new ArrayList<>(parts.subList(start, end + 1)));
+            } else if (operators.get(start) == Token.AND) {
                 replacement = new AndPart(new ArrayList<>(parts.subList(start, end + 1)));
             } else if (operators.get(start) == Token.OR) {
                 replacement = new OrPart(new ArrayList<>(parts.subList(start, end + 1)));
@@ -403,6 +405,36 @@ public class Expression {
         @Override
         protected boolean evaluate(Context context) {
             return a.evaluate(context, ExpressionResult.NUMBER) <= b.evaluate(context, ExpressionResult.NUMBER);
+        }
+    }
+
+    private static class ConcatStringPart extends Part {
+        private final List<Part> parts;
+
+        private ConcatStringPart(List<Part> parts) {
+            this.parts = parts;
+        }
+
+        @Override
+        public <T> T evaluate(Context context, ExpressionResult<T> resultType) {
+            String result = "";
+            for (Part part : parts) {
+                result += part.evaluate(context, ExpressionResult.STRING);
+            }
+            if (resultType == ExpressionResult.STRING) {
+                return (T) result;
+            } else if (resultType == ExpressionResult.NUMBER) {
+                try {
+                    return (T) (Double) Double.parseDouble(result);
+                } catch (NumberFormatException ex) {
+                    double length = result.length();
+                    return (T) (Double) length;
+                }
+            } else if (resultType == ExpressionResult.BOOLEAN) {
+                return (T) (Boolean) Boolean.parseBoolean(result);
+            } else {
+                throw new IllegalArgumentException("Unknown result type" + resultType);
+            }
         }
     }
 }

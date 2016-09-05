@@ -19,8 +19,8 @@
 
 package codecrafter47.bungeetablistplus.template;
 
-import codecrafter47.bungeetablistplus.config.Expression;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 
 public class PingTemplate {

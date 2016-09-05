@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.config;
 
+import codecrafter47.bungeetablistplus.expression.Expression;
 import lombok.Data;
 
 @Data

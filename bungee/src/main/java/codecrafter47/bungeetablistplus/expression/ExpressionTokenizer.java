@@ -46,7 +46,8 @@ public class ExpressionTokenizer {
             .put(")", Token.CLOSING_PARENTHESIS)
             .put("!", Token.NEGATION)
             .put(">", Token.GREATER_THAN)
-            .put("<", Token.LESSER_THAN).build();
+            .put("<", Token.LESSER_THAN)
+            .put(".", Token.CONCAT_STRING).build();
 
     private final String expression;
 

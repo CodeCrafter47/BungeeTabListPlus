@@ -19,8 +19,8 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
-import codecrafter47.bungeetablistplus.config.Expression;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 
 public class ConditionalComponent extends Component {

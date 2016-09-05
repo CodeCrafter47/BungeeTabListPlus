@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
