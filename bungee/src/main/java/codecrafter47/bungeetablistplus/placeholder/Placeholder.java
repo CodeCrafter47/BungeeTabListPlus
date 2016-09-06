@@ -54,7 +54,6 @@ public abstract class Placeholder {
     static {
         playerPlaceholders.put("name", ofFunction(IPlayer::getName));
         playerPlaceholders.put("ping", ofFunction(player -> Integer.toString(player.getPing())));
-        playerPlaceholders.put("skin", ofFunction(IPlayer::getName)); // todo change this
         playerPlaceholders.put("bungeeperms_display", ofStringData(DataKeys.BungeePerms_DisplayPrefix));
         playerPlaceholders.put("bungeeperms_prefix", ofStringData(DataKeys.BungeePerms_Prefix));
         playerPlaceholders.put("bungeeperms_suffix", ofStringData(DataKeys.BungeePerms_Suffix));

@@ -22,13 +22,17 @@ package codecrafter47.bungeetablistplus.api.bungee;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
  * An icon shown in the tab list.
  */
 @Data
-public class Icon {
+public class Icon implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private final UUID player;
     @NonNull
     private final String[][] properties;

@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
 import codecrafter47.bungeetablistplus.data.DataCache;
 import codecrafter47.bungeetablistplus.data.DataKey;
@@ -63,6 +64,7 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
             Server server = p.getServer();
             return server != null ? server.getInfo().getName() : null;
         });
+        bind(BungeeTabListPlus.DATA_KEY_ICON, BungeeTabListPlusAPI::getIconFromPlayer);
     }
 
     @SuppressWarnings("unchecked")

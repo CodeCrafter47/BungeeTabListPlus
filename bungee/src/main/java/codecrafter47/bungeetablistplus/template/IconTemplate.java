@@ -20,29 +20,44 @@
 package codecrafter47.bungeetablistplus.template;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.context.Context;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import codecrafter47.bungeetablistplus.player.Player;
+
+import java.util.function.Function;
 
 public class IconTemplate {
-    // todo more efficient
-    TextTemplate delegate;
+    private Function<Context, Icon> getIcon;
 
     public IconTemplate(String text) {
-        delegate = new TextTemplate(text);
+        if (text.equals("${player skin}")) {
+            getIcon = context -> {
+                Player player = context.get(Context.KEY_PLAYER);
+                if (player != null) {
+                    return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+                } else {
+                    return Icon.DEFAULT;
+                }
+            };
+        } else if (text.equals("${viewer skin}")) {
+            getIcon = context -> {
+                Player player = context.get(Context.KEY_VIEWER);
+                if (player != null) {
+                    return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+                } else {
+                    return Icon.DEFAULT;
+                }
+            };
+        } else {
+            getIcon = context -> {
+                Skin skin = BungeeTabListPlus.getInstance().getSkinManager().getSkin(text);
+                return new Icon(skin.getOwner(), skin.toProperty());
+            };
+        }
     }
 
     public Icon evaluate(Context context) {
-        String evaluate = delegate.evaluate(context);
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(evaluate);
-        if (player != null) {
-            return BungeeTabListPlusAPI.getIconFromPlayer(player);
-        } else {
-            Skin skin = BungeeTabListPlus.getInstance().getSkinManager().getSkin(evaluate);
-            return new Icon(skin.getOwner(), skin.toProperty());
-        }
+        return getIcon.apply(context);
     }
 }

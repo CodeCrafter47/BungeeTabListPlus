@@ -87,6 +87,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     public static DataKey<Integer> DATA_KEY_GAMEMODE = DataKey.builder().id("btlp:gamemode").bungee().player().build();
     public static DataKey<String> DATA_KEY_SERVER = DataKey.builder().id("btlp:server").bungee().player().build();
+    public static DataKey<Icon> DATA_KEY_ICON = DataKey.builder().id("btlp:icon").bungee().player().build();
 
     /**
      * Holds an INSTANCE of itself if the plugin is enabled
