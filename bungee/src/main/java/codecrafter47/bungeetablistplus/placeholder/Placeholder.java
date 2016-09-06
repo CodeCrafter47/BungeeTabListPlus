@@ -97,6 +97,7 @@ public abstract class Placeholder {
         playerPlaceholders.put("vault_currency_plural", ofStringData(DataKeys.Vault_CurrencyNamePlural));
         playerPlaceholders.put("tab_name", ofFunction(player -> player.get(DataKeys.PlayerListName).orElse(player.getName())));
         playerPlaceholders.put("display_name", ofFunction(player -> player.get(DataKeys.DisplayName).orElse(player.getName())));
+        playerPlaceholders.put("bungeecord_display_name", ofFunction(player -> player.get(DataKeys.BungeeCord_DisplayName).orElse(player.getName())));
         playerPlaceholders.put("session_duration_seconds", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
         playerPlaceholders.put("session_duration_minutes", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
         playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));

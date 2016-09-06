@@ -65,6 +65,7 @@ public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Li
             return server != null ? server.getInfo().getName() : null;
         });
         bind(BungeeTabListPlus.DATA_KEY_ICON, BungeeTabListPlusAPI::getIconFromPlayer);
+        bind(DataKeys.BungeeCord_DisplayName, ProxiedPlayer::getDisplayName);
     }
 
     @SuppressWarnings("unchecked")

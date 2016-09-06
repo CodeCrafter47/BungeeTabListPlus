@@ -72,6 +72,7 @@ public class DataKeys {
     public final static DataKey<String> ServerModVersion = DataKey.builder().bukkit().server().id("bukkit:version").build();
 
     // BungeeCord player data keys
+    public final static DataKey<String> BungeeCord_DisplayName = DataKey.builder().bungee().player().id("bungeecord:displayname").build();
     public final static DataKey<String> BungeeCord_PrimaryGroup = DataKey.builder().bungee().player().id("bungeecord:group").build();
     public final static DataKey<Integer> BungeeCord_Rank = DataKey.builder().bungee().player().id("bungeecord:rank").build();
     public final static DataKey<String> BungeePerms_PrimaryGroup = DataKey.builder().bungee().player().id("bungeeperms:group").build();
