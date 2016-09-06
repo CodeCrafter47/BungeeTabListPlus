@@ -93,6 +93,11 @@ public class BasicPlaceholders extends PlaceholderProvider {
                 return ((ConnectedPlayer) context.getPlayer()).getPlayer().getDisplayName();
             return context.getPlayer().getName();
         });
+        bind("proxydisplayname").alias("player").to(context -> {
+            if (context.getPlayer() instanceof ConnectedPlayer)
+                return ((ConnectedPlayer) context.getPlayer()).getPlayer().getDisplayName();
+            return context.getPlayer().getName();
+        });
         bind("rawname").to(context -> context.getPlayer().getName());
         bind("server").to(context -> context.getServerGroup().map(ServerGroup::getName).orElse(""));
         bind("config_prefix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getConfigPrefix(context, context.getPlayer()));
