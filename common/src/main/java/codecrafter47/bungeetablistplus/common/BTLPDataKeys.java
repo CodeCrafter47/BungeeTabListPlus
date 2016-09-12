@@ -90,7 +90,7 @@ public final class BTLPDataKeys {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof ThirdPartyVariableDataKey && ((ThirdPartyVariableDataKey) obj).name.equals(name);
+            return obj instanceof BungeeThirdPartyVariableDataKey && ((BungeeThirdPartyVariableDataKey) obj).name.equals(name);
         }
 
         @Override
