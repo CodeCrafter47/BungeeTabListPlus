@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -30,6 +31,16 @@ import java.util.Optional;
 public class BungeeCordGroups implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
+        Optional<Integer> p1Rank = ((Player) player1).get(DataKeys.BungeeCord_Rank);
+        Optional<Integer> p2Rank = ((Player) player2).get(DataKeys.BungeeCord_Rank);
+        if (p1Rank.isPresent() || p2Rank.isPresent()) {
+            return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
+        }
+        return 0;
+    }
+
+    @Override
+    public int compare(Context context, IPlayer player1, IPlayer player2) {
         Optional<Integer> p1Rank = ((Player) player1).get(DataKeys.BungeeCord_Rank);
         Optional<Integer> p2Rank = ((Player) player2).get(DataKeys.BungeeCord_Rank);
         if (p1Rank.isPresent() || p2Rank.isPresent()) {

@@ -21,7 +21,7 @@ package codecrafter47.bungeetablistplus.playersorting.rules;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -33,8 +33,22 @@ public class PlayerWorld implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         IPlayer viewer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(context.getViewer());
-        BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
         Optional<String> world = ((Player) viewer).get(DataKeys.World);
+        if (world.isPresent()) {
+            Optional<String> world1 = ((Player) player1).get(DataKeys.World);
+            Optional<String> world2 = ((Player) player2).get(DataKeys.World);
+            if (!world1.equals(world2)) {
+                if (world1.equals(world)) return -1;
+                if (world2.equals(world)) return 1;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int compare(Context context, IPlayer player1, IPlayer player2) {
+        Player viewer = context.get(Context.KEY_VIEWER);
+        Optional<String> world = viewer.get(DataKeys.World);
         if (world.isPresent()) {
             Optional<String> world1 = ((Player) player1).get(DataKeys.World);
             Optional<String> world2 = ((Player) player2).get(DataKeys.World);

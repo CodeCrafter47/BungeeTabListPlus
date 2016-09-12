@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -33,6 +34,17 @@ import java.util.Optional;
 public class WorldByName implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
+        BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
+        Optional<String> faction1 = ((Player) player1).get(DataKeys.World);
+        Optional<String> faction2 = ((Player) player2).get(DataKeys.World);
+        if (faction1.isPresent() || faction2.isPresent()) {
+            return Collator.getInstance().compare(faction1.orElse(""), faction2.orElse(""));
+        }
+        return 0;
+    }
+
+    @Override
+    public int compare(Context context, IPlayer player1, IPlayer player2) {
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
         Optional<String> faction1 = ((Player) player1).get(DataKeys.World);
         Optional<String> faction2 = ((Player) player2).get(DataKeys.World);

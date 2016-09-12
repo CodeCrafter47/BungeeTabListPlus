@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -35,11 +36,23 @@ public class AFKLast implements SortingRule {
         }
         if (player1AFK) {
             return 1;
-        }
-        if (player2AFK) {
+        } else {
             return -1;
         }
-        return 0;
+    }
+
+    @Override
+    public int compare(Context context, IPlayer player1, IPlayer player2) {
+        boolean player1AFK = ((Player) player1).get(DataKeys.Essentials_IsAFK).orElse(false);
+        boolean player2AFK = ((Player) player2).get(DataKeys.Essentials_IsAFK).orElse(false);
+        if (player1AFK == player2AFK) {
+            return 0;
+        }
+        if (player1AFK) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
 
 }

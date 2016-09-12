@@ -21,12 +21,19 @@ package codecrafter47.bungeetablistplus.playersorting.rules;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
 public class AdminLast implements SortingRule {
 
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
+        return -BungeeTabListPlus.getInstance().getPermissionManager().
+                comparePlayers(player1, player2);
+    }
+
+    @Override
+    public int compare(Context context, IPlayer player1, IPlayer player2) {
         return -BungeeTabListPlus.getInstance().getPermissionManager().
                 comparePlayers(player1, player2);
     }

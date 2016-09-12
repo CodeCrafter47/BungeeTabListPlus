@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.playersorting.rules;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
+import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -34,6 +35,23 @@ public class TeamFirst implements SortingRule {
         IPlayer viewer = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(context.getViewer());
         if (viewer != null) {
             Optional<String> team = ((Player) viewer).get(DataKeys.Team);
+            if (team.isPresent()) {
+                Optional<String> team1 = ((Player) player1).get(DataKeys.Team);
+                Optional<String> team2 = ((Player) player2).get(DataKeys.Team);
+                if (!team1.equals(team2)) {
+                    if (team1.equals(team)) return -1;
+                    if (team2.equals(team)) return 1;
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int compare(Context context, IPlayer player1, IPlayer player2) {
+        Player viewer = context.get(Context.KEY_VIEWER);
+        if (viewer != null) {
+            Optional<String> team = viewer.get(DataKeys.Team);
             if (team.isPresent()) {
                 Optional<String> team1 = ((Player) player1).get(DataKeys.Team);
                 Optional<String> team2 = ((Player) player2).get(DataKeys.Team);
