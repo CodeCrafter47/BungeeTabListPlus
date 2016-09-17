@@ -40,6 +40,8 @@ public class PlayersByServerComponent extends Component implements Validate {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
     private String playerSet;
     private Component serverHeader;
+    private Component serverFooter;
+    private Component serverSeparator;
     private boolean includeEmptyServers;
     private Component playerComponent;
     private Component morePlayersComponent;
@@ -51,6 +53,20 @@ public class PlayersByServerComponent extends Component implements Validate {
     public void setServerHeader(Component serverHeader) {
         Preconditions.checkArgument(serverHeader.hasConstantSize(), "serverHeader needs to have a fixed size.");
         this.serverHeader = serverHeader;
+    }
+
+    public void setServerFooter(Component serverFooter) {
+        if (serverFooter != null) {
+            Preconditions.checkArgument(serverFooter.hasConstantSize(), "serverFooter needs to have a fixed size.");
+        }
+        this.serverFooter = serverFooter;
+    }
+
+    public void setServerSeparator(Component serverSeparator) {
+        if (serverSeparator != null) {
+            Preconditions.checkArgument(serverSeparator.hasConstantSize(), "serverSeparator needs to have a fixed size.");
+        }
+        this.serverSeparator = serverSeparator;
     }
 
     public void setPlayerComponent(Component playerComponent) {
@@ -144,9 +160,12 @@ public class PlayersByServerComponent extends Component implements Validate {
 
             preferredSize = 0;
             for (List<Player> list : playersByServer.values()) {
-                int serverSize = serverHeader.getSize() + list.size() * playerComponent.getSize();
+                int serverSize = serverHeader.getSize() + list.size() * playerComponent.getSize() + (serverFooter != null ? serverFooter.getSize() : 0);
                 serverSize = ((serverSize + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 preferredSize += min(serverSize, maxSizePerServer);
+            }
+            if (serverSeparator != null && playersByServer.size() > 1) {
+                preferredSize += ((serverSeparator.getSize() + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS) * (playersByServer.size() - 1);
             }
             if (maxSize != -1) {
                 preferredSize = min(preferredSize, PlayersByServerComponent.this.maxSize);
@@ -168,13 +187,16 @@ public class PlayersByServerComponent extends Component implements Validate {
             int[] serverRows = new int[servers.size()];
             Arrays.fill(serverRows, minRowsPerServer);
             rows -= minRowsPerServer * servers.size();
+            if (serverSeparator != null && playersByServer.size() > 1) {
+                rows -= ((serverSeparator.getSize() + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * (playersByServer.size() - 1);
+            }
             boolean change;
             do {
                 change = false;
                 for (int i = 0; i < servers.size(); i++) {
                     if (rows > 0 && serverRows[i] < maxRowsPerServer) {
                         String server = servers.get(i);
-                        int serverSize = serverHeader.getSize() + playersByServer.get(server).size() * playerComponent.getSize();
+                        int serverSize = serverHeader.getSize() + playersByServer.get(server).size() * playerComponent.getSize() + (serverFooter != null ? serverFooter.getSize() : 0);
                         if (min(serverSize, maxRowsPerServer) > serverRows[i] * context.get(Context.KEY_COLUMNS)) {
                             serverRows[i]++;
                             change = true;
@@ -186,6 +208,17 @@ public class PlayersByServerComponent extends Component implements Validate {
             // create the components
             int pos = 0;
             for (int i = 0; i < servers.size() && pos < size; i++) {
+                if (serverSeparator != null && i > 0) {
+                    // Separator
+                    pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
+                    Component.Instance separator = serverSeparator.toInstance(context);
+                    separator.activate();
+                    separator.update1stStep();
+                    separator.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column, serverSeparator.getSize());
+                    separator.update2ndStep();
+                    activeComponents.add(separator);
+                    pos += serverSeparator.getSize();
+                }
                 String server = servers.get(i);
                 pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 List<Player> players = playersByServer.get(server);
@@ -200,7 +233,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                 pos += serverHeader.getSize();
                 // Players
                 int playersMaxSize = playersByServer.get(server).size() * playerComponent.getSize();
-                int serverSize = min(serverRows[i] * context.get(Context.KEY_COLUMNS) - serverHeader.getSize(), playersMaxSize);
+                int serverSize = min(serverRows[i] * context.get(Context.KEY_COLUMNS) - serverHeader.getSize() - (serverFooter != null ? serverFooter.getSize() : 0), playersMaxSize);
                 boolean allFit = serverSize >= playersMaxSize;
                 int j;
                 int pos2 = 0;
@@ -223,7 +256,19 @@ public class PlayersByServerComponent extends Component implements Validate {
                     activeComponents.add(component);
                     pos2 += morePlayersComponent.getSize();
                 }
-                pos += pos2;
+                // Footer
+                if (serverFooter != null) {
+                    pos += serverSize;
+                    Component.Instance footer = serverFooter.toInstance(serverContext);
+                    footer.activate();
+                    footer.update1stStep();
+                    footer.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), serverFooter.getSize());
+                    footer.update2ndStep();
+                    activeComponents.add(footer);
+                    pos += serverFooter.getSize();
+                } else {
+                    pos += pos2;
+                }
             }
         }
 
