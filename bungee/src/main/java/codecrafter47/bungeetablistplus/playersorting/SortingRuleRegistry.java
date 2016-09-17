@@ -48,12 +48,12 @@ public class SortingRuleRegistry {
             .put("serveralphabetically", new ServerAlphabetically())
             .put("playerserverfirst", new PlayerServerFirst())
             .put("afklast", new AFKLast())
-            .put("vaultGroupInfo", new VaultGroupInfo())
-            .put("vaultGroupInfoReversed", new ReverseOrder(new VaultGroupInfo()))
-            .put("bungeePermsGroupInfo", new BungeePermsGroupInfo())
-            .put("bungeePermsGroupInfoReversed", new ReverseOrder(new BungeePermsGroupInfo()))
-            .put("bungeeCordGroups", new BungeeCordGroups())
-            .put("bungeeCordGroupsReversed", new ReverseOrder(new BungeeCordGroups()))
+            .put("vaultgroupinfo", new VaultGroupInfo())
+            .put("vaultgroupinforeversed", new ReverseOrder(new VaultGroupInfo()))
+            .put("bungeepermsgroupinfo", new BungeePermsGroupInfo())
+            .put("bungeepermsgroupinforeversed", new ReverseOrder(new BungeePermsGroupInfo()))
+            .put("bungeecordgroups", new BungeeCordGroups())
+            .put("bungeecordgroupsreversed", new ReverseOrder(new BungeeCordGroups()))
             .build();
 
     public static Optional<SortingRule> getRule(String name) {
