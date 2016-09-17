@@ -21,14 +21,18 @@ package codecrafter47.bungeetablistplus.config;
 
 import codecrafter47.bungeetablistplus.config.components.Component;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
+import static codecrafter47.bungeetablistplus.config.ConfigValidationUtil.isRectangular;
+
 @Getter
 @Setter
-public class FixedSizeConfig extends Config {
+public class FixedSizeConfig extends Config implements Validate {
 
     private int size;
 
@@ -37,4 +41,13 @@ public class FixedSizeConfig extends Config {
     private int defaultPing;
 
     private List<Component> components;
+
+    @Override
+    public void validate() {
+        super.validate();
+        Preconditions.checkArgument(size >= 0, "size is negative", size);
+        Preconditions.checkArgument(isRectangular(size), "size is not rectangular", size);
+        Preconditions.checkNotNull(defaultIcon, "defaultIcon is null");
+        Preconditions.checkNotNull(components, "components is null");
+    }
 }

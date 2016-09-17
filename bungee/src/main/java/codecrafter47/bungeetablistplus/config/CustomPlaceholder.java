@@ -25,6 +25,8 @@ import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -61,7 +63,7 @@ public abstract class CustomPlaceholder {
 
     public abstract Placeholder instantiate(String[] args);
 
-    public static class Conditional extends CustomPlaceholder {
+    public static class Conditional extends CustomPlaceholder implements Validate {
         private String condition;
         private String trueReplacement;
         private String falseReplacement;
@@ -98,6 +100,13 @@ public abstract class CustomPlaceholder {
             return new Instance(condition, trueReplacement, falseReplacement);
         }
 
+        @Override
+        public void validate() {
+            Preconditions.checkNotNull(condition, "condition is null");
+            Preconditions.checkNotNull(trueReplacement, "true replacement is null");
+            Preconditions.checkNotNull(falseReplacement, "false replacement is null");
+        }
+
         @AllArgsConstructor
         private static class Instance extends Placeholder {
             private final Expression condition;
@@ -113,10 +122,10 @@ public abstract class CustomPlaceholder {
 
     @Getter
     @Setter
-    public static class Switch extends CustomPlaceholder {
+    public static class Switch extends CustomPlaceholder implements Validate {
         private String expression;
         private Map<String, String> replacements;
-        private String defaultReplacement;
+        private String defaultReplacement = "";
 
         @Override
         public Placeholder instantiate(String[] args) {
@@ -124,6 +133,12 @@ public abstract class CustomPlaceholder {
             Map<String, TextTemplate> replacements = new HashMap<>(Maps.transformValues(this.replacements, template -> new TextTemplate(replaceParameters(template, args))));
             TextTemplate defaultReplacement = new TextTemplate(replaceParameters(this.defaultReplacement, args));
             return new Instance(expression, replacements, defaultReplacement);
+        }
+
+        @Override
+        public void validate() {
+            Preconditions.checkNotNull(expression, "expression is null");
+            Preconditions.checkNotNull(replacements, "replacements is null");
         }
 
         @AllArgsConstructor

@@ -21,14 +21,17 @@ package codecrafter47.bungeetablistplus.config.components;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-public class AnimatedComponent extends Component {
+@Getter
+@Setter
+public class AnimatedComponent extends Component implements Validate {
 
     private List<Component> components;
     private float interval;
@@ -57,6 +60,13 @@ public class AnimatedComponent extends Component {
     @Override
     public Instance toInstance(Context context) {
         return new Instance(context);
+    }
+
+    @Override
+    public void validate() {
+        Preconditions.checkNotNull(components, "components is null");
+        Preconditions.checkArgument(!components.isEmpty(), "components is empty");
+        Preconditions.checkArgument(interval > 0, "interval is negative", interval);
     }
 
     public class Instance extends Component.Instance implements Runnable {

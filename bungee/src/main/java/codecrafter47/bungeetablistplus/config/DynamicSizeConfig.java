@@ -39,4 +39,11 @@ public class DynamicSizeConfig extends Config {
         Preconditions.checkArgument(playerComponent.hasConstantSize(), "playerComponent needs to have a fixed size.");
         this.playerComponent = playerComponent;
     }
+
+    @Override
+    public void validate() {
+        super.validate();
+        Preconditions.checkNotNull(playerSet, "playerSet is null");
+        Preconditions.checkNotNull(playerComponent, "playerComponent is null");
+    }
 }

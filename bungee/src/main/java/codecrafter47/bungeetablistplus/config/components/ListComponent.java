@@ -22,17 +22,21 @@ package codecrafter47.bungeetablistplus.config.components;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
-import lombok.Data;
+import com.google.common.base.Preconditions;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-@Data
+@Getter
+@Setter
 public class ListComponent extends Component {
     private final List<Component> list;
 
     public ListComponent(List<Component> list) {
+        Preconditions.checkNotNull(list);
         this.list = list;
     }
 

@@ -215,7 +215,15 @@ public class YamlConfig {
             if (node.getNodeId() == NodeId.mapping && node.getType() != null) {
                 ensureTypeDefinitionPresent(node.getType());
             }
-            return super.constructObject(node);
+            Object object = super.constructObject(node);
+            if (object instanceof Validate) {
+                try {
+                    ((Validate) object).validate();
+                } catch (Throwable th) {
+                    throw new YamlValidationException(node, th);
+                }
+            }
+            return object;
         }
 
         private void ensureTypeDefinitionPresent(Class<?> type) {
@@ -318,4 +326,5 @@ public class YamlConfig {
             return customName;
         }
     }
+
 }

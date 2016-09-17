@@ -23,8 +23,10 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -32,8 +34,9 @@ import java.util.*;
 
 import static java.lang.Math.min;
 
-@Data
-public class PlayersByServerComponent extends Component {
+@Getter
+@Setter
+public class PlayersByServerComponent extends Component implements Validate {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
     private String playerSet;
     private Component serverHeader;
@@ -90,6 +93,14 @@ public class PlayersByServerComponent extends Component {
         return new Instance(context);
     }
 
+    @Override
+    public void validate() {
+        Preconditions.checkNotNull(playerSet, "playerSet is null");
+        Preconditions.checkNotNull(serverHeader, "serverHeader is null");
+        Preconditions.checkNotNull(playerComponent, "playerComponent is null");
+        Preconditions.checkNotNull(morePlayersComponent, "morePlayersComponent is null");
+    }
+
     public class Instance extends Component.Instance {
 
         private List<Component.Instance> activeComponents = new ArrayList<>();
@@ -116,7 +127,12 @@ public class PlayersByServerComponent extends Component {
                     playersByServer.put(server.getName(), new ArrayList<>());
                 }
             }
-            for (Player player : context.get(Context.KEY_PLAYER_SETS).get(playerSet)) {
+            List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
+            if (players == null) {
+                players = Collections.emptyList();
+                BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
+            }
+            for (Player player : players) {
                 Optional<String> server = player.get(BungeeTabListPlus.DATA_KEY_SERVER);
                 if (server.isPresent()) {
                     playersByServer.computeIfAbsent(server.get(), s -> new ArrayList<>()).add(player);

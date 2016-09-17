@@ -25,14 +25,16 @@ import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
 import codecrafter47.bungeetablistplus.util.FastChat;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import codecrafter47.util.chat.ChatUtil;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class BasicComponent extends Component {
+public class BasicComponent extends Component implements Validate {
 
     private TextTemplate text;
     private IconTemplate icon;
@@ -52,6 +54,13 @@ public class BasicComponent extends Component {
     @Override
     public Instance toInstance(Context context) {
         return new Instance(context);
+    }
+
+    @Override
+    public void validate() {
+        Preconditions.checkNotNull(text, "text is null");
+        Preconditions.checkNotNull(icon, "icon is null");
+        Preconditions.checkNotNull(ping, "ping is null");
     }
 
     public class Instance extends Component.Instance {

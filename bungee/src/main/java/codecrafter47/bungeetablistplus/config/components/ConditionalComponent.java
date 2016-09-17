@@ -22,8 +22,10 @@ package codecrafter47.bungeetablistplus.config.components;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
+import com.google.common.base.Preconditions;
 
-public class ConditionalComponent extends Component {
+public class ConditionalComponent extends Component implements Validate {
     private Expression condition;
     private Component trueReplacement;
     private Component falseReplacement;
@@ -65,6 +67,13 @@ public class ConditionalComponent extends Component {
     @Override
     public Component.Instance toInstance(Context context) {
         return new Instance(context);
+    }
+
+    @Override
+    public void validate() {
+        Preconditions.checkNotNull(condition, "condition is null");
+        Preconditions.checkNotNull(trueReplacement, "true replacement is null");
+        Preconditions.checkNotNull(falseReplacement, "false replacement is null");
     }
 
     public class Instance extends Component.Instance {

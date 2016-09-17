@@ -19,9 +19,11 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +37,7 @@ import static java.lang.Integer.min;
 
 @Getter
 @Setter
-public class PlayersComponent extends Component {
+public class PlayersComponent extends Component implements Validate {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
     private String playerSet;
     private Component playerComponent;
@@ -73,6 +75,13 @@ public class PlayersComponent extends Component {
         return new Instance(context);
     }
 
+    @Override
+    public void validate() {
+        Preconditions.checkNotNull(playerSet, "playerSet is null");
+        Preconditions.checkNotNull(playerComponent, "playerComponent is null");
+        Preconditions.checkNotNull(morePlayersComponent, "morePlayersComponent is null");
+    }
+
     public class Instance extends Component.Instance {
         private List<Player> players = Collections.emptyList();
         private List<Component.Instance> activeComponents = new ArrayList<>();
@@ -92,6 +101,10 @@ public class PlayersComponent extends Component {
         public void update1stStep() {
             super.update1stStep();
             players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
+            if (players == null) {
+                players = Collections.emptyList();
+                BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
+            }
             playerOrder.sort(context, players);
         }
 
