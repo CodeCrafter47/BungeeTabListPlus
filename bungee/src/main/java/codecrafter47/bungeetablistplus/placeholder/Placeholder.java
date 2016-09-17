@@ -32,10 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -131,7 +128,12 @@ public abstract class Placeholder {
             return new Placeholder() {
                 @Override
                 public String evaluate(Context context) {
-                    return Integer.toString(context.get(Context.KEY_PLAYER_SETS).get(playerSet).size());
+                    List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
+                    if (players == null) {
+                        players = Collections.emptyList();
+                        BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
+                    }
+                    return Integer.toString(players.size());
                 }
             };
         } else if (tokens[0].startsWith("server:")) {
