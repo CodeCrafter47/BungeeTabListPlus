@@ -186,7 +186,7 @@ public abstract class PlayerTablistHandler {
 
         @Override
         public void setHeaderFooter(String header, String footer) {
-            handle.setHeaderFooter(header, footer);
+            handle.setHeaderFooter(FastChat.legacyTextToJson(header, '&'), FastChat.legacyTextToJson(footer, '&'));
         }
 
         @Override
@@ -195,7 +195,7 @@ public abstract class PlayerTablistHandler {
             int rows = columns == 0 ? 0 : handle.getSize() / columns;
             int index = column * rows + row;
             if (index < handle.getSize()) {
-                handle.setSlot(index, icon, text, ping);
+                handle.setSlot(index, icon, FastChat.legacyTextToJson(text, '&'), ping);
             }
         }
     }
@@ -267,7 +267,7 @@ public abstract class PlayerTablistHandler {
             int columns = (handle.getMaxSize() + 19) / 20;
             int index = row * columns + column;
             if (index < handle.getMaxSize()) {
-                handle.setSlot(index, text, ping);
+                handle.setSlot(index, ChatColor.translateAlternateColorCodes('&', text), ping);
             }
         }
     }

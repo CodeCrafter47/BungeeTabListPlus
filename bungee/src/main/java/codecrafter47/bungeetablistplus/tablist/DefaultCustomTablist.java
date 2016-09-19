@@ -22,7 +22,6 @@ package codecrafter47.bungeetablistplus.tablist;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
-import codecrafter47.bungeetablistplus.util.FastChat;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
@@ -49,12 +48,11 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
                         String text = getText(row, column);
                         int ping = getPing(row, column);
 
-                        handler.setSlot(row, column, icon, FastChat.legacyTextToJson(text, '&'), ping);
+                        handler.setSlot(row, column, icon, text, ping);
                     }
                 }
 
-                handler.setHeaderFooter(FastChat.legacyTextToJson(getHeader(), '&')
-                        , FastChat.legacyTextToJson(getFooter(), '&'));
+                handler.setHeaderFooter(getHeader(), getFooter());
             }
         });
     }
@@ -77,7 +75,7 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
     @Override
     protected void onSlotChanged(int row, int column) {
         Icon icon = getIcon(row, column);
-        String text = FastChat.legacyTextToJson(getText(row, column), '&');
+        String text = getText(row, column);
         int ping = getPing(row, column);
         for (PlayerTablistHandler handler : handlers) {
             handler.runInEventLoop(() -> handler.setSlot(row, column, icon, text, ping));
@@ -89,7 +87,7 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
         String header = getHeader();
         String footer = getFooter();
         for (PlayerTablistHandler handler : handlers) {
-            handler.runInEventLoop(() -> handler.setHeaderFooter(FastChat.legacyTextToJson(header, '&'), FastChat.legacyTextToJson(footer, '&')));
+            handler.runInEventLoop(() -> handler.setHeaderFooter(header, footer));
         }
     }
 }
