@@ -64,8 +64,14 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
         this.playerSets = new PlayerSets();
         this.context.put(Context.KEY_PLAYER_SETS, playerSets);
         Map<String, CustomPlaceholder> customPlaceholderMap = new HashMap<>();
-        customPlaceholderMap.putAll(BungeeTabListPlus.getInstance().getConfig().customPlaceholders);
-        customPlaceholderMap.putAll(config.getCustomPlaceholders());
+        Map<String, CustomPlaceholder> globalCustomPlaceholders = BungeeTabListPlus.getInstance().getConfig().customPlaceholders;
+        if (globalCustomPlaceholders != null) {
+            customPlaceholderMap.putAll(globalCustomPlaceholders);
+        }
+        Map<String, CustomPlaceholder> localCustomPlaceholders = config.getCustomPlaceholders();
+        if (localCustomPlaceholders != null) {
+            customPlaceholderMap.putAll(localCustomPlaceholders);
+        }
         this.context.put(Context.KEY_CUSTOM_PLACEHOLDERS, customPlaceholderMap);
         this.context.put(Context.KEY_TAB_LIST, this);
         init();
