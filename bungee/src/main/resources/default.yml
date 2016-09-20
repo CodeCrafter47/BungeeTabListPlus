@@ -1,32 +1,56 @@
-# Draft for new tablist.yml design
+showTo: "all"
 
-showTo: "true"
-
-priority: 20
+priority: 0
 
 type: FIXED_SIZE
 
 showHeaderFooter: true
 
 header:
-  - |-
-    &6Hello ${viewer name}
-    &eLine 2
-  - |-
-    &eHello ${viewer name}
-    &6Line 2
+- '&cWelcome &f${viewer name}'
+- '&eW&celcome &f${viewer name}'
+- '&eWe&clcome &f${viewer name}'
+- '&eWel&ccome &f${viewer name}'
+- '&eWelc&come &f${viewer name}'
+- '&eWelco&cme &f${viewer name}'
+- '&eWelcom&ce &f${viewer name}'
+- '&eWelcome &f${viewer name}'
+- '&cW&eelcome &f${viewer name}'
+- '&cWe&elcome &f${viewer name}'
+- '&cWel&ecome &f${viewer name}'
+- '&cWelc&eome &f${viewer name}'
+- '&cWelco&eme &f${viewer name}'
+- '&cWelcom&ee &f${viewer name}'
+- '&cWelcome &f${viewer name}'
 
-headerAnimationUpdateInterval: 0.5
+headerAnimationUpdateInterval: 0.2
 
 footer:
-  - |-
-    &6Line 1
-    &eLine 2
-  - |-
-    &eLine 1
-    &6Line 2
+- |-
+  &6Line 1
+  &eLine 2
+- |-
+  &eLine 1
+  &6Line 2
 
 footerAnimationUpdateInterval: 0.5
+
+customPlaceholders:
+  afk_tag:
+    !conditional
+    condition: ${player essentials_afk}
+    true: '&7|&oaway'
+    false: ''
+  viewer_colored_ping0:
+    !conditional
+    condition: "${viewer ping} < 50"
+    true: "&a${viewer ping}"
+    false: "&e${viewer ping}"
+  viewer_colored_ping:
+    !conditional
+    condition: "${viewer ping} < 150"
+    true: ${viewer_colored_ping0}
+    false: "&c${viewer ping}"
 
 defaultIcon: colors/dark_gray.png
 defaultPing: 1000
@@ -38,15 +62,7 @@ components:
 - {text: "&cServer: &6${viewer server}", icon: "default/server.png", ping: 0}
 - {text: "&cRank: &6${viewer vault_primary_group}", icon: "default/rank.png", ping: 0}
 # Show ping in different colors depending on how good/ bad it is
-- !conditional
-  condition: |-
-    ${viewer ping} < 50
-  true: {text: "&cPing: &a${viewer ping}ms", icon: "default/ping.png", ping: 0}
-  false: !conditional
-    condition: |-
-      ${viewer ping} < 150
-    true: {text: "&cPing: &e${viewer ping}ms", icon: "default/ping.png", ping: 0}
-    false: {text: "&cPing: &c${viewer ping}ms", icon: "default/ping.png", ping: 0}
+- {text: "&cPing: ${viewer_colored_ping}ms", icon: "default/ping.png", ping: 0}
 - !players_by_server
   playerSet: global
   serverHeader:
@@ -55,7 +71,7 @@ components:
   - {text: "", icon: "colors/dark_gray.png", ping: 1000}
   - {text: "&e&n${server}&f&o (${server_player_count}):", icon: "colors/yellow.png", ping: 0}
   includeEmptyServers: true
-  playerComponent: {text: "${player name}", icon: "${player skin}", ping: "${player ping}"}
+  playerComponent: {text: "${player name}${afk_tag}", icon: "${player skin}", ping: "${player ping}"}
   morePlayersComponent: {text: "&7... and &e${other_count} &7others", icon: "colors/gray.png", ping: 0}
 # We want to components below to be at the very bottom of the tab list
 - !spacer {}
@@ -119,4 +135,4 @@ components:
   - {text: "&6==============&c=&6", icon: "colors/gold.png", ping: 0}
 - {text: "&cTime: &6${time H:mm:ss}", icon: "default/clock.png", ping: 0}
 - {text: "&cPlayers: &6${playerset:global size}", icon: "default/players.png", ping: 0}
-- {text: "&cBalance: &6${viewer vault_balance}", icon: "default/balance.png", ping: 0}
+- {text: "&cBalance: &6${viewer vault_balance 1.2}", icon: "default/balance.png", ping: 0}
