@@ -197,7 +197,7 @@ public class ListComponent extends Component {
                 if (component.isBlockAligned()) {
                     pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
-                component.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), sectionSize[i]);
+                component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), sectionSize[i]);
                 pos += sectionSize[i];
             }
         }

@@ -114,14 +114,15 @@ public class PlayersComponent extends Component implements Validate {
             activeComponents.clear();
             super.update2ndStep();
             boolean allFit = super.size >= players.size() * playerComponent.getSize();
-            int pos = 0;
+            int offset = column - leftMostColumn;
+            int pos = offset;
             int i;
-            for (i = 0; (allFit || pos + playerComponent.getSize() + morePlayersComponent.getSize() <= super.size) && i < players.size(); i++) {
+            for (i = 0; (allFit || pos + playerComponent.getSize() + morePlayersComponent.getSize() - offset <= super.size) && i < players.size(); i++) {
                 Player player = players.get(i);
                 Component.Instance component = playerComponent.toInstance(context.derived().put(Context.KEY_PLAYER, player));
                 component.activate();
                 component.update1stStep();
-                component.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
+                component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
                 component.update2ndStep();
                 activeComponents.add(component);
                 pos += playerComponent.getSize();
@@ -130,7 +131,7 @@ public class PlayersComponent extends Component implements Validate {
                 Component.Instance component = morePlayersComponent.toInstance(context.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - i));
                 component.activate();
                 component.update1stStep();
-                component.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
+                component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
                 component.update2ndStep();
                 activeComponents.add(component);
             }

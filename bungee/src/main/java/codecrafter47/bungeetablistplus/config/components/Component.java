@@ -58,7 +58,7 @@ public abstract class Component {
         protected final Context context;
         protected boolean active = false;
         protected boolean hasValidPosition = false;
-        protected int row, column, size;
+        protected int leftMostColumn, row, column, size;
 
         protected Instance(Context context) {
             this.context = context;
@@ -82,8 +82,9 @@ public abstract class Component {
             Preconditions.checkState(hasValidPosition, "Position invalid");
         }
 
-        public final void setPosition(int row, int column, int size) {
+        public final void setPosition(int leftMostColumn, int row, int column, int size) {
             hasValidPosition = true;
+            this.leftMostColumn = leftMostColumn;
             this.row = row;
             this.column = column;
             this.size = size;
@@ -92,12 +93,6 @@ public abstract class Component {
         protected void setSlot(int row, int column, Icon icon, String text, int ping) {
             if (active && hasValidPosition && row * context.get(Context.KEY_COLUMNS) + column < size) {
                 context.get(Context.KEY_TAB_LIST).setSlot(this.row + row, this.column + column, icon, text, ping);
-            }
-        }
-
-        protected void setSlot(int n, Icon icon, String text, int ping) {
-            if (active && hasValidPosition && n < size) {
-                context.get(Context.KEY_TAB_LIST).setSlot(row + n / context.get(Context.KEY_COLUMNS), column + n % context.get(Context.KEY_COLUMNS), icon, text, ping);
             }
         }
 

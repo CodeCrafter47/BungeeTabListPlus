@@ -72,7 +72,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
             Component.Instance component = config.getPlayerComponent().toInstance(context.derived().put(Context.KEY_PLAYER, player));
             component.activate();
             component.update1stStep();
-            component.setPosition(pos, 0, config.getPlayerComponent().getSize());
+            component.setPosition(0, pos, 0, config.getPlayerComponent().getSize());
             component.update2ndStep();
             activeComponents.add(component);
             pos += config.getPlayerComponent().getSize();

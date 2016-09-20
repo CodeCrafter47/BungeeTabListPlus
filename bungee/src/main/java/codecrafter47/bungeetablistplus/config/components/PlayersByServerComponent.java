@@ -214,7 +214,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                     Component.Instance separator = serverSeparator.toInstance(context);
                     separator.activate();
                     separator.update1stStep();
-                    separator.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column, serverSeparator.getSize());
+                    separator.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), column, serverSeparator.getSize());
                     separator.update2ndStep();
                     activeComponents.add(separator);
                     pos += serverSeparator.getSize();
@@ -227,7 +227,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                 Component.Instance header = serverHeader.toInstance(serverContext);
                 header.activate();
                 header.update1stStep();
-                header.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column, serverHeader.getSize());
+                header.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), column, serverHeader.getSize());
                 header.update2ndStep();
                 activeComponents.add(header);
                 pos += serverHeader.getSize();
@@ -242,7 +242,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                     Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player));
                     component.activate();
                     component.update1stStep();
-                    component.setPosition(row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), column + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
+                    component.setPosition(leftMostColumn, row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), leftMostColumn + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
                     component.update2ndStep();
                     activeComponents.add(component);
                     pos2 += playerComponent.getSize();
@@ -251,7 +251,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                     Component.Instance component = morePlayersComponent.toInstance(serverContext.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - j));
                     component.activate();
                     component.update1stStep();
-                    component.setPosition(row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), column + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
+                    component.setPosition(leftMostColumn, row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), leftMostColumn + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
                     component.update2ndStep();
                     activeComponents.add(component);
                     pos2 += morePlayersComponent.getSize();
@@ -262,7 +262,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                     Component.Instance footer = serverFooter.toInstance(serverContext);
                     footer.activate();
                     footer.update1stStep();
-                    footer.setPosition(row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), serverFooter.getSize());
+                    footer.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), serverFooter.getSize());
                     footer.update2ndStep();
                     activeComponents.add(footer);
                     pos += serverFooter.getSize();

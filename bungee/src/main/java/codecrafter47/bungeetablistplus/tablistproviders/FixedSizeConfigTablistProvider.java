@@ -74,7 +74,7 @@ public class FixedSizeConfigTablistProvider extends ConfigTablistProvider<FixedS
 
         // Tab overlay
         Arrays.fill(marks, false);
-        content.setPosition(0, 0, getSize());
+        content.setPosition(0, 0, 0, getSize());
         content.update1stStep();
         content.update2ndStep();
         for (int i = 0; i < marks.length; i++) {

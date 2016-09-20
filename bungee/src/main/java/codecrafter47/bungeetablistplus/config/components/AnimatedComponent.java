@@ -111,12 +111,12 @@ public class AnimatedComponent extends Component implements Validate {
                     Component.Instance component = frames.get(0);
                     component.activate();
                     component.update1stStep();
-                    component.setPosition(row, column, size);
+                    component.setPosition(leftMostColumn, row, column, size);
                     component.update2ndStep();
                 } else {
                     Component.Instance component = frames.get(activeComponent);
                     component.update1stStep();
-                    component.setPosition(row, column, size);
+                    component.setPosition(leftMostColumn, row, column, size);
                     component.update2ndStep();
                 }
             }
@@ -134,7 +134,7 @@ public class AnimatedComponent extends Component implements Validate {
                     Component.Instance component = frames.get(activeComponent);
                     component.activate();
                     component.update1stStep();
-                    component.setPosition(row, column, size);
+                    component.setPosition(leftMostColumn, row, column, size);
                     component.update2ndStep();
                 }
             }

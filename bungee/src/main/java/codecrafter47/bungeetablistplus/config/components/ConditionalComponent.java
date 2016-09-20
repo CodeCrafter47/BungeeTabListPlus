@@ -110,7 +110,7 @@ public class ConditionalComponent extends Component implements Validate {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            component.setPosition(row, column, size);
+            component.setPosition(leftMostColumn, row, column, size);
             component.update2ndStep();
         }
 

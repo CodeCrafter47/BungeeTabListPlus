@@ -143,7 +143,7 @@ public class TableComponent extends Component {
             for (int i = 0; i < columns.length; i++) {
                 if (start[i] < context.get(Context.KEY_COLUMNS)) {
                     Component.Instance component = columns[i];
-                    component.setPosition(row, column + start[i], size / context.get(Context.KEY_COLUMNS) * width[i]);
+                    component.setPosition(column + start[i], row, column + start[i], size / context.get(Context.KEY_COLUMNS) * width[i]);
                     component.update2ndStep();
                 }
             }
