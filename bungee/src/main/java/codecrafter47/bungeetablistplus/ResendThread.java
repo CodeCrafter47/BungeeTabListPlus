@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.tablistproviders.*;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -123,12 +124,17 @@ class ResendThread implements Runnable, Executor {
                 tablistHandler.setTablistProvider((TablistProvider) connectedPlayer.getCustomTablist());
             } else {
                 TablistProvider tablistProvider = tablistHandler.getTablistProvider();
-                Context context = new Context().put(Context.KEY_VIEWER, connectedPlayer);
-                Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
-                if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
-                    tablistHandler.setTablistProvider(createTablistProvider(context, config));
-                    tablistProvider = tablistHandler.getTablistProvider();
-                } else if (config == null && tablistProvider instanceof ConfigTablistProvider) {
+                Server server = player.getServer();
+                if (server != null && !(BungeeTabListPlus.getInstance().getConfig().excludeServers.contains(server.getInfo().getName()))) {
+                    Context context = new Context().put(Context.KEY_VIEWER, connectedPlayer);
+                    Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
+                    if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
+                        tablistHandler.setTablistProvider(createTablistProvider(context, config));
+                        tablistProvider = tablistHandler.getTablistProvider();
+                    } else if (config == null && tablistProvider instanceof ConfigTablistProvider) {
+                        tablistHandler.setTablistProvider(tablistProvider = LegacyTablistProvider.INSTANCE);
+                    }
+                } else {
                     tablistHandler.setTablistProvider(tablistProvider = LegacyTablistProvider.INSTANCE);
                 }
 
