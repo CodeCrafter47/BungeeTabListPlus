@@ -65,8 +65,8 @@ public class ListComponent extends Component {
         protected Instance(Context context, ListComponent component) {
             super(context);
             components = new ArrayList<>(component.getList().size());
-            for (Component component1 : component.getList()) {
-                components.add(component1.toInstance(context));
+            for (Component c : component.getList()) {
+                components.add(null != c ? c.toInstance(context) : new BasicComponent().toInstance(context));
             }
         }
 

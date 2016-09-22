@@ -33,6 +33,7 @@ import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.template.TextTemplate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -132,8 +133,9 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
 
         // Header & Footer
         if (config.isShowHeaderFooter()) {
-            setHeader(config.getHeader().get(headerIndex).evaluate(context));
-            setFooter(config.getFooter().get(footerIndex).evaluate(context));
+            TextTemplate t;
+            setHeader(null != (t = config.getHeader().get(headerIndex)) ? t.evaluate(context) : "");
+            setFooter(null != (t = config.getFooter().get(footerIndex)) ? t.evaluate(context) : "");
         }
     }
 
@@ -147,7 +149,8 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
                     if (headerIndex >= config.getHeader().size()) {
                         headerIndex = 0;
                     }
-                    setHeader(config.getHeader().get(headerIndex).evaluate(context));
+                    TextTemplate t;
+                    setHeader(null != (t = config.getHeader().get(headerIndex)) ? t.evaluate(context) : "");
                 }
             }
         }
@@ -163,7 +166,8 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
                     if (footerIndex >= config.getFooter().size()) {
                         footerIndex = 0;
                     }
-                    setFooter(config.getFooter().get(footerIndex).evaluate(context));
+                    TextTemplate t;
+                    setFooter(null != (t = config.getFooter().get(footerIndex)) ? t.evaluate(context) : "");
                 }
             }
         }
