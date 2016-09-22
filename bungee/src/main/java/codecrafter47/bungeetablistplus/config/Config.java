@@ -36,11 +36,11 @@ public class Config implements ITabListConfig, Validate {
 
     private String type;
 
-    private Expression showTo;
+    private Expression showTo = new Expression("all");
 
-    private int priority;
+    private int priority = 0;
 
-    private boolean showHeaderFooter;
+    private boolean showHeaderFooter = false;
 
     private List<TextTemplate> header;
 

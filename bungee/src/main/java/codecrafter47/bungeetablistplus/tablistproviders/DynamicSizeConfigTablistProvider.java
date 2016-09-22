@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.tablistproviders;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.config.DynamicSizeConfig;
 import codecrafter47.bungeetablistplus.config.components.Component;
 import codecrafter47.bungeetablistplus.context.Context;
@@ -26,6 +27,7 @@ import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.lang.Integer.min;
@@ -55,6 +57,10 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
 
         // get players
         List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(config.getPlayerSet());
+        if (players == null) {
+            players = Collections.emptyList();
+            BungeeTabListPlus.getInstance().getLogger().warning("Missing player set " + config.getPlayerSet());
+        }
         config.getPlayerOrder().sort(context, players);
 
         // deactivate old components
