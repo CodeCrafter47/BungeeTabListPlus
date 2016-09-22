@@ -44,6 +44,7 @@ public class PlayersComponent extends Component implements Validate {
     private String playerSet;
     private Component playerComponent;
     private Component morePlayersComponent;
+    private boolean fillSlotsVertical = false;
     int minSize = 0;
     int maxSize = -1;
 
@@ -119,12 +120,17 @@ public class PlayersComponent extends Component implements Validate {
             int offset = column - leftMostColumn;
             int pos = offset;
             int i;
+            int rows = size / context.get(Context.KEY_COLUMNS);
             for (i = 0; (allFit || pos + playerComponent.getSize() + morePlayersComponent.getSize() - offset <= super.size) && i < players.size(); i++) {
                 Player player = players.get(i);
                 Component.Instance component = playerComponent.toInstance(context.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
                 component.activate();
                 component.update1stStep();
-                component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
+                if (fillSlotsVertical) {
+                    component.setPosition(leftMostColumn, row + (pos % rows), leftMostColumn + (pos / rows), playerComponent.getSize());
+                } else {
+                    component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
+                }
                 component.update2ndStep();
                 activeComponents.add(component);
                 pos += playerComponent.getSize();
@@ -133,7 +139,11 @@ public class PlayersComponent extends Component implements Validate {
                 Component.Instance component = morePlayersComponent.toInstance(context.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - i));
                 component.activate();
                 component.update1stStep();
-                component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
+                if (fillSlotsVertical) {
+                    component.setPosition(leftMostColumn, row + (pos % rows), leftMostColumn + (pos / rows), morePlayersComponent.getSize());
+                } else {
+                    component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
+                }
                 component.update2ndStep();
                 activeComponents.add(component);
             }
@@ -147,6 +157,9 @@ public class PlayersComponent extends Component implements Validate {
         @Override
         public int getPreferredSize() {
             int size = players.size() * playerComponent.getSize();
+            if (fillSlotsVertical) {
+                size = size * context.get(Context.KEY_COLUMNS);
+            }
             if (maxSize != -1) {
                 size = min(maxSize, size);
             }
@@ -160,7 +173,7 @@ public class PlayersComponent extends Component implements Validate {
 
         @Override
         public boolean isBlockAligned() {
-            return false;
+            return fillSlotsVertical;
         }
     }
 }
