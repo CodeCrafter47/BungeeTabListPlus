@@ -22,15 +22,46 @@ package codecrafter47.bungeetablistplus.template;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
+import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
 
-public class PingTemplate {
-    Expression expression;
+@Subtype(type = PingTemplate.ConfigPingTemplate.class)
+public abstract class PingTemplate {
 
-    public PingTemplate(String text) {
-        expression = new Expression(text);
+    public abstract int evaluate(Context context);
+
+    public static class ConfigPingTemplate extends PingTemplate {
+        private final Expression expression;
+
+        public ConfigPingTemplate(String expression) {
+            this.expression = new Expression(expression);
+        }
+
+        @Override
+        public int evaluate(Context context) {
+            return expression.evaluate(context, ExpressionResult.NUMBER).intValue();
+        }
     }
 
-    public int evaluate(Context context) {
-        return expression.evaluate(context, ExpressionResult.NUMBER).intValue();
+    public static PingTemplate constValue(int ping) {
+        return new PingTemplate() {
+            @Override
+            public int evaluate(Context context) {
+                return ping;
+            }
+        };
     }
+
+    public static final PingTemplate PLAYER_PING = new PingTemplate() {
+        @Override
+        public int evaluate(Context context) {
+            return context.get(Context.KEY_PLAYER).getPing();
+        }
+    };
+
+    public static final PingTemplate DEFAULT_PING = new PingTemplate() {
+        @Override
+        public int evaluate(Context context) {
+            return context.get(Context.KEY_DEFAULT_PING).evaluate(context);
+        }
+    };
 }

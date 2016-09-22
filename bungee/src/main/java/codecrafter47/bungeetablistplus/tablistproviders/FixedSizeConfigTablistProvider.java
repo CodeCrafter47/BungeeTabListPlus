@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.config.components.Component;
 import codecrafter47.bungeetablistplus.config.components.ListComponent;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
+import codecrafter47.bungeetablistplus.template.PingTemplate;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
@@ -45,6 +46,8 @@ public class FixedSizeConfigTablistProvider extends ConfigTablistProvider<FixedS
 
         // update context
         context.put(Context.KEY_COLUMNS, getColumns());
+        context.put(Context.KEY_DEFAULT_ICON, config.getDefaultIcon());
+        context.put(Context.KEY_DEFAULT_PING, PingTemplate.constValue(config.getDefaultPing()));
 
         // Tab overlay
         content = new ListComponent(config.getComponents()).toInstance(context);

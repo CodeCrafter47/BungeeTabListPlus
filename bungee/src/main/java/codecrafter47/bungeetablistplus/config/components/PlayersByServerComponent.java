@@ -23,6 +23,8 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.template.IconTemplate;
+import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
@@ -239,7 +241,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                 int pos2 = 0;
                 for (j = 0; (allFit || pos2 + morePlayersComponent.getSize() < serverSize) && j < players.size(); j++) {
                     Player player = players.get(j);
-                    Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player));
+                    Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
                     component.activate();
                     component.update1stStep();
                     component.setPosition(leftMostColumn, row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), leftMostColumn + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());

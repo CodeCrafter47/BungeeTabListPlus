@@ -32,6 +32,8 @@ public class TextTemplate {
     private static Pattern placeholder = Pattern.compile("(?ms)\\$\\{([^}]+)\\}");
     private List<Part> parts;
 
+    public static final TextTemplate EMPTY = new TextTemplate("");
+
     public TextTemplate(String text) {
         parts = new ArrayList<>();
 

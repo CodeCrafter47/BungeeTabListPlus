@@ -30,16 +30,22 @@ import codecrafter47.util.chat.ChatUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class BasicComponent extends Component implements Validate {
 
-    private TextTemplate text;
-    private IconTemplate icon;
-    private PingTemplate ping;
+    private TextTemplate text = TextTemplate.EMPTY;
+    private IconTemplate icon = IconTemplate.DEFAULT_ICON;
+    private PingTemplate ping = PingTemplate.DEFAULT_PING;
     private Alignment alignment = Alignment.LEFT;
+
+    public BasicComponent(String text) {
+        this.text = new TextTemplate(text);
+    }
 
     @Override
     public boolean hasConstantSize() {
@@ -61,6 +67,7 @@ public class BasicComponent extends Component implements Validate {
         Preconditions.checkNotNull(text, "text is null");
         Preconditions.checkNotNull(icon, "icon is null");
         Preconditions.checkNotNull(ping, "ping is null");
+        Preconditions.checkNotNull(alignment, "alignment is null");
     }
 
     public class Instance extends Component.Instance {

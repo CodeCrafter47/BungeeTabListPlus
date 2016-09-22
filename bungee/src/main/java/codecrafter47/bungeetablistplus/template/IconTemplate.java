@@ -24,40 +24,63 @@ import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
+import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
 
 import java.util.function.Function;
 
-public class IconTemplate {
-    private Function<Context, Icon> getIcon;
+@Subtype(type = IconTemplate.ConfigIconTemplate.class)
+public abstract class IconTemplate {
 
-    public IconTemplate(String text) {
-        if (text.equals("${player skin}")) {
-            getIcon = context -> {
-                Player player = context.get(Context.KEY_PLAYER);
-                if (player != null) {
-                    return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
-                } else {
-                    return Icon.DEFAULT;
-                }
-            };
-        } else if (text.equals("${viewer skin}")) {
-            getIcon = context -> {
-                Player player = context.get(Context.KEY_VIEWER);
-                if (player != null) {
-                    return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
-                } else {
-                    return Icon.DEFAULT;
-                }
-            };
-        } else {
-            getIcon = context -> {
-                Skin skin = BungeeTabListPlus.getInstance().getSkinManager().getSkin(text);
-                return new Icon(skin.getOwner(), skin.toProperty());
-            };
+    public abstract Icon evaluate(Context context);
+
+    public static class ConfigIconTemplate extends IconTemplate {
+
+        private Function<Context, Icon> getIcon;
+
+        public ConfigIconTemplate(String text) {
+            if (text.equals("${player skin}")) {
+                getIcon = context -> {
+                    Player player = context.get(Context.KEY_PLAYER);
+                    if (player != null) {
+                        return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+                    } else {
+                        return Icon.DEFAULT;
+                    }
+                };
+            } else if (text.equals("${viewer skin}")) {
+                getIcon = context -> {
+                    Player player = context.get(Context.KEY_VIEWER);
+                    if (player != null) {
+                        return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+                    } else {
+                        return Icon.DEFAULT;
+                    }
+                };
+            } else {
+                getIcon = context -> {
+                    Skin skin = BungeeTabListPlus.getInstance().getSkinManager().getSkin(text);
+                    return new Icon(skin.getOwner(), skin.toProperty());
+                };
+            }
+        }
+
+        @Override
+        public Icon evaluate(Context context) {
+            return getIcon.apply(context);
         }
     }
 
-    public Icon evaluate(Context context) {
-        return getIcon.apply(context);
-    }
+    public static final IconTemplate PLAYER_ICON = new IconTemplate() {
+        @Override
+        public Icon evaluate(Context context) {
+            return context.get(Context.KEY_PLAYER).get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+        }
+    };
+
+    public static final IconTemplate DEFAULT_ICON = new IconTemplate() {
+        @Override
+        public Icon evaluate(Context context) {
+            return context.get(Context.KEY_DEFAULT_ICON).evaluate(context);
+        }
+    };
 }
