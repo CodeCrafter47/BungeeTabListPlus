@@ -35,23 +35,27 @@ public class MainConfig implements UpdatableConfig {
 
     @Comment({
             "time in seconds after which the tabList will be resend to all players",
-            "set this to -1 to disable scheduled update of the tabList"
+            "set this to -1 to disable scheduled update of the tabList",
+            "This option will be removed soon. Don't use it anymore."
     })
     public double tablistUpdateInterval = 1;
 
     @Comment({
-            "whether tabList should be resend if a player joins or leaves the server"
+            "whether tabList should be resend if a player joins or leaves the server",
+            "This option will be removed soon. Don't use it anymore."
     })
     public boolean updateOnPlayerJoinLeave = true;
 
     @Comment({
-            "whether tablist should be resend if a player switches the server"
+            "whether tablist should be resend if a player switches the server",
+            "This option will be removed soon. Don't use it anymore."
     })
     public boolean updateOnServerChange = true;
 
     @Comment({
             "You can limit the number of characters per slot here",
-            "Color codes do not count as a character; -1 means unlimited"
+            "Color codes do not count as a character; -1 means unlimited",
+            "This option will be removed soon. Don't use it anymore."
     })
     public int charLimit = -1;
 
@@ -62,7 +66,8 @@ public class MainConfig implements UpdatableConfig {
             "AUTO        - take best source",
             "BUKKIT      - take information from Bukkit/Vault",
             "BUNGEEPERMS - take information from BungeePerms",
-            "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee"
+            "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee",
+            "This option will be removed soon. Don't use it anymore."
     })
     public String permissionSource = PermissionSource.AUTO.toString();
 
@@ -71,7 +76,8 @@ public class MainConfig implements UpdatableConfig {
     }
 
     @Comment({
-            "whether to show players in spectator mode"
+            "whether to show players in spectator mode",
+            "This option will be removed soon. Don't use it anymore."
     })
     public boolean showPlayersInGamemode3 = true;
 
@@ -96,7 +102,8 @@ public class MainConfig implements UpdatableConfig {
     public boolean automaticallySendBugReports = true;
 
     @Comment({
-            "server Alias fo the {server} Variable"
+            "This option will be removed soon. Don't use it anymore.",
+            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating#server-alias"
     })
     public HashMap<String, String> serverAlias = Maps.newHashMap(ImmutableMap.<String, String>builder()
             .put("factions", "Factions")
@@ -106,7 +113,8 @@ public class MainConfig implements UpdatableConfig {
             .build());
 
     @Comment({
-            "Alias fo the {world} Variable. Match 'server:world' to an alias"
+            "This option will be removed soon. Don't use it anymore.",
+            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating#world-alias"
     })
     public HashMap<String, String> worldAlias = Maps.newHashMap(ImmutableMap.<String, String>builder()
             .put("factions:world", "Overworld")
@@ -115,8 +123,8 @@ public class MainConfig implements UpdatableConfig {
             .build());
 
     @Comment({
-            "list servers you wish to create custom prefixes for.",
-            "to use the custom prefixes use the {serverPrefix} variable"
+            "This option will be removed soon. Don't use it anymore.",
+            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating#server-prefix"
     })
     public HashMap<String, String> serverPrefixes = Maps.newHashMap(ImmutableMap.<String, String>builder()
             .put("Minigames", "&8(&bM&8)")
@@ -124,8 +132,8 @@ public class MainConfig implements UpdatableConfig {
             .build());
 
     @Comment({
-            "the prefixes used for the {prefix} variable, based upon permission groups",
-            "IMPORTANT: these prefixes won't be used by default. see the wiki for details"
+            "This option will be removed soon. Don't use it anymore.",
+            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating#prefixes-in-configyml"
     })
     public HashMap<String, String> prefixes = Maps.newHashMap(ImmutableMap.<String, String>builder()
             .put("default", "")
@@ -140,13 +148,15 @@ public class MainConfig implements UpdatableConfig {
     public int pingDelay = -1;
 
     @Comment({
-            "replacement for the {onlineState} variable if the server is online"
+            "This option will be removed soon. Don't use it anymore.",
+            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating#the-onlinestate-placeholder"
     })
     @Path("online-text")
     public String online_text = "&2 ON";
 
     @Comment({
-            "replacement for the {onlineState} variable if the server is offline"
+            "This option will be removed soon. Don't use it anymore.",
+            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating#the-onlinestate-placeholder"
     })
     @Path("offline-text")
     public String offline_text = "&c OFF";
