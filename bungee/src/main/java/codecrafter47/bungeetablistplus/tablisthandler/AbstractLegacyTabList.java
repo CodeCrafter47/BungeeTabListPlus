@@ -93,7 +93,9 @@ public abstract class AbstractLegacyTabList implements PacketHandler {
     }
 
     public void setSize(int size) {
-        resize(size);
+        if (!passThrough) {
+            resize(size);
+        }
         clientSize = size;
     }
 
@@ -138,18 +140,16 @@ public abstract class AbstractLegacyTabList implements PacketHandler {
     private void resize(int size) {
         Preconditions.checkArgument(size >= 0 && size <= this.maxSize, "maxSize");
 
-        if (!passThrough) {
-            if (size > usedSlots) {
-                for (int i = usedSlots; i < size; i++) {
-                    createSlot(i);
-                }
-            } else if (size < usedSlots) {
-                for (int i = size; i < usedSlots; i++) {
-                    removeSlot(i);
-                }
+        if (size > usedSlots) {
+            for (int i = usedSlots; i < size; i++) {
+                createSlot(i);
             }
-            usedSlots = size;
+        } else if (size < usedSlots) {
+            for (int i = size; i < usedSlots; i++) {
+                removeSlot(i);
+            }
         }
+        usedSlots = size;
     }
 
     private void createSlot(int row) {
