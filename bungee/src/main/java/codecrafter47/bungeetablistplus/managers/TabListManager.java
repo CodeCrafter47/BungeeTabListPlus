@@ -41,10 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 import static net.md_5.bungee.event.EventPriority.HIGHEST;
@@ -81,7 +78,7 @@ public class TabListManager implements Listener {
                 try {
                     plugin.getLogger().log(Level.INFO, "Loading {0}", file.getName());
 
-                    ITabListConfig tabListConfig = YamlConfig.read(new FileInputStream(file), ITabListConfig.class);
+                    ITabListConfig tabListConfig = Objects.requireNonNull(YamlConfig.read(new FileInputStream(file), ITabListConfig.class));
 
                     if (tabListConfig instanceof TabListConfig) {
                         TabListConfig c = (TabListConfig) tabListConfig;
