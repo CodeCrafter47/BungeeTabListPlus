@@ -131,7 +131,7 @@ components:
 - {text: "&cServer: &6${viewer server}", icon: "default/server.png", ping: 0} # 1st row, 1st column
 - {text: "&cRank: &6${viewer vault_primary_group}", icon: "default/rank.png", ping: 0} # 1st row, 2nd column
 # Show ping in different colors depending on how good/ bad it is
-- {text: "&cPing: ${viewer_colored_ping}ms", icon: "default/ping.png", ping: 0} # 1st row, 2nd column
+- {text: "&cPing: ${viewer_colored_ping}ms", icon: "default/ping.png", ping: 0} # 1st row, 3rd column
 # A row of empty slots below
 - {text: "", icon: "colors/dark_gray.png", ping: 1000} # 2nd row, 1st column
 - {text: ""} # 2nd row, 2nd column; Since icon and ping are the default they don't need to be specified explicitely.
