@@ -81,6 +81,7 @@ public class TabListManager implements Listener {
                     ITabListConfig tabListConfig = Objects.requireNonNull(YamlConfig.read(new FileInputStream(file), ITabListConfig.class));
 
                     if (tabListConfig instanceof TabListConfig) {
+                        plugin.getLogger().log(Level.WARNING, "{0} needs to be updated, see https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating", file.getName());
                         TabListConfig c = (TabListConfig) tabListConfig;
                         plugin.getPlaceholderAPIHook().searchTabList(c);
                         validateShowTo(c);
