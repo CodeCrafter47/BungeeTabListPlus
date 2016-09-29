@@ -27,12 +27,16 @@ import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Math.min;
 
@@ -40,6 +44,7 @@ import static java.lang.Math.min;
 @Setter
 public class PlayersByServerComponent extends Component implements Validate {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
+    private String serverOrder = "alphabetically";
     private String playerSet;
     private Component serverHeader;
     private Component serverFooter;
@@ -123,10 +128,38 @@ public class PlayersByServerComponent extends Component implements Validate {
 
         private List<Component.Instance> activeComponents = new ArrayList<>();
         private Map<String, List<Player>> playersByServer = new LinkedHashMap<>();
+        private List<String> sortedServerList;
+        private Ordering<String> serverComparator;
         private int preferredSize;
 
         protected Instance(Context context) {
             super(context);
+            List<Comparator<String>> list = Stream.of(serverOrder)
+                    .filter(Objects::nonNull)
+                    .flatMap(s -> Arrays.stream(s.split(",")))
+                    .filter((s1) -> !s1.isEmpty())
+                    .map(String::toLowerCase)
+                    .map(this::getServerComparator)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            if (list.isEmpty()) {
+                serverComparator = null;
+            } else {
+                serverComparator = Ordering.compound(list);
+            }
+        }
+
+        private Comparator<String> getServerComparator(String rule) {
+            switch (rule) {
+                case "alphabetically":
+                    return Comparator.naturalOrder();
+                case "playercount":
+                    return Comparator.comparing(server -> playersByServer.get(server).size(), Comparator.reverseOrder());
+                case "online":
+                    return Comparator.comparing(server -> BungeeTabListPlus.getInstance().getServerState(server).isOnline(), Comparator.reverseOrder());
+                default:
+                    return null;
+            }
         }
 
         @Override
@@ -172,6 +205,12 @@ public class PlayersByServerComponent extends Component implements Validate {
             if (maxSize != -1) {
                 preferredSize = min(preferredSize, PlayersByServerComponent.this.maxSize);
             }
+
+            if (serverComparator != null) {
+                sortedServerList = serverComparator.immutableSortedCopy(playersByServer.keySet());
+            } else {
+                sortedServerList = ImmutableList.copyOf(playersByServer.keySet());
+            }
         }
 
         @Override
@@ -183,9 +222,7 @@ public class PlayersByServerComponent extends Component implements Validate {
             int rows = size / context.get(Context.KEY_COLUMNS);
             int minRowsPerServer = (minSizePerServer + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS);
             int maxRowsPerServer = maxSizePerServer / context.get(Context.KEY_COLUMNS);
-            List<String> servers = new ArrayList<>(playersByServer.keySet());
-            // todo make server order configurable
-            Collections.sort(servers);
+            List<String> servers = sortedServerList;
             int[] serverRows = new int[servers.size()];
             Arrays.fill(serverRows, minRowsPerServer);
             rows -= minRowsPerServer * servers.size();
