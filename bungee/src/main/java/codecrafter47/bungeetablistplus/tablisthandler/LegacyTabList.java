@@ -25,7 +25,6 @@ import net.md_5.bungee.protocol.DefinedPacket;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class LegacyTabList extends AbstractLegacyTabList {
 
@@ -42,11 +41,10 @@ public class LegacyTabList extends AbstractLegacyTabList {
     }
 
     public List<IPlayer> getServerTabList() {
-        ArrayList<IPlayer> list = new ArrayList<>(serverTabList.size());
+        ArrayList<IPlayer> list = new ArrayList<>(serverTabListEntryNames.size());
 
-        for (Map.Entry<String, Integer> entry : serverTabList.entrySet()) {
-            FakePlayer fakePlayer = new FakePlayer(entry.getKey(), player.getServer().getInfo(), false);
-            fakePlayer.setPing(entry.getValue());
+        for (String name : serverTabListEntryNames) {
+            FakePlayer fakePlayer = new FakePlayer(name, player.getServer().getInfo(), false);
             list.add(fakePlayer);
         }
 

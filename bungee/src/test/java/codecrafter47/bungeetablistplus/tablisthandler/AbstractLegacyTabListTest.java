@@ -33,10 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class AbstractLegacyTabListTest {
     private ClientTabList clientTabList;
@@ -80,7 +77,7 @@ public class AbstractLegacyTabListTest {
 
         private void validateConstraints() {
             if (passThrough) {
-                assertEquals(serverTabList.size(), clientTabList.players.size());
+                assertEquals(serverTabListEntryNames.size(), clientTabList.players.size());
             } else {
                 assertEquals(clientSize, usedSlots);
                 assertEquals(usedSlots, clientTabList.players.size());
