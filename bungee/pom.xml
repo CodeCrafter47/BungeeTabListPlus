@@ -113,7 +113,7 @@
         <dependency>
             <groupId>de.sabbertran.proxysuite</groupId>
             <artifactId>ProxySuite</artifactId>
-            <version>BETA-0.8</version>
+            <version>1.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
