@@ -23,6 +23,24 @@
             <artifactId>Multiverse-Core</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.spigotmc</groupId>
+                    <artifactId>spigot-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mcstats.bukkit</groupId>
+                    <artifactId>metrics</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.milkbowl.vault</groupId>
+                    <artifactId>VaultAPI</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
