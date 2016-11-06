@@ -63,6 +63,17 @@ public abstract class Placeholder {
         playerPlaceholders.put("world", ofStringData(DataKeys.World));
         playerPlaceholders.put("team", ofStringData(DataKeys.Team));
         playerPlaceholders.put("vault_balance", ofDoubleData(DataKeys.Vault_Balance));
+        playerPlaceholders.put("vault_balance2", ofFunction(player -> player.get(DataKeys.Vault_Balance).map(b -> {
+            if (b >= 10_000_000) {
+                return String.format("%1.0fM", b / 1_000_000);
+            } else if (b >= 10_000) {
+                return String.format("%1.0fK", b / 1_000);
+            } else if (b >= 100) {
+                return String.format("%1.0f", b);
+            } else {
+                return String.format("%1.2f", b);
+            }
+        }).orElse("")));
         playerPlaceholders.put("multiverse_world_alias", ofStringData(DataKeys.Multiverse_WorldAlias));
         playerPlaceholders.put("faction_name", ofStringData(DataKeys.Factions_FactionName));
         playerPlaceholders.put("faction_member_count", ofIntData(DataKeys.Factions_FactionMembers));
