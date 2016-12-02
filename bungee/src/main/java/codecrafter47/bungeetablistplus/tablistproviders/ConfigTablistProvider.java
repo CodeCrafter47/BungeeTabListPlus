@@ -55,7 +55,7 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
 
     private PlayerSets playerSets;
 
-    private boolean active = false;
+    protected boolean active = false;
 
     public ConfigTablistProvider(C config, Context context) {
         this.config = config;

@@ -55,6 +55,10 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
 
     @Override
     public synchronized void update() {
+        if (!active) {
+            return;
+        }
+
         super.update();
 
         // get players
