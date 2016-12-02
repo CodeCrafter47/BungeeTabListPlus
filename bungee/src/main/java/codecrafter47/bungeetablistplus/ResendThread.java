@@ -31,10 +31,7 @@ import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -125,7 +122,11 @@ class ResendThread implements Runnable, Executor {
             } else {
                 TablistProvider tablistProvider = tablistHandler.getTablistProvider();
                 Server server = player.getServer();
-                if (server != null && !(BungeeTabListPlus.getInstance().getConfig().excludeServers.contains(server.getInfo().getName()))) {
+                List<String> excludeServers = BungeeTabListPlus.getInstance().getConfig().excludeServers;
+                if (excludeServers == null) {
+                    excludeServers = Collections.emptyList();
+                }
+                if (server != null && !(excludeServers.contains(server.getInfo().getName()))) {
                     Context context = new Context().put(Context.KEY_VIEWER, connectedPlayer);
                     Config config = BungeeTabListPlus.getInstance().getTabListManager().getNewConfigForContext(context);
                     if (config != null && (!(tablistProvider instanceof ConfigTablistProvider) || ((ConfigTablistProvider) tablistProvider).config != config)) {
