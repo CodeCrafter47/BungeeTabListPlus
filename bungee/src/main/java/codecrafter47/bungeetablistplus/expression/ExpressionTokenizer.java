@@ -134,6 +134,20 @@ public class ExpressionTokenizer {
             return new StringToken(expression.substring(startIndex, index));
         }
 
+        if (index < expression.length() && expression.charAt(index) == '\'') {
+            int startIndex = index;
+
+            while (++index < expression.length() && '\'' != expression.charAt(index)) ;
+
+            if (index >= expression.length()) {
+                throw new IllegalArgumentException(format("Incomplete string literal starting at index %d in \"%s\"", startIndex, expression));
+            }
+
+            index += 1;
+
+            return new StringToken(expression.substring(startIndex, index));
+        }
+
         if (index < expression.length() && PATTERN_NUMBER.matcher(expression.substring(index, index + 1)).matches()) {
             int startIndex = index;
 
