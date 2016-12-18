@@ -73,7 +73,7 @@ public class FixedSizeConfigTablistProvider extends ConfigTablistProvider<FixedS
 
     @Override
     public synchronized void update() {
-        if (active) {
+        if (!active) {
             return;
         }
 
