@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
+import de.codecrafter47.data.bungee.api.BungeeData;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ProxyServer;
@@ -184,7 +185,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                 BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
             }
             for (Player player : players) {
-                Optional<String> server = player.get(BungeeTabListPlus.DATA_KEY_SERVER);
+                Optional<String> server = player.getOpt(BungeeData.BungeeCord_Server);
                 if (server.isPresent()) {
                     playersByServer.computeIfAbsent(server.get(), s -> new ArrayList<>()).add(player);
                 }

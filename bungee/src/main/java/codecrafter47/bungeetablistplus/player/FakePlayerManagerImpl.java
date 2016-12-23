@@ -58,7 +58,7 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
                 // do a server switch
                 FakePlayer player = online.get((int) (Math.random() * online.size()));
                 if (player.isRandomServerSwitchEnabled()) {
-                    player.server = new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size()));
+                    player.changeServer(new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size())));
                 }
             }
             if (randomJoinLeaveEventsEnabled) {

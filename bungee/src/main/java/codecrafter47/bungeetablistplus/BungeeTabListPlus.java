@@ -24,12 +24,10 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
-import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
-import codecrafter47.bungeetablistplus.common.Constants;
+import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.config.MainConfig;
-import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.DataKeys;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.placeholder.*;
@@ -48,6 +46,9 @@ import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
 import com.google.common.base.Preconditions;
+import de.codecrafter47.data.api.DataKey;
+import de.codecrafter47.data.bukkit.api.BukkitData;
+import de.codecrafter47.data.bungee.api.BungeeData;
 import de.sabbertran.proxysuite.ProxySuiteAPI;
 import lombok.Getter;
 import net.md_5.bungee.UserConnection;
@@ -85,10 +86,6 @@ import java.util.zip.ZipInputStream;
  */
 public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
-    public static DataKey<Integer> DATA_KEY_GAMEMODE = DataKey.builder().id("btlp:gamemode").bungee().player().build();
-    public static DataKey<String> DATA_KEY_SERVER = DataKey.builder().id("btlp:server").bungee().player().build();
-    public static DataKey<Icon> DATA_KEY_ICON = DataKey.builder().id("btlp:icon").bungee().player().build();
-
     /**
      * Holds an INSTANCE of itself if the plugin is enabled
      */
@@ -96,6 +93,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     @Getter
     private final Plugin plugin;
     public Collection<IPlayerProvider> playerProviders;
+    @Getter
     private ResendThread resendThread;
 
     @Getter
@@ -289,7 +287,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         playerProviders = new ArrayList<>();
 
         if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
-            redisPlayerManager = new RedisPlayerManager(connectedPlayerManager);
+            redisPlayerManager = new RedisPlayerManager(connectedPlayerManager, this, getLogger());
             playerProviders.add(redisPlayerManager);
             plugin.getLogger().info("Hooked RedisBungee");
         }
@@ -298,12 +296,12 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         playerProviders.add(fakePlayerManager);
 
-        plugin.getProxy().registerChannel(Constants.channel);
+        plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
         bukkitBridge = new BukkitBridge(this);
 
         pm = new PermissionManager(this);
 
-        dataManager = new DataManager(this, getPermissionManager());
+        dataManager = new DataManager(this);
 
         placeholderManager = new PlaceholderManagerImpl();
         placeholderManager.internalRegisterPlaceholderProvider(new BasicPlaceholders());
@@ -465,15 +463,15 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         Preconditions.checkNotNull(plugin, "plugin");
         Preconditions.checkNotNull(variable, "variable");
         Preconditions.checkArgument(!Placeholder.thirdPartyDataKeys.containsKey(variable.getName()), "Variable name already registered.");
-        DataKey<String> dataKey = BTLPDataKeys.createBungeeThirdPartyVariableDataKey(variable.getName());
+        DataKey<String> dataKey = BTLPBungeeDataKeys.createBungeeThirdPartyVariableDataKey(variable.getName());
         Placeholder.thirdPartyDataKeys.put(variable.getName(), dataKey);
         getProxy().getScheduler().schedule(plugin, () -> {
             for (ConnectedPlayer player : connectedPlayerManager.getPlayers()) {
                 try {
                     String replacement = variable.getReplacement(player.getPlayer());
-                    if (!Objects.equals(replacement, player.getData().getRawValue(dataKey))) {
+                    if (!Objects.equals(replacement, player.getLocalDataCache().get(dataKey))) {
                         runInMainThread(() -> {
-                            player.getData().updateValue(dataKey, replacement);
+                            player.getLocalDataCache().updateValue(dataKey, replacement);
                         });
                     }
                 } catch (Throwable th) {
@@ -565,7 +563,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      * @return true if the player is hidden, false otherwise
      */
     public static boolean isHidden(Player player) {
-        if (player.get(DATA_KEY_SERVER).map(BungeeTabListPlus::isHiddenServer).orElse(false)) {
+        if (player.getOpt(BungeeData.BungeeCord_Server).map(BungeeTabListPlus::isHiddenServer).orElse(false)) {
             return true;
         }
         final boolean[] hidden = new boolean[1];
@@ -580,9 +578,9 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (permanentlyHiddenPlayers.contains(player.getUniqueID().toString())) {
             hidden[0] = true;
         }
-        player.get(DataKeys.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
-        player.get(DataKeys.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
-        player.get(DataKeys.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.getOpt(BukkitData.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.getOpt(BukkitData.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.getOpt(BukkitData.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
 
         // check ProxyCore
         if (!hidden[0]) {

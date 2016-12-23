@@ -81,9 +81,39 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>data-core</artifactId>
-            <version>2.6.5-SNAPSHOT</version>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data.bukkit</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data.sponge</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>minecraft</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data.bungee</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>bungee</artifactId>
+            <version>${data-api.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -115,6 +145,12 @@
             <artifactId>ProxySuite</artifactId>
             <version>1.2</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>codecrafter47.bungeetablistplus</groupId>
+                    <artifactId>BungeeTabListPlus</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>

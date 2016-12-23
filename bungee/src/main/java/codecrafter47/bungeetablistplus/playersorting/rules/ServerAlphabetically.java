@@ -19,12 +19,12 @@
 
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
+import de.codecrafter47.data.bungee.api.BungeeData;
 
 import java.text.Collator;
 import java.util.Optional;
@@ -32,8 +32,8 @@ import java.util.Optional;
 public class ServerAlphabetically implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        Optional<String> server1 = ((Player) player1).get(BungeeTabListPlus.DATA_KEY_SERVER);
-        Optional<String> server2 = ((Player) player2).get(BungeeTabListPlus.DATA_KEY_SERVER);
+        Optional<String> server1 = ((Player) player1).getOpt(BungeeData.BungeeCord_Server);
+        Optional<String> server2 = ((Player) player2).getOpt(BungeeData.BungeeCord_Server);
         if (server1.isPresent() || server2.isPresent()) {
             return Collator.getInstance().compare(server1.orElse(""), server2.orElse(""));
         }
@@ -42,8 +42,8 @@ public class ServerAlphabetically implements SortingRule {
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
-        Optional<String> server1 = ((Player) player1).get(BungeeTabListPlus.DATA_KEY_SERVER);
-        Optional<String> server2 = ((Player) player2).get(BungeeTabListPlus.DATA_KEY_SERVER);
+        Optional<String> server1 = ((Player) player1).getOpt(BungeeData.BungeeCord_Server);
+        Optional<String> server2 = ((Player) player2).getOpt(BungeeData.BungeeCord_Server);
         if (server1.isPresent() || server2.isPresent()) {
             return Collator.getInstance().compare(server1.orElse(""), server2.orElse(""));
         }

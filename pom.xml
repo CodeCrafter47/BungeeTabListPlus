@@ -13,7 +13,6 @@
         <module>common</module>
         <module>bootstrap-bungee</module>
         <module>bootstrap-bukkit</module>
-        <module>data</module>
         <module>api-bukkit</module>
         <module>api-bungee</module>
         <module>api-sponge</module>
@@ -27,6 +26,7 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.source>1.7</maven.compiler.source>
         <build.number>unknown</build.number>
+        <data-api.version>1.0.0-SNAPSHOT</data-api.version>
     </properties>
 
     <scm>

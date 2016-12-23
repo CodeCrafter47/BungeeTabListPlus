@@ -21,16 +21,16 @@ package codecrafter47.bungeetablistplus.playersorting.rules;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
-import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
+import de.codecrafter47.data.bukkit.api.BukkitData;
 
 public class AFKLast implements SortingRule {
 
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        boolean player1AFK = ((Player) player1).get(DataKeys.Essentials_IsAFK).orElse(false);
-        boolean player2AFK = ((Player) player2).get(DataKeys.Essentials_IsAFK).orElse(false);
+        boolean player1AFK = ((Player) player1).getOpt(BukkitData.Essentials_IsAFK).orElse(false);
+        boolean player2AFK = ((Player) player2).getOpt(BukkitData.Essentials_IsAFK).orElse(false);
         if (player1AFK == player2AFK) {
             return 0;
         }
@@ -43,8 +43,8 @@ public class AFKLast implements SortingRule {
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
-        boolean player1AFK = ((Player) player1).get(DataKeys.Essentials_IsAFK).orElse(false);
-        boolean player2AFK = ((Player) player2).get(DataKeys.Essentials_IsAFK).orElse(false);
+        boolean player1AFK = ((Player) player1).getOpt(BukkitData.Essentials_IsAFK).orElse(false);
+        boolean player2AFK = ((Player) player2).getOpt(BukkitData.Essentials_IsAFK).orElse(false);
         if (player1AFK == player2AFK) {
             return 0;
         }

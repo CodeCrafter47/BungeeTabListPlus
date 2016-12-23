@@ -25,17 +25,16 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
-import codecrafter47.bungeetablistplus.common.Constants;
 import codecrafter47.bungeetablistplus.config.old.TabListConfig;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.player.Player;
 import com.google.common.collect.Sets;
+import de.codecrafter47.data.api.DataHolder;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Listener;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ConcurrentModificationException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -67,40 +66,35 @@ public class PlaceholderAPIHook implements Listener {
     }
 
     public void askForPlaceholders(ServerInfo server) {
-        if (bungeeTabListPlus.getBridge().get(server, BTLPDataKeys.PLACEHOLDERAPI_PRESENT).orElse(false)) {
-            for (String placeholder : placeholdersToCheck) {
-                if (!registeredPlaceholders.contains(placeholder) && !server.getPlayers().isEmpty()) {
-                    try {
-                        ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        ObjectOutputStream out = new ObjectOutputStream(os);
-                        out.writeUTF(Constants.subchannelPlaceholder);
-                        out.writeUTF(placeholder);
-                        out.close();
-                        server.sendData(Constants.channel, os.toByteArray());
-                    } catch (Throwable th) {
-                        bungeeTabListPlus.reportError(th);
+        DataHolder dataHolder = bungeeTabListPlus.getBridge().getServerDataHolder(server.getName());
+        Boolean b;
+        if (dataHolder != null && null != (b = dataHolder.get(BTLPDataKeys.PLACEHOLDERAPI_PRESENT)) && b) {
+            List<String> plugins = dataHolder.get(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS);
+            if (plugins != null) {
+                for (String placeholder : placeholdersToCheck) {
+                    if (!registeredPlaceholders.contains(placeholder)) {
+                        String pl = placeholder.split("_")[0].substring(1);
+                        if (plugins.stream().anyMatch(s -> s.equalsIgnoreCase(pl))) {
+                            if (!registeredPlaceholders.contains(placeholder)) {
+                                registeredPlaceholders.add(placeholder);
+                                Placeholder.placeholderAPIDataKeys.put(placeholder.substring(1, placeholder.length() - 1), BTLPDataKeys.createPlaceholderAPIDataKey(placeholder));
+                                // this implicitly causes a reload
+                                bungeeTabListPlus.registerPlaceholderProvider0(new PlaceholderProvider() {
+                                    @Override
+                                    public void setup() {
+                                        bindRegex(Pattern.quote(placeholder)).to((placeholderManager, matcher) -> new SlotTemplate() {
+                                            @Override
+                                            public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
+                                                return builder.appendText(((Player) context.getPlayer()).getOpt(BTLPDataKeys.createPlaceholderAPIDataKey(placeholder)).orElse(""));
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
-
-    public void onPlaceholderConfirmed(String placeholder) {
-        if (!registeredPlaceholders.contains(placeholder)) {
-            registeredPlaceholders.add(placeholder);
-            Placeholder.placeholderAPIDataKeys.put(placeholder.substring(1, placeholder.length() - 1), BTLPDataKeys.createPlaceholderAPIDataKey(placeholder));
-            // this implicitly causes a reload
-            bungeeTabListPlus.registerPlaceholderProvider0(new PlaceholderProvider() {
-                @Override
-                public void setup() {
-                    bindRegex(Pattern.quote(placeholder)).to((placeholderManager, matcher) -> new SlotTemplate() {
-                        @Override
-                        public SlotBuilder buildSlot(SlotBuilder builder, TabListContext context) {
-                            return builder.appendText(((Player) context.getPlayer()).get(BTLPDataKeys.createPlaceholderAPIDataKey(placeholder)).orElse(""));
-                        }
-                    });
-                }
-            });
         }
     }
 

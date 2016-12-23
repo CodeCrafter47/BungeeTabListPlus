@@ -30,9 +30,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>data-bukkit</artifactId>
-            <version>2.6.5-SNAPSHOT</version>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data.bukkit</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>${data-api.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

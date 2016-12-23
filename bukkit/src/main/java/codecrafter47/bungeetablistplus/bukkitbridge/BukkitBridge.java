@@ -22,46 +22,63 @@ import codecrafter47.bungeetablistplus.api.bukkit.BungeeTabListPlusBukkitAPI;
 import codecrafter47.bungeetablistplus.api.bukkit.Variable;
 import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
-import codecrafter47.bungeetablistplus.common.Constants;
-import codecrafter47.bungeetablistplus.data.DataAccess;
-import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.JoinedDataAccess;
-import codecrafter47.bungeetablistplus.data.bukkit.AbstractBukkitDataAccess;
-import codecrafter47.bungeetablistplus.data.bukkit.PlayerDataAccess;
-import codecrafter47.bungeetablistplus.data.bukkit.ServerDataAccess;
+import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
+import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
+import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import de.codecrafter47.data.api.*;
+import de.codecrafter47.data.bukkit.AbstractBukkitDataAccess;
+import de.codecrafter47.data.bukkit.PlayerDataAccess;
+import de.codecrafter47.data.bukkit.ServerDataAccess;
+import de.codecrafter47.data.bukkit.api.BukkitData;
+import de.codecrafter47.data.bungee.api.BungeeData;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRegisterChannelEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener {
+
+    private static final TypeAdapterRegistry typeRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
+
+    private static final DataKeyRegistry keyRegistry = DataKeyRegistry.of(
+            MinecraftData.class,
+            BukkitData.class,
+            BungeeData.class,
+            BTLPDataKeys.class);
+
+    private final UUID serverId = UUID.randomUUID();
+
     private final Plugin plugin;
 
-    private ServerDataUpdateTask serverDataUpdateTask = null;
-
-    private final Map<UUID, PlayerDataUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
+    private final Map<Player, PlayerBridgeData> playerData = new ConcurrentHashMap<>();
+    private final Map<UUID, ServerBridgeData> serverData = new ConcurrentHashMap<>();
 
     private DataAccess<Player> playerDataAccess;
     private DataAccess<Server> serverDataAccess;
@@ -71,6 +88,21 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
     private final Map<String, Variable> variablesByName = new HashMap<>();
     private final Multimap<Plugin, Variable> variablesByPlugin = HashMultimap.create();
+
+    private final Consumer<String> missingDataKeyLogger = null;
+    /*
+    private final Consumer<String> missingDataKeyLogger = new Consumer<String>() {
+
+        private final Set<String> missingKeys = Sets.newConcurrentHashSet();
+
+        @Override
+        public void accept(String id) {
+            if (missingKeys.add(id)) {
+                plugin.getLogger().warning("Missing data key with id " + id + ". Is the plugin up-to-date?");
+            }
+        }
+    };
+    */
 
     public BukkitBridge(Plugin plugin) {
         this.plugin = plugin;
@@ -86,59 +118,206 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         }
 
         plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin,
-                Constants.channel);
+                BridgeProtocolConstants.CHANNEL);
         plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin,
-                Constants.channel, (string, player, bytes) -> {
-                    try {
-                        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
+                BridgeProtocolConstants.CHANNEL, (string, player, bytes) -> {
 
-                        String subchannel = in.readUTF();
-                        if (subchannel.equals(Constants.subchannelRequestPlayerVariable)) {
-                            DataKey<Object> dataKey = (DataKey<Object>) in.readObject();
-                            getPlayerDataUpdateTask(player).requestValue(dataKey);
-                        } else if (subchannel.equals(Constants.subchannelRequestServerVariable)) {
-                            DataKey<Object> dataKey = (DataKey<Object>) in.readObject();
-                            this.serverDataUpdateTask.requestValue(dataKey);
-                        } else if (subchannel.equals(Constants.subchannelRequestResetPlayerVariables)) {
-                            getPlayerDataUpdateTask(player).reset();
-                        } else if (subchannel.equals(Constants.subchannelRequestResetServerVariables)) {
-                            serverDataUpdateTask.reset();
-                        } else if (subchannel.equals(Constants.subchannelPlaceholder)) {
-                            String placeholder = in.readUTF();
-                            PlaceholderAPIHook hook = this.placeholderAPIHook;
-                            if (hook != null) {
-                                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-                                    try {
-                                        if (hook.isPlaceholder(player, placeholder)) {
-                                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-                                            ObjectOutputStream out = new ObjectOutputStream(os);
-                                            out.writeUTF(subchannel);
-                                            out.writeUTF(placeholder);
-                                            out.close();
-                                            player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
-                                        }
-                                    } catch (Throwable ex) {
-                                        plugin.getLogger().log(Level.WARNING, "PlaceholderAPI error", ex);
+                    DataInput input = new DataInputStream(new ByteArrayInputStream(bytes));
+
+                    try {
+                        int messageId = input.readUnsignedByte();
+
+                        switch (messageId) {
+                            case BridgeProtocolConstants.MESSAGE_ID_PROXY_HANDSHAKE:
+                                UUID proxyId = DataStreamUtils.readUUID(input);
+                                int protocolVersion = input.readInt();
+
+                                if (protocolVersion > BridgeProtocolConstants.VERSION) {
+                                    plugin.getLogger().warning("BungeeTabListPlus_BukkitBridge is outdated.");
+                                } else if (protocolVersion < BridgeProtocolConstants.VERSION) {
+                                    plugin.getLogger().warning("BungeeTabListPlus proxy plugin outdated.");
+                                } else {
+                                    playerData.put(player, new PlayerBridgeData(proxyId));
+                                    serverData.computeIfAbsent(proxyId, uuid -> new ServerBridgeData());
+                                    ByteArrayDataOutput data = ByteStreams.newDataOutput();
+                                    data.writeByte(BridgeProtocolConstants.MESSAGE_ID_SERVER_HANDSHAKE);
+                                    player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, data.toByteArray());
+                                }
+
+                                break;
+
+                            case BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_DATA:
+                                BridgeData bridgeData = playerData.get(player);
+                                if (bridgeData != null) {
+                                    handleDataRequest(bridgeData, input);
+                                }
+                                break;
+
+                            case BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_SERVER_DATA:
+                                PlayerBridgeData playerBridgeData = playerData.get(player);
+                                if (playerBridgeData != null) {
+                                    bridgeData = serverData.get(playerBridgeData.proxyId);
+                                    if (bridgeData != null) {
+                                        handleDataRequest(bridgeData, input);
                                     }
-                                });
-                            }
-                        } else {
-                            plugin.getLogger().warning("Received plugin message of unknown format. Proxy/Bukkit plugin version mismatch?");
+                                }
+                                break;
+
+                            case BridgeProtocolConstants.MESSAGE_ID_PROXY_OUTDATED:
+                                plugin.getLogger().warning("BungeeTabListPlus proxy plugin outdated.");
+                                break;
+
+                            case BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_RESET_SERVER_DATA:
+                                playerBridgeData = playerData.get(player);
+                                if (playerBridgeData != null) {
+                                    bridgeData = serverData.get(playerBridgeData.proxyId);
+                                    if (bridgeData != null) {
+                                        serverData.put(playerBridgeData.proxyId, new ServerBridgeData());
+                                    }
+                                }
+                                break;
+
+                            default:
+                                plugin.getLogger().warning("Received unknown message id " + messageId);
+                                break;
                         }
-                    } catch (IOException | ClassNotFoundException ex) {
-                        plugin.getLogger().log(Level.SEVERE, "An error occurred while handling an incoming plugin message", ex);
+                    } catch (IOException ex) {
+                        plugin.getLogger().log(Level.SEVERE, "An unexpected error occurred while processing a plugin message.", ex);
                     }
                 });
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
         updateDataHooks();
 
-        // start generalInformation update task
-        this.serverDataUpdateTask = new ServerDataUpdateTask();
-        this.serverDataUpdateTask.runTaskTimerAsynchronously(plugin, 0, 20);
+        // initialize bridge for players already on the server
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            ByteArrayDataOutput data = ByteStreams.newDataOutput();
+            data.writeByte(BridgeProtocolConstants.MESSAGE_ID_SERVER_ENABLE_CONNECTION);
+            try {
+                DataStreamUtils.writeUUID(data, serverId);
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, data.toByteArray());
+        }
 
-        // start update tasks for players already on the server
-        plugin.getServer().getOnlinePlayers().forEach(this::getPlayerDataUpdateTask);
+        // start update task
+        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            long now = System.currentTimeMillis();
+            Map<UUID, Player> proxyIds = new HashMap<>();
+
+            for (Map.Entry<Player, PlayerBridgeData> e : playerData.entrySet()) {
+                Player player = e.getKey();
+                PlayerBridgeData bridgeData = e.getValue();
+
+                proxyIds.putIfAbsent(bridgeData.proxyId, player);
+
+                int size = 0;
+
+                for (CacheEntry entry : bridgeData.requestedData) {
+                    Object value = playerDataAccess.get(entry.key, player);
+                    entry.dirty = !Objects.equals(value, entry.value);
+                    entry.value = value;
+
+                    if (entry.dirty) {
+                        size++;
+                    }
+                }
+
+                if (size != 0) {
+                    ByteArrayDataOutput data = ByteStreams.newDataOutput();
+                    data.writeByte(BridgeProtocolConstants.MESSAGE_ID_SERVER_UPDATE_DATA);
+                    data.writeInt(size);
+
+                    for (CacheEntry entry : bridgeData.requestedData) {
+                        if (entry.dirty) {
+                            data.writeInt(entry.netId);
+                            data.writeBoolean(entry.value == null);
+                            if (entry.value != null) {
+                                try {
+                                    typeRegistry.getTypeAdapter((TypeToken<Object>) entry.key.getType()).write(data, entry.value);
+                                } catch (java.io.IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+
+                    player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, data.toByteArray());
+                }
+            }
+
+            for (Map.Entry<UUID, Player> e : proxyIds.entrySet()) {
+                UUID proxyId = e.getKey();
+                Player player = e.getValue();
+                ServerBridgeData bridgeData = serverData.get(proxyId);
+
+                if (bridgeData == null) {
+                    continue;
+                }
+
+                bridgeData.lastUpdate = now;
+
+                int size = 0;
+
+                for (CacheEntry entry : bridgeData.requestedData) {
+                    Object value = serverDataAccess.get(entry.key, plugin.getServer());
+                    entry.dirty = !Objects.equals(value, entry.value);
+                    entry.value = value;
+
+                    if (entry.dirty) {
+                        size++;
+                    }
+                }
+
+                ByteArrayDataOutput data = ByteStreams.newDataOutput();
+                data.writeByte(BridgeProtocolConstants.MESSAGE_ID_SERVER_UPDATE_SERVER_DATA);
+
+                if (size > 0) {
+                    bridgeData.revision++;
+                }
+
+                data.writeInt(bridgeData.revision);
+                data.writeInt(size);
+
+                for (CacheEntry entry : bridgeData.requestedData) {
+                    if (entry.dirty) {
+                        data.writeInt(entry.netId);
+                        data.writeBoolean(entry.value == null);
+                        if (entry.value != null) {
+                            try {
+                                typeRegistry.getTypeAdapter((TypeToken<Object>) entry.key.getType()).write(data, entry.value);
+                            } catch (java.io.IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
+                player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, data.toByteArray());
+            }
+
+            for (Iterator<ServerBridgeData> iterator = serverData.values().iterator(); iterator.hasNext(); ) {
+                ServerBridgeData data = iterator.next();
+                if (now - data.lastUpdate > 900000) {
+                    iterator.remove();
+                }
+            }
+
+        }, 20, 20);
+    }
+
+    private void handleDataRequest(BridgeData bridgeData, DataInput input) throws IOException {
+        int size = input.readInt();
+        for (int i = 0; i < size; i++) {
+            DataKey<?> key = DataStreamUtils.readDataKey(input, keyRegistry, missingDataKeyLogger);
+            int keyNetId = input.readInt();
+
+            if (key != null) {
+                bridgeData.addRequest(key, keyNetId);
+            }
+        }
     }
 
     private void updateDataHooks() {
@@ -156,30 +335,9 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         serverDataAccess = JoinedDataAccess.of(new ServerDataAccess(plugin), new BTLPServerDataKeyAccess());
     }
 
-    private PlayerDataUpdateTask getPlayerDataUpdateTask(Player player) {
-        if (playerInformationUpdaters.get(player.getUniqueId()) == null) {
-            PlayerDataUpdateTask playerDataUpdateTask = new PlayerDataUpdateTask(player);
-            playerDataUpdateTask.runTaskTimerAsynchronously(plugin, 0, 20);
-            playerInformationUpdaters.put(player.getUniqueId(), playerDataUpdateTask);
-        }
-        return playerInformationUpdaters.get(player.getUniqueId());
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        getPlayerDataUpdateTask(event.getPlayer());
-    }
-
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        if (playerInformationUpdaters.containsKey(player.getUniqueId())) {
-            try {
-                playerInformationUpdaters.remove(player.getUniqueId()).cancel();
-            } catch (Exception ex) {
-                plugin.getLogger().log(Level.SEVERE, "An exception occurred while removing a player", ex);
-            }
-        }
+        playerData.remove(event.getPlayer());
     }
 
     @EventHandler
@@ -192,29 +350,14 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         updateDataHooks();
     }
 
-    protected void sendInformation(String subchannel, Map<DataKey<?>, Object> delta, Player player) {
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(os);
-            out.writeUTF(subchannel);
-            out.writeObject(delta);
-            out.close();
-            player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, null, ex);
-        }
-    }
-
-    protected void sendHash(String subchannel, int hash, Player player) {
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(os);
-            out.writeUTF(subchannel);
-            out.writeInt(hash);
-            out.close();
-            player.sendPluginMessage(plugin, Constants.channel, os.toByteArray());
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, null, ex);
+    @EventHandler
+    @SneakyThrows
+    public void onChannelRegistration(PlayerRegisterChannelEvent event) {
+        if (BridgeProtocolConstants.CHANNEL.equals(event.getChannel())) {
+            ByteArrayDataOutput data = ByteStreams.newDataOutput();
+            data.writeByte(BridgeProtocolConstants.MESSAGE_ID_SERVER_ENABLE_CONNECTION);
+            DataStreamUtils.writeUUID(data, serverId);
+            event.getPlayer().sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, data.toByteArray());
         }
     }
 
@@ -259,15 +402,15 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     }
 
     private class ThirdPartyVariablesAccess extends AbstractBukkitDataAccess<Player> {
-        public ThirdPartyVariablesAccess() {
-            super(plugin.getLogger(), plugin);
-            bind(BTLPDataKeys.ThirdPartyVariableDataKey.class, this::resolveVariable);
+        ThirdPartyVariablesAccess() {
+            super(BukkitBridge.this.plugin.getLogger(), BukkitBridge.this.plugin);
+            addProvider(BTLPDataKeys.ThirdPartyPlaceholder, this::resolveVariable);
         }
 
-        private String resolveVariable(Player player, BTLPDataKeys.ThirdPartyVariableDataKey key) {
+        private String resolveVariable(Player player, DataKey<String> key) {
             apiLock.readLock().lock();
             try {
-                Variable variable = variablesByName.get(key.getName());
+                Variable variable = variablesByName.get(key.getParameter());
                 if (variable != null) {
                     String replacement = null;
                     try {
@@ -285,9 +428,9 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     }
 
     private class BTLPServerDataKeyAccess extends AbstractBukkitDataAccess<Server> {
-        public BTLPServerDataKeyAccess() {
-            super(plugin.getLogger(), plugin);
-            bind(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
+        BTLPServerDataKeyAccess() {
+            super(BukkitBridge.this.plugin.getLogger(), BukkitBridge.this.plugin);
+            addProvider(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
                 apiLock.readLock().lock();
                 try {
                     return Lists.newArrayList(variablesByName.keySet());
@@ -295,78 +438,43 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
                     apiLock.readLock().unlock();
                 }
             });
-            bind(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> placeholderAPIHook != null);
+            addProvider(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> placeholderAPIHook != null);
+            addProvider(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS, server -> placeholderAPIHook != null ? placeholderAPIHook.getRegisteredPlaceholderPlugins() : null);
         }
     }
 
-    public abstract class DataUpdateTask<B> extends BukkitRunnable {
-        Map<DataKey<?>, Object> sentData = new ConcurrentHashMap<>();
-        ImmutableSet<DataKey<?>> requestedData = ImmutableSet.of();
-        boolean requestedReset = true;
+    @RequiredArgsConstructor
+    private static class CacheEntry {
+        private final DataKey<?> key;
+        private final int netId;
+        private Object value = null;
+        private boolean dirty = false;
+    }
 
-        protected final void update(Player player, DataAccess<B> dataAccess, B boundType, String subchannel) {
-            Map<DataKey<?>, Object> newData = new ConcurrentHashMap<>();
-            requestedData.parallelStream().forEach(value -> {
-                dataAccess.getValue(value, boundType).ifPresent(data -> newData.put(value, data));
-            });
-            Map<DataKey<?>, Object> delta = new HashMap<>();
-            for (Map.Entry<DataKey<?>, Object> entry : sentData.entrySet()) {
-                if (!newData.containsKey(entry.getKey())) {
-                    delta.put(entry.getKey(), null);
-                } else if (!Objects.equals(newData.get(entry.getKey()), entry.getValue())) {
-                    delta.put(entry.getKey(), newData.get(entry.getKey()));
-                }
-            }
-            for (Map.Entry<DataKey<?>, Object> entry : newData.entrySet()) {
-                if (requestedReset || !sentData.containsKey(entry.getKey())) {
-                    delta.put(entry.getKey(), entry.getValue());
+    private static class BridgeData {
+        protected final List<CacheEntry> requestedData = new CopyOnWriteArrayList<>();
+
+        private void addRequest(DataKey<?> key, int netId) {
+            for (CacheEntry registration : requestedData) {
+                if (Objects.equals(registration.key, key)) {
+                    return;
                 }
             }
 
-            if (!delta.isEmpty()) {
-                sendInformation(subchannel, delta, player);
-            }
-            sentData = newData;
-
-            if (requestedReset) {
-                requestedReset = false;
-            }
-        }
-
-        public void requestValue(DataKey<?> dataKey) {
-            if (!requestedData.contains(dataKey)) {
-                requestedData = ImmutableSet.<DataKey<?>>builder().addAll(requestedData).add(dataKey).build();
-            }
-        }
-
-        public void reset() {
-            requestedReset = true;
+            requestedData.add(new CacheEntry(key, netId));
         }
     }
 
-    public class ServerDataUpdateTask extends DataUpdateTask<Server> {
+    private static class PlayerBridgeData extends BridgeData {
+        private UUID proxyId;
 
-        @Override
-        public void run() {
-            plugin.getServer().getOnlinePlayers().stream().findAny().ifPresent(player -> {
-                update(player, serverDataAccess, plugin.getServer(), Constants.subchannelUpdateServer);
-                sendHash(Constants.subchannelServerHash, sentData.hashCode(), player);
-            });
+        public PlayerBridgeData(UUID proxyId) {
+            this.proxyId = proxyId;
         }
-
     }
 
-    public class PlayerDataUpdateTask extends DataUpdateTask<Player> {
-        private final Player player;
-
-        public PlayerDataUpdateTask(Player player) {
-            this.player = player;
-        }
-
-        @Override
-        public void run() {
-            update(player, playerDataAccess, player, Constants.subchannelUpdatePlayer);
-            sendHash(Constants.subchannelPlayerHash, sentData.hashCode(), player);
-        }
+    private static class ServerBridgeData extends BridgeData {
+        private int revision = 0;
+        private long lastUpdate;
     }
 }

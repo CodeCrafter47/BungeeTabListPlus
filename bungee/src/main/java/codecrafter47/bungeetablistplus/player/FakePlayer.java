@@ -22,30 +22,30 @@ package codecrafter47.bungeetablistplus.player;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
-import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import com.google.common.base.Charsets;
+import de.codecrafter47.data.api.DataCache;
+import de.codecrafter47.data.api.DataKey;
+import de.codecrafter47.data.bungee.api.BungeeData;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.FutureTask;
 
-public class FakePlayer implements Player, codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer {
+public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer {
     private final String name;
-    ServerInfo server;
-    private int ping;
-    private int gamemode;
-    private Skin skin;
     private final UUID uuid;
     private boolean randomServerSwitchEnabled;
 
+    private final DataCache data = new DataCache();
+
     public FakePlayer(String name, ServerInfo server, boolean randomServerSwitchEnabled) {
         this.randomServerSwitchEnabled = randomServerSwitchEnabled;
-        this.ping = 0;
-        this.gamemode = 0;
-        this.skin = null;
         this.name = name;
-        this.server = server;
         this.uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
+
+        data.updateValue(BungeeData.BungeeCord_Server, server.getName());
     }
 
     @Override
@@ -58,29 +58,21 @@ public class FakePlayer implements Player, codecrafter47.bungeetablistplus.api.b
         return uuid;
     }
 
-    @Override
-    public Optional<ServerInfo> getServer() {
-        return Optional.of(server);
-    }
-
-    @Override
-    public int getPing() {
-        return ping;
-    }
-
-    @Override
-    public Skin getSkin() {
-        return skin != null ? skin : BungeeTabListPlus.getInstance().getSkinManager().getSkin(name);
-    }
-
-    @Override
-    public int getGameMode() {
-        return gamemode;
+    @SneakyThrows
+    private void executeInMainThread(Runnable task) {
+        BungeeTabListPlus btlp = BungeeTabListPlus.getInstance();
+        if (btlp.getResendThread().isInMainThread()) {
+            task.run();
+        } else {
+            FutureTask<Void> futureTask = new FutureTask<>(task, null);
+            btlp.runInMainThread(futureTask);
+            futureTask.get();
+        }
     }
 
     @Override
     public void setPing(int ping) {
-        this.ping = ping;
+        executeInMainThread(() -> data.updateValue(BungeeData.BungeeCord_Ping, ping));
     }
 
     @Override
@@ -94,35 +86,31 @@ public class FakePlayer implements Player, codecrafter47.bungeetablistplus.api.b
     }
 
     public void setGamemode(int gamemode) {
-        this.gamemode = gamemode;
+        executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE, gamemode));
     }
 
     @Override
     public void changeServer(ServerInfo newServer) {
-        server = newServer;
+        executeInMainThread(() -> data.updateValue(BungeeData.BungeeCord_Server, newServer.getName()));
     }
 
     @Override
     public void setSkin(Skin skin) {
-        this.skin = skin;
+        executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, new Icon(skin.getOwner(), skin.toProperty())));
     }
 
     @Override
-    public <T> Optional<T> get(DataKey<T> key) {
-        ConnectedPlayer player = BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayerIfPresent(getName());
-        if (player != null) {
-            return player.get(key);
-        }
-        if (key.equals(BungeeTabListPlus.DATA_KEY_GAMEMODE)) {
-            return (Optional<T>) Optional.of(gamemode);
-        }
-        if (key.equals(BungeeTabListPlus.DATA_KEY_SERVER)) {
-            return (Optional<T>) Optional.of(server.getName());
-        }
-        if (key.equals(BungeeTabListPlus.DATA_KEY_ICON)) {
-            Skin skin = getSkin();
-            return (Optional<T>) Optional.of(new Icon(skin.getOwner(), skin.toProperty()));
-        }
-        return Optional.empty();
+    public <V> V get(DataKey<V> key) {
+        return data.get(key);
+    }
+
+    @Override
+    public <T> void addDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+        data.addDataChangeListener(key, listener);
+    }
+
+    @Override
+    public <T> void removeDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+        data.removeDataChangeListener(key, listener);
     }
 }

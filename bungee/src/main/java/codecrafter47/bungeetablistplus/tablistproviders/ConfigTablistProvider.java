@@ -27,7 +27,6 @@ import codecrafter47.bungeetablistplus.config.PlayerSet;
 import codecrafter47.bungeetablistplus.config.PlayerVisibility;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.context.PlayerSets;
-import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
@@ -37,6 +36,7 @@ import codecrafter47.bungeetablistplus.template.TextTemplate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +116,7 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
         }
 
         BungeeTabListPlus plugin = BungeeTabListPlus.getInstance();
-        boolean canSeeHiddenPlayers = context.get(Context.KEY_VIEWER).get(DataKeys.permission("bungeetablistplus.seevanished")).orElse(false);
+        boolean canSeeHiddenPlayers = context.get(Context.KEY_VIEWER).getOpt(MinecraftData.permission("bungeetablistplus.seevanished")).orElse(false);
 
         // PlayerSets
         ImmutableList<? extends IPlayer> all = ImmutableList.copyOf(Iterables.concat(Collections2.transform(plugin.playerProviders, IPlayerProvider::getPlayers)));

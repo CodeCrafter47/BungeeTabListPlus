@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
+import de.codecrafter47.data.api.DataHolder;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -93,7 +94,8 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
         List<String> withoutBridge = new ArrayList<>();
         List<String> maybeBridge = new ArrayList<>();
         for (ServerInfo server : servers) {
-            if (bridge.get(server, BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES).isPresent()) {
+            DataHolder dataHolder = bridge.getServerDataHolder(server.getName());
+            if (dataHolder != null && dataHolder.get(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES) != null) {
                 withBridge.add(server.getName());
             } else {
                 if (server.getPlayers().isEmpty()) {
@@ -115,7 +117,11 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
 
         // PlaceholderAPI
         List<String> withPAPI = servers.stream()
-                .filter(server -> bridge.get(server, BTLPDataKeys.PLACEHOLDERAPI_PRESENT).orElse(false))
+                .filter(server -> {
+                    DataHolder dataHolder = bridge.getServerDataHolder(server.getName());
+                    Boolean b;
+                    return dataHolder != null && (b = dataHolder.get(BTLPDataKeys.PLACEHOLDERAPI_PRESENT)) != null && b;
+                })
                 .map(ServerInfo::getName)
                 .collect(Collectors.toList());
         if (!withPAPI.isEmpty()) {

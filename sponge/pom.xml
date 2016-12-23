@@ -20,8 +20,26 @@
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>4.1.0</version>
+            <version>5.0.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data.sponge</groupId>
+            <artifactId>api</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecrafter47.data</groupId>
+            <artifactId>sponge</artifactId>
+            <version>${data-api.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>

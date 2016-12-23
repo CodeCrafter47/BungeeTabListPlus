@@ -21,67 +21,74 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.data.AbstractDataAccess;
-import codecrafter47.bungeetablistplus.data.DataCache;
-import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.DataKeys;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
+import codecrafter47.bungeetablistplus.data.TrackingDataCache;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import de.codecrafter47.data.api.DataAccess;
+import de.codecrafter47.data.api.DataCache;
+import de.codecrafter47.data.api.DataKey;
+import de.codecrafter47.data.api.JoinedDataAccess;
+import de.codecrafter47.data.bungee.AbstractBungeeDataAccess;
+import de.codecrafter47.data.bungee.PlayerDataAccess;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
-public class DataManager extends AbstractDataAccess<ProxiedPlayer> implements Listener {
+public class DataManager implements Listener {
     private final BungeeTabListPlus bungeeTabListPlus;
-    private final PermissionManager permissionManager;
 
-    public DataManager(BungeeTabListPlus bungeeTabListPlus, PermissionManager permissionManager) {
+    private final DataAccess<ProxiedPlayer> playerDataAccess;
+
+    public DataManager(BungeeTabListPlus bungeeTabListPlus) {
         this.bungeeTabListPlus = bungeeTabListPlus;
-        this.permissionManager = permissionManager;
-        init();
-        ProxyServer.getInstance().getScheduler().schedule(bungeeTabListPlus.getPlugin(), this::updateData, 1, 1, TimeUnit.SECONDS);
+
+        Plugin plugin = bungeeTabListPlus.getPlugin();
+        Logger logger = bungeeTabListPlus.getLogger();
+
+        playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin, logger),
+                new LocalPlayerDataAccess(plugin, logger));
+
+        ProxyServer.getInstance().getScheduler().schedule(plugin, this::updateData, 1, 1, TimeUnit.SECONDS);
     }
 
-    private void init() {
-        bind(DataKeys.BungeeCord_PrimaryGroup, permissionManager::getMainGroupFromBungeeCord);
-        bind(DataKeys.BungeeCord_Rank, permissionManager::getBungeeCordRank);
-        bind(DataKeys.BungeePerms_PrimaryGroup, permissionManager::getMainGroupFromBungeePerms);
-        bind(DataKeys.BungeePerms_Prefix, permissionManager::getPrefixFromBungeePerms);
-        bind(DataKeys.BungeePerms_DisplayPrefix, permissionManager::getDisplayPrefix);
-        bind(DataKeys.BungeePerms_Suffix, permissionManager::getSuffixFromBungeePerms);
-        bind(DataKeys.BungeePerms_Rank, permissionManager::getBungeePermsRank);
-        bind(DataKeys.BungeePerms_PrimaryGroupPrefix, permissionManager::getPrimaryGroupPrefixFromBungeePerms);
-        bind(DataKeys.BungeePerms_PlayerPrefix, permissionManager::getPlayerPrefixFromBungeePerms);
-        bind(DataKeys.ClientVersion, player1 -> BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersionString(player1));
-        bind(DataKeys.BungeeCord_SessionDuration, p -> Optional.ofNullable(bungeeTabListPlus.getConnectedPlayerManager().getPlayerIfPresent(p)).map(ConnectedPlayer::getCurrentSessionDuration).orElse(null));
-        bind(BungeeTabListPlus.DATA_KEY_GAMEMODE, p -> ((UserConnection) p).getGamemode());
-        bind(BungeeTabListPlus.DATA_KEY_SERVER, p -> {
-            Server server = p.getServer();
-            return server != null ? server.getInfo().getName() : null;
-        });
-        bind(BungeeTabListPlus.DATA_KEY_ICON, BungeeTabListPlusAPI::getIconFromPlayer);
-        bind(DataKeys.BungeeCord_DisplayName, ProxiedPlayer::getDisplayName);
+    public LocalDataCache createDataCacheForPlayer(ConnectedPlayer player) {
+        return new LocalDataCache();
     }
 
     @SuppressWarnings("unchecked")
     private void updateData() {
         for (ConnectedPlayer player : bungeeTabListPlus.getConnectedPlayerManager().getPlayers()) {
-            for (DataKey<?> dataKey : providersByDataKey.keySet()) {
+            for (DataKey<?> dataKey : player.getLocalDataCache().getQueriedKeys()) {
                 DataKey<Object> key = (DataKey<Object>) dataKey;
-                updateIfNecessary(player, key, getRawValue(key, player.getPlayer()));
+                updateIfNecessary(player, key, playerDataAccess.get(key, player.getPlayer()));
             }
         }
     }
 
     private <T> void updateIfNecessary(ConnectedPlayer player, DataKey<T> key, T value) {
-        DataCache data = player.getData();
-        if (!Objects.equals(data.getRawValue(key), value)) {
+        DataCache data = player.getLocalDataCache();
+        if (!Objects.equals(data.get(key), value)) {
             bungeeTabListPlus.runInMainThread(() -> data.updateValue(key, value));
         }
+    }
+
+    public static class LocalPlayerDataAccess extends AbstractBungeeDataAccess<ProxiedPlayer> {
+
+        public LocalPlayerDataAccess(Plugin plugin, Logger logger) {
+            super(plugin, logger);
+
+            addProvider(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE, p -> ((UserConnection) p).getGamemode());
+            addProvider(BTLPBungeeDataKeys.DATA_KEY_ICON, BungeeTabListPlusAPI::getIconFromPlayer);
+        }
+    }
+
+    public static class LocalDataCache extends TrackingDataCache {
+
     }
 }

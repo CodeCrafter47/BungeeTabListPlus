@@ -25,9 +25,10 @@ import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvide
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.Player;
+import de.codecrafter47.data.bungee.api.BungeeData;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Optional;
@@ -85,7 +86,7 @@ public class BasicPlaceholders extends PlaceholderProvider {
             }
         });
         bind("name").alias("player").to(context -> {
-            Optional<String> displayName = ((Player) context.getPlayer()).get(DataKeys.DisplayName);
+            Optional<String> displayName = ((Player) context.getPlayer()).getOpt(MinecraftData.DisplayName);
             if (displayName.isPresent()) {
                 return displayName.get();
             }
@@ -126,13 +127,13 @@ public class BasicPlaceholders extends PlaceholderProvider {
             return prefix.substring(0, 4);
         });
         bind("permsuffix").alias("suffix").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getSuffix(context.getPlayer()));
-        bind("displayprefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_DisplayPrefix).orElse(""));
-        bind("bungeeperms_prefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_Prefix).orElse(""));
-        bind("bungeeperms_suffix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_Suffix).orElse(""));
-        bind("bungeeperms_group").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_PrimaryGroup).orElse(""));
-        bind("bungeeperms_primary_group_prefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_PrimaryGroupPrefix).orElse(""));
-        bind("bungeeperms_player_prefix").to(context -> ((Player) context.getPlayer()).get(DataKeys.BungeePerms_PlayerPrefix).orElse(""));
-        bind("clientVersion").to(context -> ((Player) context.getPlayer()).get(DataKeys.ClientVersion).orElse("unknown"));
+        bind("displayprefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_DisplayPrefix).orElse(""));
+        bind("bungeeperms_prefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_Prefix).orElse(""));
+        bind("bungeeperms_suffix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_Suffix).orElse(""));
+        bind("bungeeperms_group").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_PrimaryGroup).orElse(""));
+        bind("bungeeperms_primary_group_prefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_PrimaryGroupPrefix).orElse(""));
+        bind("bungeeperms_player_prefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_PlayerPrefix).orElse(""));
+        bind("clientVersion").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.ClientVersion).orElse("unknown"));
         bind("ping").to(context -> String.format("%d", context.getPlayer().getPing()));
         bind("group").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(context.getPlayer()));
         bind("uuid").to(context -> context.getPlayer().getUniqueID().toString());

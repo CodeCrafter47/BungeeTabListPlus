@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi;
 
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
-import codecrafter47.bungeetablistplus.data.bukkit.AbstractBukkitDataAccess;
+import de.codecrafter47.data.bukkit.AbstractBukkitDataAccess;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -32,11 +32,12 @@ public class PlaceholderAPIDataAccess extends AbstractBukkitDataAccess<Player> {
 
     public PlaceholderAPIDataAccess(Logger logger, Plugin plugin) {
         super(logger, plugin);
-        bind(BTLPDataKeys.PlaceholderAPIDataKey.class, (player, key) -> {
+
+        addProvider(BTLPDataKeys.PAPIPlaceholder, (player, key) -> {
             try {
-                return PlaceholderAPI.setPlaceholders(player, key.getPlaceholder());
+                return PlaceholderAPI.setPlaceholders(player, key.getParameter());
             } catch (Throwable th) {
-                logger.log(Level.WARNING, "Failed to query value for placeholder \"" + key.getPlaceholder() + "\" from PlaceholderAPI", th);
+                logger.log(Level.WARNING, "Failed to query value for placeholder \"" + key.getParameter() + "\" from PlaceholderAPI", th);
                 return null;
             }
         });

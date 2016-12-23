@@ -24,9 +24,9 @@ import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.context.Context;
-import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 
 import java.text.Collator;
 import java.util.Optional;
@@ -35,8 +35,8 @@ public class WorldByName implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> faction1 = ((Player) player1).get(DataKeys.World);
-        Optional<String> faction2 = ((Player) player2).get(DataKeys.World);
+        Optional<String> faction1 = ((Player) player1).getOpt(MinecraftData.World);
+        Optional<String> faction2 = ((Player) player2).getOpt(MinecraftData.World);
         if (faction1.isPresent() || faction2.isPresent()) {
             return Collator.getInstance().compare(faction1.orElse(""), faction2.orElse(""));
         }
@@ -46,8 +46,8 @@ public class WorldByName implements SortingRule {
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
-        Optional<String> faction1 = ((Player) player1).get(DataKeys.World);
-        Optional<String> faction2 = ((Player) player2).get(DataKeys.World);
+        Optional<String> faction1 = ((Player) player1).getOpt(MinecraftData.World);
+        Optional<String> faction2 = ((Player) player2).getOpt(MinecraftData.World);
         if (faction1.isPresent() || faction2.isPresent()) {
             return Collator.getInstance().compare(faction1.orElse(""), faction2.orElse(""));
         }

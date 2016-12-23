@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
 
@@ -42,7 +43,7 @@ public abstract class IconTemplate {
                 getIcon = context -> {
                     Player player = context.get(Context.KEY_PLAYER);
                     if (player != null) {
-                        return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+                        return player.getOpt(BTLPBungeeDataKeys.DATA_KEY_ICON).orElse(Icon.DEFAULT);
                     } else {
                         return Icon.DEFAULT;
                     }
@@ -51,7 +52,7 @@ public abstract class IconTemplate {
                 getIcon = context -> {
                     Player player = context.get(Context.KEY_VIEWER);
                     if (player != null) {
-                        return player.get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+                        return player.getOpt(BTLPBungeeDataKeys.DATA_KEY_ICON).orElse(Icon.DEFAULT);
                     } else {
                         return Icon.DEFAULT;
                     }
@@ -73,7 +74,7 @@ public abstract class IconTemplate {
     public static final IconTemplate PLAYER_ICON = new IconTemplate() {
         @Override
         public Icon evaluate(Context context) {
-            return context.get(Context.KEY_PLAYER).get(BungeeTabListPlus.DATA_KEY_ICON).orElse(Icon.DEFAULT);
+            return context.get(Context.KEY_PLAYER).getOpt(BTLPBungeeDataKeys.DATA_KEY_ICON).orElse(Icon.DEFAULT);
         }
     };
 

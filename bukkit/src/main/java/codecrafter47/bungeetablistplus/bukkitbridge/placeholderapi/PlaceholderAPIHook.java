@@ -19,10 +19,13 @@
 
 package codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi;
 
-import codecrafter47.bungeetablistplus.data.DataAccess;
+import com.google.common.collect.Lists;
+import de.codecrafter47.data.api.DataAccess;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 public class PlaceholderAPIHook {
     private final Plugin plugin;
@@ -35,7 +38,7 @@ public class PlaceholderAPIHook {
         return new PlaceholderAPIDataAccess(plugin.getLogger(), plugin);
     }
 
-    public boolean isPlaceholder(Player player, String placeholder) {
-        return !PlaceholderAPI.setPlaceholders(player, placeholder).equals(placeholder);
+    public List<String> getRegisteredPlaceholderPlugins() {
+        return Lists.newArrayList(PlaceholderAPI.getRegisteredPlaceholderPlugins());
     }
 }

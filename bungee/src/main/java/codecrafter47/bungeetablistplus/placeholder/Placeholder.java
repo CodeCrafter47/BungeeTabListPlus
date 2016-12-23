@@ -22,12 +22,15 @@ package codecrafter47.bungeetablistplus.placeholder;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.context.Context;
-import codecrafter47.bungeetablistplus.data.DataKey;
-import codecrafter47.bungeetablistplus.data.DataKeys;
-import codecrafter47.bungeetablistplus.data.PermissionDataKey;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.util.Functions;
 import codecrafter47.bungeetablistplus.util.PingTask;
+import de.codecrafter47.data.api.DataKey;
+import de.codecrafter47.data.bukkit.api.BukkitData;
+import de.codecrafter47.data.bungee.api.BungeeData;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
+import de.codecrafter47.data.sponge.api.SpongeData;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -51,19 +54,19 @@ public abstract class Placeholder {
     static {
         playerPlaceholders.put("name", ofFunction(IPlayer::getName));
         playerPlaceholders.put("ping", ofFunction(player -> Integer.toString(player.getPing())));
-        playerPlaceholders.put("bungeecord_primary_group", ofStringData(DataKeys.BungeeCord_PrimaryGroup));
-        playerPlaceholders.put("bungeeperms_display", ofStringData(DataKeys.BungeePerms_DisplayPrefix));
-        playerPlaceholders.put("bungeeperms_prefix", ofStringData(DataKeys.BungeePerms_Prefix));
-        playerPlaceholders.put("bungeeperms_suffix", ofStringData(DataKeys.BungeePerms_Suffix));
-        playerPlaceholders.put("bungeeperms_primary_group", ofStringData(DataKeys.BungeePerms_PrimaryGroup));
-        playerPlaceholders.put("bungeeperms_primary_group_prefix", ofStringData(DataKeys.BungeePerms_PrimaryGroupPrefix));
-        playerPlaceholders.put("bungeeperms_user_prefix", ofStringData(DataKeys.BungeePerms_PlayerPrefix));
-        playerPlaceholders.put("client_version", ofStringData(DataKeys.ClientVersion));
+        playerPlaceholders.put("bungeecord_primary_group", ofStringData(BungeeData.BungeeCord_PrimaryGroup));
+        playerPlaceholders.put("bungeeperms_display", ofStringData(BungeeData.BungeePerms_DisplayPrefix));
+        playerPlaceholders.put("bungeeperms_prefix", ofStringData(BungeeData.BungeePerms_Prefix));
+        playerPlaceholders.put("bungeeperms_suffix", ofStringData(BungeeData.BungeePerms_Suffix));
+        playerPlaceholders.put("bungeeperms_primary_group", ofStringData(BungeeData.BungeePerms_PrimaryGroup));
+        playerPlaceholders.put("bungeeperms_primary_group_prefix", ofStringData(BungeeData.BungeePerms_PrimaryGroupPrefix));
+        playerPlaceholders.put("bungeeperms_user_prefix", ofStringData(BungeeData.BungeePerms_PlayerPrefix));
+        playerPlaceholders.put("client_version", ofStringData(BungeeData.ClientVersion));
         playerPlaceholders.put("uuid", ofFunction(player -> player.getUniqueID().toString()));
-        playerPlaceholders.put("world", ofStringData(DataKeys.World));
-        playerPlaceholders.put("team", ofStringData(DataKeys.Team));
-        playerPlaceholders.put("vault_balance", ofDoubleData(DataKeys.Vault_Balance));
-        playerPlaceholders.put("vault_balance2", ofFunction(player -> player.get(DataKeys.Vault_Balance).map(b -> {
+        playerPlaceholders.put("world", ofStringData(MinecraftData.World));
+        playerPlaceholders.put("team", ofStringData(MinecraftData.Team));
+        playerPlaceholders.put("vault_balance", ofDoubleData(BukkitData.Vault_Balance));
+        playerPlaceholders.put("vault_balance2", ofFunction(player -> player.getOpt(BukkitData.Vault_Balance).map(b -> {
             if (b >= 10_000_000) {
                 return String.format("%1.0fM", b / 1_000_000);
             } else if (b >= 10_000) {
@@ -74,48 +77,69 @@ public abstract class Placeholder {
                 return String.format("%1.2f", b);
             }
         }).orElse("")));
-        playerPlaceholders.put("multiverse_world_alias", ofStringData(DataKeys.Multiverse_WorldAlias));
-        playerPlaceholders.put("faction_name", ofStringData(DataKeys.Factions_FactionName));
-        playerPlaceholders.put("faction_member_count", ofIntData(DataKeys.Factions_FactionMembers));
-        playerPlaceholders.put("faction_online_member_count", ofIntData(DataKeys.Factions_OnlineFactionMembers));
-        playerPlaceholders.put("faction_at_current_location", ofStringData(DataKeys.Factions_FactionsWhere));
-        playerPlaceholders.put("faction_power", ofIntData(DataKeys.Factions_FactionPower));
-        playerPlaceholders.put("faction_player_power", ofIntData(DataKeys.Factions_PlayerPower));
-        playerPlaceholders.put("faction_rank", ofStringData(DataKeys.Factions_FactionsRank));
-        playerPlaceholders.put("SimpleClans_ClanName", ofStringData(DataKeys.SimpleClans_ClanName));
-        playerPlaceholders.put("SimpleClans_ClanMembers", ofIntData(DataKeys.SimpleClans_ClanMembers));
-        playerPlaceholders.put("SimpleClans_OnlineClanMembers", ofIntData(DataKeys.SimpleClans_OnlineClanMembers));
-        playerPlaceholders.put("SimpleClans_ClanTag", ofStringData(DataKeys.SimpleClans_ClanTag));
-        playerPlaceholders.put("SimpleClans_ClanTagLabel", ofStringData(DataKeys.SimpleClans_ClanTagLabel));
-        playerPlaceholders.put("SimpleClans_ClanColorTag", ofStringData(DataKeys.SimpleClans_ClanColorTag));
-        playerPlaceholders.put("vault_primary_group", ofStringData(DataKeys.Vault_PermissionGroup));
-        playerPlaceholders.put("vault_prefix", ofStringData(DataKeys.Vault_Prefix));
-        playerPlaceholders.put("vault_suffix", ofStringData(DataKeys.Vault_Suffix));
-        playerPlaceholders.put("vault_primary_group_prefix", ofStringData(DataKeys.Vault_PrimaryGroupPrefix));
-        playerPlaceholders.put("vault_player_prefix", ofStringData(DataKeys.Vault_PlayerPrefix));
-        playerPlaceholders.put("health", ofDoubleData(DataKeys.Health));
-        playerPlaceholders.put("max_health", ofDoubleData(DataKeys.MaxHealth));
-        playerPlaceholders.put("location_x", ofDoubleData(DataKeys.PosX));
-        playerPlaceholders.put("location_y", ofDoubleData(DataKeys.PosY));
-        playerPlaceholders.put("location_z", ofDoubleData(DataKeys.PosZ));
-        playerPlaceholders.put("xp", ofFloatData(DataKeys.XP));
-        playerPlaceholders.put("total_xp", ofIntData(DataKeys.TotalXP));
-        playerPlaceholders.put("level", ofIntData(DataKeys.Level));
-        playerPlaceholders.put("player_points", ofIntData(DataKeys.PlayerPoints_Points));
-        playerPlaceholders.put("vault_currency", ofStringData(DataKeys.Vault_CurrencyNameSingular));
-        playerPlaceholders.put("vault_currency_plural", ofStringData(DataKeys.Vault_CurrencyNamePlural));
-        playerPlaceholders.put("tab_name", ofFunction(player -> player.get(DataKeys.PlayerListName).orElse(player.getName())));
-        playerPlaceholders.put("display_name", ofFunction(player -> player.get(DataKeys.DisplayName).orElse(player.getName())));
-        playerPlaceholders.put("bungeecord_display_name", ofFunction(player -> player.get(DataKeys.BungeeCord_DisplayName).orElse(player.getName())));
-        playerPlaceholders.put("session_duration_seconds", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
-        playerPlaceholders.put("session_duration_minutes", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
-        playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.get(DataKeys.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
-        playerPlaceholders.put("essentials_afk", ofFunction(p -> p.get(DataKeys.Essentials_IsAFK).orElse(false).toString()));
+        playerPlaceholders.put("multiverse_world_alias", ofStringData(BukkitData.Multiverse_WorldAlias));
+        playerPlaceholders.put("faction_name", ofStringData(BukkitData.Factions_FactionName));
+        playerPlaceholders.put("faction_member_count", ofIntData(BukkitData.Factions_FactionMembers));
+        playerPlaceholders.put("faction_online_member_count", ofIntData(BukkitData.Factions_OnlineFactionMembers));
+        playerPlaceholders.put("faction_at_current_location", ofStringData(BukkitData.Factions_FactionsWhere));
+        playerPlaceholders.put("faction_power", ofIntData(BukkitData.Factions_FactionPower));
+        playerPlaceholders.put("faction_player_power", ofIntData(BukkitData.Factions_PlayerPower));
+        playerPlaceholders.put("faction_rank", ofStringData(BukkitData.Factions_FactionsRank));
+        playerPlaceholders.put("SimpleClans_ClanName", ofStringData(BukkitData.SimpleClans_ClanName));
+        playerPlaceholders.put("SimpleClans_ClanMembers", ofIntData(BukkitData.SimpleClans_ClanMembers));
+        playerPlaceholders.put("SimpleClans_OnlineClanMembers", ofIntData(BukkitData.SimpleClans_OnlineClanMembers));
+        playerPlaceholders.put("SimpleClans_ClanTag", ofStringData(BukkitData.SimpleClans_ClanTag));
+        playerPlaceholders.put("SimpleClans_ClanTagLabel", ofStringData(BukkitData.SimpleClans_ClanTagLabel));
+        playerPlaceholders.put("SimpleClans_ClanColorTag", ofStringData(BukkitData.SimpleClans_ClanColorTag));
+        playerPlaceholders.put("vault_primary_group", ofStringData(BukkitData.Vault_PermissionGroup));
+        playerPlaceholders.put("vault_prefix", ofStringData(BukkitData.Vault_Prefix));
+        playerPlaceholders.put("vault_suffix", ofStringData(BukkitData.Vault_Suffix));
+        playerPlaceholders.put("vault_primary_group_prefix", ofStringData(BukkitData.Vault_PrimaryGroupPrefix));
+        playerPlaceholders.put("vault_player_prefix", ofStringData(BukkitData.Vault_PlayerPrefix));
+        playerPlaceholders.put("health", ofDoubleData(MinecraftData.Health));
+        playerPlaceholders.put("max_health", ofDoubleData(MinecraftData.MaxHealth));
+        playerPlaceholders.put("location_x", ofDoubleData(MinecraftData.PosX));
+        playerPlaceholders.put("location_y", ofDoubleData(MinecraftData.PosY));
+        playerPlaceholders.put("location_z", ofDoubleData(MinecraftData.PosZ));
+        playerPlaceholders.put("xp", ofFloatData(MinecraftData.XP));
+        playerPlaceholders.put("total_xp", ofIntData(MinecraftData.TotalXP));
+        playerPlaceholders.put("level", ofIntData(MinecraftData.Level));
+        playerPlaceholders.put("player_points", ofIntData(BukkitData.PlayerPoints_Points));
+        playerPlaceholders.put("vault_currency", ofStringData(BukkitData.Vault_CurrencyNameSingular));
+        playerPlaceholders.put("vault_currency_plural", ofStringData(BukkitData.Vault_CurrencyNamePlural));
+        playerPlaceholders.put("tab_name", ofFunction(player -> player.getOpt(BukkitData.PlayerListName).orElse(player.getName())));
+        playerPlaceholders.put("display_name", ofFunction(player -> player.getOpt(MinecraftData.DisplayName).orElse(player.getName())));
+        playerPlaceholders.put("bungeecord_display_name", ofFunction(player -> player.getOpt(BungeeData.BungeeCord_DisplayName).orElse(player.getName())));
+        playerPlaceholders.put("session_duration_seconds", ofIntFunction(player -> player.getOpt(BungeeData.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
+        playerPlaceholders.put("session_duration_minutes", ofIntFunction(player -> player.getOpt(BungeeData.BungeeCord_SessionDuration).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
+        playerPlaceholders.put("session_duration_hours", ofIntFunction(player -> player.getOpt(BungeeData.BungeeCord_SessionDuration).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
+        playerPlaceholders.put("essentials_afk", ofFunction(p -> p.getOpt(BukkitData.Essentials_IsAFK).orElse(false).toString()));
         playerPlaceholders.put("is_hidden", ofFunction(p -> Boolean.toString(BungeeTabListPlus.isHidden(p))));
-        playerPlaceholders.put("gamemode", ofIntData(BungeeTabListPlus.DATA_KEY_GAMEMODE));
+        playerPlaceholders.put("gamemode", ofIntData(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE));
+
+        playerPlaceholders.put("sponge_balance", ofDoubleData(SpongeData.Balance));
+        playerPlaceholders.put("sponge_balance2", ofFunction(player -> player.getOpt(SpongeData.Balance).map(b -> {
+            if (b >= 10_000_000) {
+                return String.format("%1.0fM", b / 1_000_000);
+            } else if (b >= 10_000) {
+                return String.format("%1.0fK", b / 1_000);
+            } else if (b >= 100) {
+                return String.format("%1.0f", b);
+            } else {
+                return String.format("%1.2f", b);
+            }
+        }).orElse("")));
+        playerPlaceholders.put("sponge_primary_group", ofStringData(SpongeData.PermissionGroup));
+        playerPlaceholders.put("sponge_prefix", ofStringData(SpongeData.Prefix));
+        playerPlaceholders.put("sponge_suffix", ofStringData(SpongeData.Suffix));
+        playerPlaceholders.put("sponge_currency", ofStringData(SpongeData.CurrencyNameSingular));
+        playerPlaceholders.put("sponge_currency_plural", ofStringData(SpongeData.CurrencyNamePlural));
 
         // Server
-        serverPlaceholders.put("tps", serverInfo -> BungeeTabListPlus.getInstance().getBridge().get(serverInfo, DataKeys.TPS).map(d -> String.format("%1.1f", d)).orElse(""));
+        serverPlaceholders.put("tps", server -> {
+            Double tps = BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server).get(MinecraftData.TPS);
+            return tps != null ? String.format("%1.1f", tps) : "";
+        });
         serverPlaceholders.put("online", serverName -> {
             PingTask serverState = BungeeTabListPlus.getInstance().getServerState(serverName);
             return serverState != null ? Boolean.toString(serverState.isOnline()) : "false";
@@ -166,17 +190,17 @@ public abstract class Placeholder {
         if (tokens.length == 0) {
             return new PlayerBoundPlaceholder(playerFunction, Player::getName);
         } else if ("server".equals(tokens[0])) {
-            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Functions.composeNullable(p -> p.get(BungeeTabListPlus.DATA_KEY_SERVER).orElse(null), playerFunction));
+            return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), Functions.composeNullable(p -> p.getOpt(BungeeData.BungeeCord_Server).orElse(null), playerFunction));
         } else if ("permission".equals(tokens[0])) {
             return new PermissionPlaceholder(playerFunction, tokens[1]);
         } else if (playerPlaceholders.containsKey(tokens[0])) {
             return playerPlaceholders.get(tokens[0]).apply(Arrays.copyOfRange(tokens, 1, tokens.length), playerFunction);
         } else if (thirdPartyDataKeys.containsKey(tokens[0])) {
-            return new PlayerBoundPlaceholder(playerFunction, player -> player.get(thirdPartyDataKeys.get(tokens[0])).orElse(""));
+            return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(thirdPartyDataKeys.get(tokens[0])).orElse(""));
         } else if (remoteThirdPartyDataKeys.containsKey(tokens[0])) {
-            return new PlayerBoundPlaceholder(playerFunction, player -> player.get(remoteThirdPartyDataKeys.get(tokens[0])).orElse(""));
+            return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(remoteThirdPartyDataKeys.get(tokens[0])).orElse(""));
         } else if (placeholderAPIDataKeys.containsKey(tokens[0])) {
-            return new PlayerBoundPlaceholder(playerFunction, player -> player.get(placeholderAPIDataKeys.get(tokens[0])).orElse(""));
+            return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(placeholderAPIDataKeys.get(tokens[0])).orElse(""));
         } else {
             BungeeTabListPlus.getInstance().getPlaceholderAPIHook().addMaybePlaceholder(tokens[0]);
             return NULL_PLACEHOLDER;
@@ -215,17 +239,17 @@ public abstract class Placeholder {
 
     private static class PermissionPlaceholder extends Placeholder {
         private final Function<Context, Player> playerFunction;
-        private final PermissionDataKey permissionDataKey;
+        private final DataKey<Boolean> permissionDataKey;
 
         private PermissionPlaceholder(Function<Context, Player> playerFunction, String permission) {
             this.playerFunction = playerFunction;
-            permissionDataKey = DataKeys.permission(permission);
+            permissionDataKey = MinecraftData.permission(permission);
         }
 
         @Override
         public String evaluate(Context context) {
             Player player = playerFunction.apply(context);
-            return player != null ? player.get(permissionDataKey).orElse(false).toString() : "";
+            return player != null ? player.getOpt(permissionDataKey).orElse(false).toString() : "";
         }
     }
 
@@ -298,10 +322,10 @@ public abstract class Placeholder {
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofStringData(DataKey<String> dataKey) {
         return (tokens, playerFunction) -> {
             if (tokens.length == 0) {
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).orElse(""));
             } else {
                 int length = Integer.valueOf(tokens[0]);
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(s -> (s.length() > length ? s.substring(0, length) : s)).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(s -> (s.length() > length ? s.substring(0, length) : s)).orElse(""));
             }
         };
     }
@@ -309,10 +333,10 @@ public abstract class Placeholder {
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofIntData(DataKey<Integer> dataKey) {
         return (tokens, playerFunction) -> {
             if (tokens.length == 0) {
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(Object::toString).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(Object::toString).orElse(""));
             } else {
                 String format = "%0" + tokens[0] + "d";
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(i -> String.format(format, i)).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(i -> String.format(format, i)).orElse(""));
             }
         };
     }
@@ -331,10 +355,10 @@ public abstract class Placeholder {
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofDoubleData(DataKey<Double> dataKey) {
         return (tokens, playerFunction) -> {
             if (tokens.length == 0) {
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(Object::toString).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(Object::toString).orElse(""));
             } else {
                 String format = "%0" + tokens[0] + "f";
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(i -> String.format(format, i)).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(i -> String.format(format, i)).orElse(""));
             }
         };
     }
@@ -342,10 +366,10 @@ public abstract class Placeholder {
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofFloatData(DataKey<Float> dataKey) {
         return (tokens, playerFunction) -> {
             if (tokens.length == 0) {
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(Object::toString).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(Object::toString).orElse(""));
             } else {
                 String format = "%0" + tokens[0] + "f";
-                return new PlayerBoundPlaceholder(playerFunction, player -> player.get(dataKey).map(i -> String.format(format, i)).orElse(""));
+                return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(i -> String.format(format, i)).orElse(""));
             }
         };
     }

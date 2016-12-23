@@ -25,7 +25,6 @@ import codecrafter47.bungeetablistplus.api.bungee.ServerGroup;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotBuilder;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
-import codecrafter47.bungeetablistplus.data.DataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -36,6 +35,7 @@ import codecrafter47.bungeetablistplus.tablistproviders.legacy.ConfigTabListProv
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.IConfigTabListProvider;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -542,7 +542,7 @@ public class ConfigParser {
 
         @Override
         public boolean test(ProxiedPlayer viewer, IPlayer iPlayer) {
-            return iPlayer.getServer().map(serverInfo -> server.equalsIgnoreCase(serverInfo.getName()) && ((Player) iPlayer).get(DataKeys.World).map(w -> w.equalsIgnoreCase(world)).orElse(false)).orElse(false);
+            return iPlayer.getServer().map(serverInfo -> server.equalsIgnoreCase(serverInfo.getName()) && ((Player) iPlayer).getOpt(MinecraftData.World).map(w -> w.equalsIgnoreCase(world)).orElse(false)).orElse(false);
         }
 
         @Override

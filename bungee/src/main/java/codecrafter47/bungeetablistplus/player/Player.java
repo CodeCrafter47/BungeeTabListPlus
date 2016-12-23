@@ -20,11 +20,14 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.data.DataKey;
+import de.codecrafter47.data.api.DataHolder;
+import de.codecrafter47.data.api.DataKey;
 
 import java.util.Optional;
 
-public interface Player extends IPlayer {
+public interface Player extends IPlayer, DataHolder {
 
-    <T> Optional<T> get(DataKey<T> key);
+    default <T> Optional<T> getOpt(DataKey<T> key) {
+        return Optional.ofNullable(get(key));
+    }
 }

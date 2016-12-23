@@ -21,17 +21,21 @@ package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Skin;
-import codecrafter47.bungeetablistplus.data.DataCache;
-import codecrafter47.bungeetablistplus.data.DataKey;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
+import codecrafter47.bungeetablistplus.data.NullDataHolder;
+import codecrafter47.bungeetablistplus.data.TrackingDataCache;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
+import de.codecrafter47.data.api.DataCache;
+import de.codecrafter47.data.api.DataHolder;
+import de.codecrafter47.data.api.DataKey;
+import de.codecrafter47.data.bungee.api.BungeeData;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -42,8 +46,13 @@ public class RedisPlayer implements Player {
     private long lastServerLookup = 0;
 
     @Getter
-    private final DataCache data = new DataCache();
-    private final Set<DataKey<?>> requestedData = new HashSet<>();
+    private final DataCache data = new TrackingDataCache() {
+        @Override
+        protected <V> void onMissingData(DataKey<V> key) {
+            super.onMissingData(key);
+            BungeeTabListPlus.getInstance().getRedisPlayerManager().request(uuid, key);
+        }
+    };
 
     public RedisPlayer(UUID uuid) {
         this.uuid = uuid;
@@ -94,19 +103,43 @@ public class RedisPlayer implements Player {
 
     @Override
     public int getGameMode() {
-        return get(BungeeTabListPlus.DATA_KEY_GAMEMODE).orElse(0);
+        return getOpt(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE).orElse(0);
+    }
+
+    private DataHolder getResponsibleDataHolder(DataKey<?> key) {
+
+        if (key.getScope().equals(BungeeData.SCOPE_BUNGEE_PLAYER)) {
+            return data;
+        }
+
+        if (key.getScope().equals(MinecraftData.SCOPE_PLAYER)) {
+            return data;
+        }
+
+        if (key.getScope().equals(MinecraftData.SCOPE_SERVER)) {
+            Optional<ServerInfo> server = getServer();
+            if (server.isPresent()) {
+                BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server.get().getName());
+            }
+            return NullDataHolder.INSTANCE;
+        }
+
+        BungeeTabListPlus.getInstance().getLogger().warning("Data key with unknown scope: " + key);
+        return NullDataHolder.INSTANCE;
     }
 
     @Override
-    public <T> Optional<T> get(DataKey<T> key) {
-        if (key.getScope() == DataKey.Scope.SERVER) {
-            return getServer().flatMap(server -> BungeeTabListPlus.getInstance().getBridge().get(server, key));
-        }
-        Optional<T> value = data.getValue(key);
-        if (!value.isPresent() && !requestedData.contains(key)) {
-            BungeeTabListPlus.getInstance().getRedisPlayerManager().request(uuid, key);
-            requestedData.add(key);
-        }
-        return value;
+    public <V> V get(DataKey<V> key) {
+        return getResponsibleDataHolder(key).get(key);
+    }
+
+    @Override
+    public <T> void addDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+        getResponsibleDataHolder(key).addDataChangeListener(key, listener);
+    }
+
+    @Override
+    public <T> void removeDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+        getResponsibleDataHolder(key).removeDataChangeListener(key, listener);
     }
 }

@@ -55,6 +55,8 @@ public class SortingRuleRegistry {
             .put("bungeecordgroups", new BungeeCordGroups())
             .put("bungeecordgroupsreversed", new ReverseOrder(new BungeeCordGroups()))
             .put("vaultprefix", new VaultPrefixAlphabetically())
+            .put("spongegroupinfo", new SpongeGroupInfo())
+            .put("spongegroupinforeversed", new ReverseOrder(new SpongeGroupInfo()))
             .build();
 
     public static Optional<SortingRule> getRule(String name) {

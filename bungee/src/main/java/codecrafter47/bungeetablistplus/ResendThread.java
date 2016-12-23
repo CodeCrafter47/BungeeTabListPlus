@@ -39,7 +39,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-class ResendThread implements Runnable, Executor {
+public class ResendThread implements Runnable, Executor {
 
     private final Queue<ProxiedPlayer> queue = new ConcurrentLinkedQueue<>();
     private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
