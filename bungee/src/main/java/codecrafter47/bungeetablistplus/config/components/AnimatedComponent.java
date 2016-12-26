@@ -126,16 +126,18 @@ public class AnimatedComponent extends Component implements Validate {
         public void run() {
             if (activeComponent != -1) {
                 synchronized (context.get(Context.KEY_TAB_LIST)) {
-                    frames.get(activeComponent).deactivate();
-                    activeComponent++;
-                    if (activeComponent >= frames.size()) {
-                        activeComponent = 0;
+                    if (activeComponent != -1) {
+                        frames.get(activeComponent).deactivate();
+                        activeComponent++;
+                        if (activeComponent >= frames.size()) {
+                            activeComponent = 0;
+                        }
+                        Component.Instance component = frames.get(activeComponent);
+                        component.activate();
+                        component.update1stStep();
+                        component.setPosition(leftMostColumn, row, column, size);
+                        component.update2ndStep();
                     }
-                    Component.Instance component = frames.get(activeComponent);
-                    component.activate();
-                    component.update1stStep();
-                    component.setPosition(leftMostColumn, row, column, size);
-                    component.update2ndStep();
                 }
             }
         }
