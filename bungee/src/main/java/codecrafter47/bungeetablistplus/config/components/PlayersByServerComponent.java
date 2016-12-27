@@ -46,6 +46,7 @@ import static java.lang.Math.min;
 public class PlayersByServerComponent extends Component implements Validate {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
     private String serverOrder = "alphabetically";
+    private ServerOptions showServers = null;
     private String playerSet;
     private Component serverHeader;
     private Component serverFooter;
@@ -114,6 +115,9 @@ public class PlayersByServerComponent extends Component implements Validate {
 
     @Override
     public Instance toInstance(Context context) {
+        if (showServers == null) {
+            showServers = includeEmptyServers ? ServerOptions.ALL : ServerOptions.NON_EMPTY;
+        }
         return new Instance(context);
     }
 
@@ -174,9 +178,16 @@ public class PlayersByServerComponent extends Component implements Validate {
         public void update1stStep() {
             super.update1stStep();
             playersByServer.clear();
-            if (includeEmptyServers) {
+            if (showServers == ServerOptions.ALL) {
                 for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
                     playersByServer.put(server.getName(), new ArrayList<>());
+                }
+            }
+            if (showServers == ServerOptions.ONLINE) {
+                for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
+                    if (BungeeTabListPlus.getInstance().getServerState(server.getName()).isOnline()) {
+                        playersByServer.put(server.getName(), new ArrayList<>());
+                    }
                 }
             }
             List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
@@ -331,5 +342,9 @@ public class PlayersByServerComponent extends Component implements Validate {
         public boolean isBlockAligned() {
             return true;
         }
+    }
+
+    public enum ServerOptions {
+        ALL, ONLINE, NON_EMPTY
     }
 }
