@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>5.0.0</version>
+            <version>${sponge-api.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
