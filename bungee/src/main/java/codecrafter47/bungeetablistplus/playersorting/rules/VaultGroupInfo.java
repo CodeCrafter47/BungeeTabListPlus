@@ -24,7 +24,7 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
-import de.codecrafter47.data.bukkit.api.BukkitData;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 
 import java.util.Optional;
 
@@ -32,16 +32,16 @@ public class VaultGroupInfo implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
         {
-            Optional<Integer> p1Rank = ((Player) player1).getOpt(BukkitData.Vault_PermissionGroupWeight);
-            Optional<Integer> p2Rank = ((Player) player2).getOpt(BukkitData.Vault_PermissionGroupWeight);
+            Optional<Integer> p1Rank = ((Player) player1).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
+            Optional<Integer> p2Rank = ((Player) player2).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
             if (p1Rank.isPresent() || p2Rank.isPresent()) {
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
         }
 
         {
-            Optional<Integer> p1Rank = ((Player) player1).getOpt(BukkitData.Vault_PermissionGroupRank);
-            Optional<Integer> p2Rank = ((Player) player2).getOpt(BukkitData.Vault_PermissionGroupRank);
+            Optional<Integer> p1Rank = ((Player) player1).getOpt(MinecraftData.Permissions_PermissionGroupRank);
+            Optional<Integer> p2Rank = ((Player) player2).getOpt(MinecraftData.Permissions_PermissionGroupRank);
             if (p1Rank.isPresent() || p2Rank.isPresent()) {
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
@@ -52,16 +52,16 @@ public class VaultGroupInfo implements SortingRule {
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
         {
-            Optional<Integer> p1Rank = ((Player) player1).getOpt(BukkitData.Vault_PermissionGroupWeight);
-            Optional<Integer> p2Rank = ((Player) player2).getOpt(BukkitData.Vault_PermissionGroupWeight);
+            Optional<Integer> p1Rank = ((Player) player1).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
+            Optional<Integer> p2Rank = ((Player) player2).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
             if (p1Rank.isPresent() || p2Rank.isPresent()) {
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
         }
 
         {
-            Optional<Integer> p1Rank = ((Player) player1).getOpt(BukkitData.Vault_PermissionGroupRank);
-            Optional<Integer> p2Rank = ((Player) player2).getOpt(BukkitData.Vault_PermissionGroupRank);
+            Optional<Integer> p1Rank = ((Player) player1).getOpt(MinecraftData.Permissions_PermissionGroupRank);
+            Optional<Integer> p2Rank = ((Player) player2).getOpt(MinecraftData.Permissions_PermissionGroupRank);
             if (p1Rank.isPresent() || p2Rank.isPresent()) {
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }

@@ -24,7 +24,7 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
-import de.codecrafter47.data.bukkit.api.BukkitData;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
 
 import java.text.Collator;
 import java.util.Optional;
@@ -32,8 +32,8 @@ import java.util.Optional;
 public class VaultPrefixAlphabetically implements SortingRule {
     @Override
     public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        Optional<String> team1 = ((Player) player1).getOpt(BukkitData.Vault_Prefix);
-        Optional<String> team2 = ((Player) player2).getOpt(BukkitData.Vault_Prefix);
+        Optional<String> team1 = ((Player) player1).getOpt(MinecraftData.Permissions_Prefix);
+        Optional<String> team2 = ((Player) player2).getOpt(MinecraftData.Permissions_Prefix);
         if (team1.isPresent() || team2.isPresent()) {
             return Collator.getInstance().compare(team1.orElse(""), team2.orElse(""));
         }
@@ -42,8 +42,8 @@ public class VaultPrefixAlphabetically implements SortingRule {
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
-        Optional<String> team1 = ((Player) player1).getOpt(BukkitData.Vault_Prefix);
-        Optional<String> team2 = ((Player) player2).getOpt(BukkitData.Vault_Prefix);
+        Optional<String> team1 = ((Player) player1).getOpt(MinecraftData.Permissions_Prefix);
+        Optional<String> team2 = ((Player) player2).getOpt(MinecraftData.Permissions_Prefix);
         if (team1.isPresent() || team2.isPresent()) {
             return Collator.getInstance().compare(team1.orElse(""), team2.orElse(""));
         }

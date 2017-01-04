@@ -48,8 +48,8 @@ public class BukkitPlaceholders extends PlaceholderProvider {
             return "";
         });
         addBukkitBridgePlaceholder("team", MinecraftData.Team);
-        addBukkitBridgePlaceholder("balance", BukkitData.Vault_Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
-        addBukkitBridgePlaceholder("balance2", BukkitData.Vault_Balance, balance -> balance.map(b -> {
+        addBukkitBridgePlaceholder("balance", MinecraftData.Economy_Balance, balance -> balance.map(b -> String.format("%1.2f", b)).orElse("-"));
+        addBukkitBridgePlaceholder("balance2", MinecraftData.Economy_Balance, balance -> balance.map(b -> {
             if (b > 2000000) {
                 return String.format("%1.0fM", b / 1000000);
             } else if (b > 2000) {
@@ -72,14 +72,14 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         addBukkitBridgePlaceholder("SimpleClans_ClanTag", BukkitData.SimpleClans_ClanTag);
         addBukkitBridgePlaceholder("SimpleClans_ClanTagLabel", BukkitData.SimpleClans_ClanTagLabel);
         addBukkitBridgePlaceholder("SimpleClans_ClanColorTag", BukkitData.SimpleClans_ClanColorTag);
-        addBukkitBridgePlaceholder("permissionsex_group", BukkitData.Vault_PermissionGroup);
-        addBukkitBridgePlaceholder("permissionsex_prefix", BukkitData.Vault_Prefix);
-        addBukkitBridgePlaceholder("permissionsex_suffix", BukkitData.Vault_Suffix);
-        addBukkitBridgePlaceholder("vault_group", BukkitData.Vault_PermissionGroup);
-        addBukkitBridgePlaceholder("vault_prefix", BukkitData.Vault_Prefix);
-        addBukkitBridgePlaceholder("vault_suffix", BukkitData.Vault_Suffix);
-        addBukkitBridgePlaceholder("vault_primary_group_prefix", BukkitData.Vault_PrimaryGroupPrefix);
-        addBukkitBridgePlaceholder("vault_player_prefix", BukkitData.Vault_PlayerPrefix);
+        addBukkitBridgePlaceholder("permissionsex_group", MinecraftData.Permissions_PermissionGroup);
+        addBukkitBridgePlaceholder("permissionsex_prefix", MinecraftData.Permissions_Prefix);
+        addBukkitBridgePlaceholder("permissionsex_suffix", MinecraftData.Permissions_Suffix);
+        addBukkitBridgePlaceholder("vault_group", MinecraftData.Permissions_PermissionGroup);
+        addBukkitBridgePlaceholder("vault_prefix", MinecraftData.Permissions_Prefix);
+        addBukkitBridgePlaceholder("vault_suffix", MinecraftData.Permissions_Suffix);
+        addBukkitBridgePlaceholder("vault_primary_group_prefix", MinecraftData.Permissions_PrimaryGroupPrefix);
+        addBukkitBridgePlaceholder("vault_player_prefix", MinecraftData.Permissions_PlayerPrefix);
         addBukkitBridgePlaceholder("health", MinecraftData.Health, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
         addBukkitBridgePlaceholder("maxHealth", MinecraftData.MaxHealth, health -> health.map(h -> String.format("%1.1f", h)).orElse("-"));
         addBukkitBridgePlaceholder("posX", MinecraftData.PosX, pos -> pos.map(d -> String.format("%1.0f", d)).orElse(""));
@@ -89,8 +89,8 @@ public class BukkitPlaceholders extends PlaceholderProvider {
         addBukkitBridgePlaceholder("totalXP", MinecraftData.TotalXP);
         addBukkitBridgePlaceholder("level", MinecraftData.Level, level -> level.orElse(-1).toString());
         addBukkitBridgePlaceholder("playerPoints", BukkitData.PlayerPoints_Points);
-        addBukkitBridgeServerPlaceholder("currency", BukkitData.Vault_CurrencyNameSingular);
-        addBukkitBridgeServerPlaceholder("currencyPl", BukkitData.Vault_CurrencyNamePlural);
+        addBukkitBridgeServerPlaceholder("currency", MinecraftData.Economy_CurrencyNameSingular);
+        addBukkitBridgeServerPlaceholder("currencyPl", MinecraftData.Economy_CurrencyNamePlural);
         bind("tps").withArgs().to((context, arg) -> {
             if (arg != null) {
                 ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(arg);

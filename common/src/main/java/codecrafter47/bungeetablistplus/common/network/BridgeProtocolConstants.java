@@ -25,7 +25,7 @@ public class BridgeProtocolConstants {
 
     public static final String CHANNEL = "BTLP";
 
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     public static final int MESSAGE_ID_PROXY_HANDSHAKE = 0x80;
     public static final int MESSAGE_ID_PROXY_REQUEST_DATA = 0x81;

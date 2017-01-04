@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.Player;
 import de.codecrafter47.data.api.DataKey;
-import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import net.alpenblock.bungeeperms.BungeePerms;
@@ -51,7 +50,7 @@ public class PermissionManager {
     public String getMainGroup(IPlayer player) {
         switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT:
-                return ((Player) player).getOpt(BukkitData.Vault_PermissionGroup).orElse("");
+                return ((Player) player).getOpt(MinecraftData.Permissions_PermissionGroup).orElse("");
             case BUNGEE:
                 return ((Player) player).getOpt(BungeeData.BungeeCord_PrimaryGroup).orElse("default");
             case BUNGEEPERMS:
@@ -62,7 +61,7 @@ public class PermissionManager {
                 if (group.isPresent()) {
                     return group.get();
                 }
-                Optional<String> optional = ((Player) player).getOpt(BukkitData.Vault_PermissionGroup);
+                Optional<String> optional = ((Player) player).getOpt(MinecraftData.Permissions_PermissionGroup);
                 if (optional.isPresent()) {
                     return optional.get();
                 } else {
@@ -149,13 +148,13 @@ public class PermissionManager {
     public int comparePlayers(IPlayer p1, IPlayer p2) {
         switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT: {
-                Optional<Integer> p1Rank = ((Player) p1).getOpt(BukkitData.Vault_PermissionGroupWeight);
-                Optional<Integer> p2Rank = ((Player) p2).getOpt(BukkitData.Vault_PermissionGroupWeight);
+                Optional<Integer> p1Rank = ((Player) p1).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
+                Optional<Integer> p2Rank = ((Player) p2).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
                 if (p1Rank.isPresent() || p2Rank.isPresent()) {
                     return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
                 }
-                p1Rank = ((Player) p1).getOpt(BukkitData.Vault_PermissionGroupRank);
-                p2Rank = ((Player) p2).getOpt(BukkitData.Vault_PermissionGroupRank);
+                p1Rank = ((Player) p1).getOpt(MinecraftData.Permissions_PermissionGroupRank);
+                p2Rank = ((Player) p2).getOpt(MinecraftData.Permissions_PermissionGroupRank);
                 return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
             }
             case BUNGEE: {
@@ -178,16 +177,16 @@ public class PermissionManager {
             }
 
             {
-                Optional<Integer> p1Rank = ((Player) p1).getOpt(BukkitData.Vault_PermissionGroupWeight);
-                Optional<Integer> p2Rank = ((Player) p2).getOpt(BukkitData.Vault_PermissionGroupWeight);
+                Optional<Integer> p1Rank = ((Player) p1).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
+                Optional<Integer> p2Rank = ((Player) p2).getOpt(MinecraftData.Permissions_PermissionGroupWeight);
                 if (p1Rank.isPresent() || p2Rank.isPresent()) {
                     return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
                 }
             }
 
             {
-                Optional<Integer> p1Rank = ((Player) p1).getOpt(BukkitData.Vault_PermissionGroupRank);
-                Optional<Integer> p2Rank = ((Player) p2).getOpt(BukkitData.Vault_PermissionGroupRank);
+                Optional<Integer> p1Rank = ((Player) p1).getOpt(MinecraftData.Permissions_PermissionGroupRank);
+                Optional<Integer> p2Rank = ((Player) p2).getOpt(MinecraftData.Permissions_PermissionGroupRank);
                 if (p1Rank.isPresent() || p2Rank.isPresent()) {
                     return p1Rank.orElse(Integer.MAX_VALUE) - p2Rank.orElse(Integer.MAX_VALUE);
                 }
@@ -222,7 +221,7 @@ public class PermissionManager {
         IPlayer player = context.getPlayer();
         switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT:
-                return ((Player) player).getOpt(BukkitData.Vault_Prefix).orElse("");
+                return ((Player) player).getOpt(MinecraftData.Permissions_Prefix).orElse("");
             case BUNGEE:
                 return getConfigPrefix(context, player);
             case BUNGEEPERMS:
@@ -233,7 +232,7 @@ public class PermissionManager {
                 if (!prefix.isEmpty()) {
                     return prefix;
                 }
-                return ((Player) player).getOpt(BungeeData.BungeePerms_Prefix).orElseGet(() -> ((Player) player).getOpt(BukkitData.Vault_Prefix).orElse(""));
+                return ((Player) player).getOpt(BungeeData.BungeePerms_Prefix).orElseGet(() -> ((Player) player).getOpt(MinecraftData.Permissions_Prefix).orElse(""));
         }
     }
 
@@ -364,13 +363,13 @@ public class PermissionManager {
     public String getSuffix(IPlayer player) {
         switch (plugin.getConfig().permissionSourceValue()) {
             case BUKKIT:
-                return ((Player) player).getOpt(BukkitData.Vault_Suffix).orElse("");
+                return ((Player) player).getOpt(MinecraftData.Permissions_Suffix).orElse("");
             case BUNGEE:
             case BUNGEEPERMS:
                 return ((Player) player).getOpt(BungeeData.BungeePerms_Suffix).orElse("");
             case AUTO:
             default:
-                return ((Player) player).getOpt(BungeeData.BungeePerms_Suffix).orElseGet(() -> ((Player) player).getOpt(BukkitData.Vault_Suffix).orElse(""));
+                return ((Player) player).getOpt(BungeeData.BungeePerms_Suffix).orElseGet(() -> ((Player) player).getOpt(MinecraftData.Permissions_Suffix).orElse(""));
         }
     }
 

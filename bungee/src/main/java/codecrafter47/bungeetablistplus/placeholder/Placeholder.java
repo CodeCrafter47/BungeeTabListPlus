@@ -30,7 +30,6 @@ import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
-import de.codecrafter47.data.sponge.api.SpongeData;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -65,8 +64,8 @@ public abstract class Placeholder {
         playerPlaceholders.put("uuid", ofFunction(player -> player.getUniqueID().toString()));
         playerPlaceholders.put("world", ofStringData(MinecraftData.World));
         playerPlaceholders.put("team", ofStringData(MinecraftData.Team));
-        playerPlaceholders.put("vault_balance", ofDoubleData(BukkitData.Vault_Balance));
-        playerPlaceholders.put("vault_balance2", ofFunction(player -> player.getOpt(BukkitData.Vault_Balance).map(b -> {
+        playerPlaceholders.put("vault_balance", ofDoubleData(MinecraftData.Economy_Balance));
+        playerPlaceholders.put("vault_balance2", ofFunction(player -> player.getOpt(MinecraftData.Economy_Balance).map(b -> {
             if (b >= 10_000_000) {
                 return String.format("%1.0fM", b / 1_000_000);
             } else if (b >= 10_000) {
@@ -91,11 +90,11 @@ public abstract class Placeholder {
         playerPlaceholders.put("SimpleClans_ClanTag", ofStringData(BukkitData.SimpleClans_ClanTag));
         playerPlaceholders.put("SimpleClans_ClanTagLabel", ofStringData(BukkitData.SimpleClans_ClanTagLabel));
         playerPlaceholders.put("SimpleClans_ClanColorTag", ofStringData(BukkitData.SimpleClans_ClanColorTag));
-        playerPlaceholders.put("vault_primary_group", ofStringData(BukkitData.Vault_PermissionGroup));
-        playerPlaceholders.put("vault_prefix", ofStringData(BukkitData.Vault_Prefix));
-        playerPlaceholders.put("vault_suffix", ofStringData(BukkitData.Vault_Suffix));
-        playerPlaceholders.put("vault_primary_group_prefix", ofStringData(BukkitData.Vault_PrimaryGroupPrefix));
-        playerPlaceholders.put("vault_player_prefix", ofStringData(BukkitData.Vault_PlayerPrefix));
+        playerPlaceholders.put("vault_primary_group", ofStringData(MinecraftData.Permissions_PermissionGroup));
+        playerPlaceholders.put("vault_prefix", ofStringData(MinecraftData.Permissions_Prefix));
+        playerPlaceholders.put("vault_suffix", ofStringData(MinecraftData.Permissions_Suffix));
+        playerPlaceholders.put("vault_primary_group_prefix", ofStringData(MinecraftData.Permissions_PrimaryGroupPrefix));
+        playerPlaceholders.put("vault_player_prefix", ofStringData(MinecraftData.Permissions_PlayerPrefix));
         playerPlaceholders.put("health", ofDoubleData(MinecraftData.Health));
         playerPlaceholders.put("max_health", ofDoubleData(MinecraftData.MaxHealth));
         playerPlaceholders.put("location_x", ofDoubleData(MinecraftData.PosX));
@@ -105,8 +104,8 @@ public abstract class Placeholder {
         playerPlaceholders.put("total_xp", ofIntData(MinecraftData.TotalXP));
         playerPlaceholders.put("level", ofIntData(MinecraftData.Level));
         playerPlaceholders.put("player_points", ofIntData(BukkitData.PlayerPoints_Points));
-        playerPlaceholders.put("vault_currency", ofStringData(BukkitData.Vault_CurrencyNameSingular));
-        playerPlaceholders.put("vault_currency_plural", ofStringData(BukkitData.Vault_CurrencyNamePlural));
+        playerPlaceholders.put("vault_currency", ofStringData(MinecraftData.Economy_CurrencyNameSingular));
+        playerPlaceholders.put("vault_currency_plural", ofStringData(MinecraftData.Economy_CurrencyNamePlural));
         playerPlaceholders.put("tab_name", ofFunction(player -> player.getOpt(BukkitData.PlayerListName).orElse(player.getName())));
         playerPlaceholders.put("display_name", ofFunction(player -> player.getOpt(MinecraftData.DisplayName).orElse(player.getName())));
         playerPlaceholders.put("bungeecord_display_name", ofFunction(player -> player.getOpt(BungeeData.BungeeCord_DisplayName).orElse(player.getName())));
@@ -116,24 +115,6 @@ public abstract class Placeholder {
         playerPlaceholders.put("essentials_afk", ofFunction(p -> p.getOpt(BukkitData.Essentials_IsAFK).orElse(false).toString()));
         playerPlaceholders.put("is_hidden", ofFunction(p -> Boolean.toString(BungeeTabListPlus.isHidden(p))));
         playerPlaceholders.put("gamemode", ofIntData(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE));
-
-        playerPlaceholders.put("sponge_balance", ofDoubleData(SpongeData.Balance));
-        playerPlaceholders.put("sponge_balance2", ofFunction(player -> player.getOpt(SpongeData.Balance).map(b -> {
-            if (b >= 10_000_000) {
-                return String.format("%1.0fM", b / 1_000_000);
-            } else if (b >= 10_000) {
-                return String.format("%1.0fK", b / 1_000);
-            } else if (b >= 100) {
-                return String.format("%1.0f", b);
-            } else {
-                return String.format("%1.2f", b);
-            }
-        }).orElse("")));
-        playerPlaceholders.put("sponge_primary_group", ofStringData(SpongeData.PermissionGroup));
-        playerPlaceholders.put("sponge_prefix", ofStringData(SpongeData.Prefix));
-        playerPlaceholders.put("sponge_suffix", ofStringData(SpongeData.Suffix));
-        playerPlaceholders.put("sponge_currency", ofStringData(SpongeData.CurrencyNameSingular));
-        playerPlaceholders.put("sponge_currency_plural", ofStringData(SpongeData.CurrencyNamePlural));
 
         // Server
         serverPlaceholders.put("tps", server -> {
