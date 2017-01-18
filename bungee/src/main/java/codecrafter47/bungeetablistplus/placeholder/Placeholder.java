@@ -44,7 +44,7 @@ public abstract class Placeholder {
     private static final Placeholder OTHER_COUNT_PLACEHOLDER = new OtherCountPlaceholder();
     private static final Placeholder SERVER_PLAYER_COUNT_PLACEHOLDER = new ServerPlayerCountPlaceholder();
     private static final Map<String, BiFunction<String[], Function<Context, Player>, Placeholder>> playerPlaceholders = new HashMap<>();
-    private static final Map<String, Function<String, String>> serverPlaceholders = new HashMap<>();
+    private static final Map<String, BiFunction<String[], Function<Context, String>, Placeholder>> serverPlaceholders = new HashMap<>();
 
     public static final Map<String, DataKey<String>> placeholderAPIDataKeys = Collections.synchronizedMap(new HashMap<>());
     public static final Map<String, DataKey<String>> remoteThirdPartyDataKeys = Collections.synchronizedMap(new HashMap<>());
@@ -117,13 +117,25 @@ public abstract class Placeholder {
         playerPlaceholders.put("gamemode", ofIntData(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE));
 
         // Server
-        serverPlaceholders.put("tps", server -> {
-            Double tps = BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server).get(MinecraftData.TPS);
-            return tps != null ? String.format("%1.1f", tps) : "";
+        serverPlaceholders.put("tps", (tokens, serverFunction) -> {
+            if (tokens.length == 0) {
+                return new ServerBoundPlaceholder(serverFunction, server -> {
+                    Double tps = BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server).get(MinecraftData.TPS);
+                    return tps != null ? String.format("%1.1f", tps) : "";
+                });
+            } else {
+                String format = "%0" + tokens[0] + "f";
+                return new ServerBoundPlaceholder(serverFunction, server -> {
+                    Double tps = BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server).get(MinecraftData.TPS);
+                    return tps != null ? String.format(format, tps) : "";
+                });
+            }
         });
-        serverPlaceholders.put("online", serverName -> {
-            PingTask serverState = BungeeTabListPlus.getInstance().getServerState(serverName);
-            return serverState != null ? Boolean.toString(serverState.isOnline()) : "false";
+        serverPlaceholders.put("online", (tokens, serverFunction) -> {
+            return new ServerBoundPlaceholder(serverFunction, serverName -> {
+                PingTask serverState = BungeeTabListPlus.getInstance().getServerState(serverName);
+                return serverState != null ? Boolean.toString(serverState.isOnline()) : "false";
+            });
         });
     }
 
@@ -192,7 +204,7 @@ public abstract class Placeholder {
         if (tokens.length == 0) {
             return new ServerBoundPlaceholder(serverFunction, o -> o);
         } else if (serverPlaceholders.containsKey(tokens[0])) {
-            return new ServerBoundPlaceholder(serverFunction, serverPlaceholders.get(tokens[0]));
+            return serverPlaceholders.get(tokens[0]).apply(Arrays.copyOfRange(tokens, 1, tokens.length), serverFunction);
         } else {
             return NULL_PLACEHOLDER;
         }
@@ -294,6 +306,7 @@ public abstract class Placeholder {
             }
             return instance.evaluate(context);
         }
+
     }
 
     private static BiFunction<String[], Function<Context, Player>, Placeholder> ofFunction(Function<Player, String> function) {
