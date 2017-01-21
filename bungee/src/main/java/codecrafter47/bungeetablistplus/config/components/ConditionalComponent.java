@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.config.components;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 
@@ -110,8 +111,11 @@ public class ConditionalComponent extends Component implements Validate {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            component.setPosition(leftMostColumn, row, column, size);
-            component.update2ndStep();
+            ComponentTablistAccess cta = getTablistAccess();
+            if (cta != null) {
+                component.setPosition(cta);
+                component.update2ndStep();
+            }
         }
 
         @Override

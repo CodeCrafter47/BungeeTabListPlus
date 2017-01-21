@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
@@ -112,40 +113,46 @@ public class PlayersComponent extends Component implements Validate {
         }
 
         @Override
+        public void setPosition(ComponentTablistAccess cta) {
+            if (fillSlotsVertical) {
+                int columns = context.get(Context.KEY_COLUMNS);
+                int rows = (cta.getSize() + columns - 1) / columns;
+                super.setPosition(ComponentTablistAccess.createChild(cta, cta.getSize(), index ->
+                        (index / rows) + (index % rows) * columns
+                ));
+            } else {
+                super.setPosition(cta);
+            }
+        }
+
+        @Override
         public void update2ndStep() {
             activeComponents.forEach(Component.Instance::deactivate);
             activeComponents.clear();
             super.update2ndStep();
-            boolean allFit = super.size >= players.size() * playerComponent.getSize();
-            int offset = column - leftMostColumn;
-            int pos = offset;
-            int i;
-            int rows = size / context.get(Context.KEY_COLUMNS);
-            for (i = 0; (allFit || pos + playerComponent.getSize() + morePlayersComponent.getSize() - offset <= super.size) && i < players.size(); i++) {
-                Player player = players.get(i);
-                Component.Instance component = playerComponent.toInstance(context.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
-                component.activate();
-                component.update1stStep();
-                if (fillSlotsVertical) {
-                    component.setPosition(leftMostColumn, row + (pos % rows), leftMostColumn + (pos / rows), playerComponent.getSize());
-                } else {
-                    component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
+            ComponentTablistAccess cta = getTablistAccess();
+            if (cta != null) {
+                boolean allFit = cta.getSize() >= players.size() * playerComponent.getSize();
+                int pos = 0;
+                int i;
+                for (i = 0; (allFit || pos + playerComponent.getSize() + morePlayersComponent.getSize() <= cta.getSize()) && i < players.size(); i++) {
+                    Player player = players.get(i);
+                    Component.Instance component = playerComponent.toInstance(context.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
+                    component.activate();
+                    component.update1stStep();
+                    component.setPosition(ComponentTablistAccess.createChild(cta, playerComponent.getSize(), pos));
+                    component.update2ndStep();
+                    activeComponents.add(component);
+                    pos += playerComponent.getSize();
                 }
-                component.update2ndStep();
-                activeComponents.add(component);
-                pos += playerComponent.getSize();
-            }
-            if (!allFit) {
-                Component.Instance component = morePlayersComponent.toInstance(context.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - i));
-                component.activate();
-                component.update1stStep();
-                if (fillSlotsVertical) {
-                    component.setPosition(leftMostColumn, row + (pos % rows), leftMostColumn + (pos / rows), morePlayersComponent.getSize());
-                } else {
-                    component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
+                if (!allFit) {
+                    Component.Instance component = morePlayersComponent.toInstance(context.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - i));
+                    component.activate();
+                    component.update1stStep();
+                    component.setPosition(ComponentTablistAccess.createChild(cta, morePlayersComponent.getSize(), pos));
+                    component.update2ndStep();
+                    activeComponents.add(component);
                 }
-                component.update2ndStep();
-                activeComponents.add(component);
             }
         }
 

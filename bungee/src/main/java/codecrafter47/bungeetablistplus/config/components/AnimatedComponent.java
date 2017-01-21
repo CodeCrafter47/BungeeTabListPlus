@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.config.components;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
@@ -106,18 +107,21 @@ public class AnimatedComponent extends Component implements Validate {
         public void update2ndStep() {
             super.update2ndStep();
             synchronized (context.get(Context.KEY_TAB_LIST)) {
-                if (activeComponent == -1) {
-                    activeComponent = 0;
-                    Component.Instance component = frames.get(0);
-                    component.activate();
-                    component.update1stStep();
-                    component.setPosition(leftMostColumn, row, column, size);
-                    component.update2ndStep();
-                } else {
-                    Component.Instance component = frames.get(activeComponent);
-                    component.update1stStep();
-                    component.setPosition(leftMostColumn, row, column, size);
-                    component.update2ndStep();
+                ComponentTablistAccess cta = getTablistAccess();
+                if (cta != null) {
+                    if (activeComponent == -1) {
+                        activeComponent = 0;
+                        Component.Instance component = frames.get(0);
+                        component.activate();
+                        component.update1stStep();
+                        component.setPosition(cta);
+                        component.update2ndStep();
+                    } else {
+                        Component.Instance component = frames.get(activeComponent);
+                        component.update1stStep();
+                        component.setPosition(cta);
+                        component.update2ndStep();
+                    }
                 }
             }
         }
@@ -126,17 +130,20 @@ public class AnimatedComponent extends Component implements Validate {
         public void run() {
             if (activeComponent != -1) {
                 synchronized (context.get(Context.KEY_TAB_LIST)) {
-                    if (activeComponent != -1) {
-                        frames.get(activeComponent).deactivate();
-                        activeComponent++;
-                        if (activeComponent >= frames.size()) {
-                            activeComponent = 0;
+                    ComponentTablistAccess cta = getTablistAccess();
+                    if (cta != null) {
+                        if (activeComponent != -1) {
+                            frames.get(activeComponent).deactivate();
+                            activeComponent++;
+                            if (activeComponent >= frames.size()) {
+                                activeComponent = 0;
+                            }
+                            Component.Instance component = frames.get(activeComponent);
+                            component.activate();
+                            component.update1stStep();
+                            component.setPosition(cta);
+                            component.update2ndStep();
                         }
-                        Component.Instance component = frames.get(activeComponent);
-                        component.activate();
-                        component.update1stStep();
-                        component.setPosition(leftMostColumn, row, column, size);
-                        component.update2ndStep();
                     }
                 }
             }

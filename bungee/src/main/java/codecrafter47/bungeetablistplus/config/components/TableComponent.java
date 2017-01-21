@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.config.components;
 
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -140,11 +141,18 @@ public class TableComponent extends Component {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            for (int i = 0; i < columns.length; i++) {
-                if (start[i] < context.get(Context.KEY_COLUMNS)) {
-                    Component.Instance component = columns[i];
-                    component.setPosition(column + start[i], row, column + start[i], size / context.get(Context.KEY_COLUMNS) * width[i]);
-                    component.update2ndStep();
+            ComponentTablistAccess cta = getTablistAccess();
+            if (cta != null) {
+                for (int i = 0; i < columns.length; i++) {
+                    if (start[i] + width[i] <= context.get(Context.KEY_COLUMNS)) {
+                        Component.Instance component = columns[i];
+                        int offset = start[i];
+                        int size = cta.getSize() / context.get(Context.KEY_COLUMNS) * width[i];
+                        int span = width[i];
+                        int scan = context.get(Context.KEY_COLUMNS) - span;
+                        component.setPosition(ComponentTablistAccess.createChild(cta, size, index -> offset + index + (index / span) * scan));
+                        component.update2ndStep();
+                    }
                 }
             }
         }

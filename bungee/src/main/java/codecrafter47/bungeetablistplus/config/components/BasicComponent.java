@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.config.components;
 
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
@@ -79,33 +80,38 @@ public class BasicComponent extends Component implements Validate {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            CustomTablist tablist = context.get(Context.KEY_TAB_LIST);
-            String text = getText().evaluate(context);
 
-            if (alignment != Alignment.LEFT) {
-                int slotWidth = 80;
-                if (tablist.getSize() <= 60) {
-                    slotWidth = 110;
-                } else if (tablist.getSize() <= 40) {
-                    slotWidth = 180;
-                } else if (tablist.getSize() <= 20) {
-                    slotWidth = 360;
-                }
-                int textLength = FastChat.legacyTextLength(text, '&');
-                int space = slotWidth - textLength;
-                if (space > 0) {
-                    int spaces = (int) (space / ChatUtil.getCharWidth(' ', false));
-                    int spacesBefore = spaces;
-                    int spacesBehind = 0;
-                    if (alignment == Alignment.CENTER) {
-                        spacesBefore = spaces >> 1;
-                        spacesBehind = spaces - spacesBefore;
+            ComponentTablistAccess cta = getTablistAccess();
+            if (cta != null) {
+
+                CustomTablist tablist = context.get(Context.KEY_TAB_LIST);
+                String text = getText().evaluate(context);
+
+                if (alignment != Alignment.LEFT) {
+                    int slotWidth = 80;
+                    if (tablist.getSize() <= 60) {
+                        slotWidth = 110;
+                    } else if (tablist.getSize() <= 40) {
+                        slotWidth = 180;
+                    } else if (tablist.getSize() <= 20) {
+                        slotWidth = 360;
                     }
-                    text = Strings.repeat(" ", spacesBefore) + text + "&r" + Strings.repeat(" ", spacesBehind);
+                    int textLength = FastChat.legacyTextLength(text, '&');
+                    int space = slotWidth - textLength;
+                    if (space > 0) {
+                        int spaces = (int) (space / ChatUtil.getCharWidth(' ', false));
+                        int spacesBefore = spaces;
+                        int spacesBehind = 0;
+                        if (alignment == Alignment.CENTER) {
+                            spacesBefore = spaces >> 1;
+                            spacesBehind = spaces - spacesBefore;
+                        }
+                        text = Strings.repeat(" ", spacesBefore) + text + "&r" + Strings.repeat(" ", spacesBehind);
+                    }
                 }
-            }
 
-            tablist.setSlot(row, column, getIcon().evaluate(context), text, getPing().evaluate(context));
+                cta.setSlot(0, getIcon().evaluate(context), text, getPing().evaluate(context));
+            }
         }
 
         @Override

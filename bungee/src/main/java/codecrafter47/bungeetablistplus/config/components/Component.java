@@ -19,12 +19,13 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.yamlconfig.Factory;
 import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
 import com.google.common.base.Preconditions;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Subtype(type = AnimatedComponent.class, tag = "!animated")
@@ -58,7 +59,7 @@ public abstract class Component {
         protected final Context context;
         protected boolean active = false;
         protected boolean hasValidPosition = false;
-        protected int leftMostColumn, row, column, size;
+        private ComponentTablistAccess cta;
 
         protected Instance(Context context) {
             this.context = context;
@@ -82,18 +83,17 @@ public abstract class Component {
             Preconditions.checkState(hasValidPosition, "Position invalid");
         }
 
-        public final void setPosition(int leftMostColumn, int row, int column, int size) {
+        public void setPosition(ComponentTablistAccess cta) {
             hasValidPosition = true;
-            this.leftMostColumn = leftMostColumn;
-            this.row = row;
-            this.column = column;
-            this.size = size;
+            this.cta = cta;
         }
 
-        protected void setSlot(int row, int column, Icon icon, String text, int ping) {
-            if (active && hasValidPosition && row * context.get(Context.KEY_COLUMNS) + column < size) {
-                context.get(Context.KEY_TAB_LIST).setSlot(this.row + row, this.column + column, icon, text, ping);
+        @Nullable
+        protected final ComponentTablistAccess getTablistAccess() {
+            if (active && hasValidPosition && this.cta != null) {
+                return cta;
             }
+            return null;
         }
 
         public abstract int getMinSize();

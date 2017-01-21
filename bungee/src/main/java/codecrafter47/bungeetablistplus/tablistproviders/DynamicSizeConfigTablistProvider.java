@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.config.DynamicSizeConfig;
 import codecrafter47.bungeetablistplus.config.components.Component;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
@@ -77,6 +78,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
         setSize(1, size);
 
         // create & update components
+        ComponentTablistAccess cta = ComponentTablistAccess.of(this);
         int pos = 0;
         int i;
         for (i = 0; pos < size; i++) {
@@ -84,7 +86,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
             Component.Instance component = config.getPlayerComponent().toInstance(context.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
             component.activate();
             component.update1stStep();
-            component.setPosition(0, pos, 0, config.getPlayerComponent().getSize());
+            component.setPosition(ComponentTablistAccess.createChild(cta, config.getPlayerComponent().getSize(), pos));
             component.update2ndStep();
             activeComponents.add(component);
             pos += config.getPlayerComponent().getSize();

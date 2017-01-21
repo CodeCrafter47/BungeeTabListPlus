@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
@@ -230,95 +231,99 @@ public class PlayersByServerComponent extends Component implements Validate {
             activeComponents.forEach(Component.Instance::deactivate);
             activeComponents.clear();
             super.update2ndStep();
-            // figure out how much space each server gets
-            int rows = size / context.get(Context.KEY_COLUMNS);
-            int minRowsPerServer = (minSizePerServer + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS);
-            int maxRowsPerServer = maxSizePerServer / context.get(Context.KEY_COLUMNS);
-            List<String> servers = sortedServerList;
-            int[] serverRows = new int[servers.size()];
-            Arrays.fill(serverRows, minRowsPerServer);
-            rows -= minRowsPerServer * servers.size();
-            if (serverSeparator != null && playersByServer.size() > 1) {
-                rows -= ((serverSeparator.getSize() + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * (playersByServer.size() - 1);
-            }
-            boolean change;
-            do {
-                change = false;
-                for (int i = 0; i < servers.size(); i++) {
-                    if (rows > 0 && serverRows[i] < maxRowsPerServer) {
-                        String server = servers.get(i);
-                        int serverSize = serverHeader.getSize() + playersByServer.get(server).size() * playerComponent.getSize() + (serverFooter != null ? serverFooter.getSize() : 0);
-                        if (min(serverSize, maxRowsPerServer) > serverRows[i] * context.get(Context.KEY_COLUMNS)) {
-                            serverRows[i]++;
-                            change = true;
-                            rows--;
+            ComponentTablistAccess cta = getTablistAccess();
+            if (cta != null) {
+                // figure out how much space each server gets
+                int columns = context.get(Context.KEY_COLUMNS);
+                int rows = cta.getSize() / columns;
+                int minRowsPerServer = (minSizePerServer + columns - 1) / columns;
+                int maxRowsPerServer = maxSizePerServer / columns;
+                List<String> servers = sortedServerList;
+                int[] serverRows = new int[servers.size()];
+                Arrays.fill(serverRows, minRowsPerServer);
+                rows -= minRowsPerServer * servers.size();
+                if (serverSeparator != null && playersByServer.size() > 1) {
+                    rows -= ((serverSeparator.getSize() + columns - 1) / columns) * (playersByServer.size() - 1);
+                }
+                boolean change;
+                do {
+                    change = false;
+                    for (int i = 0; i < servers.size(); i++) {
+                        if (rows > 0 && serverRows[i] < maxRowsPerServer) {
+                            String server = servers.get(i);
+                            int serverSize = serverHeader.getSize() + playersByServer.get(server).size() * playerComponent.getSize() + (serverFooter != null ? serverFooter.getSize() : 0);
+                            if (min(serverSize, maxRowsPerServer) > serverRows[i] * columns) {
+                                serverRows[i]++;
+                                change = true;
+                                rows--;
+                            }
                         }
                     }
-                }
-            } while (rows > 0 && change);
-            // create the components
-            int pos = 0;
-            for (int i = 0; i < servers.size() && pos < size; i++) {
-                if (serverSeparator != null && i > 0) {
-                    // Separator
-                    pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
-                    Component.Instance separator = serverSeparator.toInstance(context);
-                    separator.activate();
-                    separator.update1stStep();
-                    separator.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), column, serverSeparator.getSize());
-                    separator.update2ndStep();
-                    activeComponents.add(separator);
-                    pos += serverSeparator.getSize();
-                }
-                String server = servers.get(i);
-                pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
-                List<Player> players = playersByServer.get(server);
-                // Header
-                Context serverContext = context.derived().put(Context.KEY_SERVER, server).put(Context.KEY_SERVER_PLAYER_COUNT, players.size());
-                Component.Instance header = serverHeader.toInstance(serverContext);
-                header.activate();
-                header.update1stStep();
-                header.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), column, serverHeader.getSize());
-                header.update2ndStep();
-                activeComponents.add(header);
-                pos += serverHeader.getSize();
-                // Players
-                int playersMaxSize = playersByServer.get(server).size() * playerComponent.getSize();
-                int serverSize = min(serverRows[i] * context.get(Context.KEY_COLUMNS) - serverHeader.getSize() - (serverFooter != null ? serverFooter.getSize() : 0), playersMaxSize);
-                boolean allFit = serverSize >= playersMaxSize;
-                int j;
-                int pos2 = 0;
-                for (j = 0; (allFit || pos2 + morePlayersComponent.getSize() < serverSize) && j < players.size(); j++) {
-                    Player player = players.get(j);
-                    Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
-                    component.activate();
-                    component.update1stStep();
-                    component.setPosition(leftMostColumn, row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), leftMostColumn + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), playerComponent.getSize());
-                    component.update2ndStep();
-                    activeComponents.add(component);
-                    pos2 += playerComponent.getSize();
-                }
-                if (!allFit) {
-                    Component.Instance component = morePlayersComponent.toInstance(serverContext.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - j));
-                    component.activate();
-                    component.update1stStep();
-                    component.setPosition(leftMostColumn, row + ((pos + pos2) / context.get(Context.KEY_COLUMNS)), leftMostColumn + ((pos + pos2) % context.get(Context.KEY_COLUMNS)), morePlayersComponent.getSize());
-                    component.update2ndStep();
-                    activeComponents.add(component);
-                    pos2 += morePlayersComponent.getSize();
-                }
-                // Footer
-                if (serverFooter != null) {
-                    pos += serverSize;
-                    Component.Instance footer = serverFooter.toInstance(serverContext);
-                    footer.activate();
-                    footer.update1stStep();
-                    footer.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), leftMostColumn + (pos % context.get(Context.KEY_COLUMNS)), serverFooter.getSize());
-                    footer.update2ndStep();
-                    activeComponents.add(footer);
-                    pos += serverFooter.getSize();
-                } else {
-                    pos += pos2;
+                } while (rows > 0 && change);
+                // create the components
+                int pos = 0;
+                for (int i = 0; i < servers.size() && pos < cta.getSize(); i++) {
+                    if (serverSeparator != null && i > 0) {
+                        // Separator
+                        pos = ((pos + columns - 1) / columns) * columns;
+                        Component.Instance separator = serverSeparator.toInstance(context);
+                        separator.activate();
+                        separator.update1stStep();
+                        separator.setPosition(ComponentTablistAccess.createChild(cta, serverSeparator.getSize(), pos));
+                        separator.update2ndStep();
+                        activeComponents.add(separator);
+                        pos += serverSeparator.getSize();
+                    }
+                    String server = servers.get(i);
+                    pos = ((pos + columns - 1) / columns) * columns;
+                    List<Player> players = playersByServer.get(server);
+                    // Header
+                    Context serverContext = context.derived().put(Context.KEY_SERVER, server).put(Context.KEY_SERVER_PLAYER_COUNT, players.size());
+                    Component.Instance header = serverHeader.toInstance(serverContext);
+                    header.activate();
+                    header.update1stStep();
+                    header.setPosition(ComponentTablistAccess.createChild(cta, serverHeader.getSize(), pos));
+                    header.update2ndStep();
+                    activeComponents.add(header);
+                    pos += serverHeader.getSize();
+                    // Players
+                    int playersMaxSize = playersByServer.get(server).size() * playerComponent.getSize();
+                    int serverSize = min(serverRows[i] * columns - serverHeader.getSize() - (serverFooter != null ? serverFooter.getSize() : 0), playersMaxSize);
+                    boolean allFit = serverSize >= playersMaxSize;
+                    int j;
+                    int pos2 = 0;
+                    for (j = 0; (allFit || pos2 + morePlayersComponent.getSize() < serverSize) && j < players.size(); j++) {
+                        Player player = players.get(j);
+                        Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
+                        component.activate();
+                        component.update1stStep();
+                        component.setPosition(ComponentTablistAccess.createChild(cta, playerComponent.getSize(), pos + pos2));
+                        component.update2ndStep();
+                        activeComponents.add(component);
+                        pos2 += playerComponent.getSize();
+                    }
+                    if (!allFit) {
+                        Component.Instance component = morePlayersComponent.toInstance(serverContext.derived().put(Context.KEY_OTHER_PLAYERS_COUNT, players.size() - j));
+                        component.activate();
+                        component.update1stStep();
+                        component.setPosition(ComponentTablistAccess.createChild(cta, morePlayersComponent.getSize(), pos + pos2));
+                        component.update2ndStep();
+                        activeComponents.add(component);
+                        pos2 += morePlayersComponent.getSize();
+                    }
+                    // Footer
+                    if (serverFooter != null) {
+                        pos += serverSize;
+                        Component.Instance footer = serverFooter.toInstance(serverContext);
+                        footer.activate();
+                        footer.update1stStep();
+                        footer.setPosition(ComponentTablistAccess.createChild(cta, serverFooter.getSize(), pos));
+                        footer.update2ndStep();
+                        activeComponents.add(footer);
+                        pos += serverFooter.getSize();
+                    } else {
+                        pos += pos2;
+                    }
                 }
             }
         }

@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.config.components;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
+import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
@@ -127,18 +128,20 @@ public class ListComponent extends Component {
         public void update2ndStep() {
             super.update2ndStep();
             try {
-                updateLayout();
+                ComponentTablistAccess cta = getTablistAccess();
+                if (cta != null) {
+                    updateLayout(cta);
+                    for (int i = 0; i < components.size(); i++) {
+                        Component.Instance component = components.get(i);
+                        component.update2ndStep();
+                    }
+                }
             } catch (LayoutException e) {
                 BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Config error.", e);
-                return;
-            }
-            for (int i = 0; i < components.size(); i++) {
-                Component.Instance component = components.get(i);
-                component.update2ndStep();
             }
         }
 
-        void updateLayout() throws LayoutException {
+        void updateLayout(ComponentTablistAccess cta) throws LayoutException {
             int[] sectionSize = new int[components.size()];
             for (int i = 0; i < components.size(); i++) {
                 sectionSize[i] = components.get(i).getMinSize();
@@ -151,9 +154,6 @@ public class ListComponent extends Component {
                     sizeNeeded = ((sizeNeeded + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
                 sizeNeeded += sectionSize[i];
-            }
-            if (sizeNeeded > size) {
-                throw new LayoutException(String.format("Minimum size the given layout would need is %d but tab_size is only %d", sizeNeeded, size));
             }
 
             boolean repeat;
@@ -178,7 +178,7 @@ public class ListComponent extends Component {
                         sizeNeeded += sectionSize[j];
                     }
 
-                    if (sizeNeeded <= size) {
+                    if (sizeNeeded <= cta.getSize()) {
                         repeat = true;
                     } else {
                         sectionSize[i] = oldSectionSize;
@@ -197,7 +197,7 @@ public class ListComponent extends Component {
                 if (component.isBlockAligned()) {
                     pos = ((pos + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
                 }
-                component.setPosition(leftMostColumn, row + (pos / context.get(Context.KEY_COLUMNS)), column + (pos % context.get(Context.KEY_COLUMNS)), sectionSize[i]);
+                component.setPosition(ComponentTablistAccess.createChild(cta, sectionSize[i], pos));
                 pos += sectionSize[i];
             }
         }
