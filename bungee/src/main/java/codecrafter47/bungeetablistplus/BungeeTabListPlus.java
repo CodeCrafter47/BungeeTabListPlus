@@ -434,6 +434,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         failIfNotMainThread();
         try {
             // todo requestedUpdateInterval = null;
+            fakePlayerManager.removeConfigFakePlayers();
             config = YamlConfig.read(new FileInputStream(new File(plugin.getDataFolder(), "config.yml")), MainConfig.class);
             placeholderManager.reload();
             if (reloadTablists()) return false;
@@ -443,6 +444,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             skins.onReload();
         } catch (IOException | YAMLException ex) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
+            return false;
         }
         return true;
     }

@@ -43,13 +43,8 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
             randomJoinLeaveEventsEnabled = true;
             offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
             sanitizeFakePlayerNames();
-            plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    triggerRandomEvent();
-                }
-            }, 10, 10, TimeUnit.SECONDS);
         }
+        plugin.getProxy().getScheduler().schedule(plugin, this::triggerRandomEvent, 10, 10, TimeUnit.SECONDS);
     }
 
     private void triggerRandomEvent() {
@@ -60,8 +55,7 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
                 if (player.isRandomServerSwitchEnabled()) {
                     player.changeServer(new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size())));
                 }
-            }
-            if (randomJoinLeaveEventsEnabled) {
+            } else if (randomJoinLeaveEventsEnabled) {
                 if (Math.random() < 0.7 && offline.size() > 0) {
                     // add player
                     String name = offline.get((int) (Math.random() * offline.size()));
@@ -70,7 +64,10 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
                     online.add(player);
                 } else if (online.size() > 0) {
                     // remove player
-                    offline.add(online.remove((int) (online.size() * Math.random())).getName());
+                    FakePlayer fakePlayer = online.get((int) (online.size() * Math.random()));
+                    if (BungeeTabListPlus.getInstance().getConfig().fakePlayers.contains(fakePlayer.getName())) {
+                        removeFakePlayer(fakePlayer);
+                    }
                 }
             }
         } catch (Throwable th) {
@@ -78,10 +75,18 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
         }
     }
 
+    public void removeConfigFakePlayers() {
+        offline.clear();
+        for (FakePlayer fakePlayer : online) {
+            if (BungeeTabListPlus.getInstance().getConfig().fakePlayers.contains(fakePlayer.getName())) {
+                online.remove(fakePlayer);
+            }
+        }
+    }
+
     public void reload() {
         offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
         sanitizeFakePlayerNames();
-        online = new CopyOnWriteArrayList<>();
         for (int i = offline.size(); i > 0; i--) {
             triggerRandomEvent();
         }
