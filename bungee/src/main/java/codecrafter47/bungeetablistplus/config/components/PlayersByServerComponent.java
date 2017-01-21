@@ -29,10 +29,12 @@ import codecrafter47.bungeetablistplus.template.PingTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Ordering;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -47,6 +49,7 @@ import static java.lang.Math.min;
 public class PlayersByServerComponent extends Component implements Validate {
     private PlayerSorter playerOrder = new PlayerSorter("alphabetically");
     private String serverOrder = "alphabetically";
+    private Map<String, Integer> customServerOrder = ImmutableMap.of();
     private ServerOptions showServers = null;
     private String playerSet;
     private Component serverHeader;
@@ -60,6 +63,21 @@ public class PlayersByServerComponent extends Component implements Validate {
     int maxSizePerServer = 200;
     int minSize = 0;
     int maxSize = -1;
+
+    public List<String> getCustomServerOrder() {
+        // dummy method for snakeyaml to detect property type
+        return null;
+    }
+
+    public void setCustomServerOrder(List<String> customServerOrder) {
+        Preconditions.checkNotNull(customServerOrder);
+        val builder = ImmutableMap.<String, Integer>builder();
+        int rank = 0;
+        for (String server : customServerOrder) {
+            builder.put(server, rank++);
+        }
+        this.customServerOrder = builder.build();
+    }
 
     public void setServerHeader(Component serverHeader) {
         Preconditions.checkArgument(serverHeader.hasConstantSize(), "serverHeader needs to have a fixed size.");
@@ -164,6 +182,8 @@ public class PlayersByServerComponent extends Component implements Validate {
                     return Comparator.comparing(server -> playersByServer.get(server).size(), Comparator.reverseOrder());
                 case "online":
                     return Comparator.comparing(server -> BungeeTabListPlus.getInstance().getServerState(server).isOnline(), Comparator.reverseOrder());
+                case "custom":
+                    return Comparator.comparing(server -> customServerOrder.getOrDefault(server, Integer.MAX_VALUE));
                 default:
                     return null;
             }
