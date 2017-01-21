@@ -79,6 +79,7 @@ public class BukkitBridge implements Listener {
         plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), () -> plugin.runInMainThread(this::checkForThirdPartyVariables), 2, 2, TimeUnit.SECONDS);
         plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::requestMissingServerData, 1, 1, TimeUnit.SECONDS);
         plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::removeObsoleteServerConnections, 5, 5, TimeUnit.SECONDS);
+        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::tryInitConnections, 5, 5, TimeUnit.SECONDS);
     }
 
     private void checkForThirdPartyVariables() {
@@ -124,6 +125,18 @@ public class BukkitBridge implements Listener {
     private void removeObsoleteServerConnections() {
         for (ServerBridgeDataCache cache : serverInformation.values()) {
             cache.removeObsoleteConnections();
+        }
+    }
+
+    private void tryInitConnections() {
+        // Usually the handshake is initiated by the server, but in case this fails, try again.
+        for (ConnectedPlayer player : BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayers()) {
+            if (player.getBridgeDataCache().connection == null) {
+                Server server = player.getPlayer().getServer();
+                if (server != null && server.isConnected()) {
+                    initializeHandshake(server);
+                }
+            }
         }
     }
 
