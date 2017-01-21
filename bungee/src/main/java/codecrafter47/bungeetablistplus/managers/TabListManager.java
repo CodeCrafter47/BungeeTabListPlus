@@ -29,7 +29,10 @@ import codecrafter47.bungeetablistplus.expression.ExpressionResult;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.tablistproviders.legacy.IConfigTabListProvider;
 import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
+import lombok.Getter;
+import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -51,6 +54,8 @@ public class TabListManager implements Listener {
     private final BungeeTabListPlus plugin;
     private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
     private final List<Config> configs = new ArrayList<>();
+    @Getter
+    private ImmutableList<String> filesNeedingUpgrade = ImmutableList.of();
 
     public Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
 
@@ -73,6 +78,7 @@ public class TabListManager implements Listener {
             }
         }
 
+        val needUpgrade = ImmutableList.<String>builder();
         for (File file : tablistFolder.listFiles()) {
             if (file.isFile() && file.getName().endsWith(".yml")) {
                 try {
@@ -81,6 +87,7 @@ public class TabListManager implements Listener {
                     ITabListConfig tabListConfig = Objects.requireNonNull(YamlConfig.read(new FileInputStream(file), ITabListConfig.class));
 
                     if (tabListConfig instanceof TabListConfig) {
+                        needUpgrade.add(file.getName());
                         plugin.getLogger().log(Level.WARNING, "{0} needs to be updated, see https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating", file.getName());
                         TabListConfig c = (TabListConfig) tabListConfig;
                         plugin.getPlaceholderAPIHook().searchTabList(c);
@@ -94,6 +101,7 @@ public class TabListManager implements Listener {
                 }
             }
         }
+        this.filesNeedingUpgrade = needUpgrade.build();
         return true;
     }
 

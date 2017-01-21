@@ -45,7 +45,10 @@ import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
+import codecrafter47.util.chat.ChatUtil;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
@@ -54,6 +57,7 @@ import lombok.Getter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -365,10 +369,21 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             return;
         }
 
-        ProxyServer.getInstance().getPluginManager().registerListener(plugin,
-                listener);
+        ProxyServer.getInstance().getPluginManager().registerListener(plugin, listener);
         plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
         restartRefreshThread();
+
+        plugin.getProxy().getScheduler().schedule(plugin, () -> {
+            ImmutableList<String> filesNeedingUpgrade = tabLists.getFilesNeedingUpgrade();
+            if (!filesNeedingUpgrade.isEmpty()) {
+                BaseComponent[] message = ChatUtil.parseBBCode("&c[BungeeTabListPlus] Warning: &eThe following tablist configuration files need to be upgraded: &f" + Joiner.on(", ").join(filesNeedingUpgrade) + "\n&eYou can find more information at &b[url]https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating[/url]&e.");
+                for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
+                    if (getPermissionManager().hasPermission(player, "bungeetablistplus.admin")) {
+                        player.sendMessage(message);
+                    }
+                }
+            }
+        }, 15, 15, TimeUnit.MINUTES);
     }
 
     public void onDisable() {
