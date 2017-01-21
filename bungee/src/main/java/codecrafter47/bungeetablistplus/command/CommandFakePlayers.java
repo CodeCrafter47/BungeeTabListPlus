@@ -26,15 +26,10 @@ import codecrafter47.bungeetablistplus.command.util.CommandBase;
 import codecrafter47.bungeetablistplus.command.util.CommandExecutor;
 import codecrafter47.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
-import com.google.gson.Gson;
-import lombok.SneakyThrows;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -53,7 +48,6 @@ public class CommandFakePlayers extends CommandExecutor {
         addSubCommand(new CommandBase("remove", null, this::commandRemove));
         addSubCommand(new CommandBase("list", null, this::commandList));
         addSubCommand(new CommandBase("removeall", null, this::commandRemoveAll));
-        addSubCommand(new CommandBase("addrandom", null, this::commandAddRandom));
         addSubCommand(new CommandBase("help", null, this::commandHelp));
         setDefaultAction(this::commandHelp);
     }
@@ -110,29 +104,9 @@ public class CommandFakePlayers extends CommandExecutor {
         sender.sendMessage(ChatUtil.parseBBCode("&aRemoved " + count + " fake players."));
     }
 
-    @SneakyThrows
-    private void commandAddRandom(CommandSender sender, String[] args) {
-        if (args.length != 1 || !args[0].matches("\\d+")) {
-            sender.sendMessage(ChatUtil.parseBBCode("&cUsage: [suggest=/btlp fake addrandom 25]/btlp fake addrandom <number>[/suggest]"));
-        } else {
-            int number = Integer.parseInt(args[0]);
-            RandomUsernames usernames = new Gson().fromJson(new InputStreamReader(new URL("http://uuid.turt2live.com/api/v2/random/" + number).openConnection().getInputStream()), (Type) RandomUsernames.class);
-            int count = 0;
-            if (usernames.results != null) {
-                for (RandomUsernames.Entry entry : usernames.results) {
-                    FakePlayer fakePlayer = manager().createFakePlayer(entry.name, randomServer());
-                    fakePlayer.setRandomServerSwitchEnabled(true);
-                    count++;
-                }
-            }
-            sender.sendMessage(ChatUtil.parseBBCode("&aAdded " + count + " random fake players."));
-        }
-    }
-
     private void commandHelp(CommandSender sender) {
         sender.sendMessage(ChatUtil.parseBBCode("&e&lAvailable Commands:"));
         sender.sendMessage(ChatUtil.parseBBCode("&e[suggest=/btlp fake add]/btlp fake add <name>[/suggest] &f&oAdd a fake player."));
-        sender.sendMessage(ChatUtil.parseBBCode("&e[suggest=/btlp fake addrandom 25]/btlp fake addrandom <number>[/suggest] &f&oAdd a specified number of random fake players."));
         sender.sendMessage(ChatUtil.parseBBCode("&e[suggest=/btlp fake remove]/btlp fake remove <name>[/suggest] &f&oRemove a fake player."));
         sender.sendMessage(ChatUtil.parseBBCode("&e[suggest]/btlp fake list[/suggest] &f&oShows a list of all fake players."));
         sender.sendMessage(ChatUtil.parseBBCode("&e[suggest]/btlp fake removeall[/suggest] &f&oRemoves all fake players."));
@@ -146,20 +120,5 @@ public class CommandFakePlayers extends CommandExecutor {
     private static ServerInfo randomServer() {
         ArrayList<ServerInfo> servers = new ArrayList<>(ProxyServer.getInstance().getServers().values());
         return servers.get(ThreadLocalRandom.current().nextInt(servers.size()));
-    }
-
-    // Required for json
-    public static class RandomUsernames {
-        int requested;
-        int got;
-        Entry[] results;
-
-        public static class Entry {
-            String name;
-            String uuid;
-            String offline_uuid;
-            long expires_in;
-            long expires_on;
-        }
     }
 }
