@@ -157,17 +157,32 @@ public abstract class Placeholder {
             return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), (context) -> context.get(Context.KEY_SERVER));
         } else if (tokens[0].startsWith("playerset:")) {
             String playerSet = tokens[0].split(":")[1];
-            return new Placeholder() {
-                @Override
-                public String evaluate(Context context) {
-                    List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
-                    if (players == null) {
-                        players = Collections.emptyList();
-                        BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
+            if (tokens.length == 3 && "size".equals(tokens[1])) {
+                String format = "%0" + tokens[2] + "d";
+                return new Placeholder() {
+                    @Override
+                    public String evaluate(Context context) {
+                        List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
+                        if (players == null) {
+                            players = Collections.emptyList();
+                            BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
+                        }
+                        return String.format(format, players.size());
                     }
-                    return Integer.toString(players.size());
-                }
-            };
+                };
+            } else {
+                return new Placeholder() {
+                    @Override
+                    public String evaluate(Context context) {
+                        List<Player> players = context.get(Context.KEY_PLAYER_SETS).get(playerSet);
+                        if (players == null) {
+                            players = Collections.emptyList();
+                            BungeeTabListPlus.getInstance().getLogger().info("Missing player set " + playerSet);
+                        }
+                        return Integer.toString(players.size());
+                    }
+                };
+            }
         } else if (tokens[0].startsWith("server:")) {
             String server = tokens[0].split(":")[1];
             return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), context -> server);
