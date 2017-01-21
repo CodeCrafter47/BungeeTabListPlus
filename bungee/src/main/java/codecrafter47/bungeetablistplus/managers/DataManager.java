@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.TrackingDataCache;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import de.codecrafter47.data.api.DataAccess;
 import de.codecrafter47.data.api.DataCache;
 import de.codecrafter47.data.api.DataKey;
@@ -85,6 +86,12 @@ public class DataManager implements Listener {
 
             addProvider(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE, p -> ((UserConnection) p).getGamemode());
             addProvider(BTLPBungeeDataKeys.DATA_KEY_ICON, BungeeTabListPlusAPI::getIconFromPlayer);
+
+            if (ProxyServer.getInstance().getPluginManager().getPlugin("RedisBungee") != null) {
+                addProvider(BTLPBungeeDataKeys.DATA_KEY_RedisBungee_ServerId, player -> {
+                    return RedisBungee.getApi().getServerId();
+                });
+            }
         }
     }
 

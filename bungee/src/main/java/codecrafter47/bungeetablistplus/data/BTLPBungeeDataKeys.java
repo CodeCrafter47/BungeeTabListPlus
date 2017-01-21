@@ -32,6 +32,8 @@ public class BTLPBungeeDataKeys implements DataKeyCatalogue {
     public static final DataKey<Integer> DATA_KEY_GAMEMODE = new DataKey<>("btlp:gamemode", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.INTEGER);
     public static final DataKey<Icon> DATA_KEY_ICON = new DataKey<>("btlp:icon", BungeeData.SCOPE_BUNGEE_PLAYER, BTLPDataTypes.ICON);
 
+    public static final DataKey<String> DATA_KEY_RedisBungee_ServerId = new DataKey<>("btlp:redisbungee:serverId", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.STRING);
+
     public static DataKey<String> createBungeeThirdPartyVariableDataKey(String name) {
         return ThirdPartyPlaceholderBungee.withParameter(name);
     }

@@ -118,6 +118,7 @@ public abstract class Placeholder {
         playerPlaceholders.put("bungeeonlinetime_seconds", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
         playerPlaceholders.put("bungeeonlinetime_minutes", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
         playerPlaceholders.put("bungeeonlinetime_hours", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
+        playerPlaceholders.put("redisbungee_server_id", ofStringData(BTLPBungeeDataKeys.DATA_KEY_RedisBungee_ServerId));
 
         // Server
         serverPlaceholders.put("tps", (tokens, serverFunction) -> {
