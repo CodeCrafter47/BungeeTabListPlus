@@ -55,6 +55,7 @@ public class PlayersByServerComponent extends Component implements Validate {
     private boolean includeEmptyServers;
     private Component playerComponent;
     private Component morePlayersComponent;
+    private boolean fillSlotsVertical = false;
     int minSizePerServer = 0;
     int maxSizePerServer = 200;
     int minSize = 0;
@@ -206,15 +207,21 @@ public class PlayersByServerComponent extends Component implements Validate {
                 playerOrder.sort(context, list);
             }
 
+            int columns = fillSlotsVertical ? 1 : context.get(Context.KEY_COLUMNS);
             preferredSize = 0;
             for (List<Player> list : playersByServer.values()) {
                 int serverSize = serverHeader.getSize() + list.size() * playerComponent.getSize() + (serverFooter != null ? serverFooter.getSize() : 0);
-                serverSize = ((serverSize + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS);
+                serverSize = ((serverSize + columns - 1) / columns) * columns;
                 preferredSize += min(serverSize, maxSizePerServer);
             }
             if (serverSeparator != null && playersByServer.size() > 1) {
-                preferredSize += ((serverSeparator.getSize() + context.get(Context.KEY_COLUMNS) - 1) / context.get(Context.KEY_COLUMNS)) * context.get(Context.KEY_COLUMNS) * (playersByServer.size() - 1);
+                preferredSize += ((serverSeparator.getSize() + columns - 1) / columns) * columns * (playersByServer.size() - 1);
             }
+
+            if (fillSlotsVertical) {
+                preferredSize = preferredSize * context.get(Context.KEY_COLUMNS);
+            }
+
             if (maxSize != -1) {
                 preferredSize = min(preferredSize, PlayersByServerComponent.this.maxSize);
             }
@@ -227,6 +234,19 @@ public class PlayersByServerComponent extends Component implements Validate {
         }
 
         @Override
+        public void setPosition(ComponentTablistAccess cta) {
+            if (fillSlotsVertical) {
+                int columns = context.get(Context.KEY_COLUMNS);
+                int rows = (cta.getSize() + columns - 1) / columns;
+                super.setPosition(ComponentTablistAccess.createChild(cta, cta.getSize(), index ->
+                        (index / rows) + (index % rows) * columns
+                ));
+            } else {
+                super.setPosition(cta);
+            }
+        }
+
+        @Override
         public void update2ndStep() {
             activeComponents.forEach(Component.Instance::deactivate);
             activeComponents.clear();
@@ -234,7 +254,7 @@ public class PlayersByServerComponent extends Component implements Validate {
             ComponentTablistAccess cta = getTablistAccess();
             if (cta != null) {
                 // figure out how much space each server gets
-                int columns = context.get(Context.KEY_COLUMNS);
+                int columns = fillSlotsVertical ? 1 : context.get(Context.KEY_COLUMNS);
                 int rows = cta.getSize() / columns;
                 int minRowsPerServer = (minSizePerServer + columns - 1) / columns;
                 int maxRowsPerServer = maxSizePerServer / columns;
