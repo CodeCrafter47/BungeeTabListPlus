@@ -117,9 +117,20 @@ public class PlayersComponent extends Component implements Validate {
             if (fillSlotsVertical) {
                 int columns = context.get(Context.KEY_COLUMNS);
                 int rows = (cta.getSize() + columns - 1) / columns;
-                super.setPosition(ComponentTablistAccess.createChild(cta, cta.getSize(), index ->
-                        (index / rows) + (index % rows) * columns
-                ));
+                if (playerComponent.getSize() > 1 && columns % playerComponent.getSize() == 0) {
+                    int playerComponentSize = playerComponent.getSize();
+                    int scan = columns - playerComponentSize;
+                    super.setPosition(ComponentTablistAccess.createChild(cta, cta.getSize(), index -> {
+                                int c = index / (rows * playerComponentSize);
+                                int i = index % (rows * playerComponentSize);
+                                return c * playerComponentSize + i + (i / playerComponentSize) * scan;
+                            }
+                    ));
+                } else {
+                    super.setPosition(ComponentTablistAccess.createChild(cta, cta.getSize(), index ->
+                            (index / rows) + (index % rows) * columns
+                    ));
+                }
             } else {
                 super.setPosition(cta);
             }
