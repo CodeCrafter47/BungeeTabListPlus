@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.managers;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
@@ -90,7 +91,9 @@ public class ConnectedPlayerManager implements IPlayerProvider {
         byName.remove(player.getName(), player);
         byUUID.remove(player.getUniqueID(), player);
         playerList = ImmutableList.copyOf((Iterable<? extends ConnectedPlayer>) players);
-        player.getPlayerTablistHandler().onDisconnect();
+        BungeeTabListPlus.getInstance().runInMainThread(() -> {
+            player.getPlayerTablistHandler().onDisconnect();
+        });
         PacketHandler packetHandler = player.getPacketHandler();
         if (packetHandler instanceof TabListHandler) {
             ((TabListHandler) packetHandler).onDisconnected();
