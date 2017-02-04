@@ -67,5 +67,12 @@ public class Config implements ITabListConfig, Validate {
         }
         Preconditions.checkNotNull(customPlaceholders, "customPlaceholders is null");
         Preconditions.checkNotNull(playerSets, "playerSets is null");
+        for (Map.Entry<String, PlayerSet> entry : playerSets.entrySet()) {
+            Preconditions.checkNotNull(entry.getKey(), "playerSet with null key");
+            Preconditions.checkNotNull(entry.getValue(), "playerSet definition for " + entry.getKey() + " is incomplete");
+            Preconditions.checkNotNull(entry.getValue().getFilter(), "playerSet definition for " + entry.getKey() + " is missing the filter option");
+            Preconditions.checkNotNull(entry.getValue().getHiddenPlayers(), "playerSet definition for " + entry.getKey() + " is missing the hiddenPlayers option");
+        }
+
     }
 }
