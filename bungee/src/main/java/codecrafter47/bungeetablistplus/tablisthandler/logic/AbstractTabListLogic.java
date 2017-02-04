@@ -915,10 +915,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         addPlayerToTeam(slot, clientUuid[slot], clientUsername[slot]);
                     }
                     if (serverTabList.containsKey(getUniqueId())
-                            && serverTabList.get(getUniqueId()).getGamemode() == 3
-                            && clientUuid[this.size - 1].equals(getUniqueId())) {
-                        useFakePlayerForSlot(this.size - 1);
-                        useRealPlayerForSlot(size - 1, getUniqueId());
+                            && serverTabList.get(getUniqueId()).getGamemode() == 3) {
+                        if (this.size > 0 && clientUuid[this.size - 1].equals(getUniqueId())) {
+                            useFakePlayerForSlot(this.size - 1);
+                            useRealPlayerForSlot(size - 1, getUniqueId());
+                        }
                     }
                 }
             } else if (size < this.size) {
