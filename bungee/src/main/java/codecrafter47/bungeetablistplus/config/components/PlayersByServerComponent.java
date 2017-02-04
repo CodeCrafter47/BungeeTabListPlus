@@ -26,11 +26,11 @@ import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
 import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
+import codecrafter47.bungeetablistplus.util.ContextAwareOrdering;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Ordering;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import lombok.Getter;
 import lombok.Setter;
@@ -154,12 +154,12 @@ public class PlayersByServerComponent extends Component implements Validate {
         private List<Component.Instance> activeComponents = new ArrayList<>();
         private Map<String, List<Player>> playersByServer = new LinkedHashMap<>();
         private List<String> sortedServerList;
-        private Ordering<String> serverComparator;
+        private ContextAwareOrdering<Context, String> serverComparator;
         private int preferredSize;
 
         protected Instance(Context context) {
             super(context);
-            List<Comparator<String>> list = Stream.of(serverOrder)
+            List<ContextAwareOrdering<Context, String>> list = Stream.of(serverOrder)
                     .filter(Objects::nonNull)
                     .flatMap(s -> Arrays.stream(s.split(",")))
                     .filter((s1) -> !s1.isEmpty())
@@ -170,20 +170,34 @@ public class PlayersByServerComponent extends Component implements Validate {
             if (list.isEmpty()) {
                 serverComparator = null;
             } else {
-                serverComparator = Ordering.compound(list);
+                serverComparator = ContextAwareOrdering.compound(list);
             }
         }
 
-        private Comparator<String> getServerComparator(String rule) {
+        private ContextAwareOrdering<Context, String> getServerComparator(String rule) {
             switch (rule) {
                 case "alphabetically":
-                    return Comparator.naturalOrder();
+                    return ContextAwareOrdering.from(Comparator.<String>naturalOrder());
                 case "playercount":
-                    return Comparator.comparing(server -> playersByServer.get(server).size(), Comparator.reverseOrder());
+                    return ContextAwareOrdering.from(Comparator.comparing(server -> playersByServer.get(server).size(), Comparator.reverseOrder()));
                 case "online":
-                    return Comparator.comparing(server -> BungeeTabListPlus.getInstance().getServerState(server).isOnline(), Comparator.reverseOrder());
+                    return ContextAwareOrdering.from(Comparator.comparing(server -> BungeeTabListPlus.getInstance().getServerState(server).isOnline(), Comparator.reverseOrder()));
                 case "custom":
-                    return Comparator.comparing(server -> customServerOrder.getOrDefault(server, Integer.MAX_VALUE));
+                    return ContextAwareOrdering.from(Comparator.comparing(server -> customServerOrder.getOrDefault(server, Integer.MAX_VALUE)));
+                case "yourserverfirst":
+                    return new ContextAwareOrdering<Context, String>() {
+                        @Override
+                        public int compare(Context context, String first, String second) {
+                            String server = context.get(Context.KEY_VIEWER).get(BungeeData.BungeeCord_Server);
+                            if (first.equals(server)) {
+                                return -1;
+                            } else if (second.equals(server)) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    };
                 default:
                     return null;
             }
@@ -247,7 +261,7 @@ public class PlayersByServerComponent extends Component implements Validate {
             }
 
             if (serverComparator != null) {
-                sortedServerList = serverComparator.immutableSortedCopy(playersByServer.keySet());
+                sortedServerList = serverComparator.immutableSortedCopy(context, playersByServer.keySet());
             } else {
                 sortedServerList = ImmutableList.copyOf(playersByServer.keySet());
             }
