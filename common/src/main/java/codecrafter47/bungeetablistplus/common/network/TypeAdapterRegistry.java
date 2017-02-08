@@ -114,8 +114,10 @@ public class TypeAdapterRegistry {
 
                 @Override
                 public void write(DataOutput output, List<String> object) throws IOException {
-                    output.writeInt(object.size());
-                    for (String element : object) {
+                    int size = object.size();
+                    output.writeInt(size);
+                    for (int i = 0; i < size; i++) {
+                        String element = object.get(i);
                         output.writeUTF(element);
                     }
 

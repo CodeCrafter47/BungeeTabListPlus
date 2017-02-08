@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
+import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
 import codecrafter47.bungeetablistplus.data.NullDataHolder;
 import codecrafter47.bungeetablistplus.data.TrackingDataCache;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
@@ -61,6 +62,8 @@ import java.util.logging.Level;
 public class BukkitBridge implements Listener {
 
     private static final TypeAdapterRegistry typeAdapterRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
+
+    private static final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);
 
     private final BungeeTabListPlus plugin;
 
@@ -241,7 +244,7 @@ public class BukkitBridge implements Listener {
                                 break;
                             case BridgeProtocolConstants.MESSAGE_ID_SERVER_OUTDATED:
 
-                                plugin.getLogger().warning("Bridge plugin on server " + server.getInfo().getName() + " is outdated.");
+                                rlExecutor.execute(() -> plugin.getLogger().warning("Bridge plugin on server " + server.getInfo().getName() + " is outdated."));
                                 break;
                         }
                     } catch (IOException ex) {

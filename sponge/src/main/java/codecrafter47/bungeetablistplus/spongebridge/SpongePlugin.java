@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.api.sponge.Variable;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
+import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
 import codecrafter47.bungeetablistplus.spongebridge.messages.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -77,6 +78,8 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
             BungeeData.class,
             BTLPDataKeys.class,
             SpongeData.class);
+
+    private final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);
 
     public static final UUID serverId = UUID.randomUUID();
 
@@ -150,9 +153,9 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         Player player = ((PlayerConnection) remoteConnection).getPlayer();
 
         if (message.getProtocolVersion() > BridgeProtocolConstants.VERSION) {
-            logger.warn("BungeeTabListPlus_SpongeBridge is outdated.");
+            rlExecutor.execute(() -> logger.warn("BungeeTabListPlus_SpongeBridge is outdated."));
         } else if (message.getProtocolVersion() < BridgeProtocolConstants.VERSION) {
-            logger.warn("BungeeTabListPlus proxy plugin outdated.");
+            rlExecutor.execute(() -> logger.warn("BungeeTabListPlus proxy plugin outdated."));
         } else {
             playerData.put(player, new PlayerBridgeData(message.getProxyId()));
             serverData.computeIfAbsent(message.getProxyId(), uuid -> new ServerBridgeData());
@@ -203,7 +206,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     }
 
     private void onMessagePluginOutdated(MessageProxyPluginOutdated message, RemoteConnection remoteConnection, Platform.Type platform) {
-        logger.warn("BungeeTabListPlus proxy plugin outdated.");
+        rlExecutor.execute(() -> logger.warn("BungeeTabListPlus proxy plugin outdated."));
     }
 
     private void handleDataRequest(BridgeData bridgeData, AbstractMessageProxyRequestData message) {

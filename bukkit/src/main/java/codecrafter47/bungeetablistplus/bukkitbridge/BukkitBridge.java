@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
+import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -72,6 +73,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
             BukkitData.class,
             BungeeData.class,
             BTLPDataKeys.class);
+
+    private static final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);
 
     private final UUID serverId = UUID.randomUUID();
 
@@ -133,9 +136,9 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
                                 int protocolVersion = input.readInt();
 
                                 if (protocolVersion > BridgeProtocolConstants.VERSION) {
-                                    plugin.getLogger().warning("BungeeTabListPlus_BukkitBridge is outdated.");
+                                    rlExecutor.execute(() -> plugin.getLogger().warning("BungeeTabListPlus_BukkitBridge is outdated."));
                                 } else if (protocolVersion < BridgeProtocolConstants.VERSION) {
-                                    plugin.getLogger().warning("BungeeTabListPlus proxy plugin outdated.");
+                                    rlExecutor.execute(() -> plugin.getLogger().warning("BungeeTabListPlus proxy plugin outdated."));
                                 } else {
                                     playerData.put(player, new PlayerBridgeData(proxyId));
                                     serverData.computeIfAbsent(proxyId, uuid -> new ServerBridgeData());
@@ -164,7 +167,7 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
                                 break;
 
                             case BridgeProtocolConstants.MESSAGE_ID_PROXY_OUTDATED:
-                                plugin.getLogger().warning("BungeeTabListPlus proxy plugin outdated.");
+                                rlExecutor.execute(() -> plugin.getLogger().warning("BungeeTabListPlus proxy plugin outdated."));
                                 break;
 
                             case BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_RESET_SERVER_DATA:
