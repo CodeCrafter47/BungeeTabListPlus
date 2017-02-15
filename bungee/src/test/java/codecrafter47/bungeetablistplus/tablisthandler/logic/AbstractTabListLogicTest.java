@@ -712,9 +712,36 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
-        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
 
         assertEquals(1, clientTabList.getSize());
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(0).getUuid());
+    }
+
+    @Test
+    public void testSelfGamemode3Size1() {
+        assertEquals(0, clientTabList.getSize());
+        tabListHandler.setResizePolicy(PlayerTablistHandler.ResizePolicy.DYNAMIC);
+        tabListHandler.setPassThrough(false);
+        tabListHandler.setSize(1);
+        tabListHandler.setSlot(0, new Icon(clientUUID, new String[0][]), "name", 47);
+        assertEquals(1, clientTabList.getSize());
+
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(clientUUID);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(0);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabListHandler.onPlayerListPacket(packet);
+        assertEquals(0, clientTabList.getVisibleEntries().get(0).getGamemode());
+
+        item.setGamemode(3);
+        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+        tabListHandler.onPlayerListPacket(packet);
+
+        assertEquals(3, clientTabList.getVisibleEntries().get(0).getGamemode());
     }
 }

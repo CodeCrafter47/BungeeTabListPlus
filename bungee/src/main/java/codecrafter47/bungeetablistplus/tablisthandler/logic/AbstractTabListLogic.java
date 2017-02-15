@@ -287,6 +287,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         } else if (item.getGamemode() != 3 && slot == size - 1) {
                             useFakePlayerForSlot(size - 1);
                             useRealPlayerForSlot(findSlotForPlayer(getUniqueId()), getUniqueId());
+                        } else {
+                            PlayerListItem packetOut = new PlayerListItem();
+                            packetOut.setAction(UPDATE_GAMEMODE);
+                            packetOut.setItems(new PlayerListItem.Item[]{item});
+                            sendPacket(packetOut);
                         }
                     }
                 }
