@@ -24,10 +24,14 @@ import codecrafter47.bungeetablistplus.config.DynamicSizeConfig;
 import codecrafter47.bungeetablistplus.config.components.Component;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
+import codecrafter47.bungeetablistplus.playersorting.PlayerSorter;
+import codecrafter47.bungeetablistplus.playersorting.SortingRule;
+import codecrafter47.bungeetablistplus.playersorting.rules.ViewerInSpectatorModeLast;
 import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,10 +42,14 @@ import static java.lang.Integer.min;
 public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<DynamicSizeConfig> {
 
     private List<Component.Instance> activeComponents = new ArrayList<>();
+    private final PlayerSorter playerSorter;
 
     public DynamicSizeConfigTablistProvider(DynamicSizeConfig config, Context context) {
         super(config, context);
         this.context.put(Context.KEY_COLUMNS, 1);
+        this.playerSorter = new PlayerSorter(ImmutableList.<SortingRule>builder()
+                .add(new ViewerInSpectatorModeLast())
+                .addAll(config.getPlayerOrder().getRules()).build());
     }
 
     @Override
@@ -68,7 +76,7 @@ public class DynamicSizeConfigTablistProvider extends ConfigTablistProvider<Dyna
             players = Collections.emptyList();
             BungeeTabListPlus.getInstance().getLogger().warning("Missing player set " + config.getPlayerSet());
         }
-        config.getPlayerOrder().sort(context, players);
+        playerSorter.sort(context, players);
 
         // deactivate old components
         activeComponents.forEach(Component.Instance::deactivate);

@@ -23,12 +23,14 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class PlayerSorter {
+    @Getter
     private final List<SortingRule> rules;
 
     public PlayerSorter(List<SortingRule> rules) {
