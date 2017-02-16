@@ -251,11 +251,11 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
                 Player player = e.getValue();
                 ServerBridgeData bridgeData = serverData.get(proxyId);
 
-                bridgeData.lastUpdate = now;
-
                 if (bridgeData == null) {
                     continue;
                 }
+
+                bridgeData.lastUpdate = now;
 
                 for (CacheEntry entry : bridgeData.requestedData) {
                     Object value = serverDataAccess.get(entry.key, game.getServer());
