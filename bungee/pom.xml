@@ -35,34 +35,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.alpenblock</groupId>
-            <artifactId>BungeePerms</artifactId>
-            <version>3.0-dev-52</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.md-5</groupId>
-                    <artifactId>bungeecord-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.spigotmc</groupId>
-                    <artifactId>spigot-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sk89q</groupId>
-                    <artifactId>worldedit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.milkbowl.vault</groupId>
-                    <artifactId>Vault</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.ess3</groupId>
-                    <artifactId>Essentials</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>com.imaginarycode.minecraft</groupId>
             <artifactId>RedisBungee</artifactId>
             <version>0.3.5-SNAPSHOT</version>

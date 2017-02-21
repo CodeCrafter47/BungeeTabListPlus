@@ -20,5 +20,5 @@
 package codecrafter47.bungeetablistplus.config;
 
 public enum PermissionSource {
-    AUTO, BUKKIT, BUNGEE, BUNGEEPERMS
+    AUTO, BUKKIT, BUNGEE, BUNGEEPERMS, LUCKPERMS
 }

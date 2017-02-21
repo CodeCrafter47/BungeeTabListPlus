@@ -52,6 +52,8 @@ public class SortingRuleRegistry {
             .put("vaultgroupinforeversed", new ReverseOrder(new VaultGroupInfo()))
             .put("bungeepermsgroupinfo", new BungeePermsGroupInfo())
             .put("bungeepermsgroupinforeversed", new ReverseOrder(new BungeePermsGroupInfo()))
+            .put("luckpermsgroupinfo", new LuckPermsGroupInfo())
+            .put("luckpermsgroupinforeversed", new ReverseOrder(new LuckPermsGroupInfo()))
             .put("bungeecordgroups", new BungeeCordGroups())
             .put("bungeecordgroupsreversed", new ReverseOrder(new BungeeCordGroups()))
             .put("vaultprefix", new VaultPrefixAlphabetically())

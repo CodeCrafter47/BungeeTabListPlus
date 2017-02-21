@@ -133,6 +133,9 @@ public class BasicPlaceholders extends PlaceholderProvider {
         bind("bungeeperms_group").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_PrimaryGroup).orElse(""));
         bind("bungeeperms_primary_group_prefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_PrimaryGroupPrefix).orElse(""));
         bind("bungeeperms_player_prefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.BungeePerms_PlayerPrefix).orElse(""));
+        bind("luckperms_prefix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.LuckPerms_Prefix).orElse(""));
+        bind("luckperms_suffix").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.LuckPerms_Suffix).orElse(""));
+        bind("luckperms_primary_group").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.LuckPerms_PrimaryGroup).orElse(""));
         bind("clientVersion").to(context -> ((Player) context.getPlayer()).getOpt(BungeeData.ClientVersion).orElse("unknown"));
         bind("ping").to(context -> String.format("%d", context.getPlayer().getPing()));
         bind("group").to(context -> BungeeTabListPlus.getInstance().getPermissionManager().getMainGroup(context.getPlayer()));

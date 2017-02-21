@@ -66,6 +66,7 @@ public class MainConfig implements UpdatableConfig {
             "AUTO        - take best source",
             "BUKKIT      - take information from Bukkit/Vault",
             "BUNGEEPERMS - take information from BungeePerms",
+            "LUCKPERMS   - take information from LuckPerms",
             "BUNGEE      - take group from bungee, prefix from config.yml, permissions from bungee",
             "This option will be removed soon. Don't use it anymore."
     })
