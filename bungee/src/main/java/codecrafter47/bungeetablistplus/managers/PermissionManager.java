@@ -21,10 +21,8 @@ package codecrafter47.bungeetablistplus.managers;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
-
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;

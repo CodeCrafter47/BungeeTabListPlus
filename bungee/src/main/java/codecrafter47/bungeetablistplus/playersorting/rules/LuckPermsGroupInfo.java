@@ -20,7 +20,6 @@
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import de.codecrafter47.data.bungee.api.BungeeData;
-
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
