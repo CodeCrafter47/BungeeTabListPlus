@@ -60,6 +60,9 @@ public abstract class Placeholder {
         playerPlaceholders.put("bungeeperms_primary_group", ofStringData(BungeeData.BungeePerms_PrimaryGroup));
         playerPlaceholders.put("bungeeperms_primary_group_prefix", ofStringData(BungeeData.BungeePerms_PrimaryGroupPrefix));
         playerPlaceholders.put("bungeeperms_user_prefix", ofStringData(BungeeData.BungeePerms_PlayerPrefix));
+        playerPlaceholders.put("luckperms_prefix", ofStringData(BungeeData.LuckPerms_Prefix));
+        playerPlaceholders.put("luckperms_suffix", ofStringData(BungeeData.LuckPerms_Suffix));
+        playerPlaceholders.put("luckperms_primary_group", ofStringData(BungeeData.LuckPerms_PrimaryGroup));
         playerPlaceholders.put("client_version", ofStringData(BungeeData.ClientVersion));
         playerPlaceholders.put("uuid", ofFunction(player -> player.getUniqueID().toString()));
         playerPlaceholders.put("world", ofStringData(MinecraftData.World));
