@@ -81,6 +81,8 @@ public class TabListListener implements Listener {
         } catch (Throwable th){
             BungeeTabListPlus.getInstance().reportError(th);
         }
+
+        plugin.getTabListManager().removeCustomTabList(e.getPlayer());
     }
 
     @EventHandler

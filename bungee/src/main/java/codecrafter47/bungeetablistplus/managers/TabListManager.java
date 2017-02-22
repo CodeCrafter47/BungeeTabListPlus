@@ -35,10 +35,6 @@ import lombok.Getter;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,9 +43,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-import static net.md_5.bungee.event.EventPriority.HIGHEST;
-
-public class TabListManager implements Listener {
+public class TabListManager {
 
     private final BungeeTabListPlus plugin;
     private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
@@ -61,7 +55,6 @@ public class TabListManager implements Listener {
 
     public TabListManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;
-        plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
     }
 
     // returns true on success
@@ -220,16 +213,5 @@ public class TabListManager implements Listener {
 
     public void removeCustomTabList(ProxiedPlayer player) {
         customTabLists.remove(player);
-    }
-
-    @EventHandler
-    public void onDisconnect(PlayerDisconnectEvent event) {
-        if (customTabLists.containsKey(event.getPlayer())) customTabLists.remove(event.getPlayer());
-    }
-
-    @EventHandler(priority = HIGHEST)
-    public void onDisconnect(ServerKickEvent event) {
-        if (event.isCancelled()) return;
-        if (customTabLists.containsKey(event.getPlayer())) customTabLists.remove(event.getPlayer());
     }
 }
