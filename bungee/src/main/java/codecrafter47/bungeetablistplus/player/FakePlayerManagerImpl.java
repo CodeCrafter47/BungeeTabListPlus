@@ -39,8 +39,8 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
 
     public FakePlayerManagerImpl(final Plugin plugin) {
         this.plugin = plugin;
+        randomJoinLeaveEventsEnabled = true;
         if (BungeeTabListPlus.getInstance().getConfig().fakePlayers.size() > 0) {
-            randomJoinLeaveEventsEnabled = true;
             offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
             sanitizeFakePlayerNames();
         }
@@ -49,7 +49,7 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
 
     private void triggerRandomEvent() {
         try {
-            if (Math.random() < 0.3 * online.size()) {
+            if (Math.random() <= 0.5 && online.size() > 0) {
                 // do a server switch
                 FakePlayer player = online.get((int) (Math.random() * online.size()));
                 if (player.isRandomServerSwitchEnabled()) {
