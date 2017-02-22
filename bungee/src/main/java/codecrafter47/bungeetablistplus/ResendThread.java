@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.config.Config;
 import codecrafter47.bungeetablistplus.config.DynamicSizeConfig;
+import codecrafter47.bungeetablistplus.config.FixedColumnsConfig;
 import codecrafter47.bungeetablistplus.config.FixedSizeConfig;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.layout.LayoutException;
@@ -153,6 +154,8 @@ public class ResendThread implements Runnable, Executor {
     private ConfigTablistProvider createTablistProvider(Context context, Config config) {
         if (config instanceof FixedSizeConfig) {
             return new FixedSizeConfigTablistProvider((FixedSizeConfig) config, context);
+        } else if (config instanceof FixedColumnsConfig) {
+            return new FixedColumnsConfigTablistProvider((FixedColumnsConfig) config, context);
         } else if (config instanceof DynamicSizeConfig) {
             return new DynamicSizeConfigTablistProvider((DynamicSizeConfig) config, context);
         } else {
