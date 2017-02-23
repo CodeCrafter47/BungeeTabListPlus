@@ -125,6 +125,11 @@ public abstract class Placeholder {
         playerPlaceholders.put("askyblock_island_level", ofIntData(BukkitData.ASkyBlock_IslandLevel));
         playerPlaceholders.put("askyblock_island_name", ofStringData(BukkitData.ASkyBlock_IslandName));
         playerPlaceholders.put("askyblock_team_leader", ofStringData(BukkitData.ASkyBlock_TeamLeader));
+        playerPlaceholders.put("paf_clans_clan_name", ofStringData(BungeeData.PAFClans_ClanName));
+        playerPlaceholders.put("paf_clans_clan_tag", ofStringData(BungeeData.PAFClans_ClanTag));
+        playerPlaceholders.put("paf_clans_clan_member_count", ofIntData(BungeeData.PAFClans_MemberCount));
+        playerPlaceholders.put("paf_clans_clan_online_member_count", ofIntData(BungeeData.PAFClans_OnlineMemberCount));
+        playerPlaceholders.put("paf_clans_is_leader", ofFunction(p -> p.getOpt(BungeeData.PAFClans_IsLeader).orElse(false).toString()));
 
         // Server
         serverPlaceholders.put("tps", (tokens, serverFunction) -> {
