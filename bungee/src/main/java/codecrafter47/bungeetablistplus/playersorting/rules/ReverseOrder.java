@@ -36,6 +36,6 @@ public class ReverseOrder implements SortingRule {
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
-        return 0;
+        return -delegate.compare(context, player1, player2);
     }
 }
