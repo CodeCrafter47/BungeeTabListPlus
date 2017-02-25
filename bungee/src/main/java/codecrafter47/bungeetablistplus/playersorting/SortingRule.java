@@ -19,12 +19,9 @@
 package codecrafter47.bungeetablistplus.playersorting;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 
 public interface SortingRule {
-
-    int compare(TabListContext context, IPlayer player1, IPlayer player2);
 
     int compare(Context context, IPlayer player1, IPlayer player2);
 }

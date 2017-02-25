@@ -19,25 +19,15 @@
 
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
-import de.codecrafter47.data.bungee.api.BungeeData;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
+import de.codecrafter47.data.bungee.api.BungeeData;
 
 import java.util.Optional;
 
 public class LuckPermsGroupInfo implements SortingRule {
-    @Override
-    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        Optional<Integer> p1Weight = ((Player) player1).getOpt(BungeeData.LuckPerms_Weight);
-        Optional<Integer> p2Weight = ((Player) player2).getOpt(BungeeData.LuckPerms_Weight);
-        if (p1Weight.isPresent() || p2Weight.isPresent()) {
-            return p1Weight.orElse(Integer.MAX_VALUE) - p2Weight.orElse(Integer.MAX_VALUE);
-        }
-        return 0;
-    }
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {

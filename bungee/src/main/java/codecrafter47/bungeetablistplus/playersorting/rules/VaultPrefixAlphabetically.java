@@ -20,7 +20,6 @@
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -30,15 +29,6 @@ import java.text.Collator;
 import java.util.Optional;
 
 public class VaultPrefixAlphabetically implements SortingRule {
-    @Override
-    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        Optional<String> team1 = ((Player) player1).getOpt(MinecraftData.Permissions_Prefix);
-        Optional<String> team2 = ((Player) player2).getOpt(MinecraftData.Permissions_Prefix);
-        if (team1.isPresent() || team2.isPresent()) {
-            return Collator.getInstance().compare(team1.orElse(""), team2.orElse(""));
-        }
-        return 0;
-    }
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {

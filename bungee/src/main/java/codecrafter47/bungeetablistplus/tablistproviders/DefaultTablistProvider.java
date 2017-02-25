@@ -17,32 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api.bungee;
+package codecrafter47.bungeetablistplus.tablistproviders;
 
-import java.util.UUID;
+import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 
-/**
- * Represents a skin of a player
- * <p>
- * You can obtain a skin using {@link BungeeTabListPlusAPI#getSkinForPlayer(String)}
- */
-public interface Skin {
+public class DefaultTablistProvider implements TablistProvider {
 
-    /**
-     * The property associated with the skin.
-     * See http://wiki.vg/Mojang_API#UUID_-.3E_Profile_.2B_Skin.2FCape
-     * <p>
-     * If this returns null {@link Skin#getOwner()} must also return null. In that case this is a
-     * random Alex/ Steve skin.
-     *
-     * @return the properties associated with this skin
-     */
-    String[][] toProperty();
+    public static final DefaultTablistProvider INSTANCE = new DefaultTablistProvider();
 
-    /**
-     * The UUID of the player who's skin is represented by this object
-     *
-     * @return the uuid or null
-     */
-    UUID getOwner();
+    private DefaultTablistProvider() {
+
+    }
+
+    @Override
+    public void onActivated(PlayerTablistHandler handler) {
+        handler.runInEventLoop(() -> handler.setPassThrough(true));
+    }
+
+    @Override
+    public void onDeactivated(PlayerTablistHandler tablist) {
+
+    }
 }

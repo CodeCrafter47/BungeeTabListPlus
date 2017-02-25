@@ -19,24 +19,12 @@
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
 import java.util.Objects;
 
 public class YouFirst implements SortingRule {
-
-    @Override
-    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        if (Objects.equals(player1.getName(), context.getViewer().getName())) {
-            return -1;
-        }
-        if (Objects.equals(player2.getName(), context.getViewer().getName())) {
-            return 1;
-        }
-        return 0;
-    }
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {

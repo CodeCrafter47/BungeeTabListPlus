@@ -20,8 +20,6 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
-import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -51,9 +49,9 @@ public class SkinManagerImpl implements SkinManager {
     private final Plugin plugin;
     private static final Gson gson = new Gson();
 
-    private final Cache<String, Skin> cache = CacheBuilder.newBuilder().expireAfterAccess(35, TimeUnit.MINUTES).build();
-    private final Map<File, Skin> fileSkinCache = new ConcurrentHashMap<>();
-    private final Map<Head, Skin> headCache = new ConcurrentHashMap<>();
+    private final Cache<String, Icon> cache = CacheBuilder.newBuilder().expireAfterAccess(35, TimeUnit.MINUTES).build();
+    private final Map<File, Icon> fileSkinCache = new ConcurrentHashMap<>();
+    private final Map<Head, Icon> headCache = new ConcurrentHashMap<>();
 
     private final Set<String> fetchingSkins = Sets.newConcurrentHashSet();
 
@@ -76,7 +74,7 @@ public class SkinManagerImpl implements SkinManager {
                         .map(line -> line.split(" "))
                         .forEach(entry -> headCache.put(
                                 Head.of(Base64.getDecoder().decode(entry[0])),
-                                new PlayerSkin(null, new String[][]{{"textures", entry[1], entry[2]}})
+                                new Icon(null, new String[][]{{"textures", entry[1], entry[2]}})
                         ));
             } catch (Throwable th) {
                 plugin.getLogger().log(Level.WARNING, "Failed to load heads/cache.txt", th);
@@ -85,8 +83,7 @@ public class SkinManagerImpl implements SkinManager {
     }
 
     @Override
-    @SneakyThrows
-    public Skin getSkin(String nameOrUUID) {
+    public Icon getIcon(String nameOrUUID) {
         Preconditions.checkNotNull(nameOrUUID, "nameOrUuid");
 
         if (nameOrUUID.endsWith(".png")) {
@@ -103,20 +100,20 @@ public class SkinManagerImpl implements SkinManager {
             }
         }
 
-        Skin skin = cache.getIfPresent(nameOrUUID);
+        Icon skin = cache.getIfPresent(nameOrUUID);
         if (skin != null) return skin;
         if (!fetchingSkins.contains(nameOrUUID)) {
             fetchingSkins.add(nameOrUUID);
             ProxyServer.getInstance().getScheduler().schedule(plugin, new SkinFetchTask(nameOrUUID), 0, TimeUnit.MILLISECONDS);
         }
-        return defaultSkin;
+        return null;
     }
 
     @SneakyThrows
-    public Skin getSkin(File file) {
+    public Icon getSkin(File file) {
         Preconditions.checkNotNull(file, "file");
 
-        Skin skin = fileSkinCache.get(file);
+        Icon skin = fileSkinCache.get(file);
         if (skin != null) {
             return skin;
         }
@@ -127,7 +124,7 @@ public class SkinManagerImpl implements SkinManager {
             return missingSkinTexture;
         }
 
-        fileSkinCache.put(file, loadingSkinTexture);
+        // todo fileSkinCache.put(file, loadingSkinTexture);
         ProxyServer.getInstance().getScheduler().runAsync(plugin, () -> {
             if (!file.exists()) {
                 plugin.getLogger().warning("Requested file does not exists: " + file.getAbsolutePath());
@@ -149,7 +146,7 @@ public class SkinManagerImpl implements SkinManager {
                 byte[] headArray = byteBuffer.array();
 
                 if (headCache.containsKey(Head.of(headArray))) {
-                    Skin skin1 = headCache.get(Head.of(headArray));
+                    Icon skin1 = headCache.get(Head.of(headArray));
                     fileSkinCache.put(file, skin1);
 
                     // a new skin is available -> update tab to all players
@@ -165,7 +162,8 @@ public class SkinManagerImpl implements SkinManager {
             }
         });
 
-        return loadingSkinTexture;
+        // todo
+        return null;
     }
 
     private void fetchHeadSkin(File file, byte[] headArray) {
@@ -190,7 +188,7 @@ public class SkinManagerImpl implements SkinManager {
                 plugin.getLogger().info("Preparing head " + file.getName() + " approx. " + map.get("timeLeft") + " minutes remaining.");
                 ProxyServer.getInstance().getScheduler().schedule(plugin, () -> fetchHeadSkin(file, headArray), 30, TimeUnit.SECONDS);
             } else if (map.get("state").equals("SUCCESS")) {
-                PlayerSkin skin = new PlayerSkin(null, new String[][]{{"textures", (String) map.get("skin"), (String) map.get("signature")}});
+                Icon skin = new Icon(null, new String[][]{{"textures", (String) map.get("skin"), (String) map.get("signature")}});
                 fileSkinCache.put(file, skin);
                 headCache.put(Head.of(headArray), skin);
                 plugin.getLogger().info("Head " + file.getName() + " is now ready for use.");
@@ -206,9 +204,9 @@ public class SkinManagerImpl implements SkinManager {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(cacheFile, true));
                 writer.write(Base64.getEncoder().encodeToString(headArray));
                 writer.write(' ');
-                writer.write(skin.toProperty()[0][1]);
+                writer.write(skin.getProperties()[0][1]);
                 writer.write(' ');
-                writer.write(skin.toProperty()[0][2]);
+                writer.write(skin.getProperties()[0][2]);
                 writer.newLine();
                 writer.close();
             } else {
@@ -277,7 +275,7 @@ public class SkinManagerImpl implements SkinManager {
 
     }
 
-    private Skin fetchSkin(String uuid) {
+    private Icon fetchSkin(String uuid) {
         try {
             uuid = uuid.replace("-", "");
             HttpURLConnection connection = (HttpURLConnection) new URL(
@@ -287,7 +285,7 @@ public class SkinManagerImpl implements SkinManager {
                     connection.getInputStream(), Charsets.UTF_8));
             SkinProfile skin = gson.fromJson(reader, SkinProfile.class);
             if (skin != null && skin.properties != null && !skin.properties.isEmpty()) {
-                return new PlayerSkin(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[][]{{"textures", skin.properties.get(0).value, skin.properties.
+                return new Icon(UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32)), new String[][]{{"textures", skin.properties.get(0).value, skin.properties.
                         get(0).signature}});
             }
         } catch (Throwable e) {
@@ -315,8 +313,8 @@ public class SkinManagerImpl implements SkinManager {
         byte[] headArray = byteBuffer.array();
 
         if (headCache.containsKey(Head.of(headArray))) {
-            Skin skin1 = headCache.get(Head.of(headArray));
-            callback.accept(new Icon(skin1.getOwner(), skin1.toProperty()));
+            Icon skin1 = headCache.get(Head.of(headArray));
+            callback.accept(new Icon(skin1.getPlayer(), skin1.getProperties()));
             return;
         }
 
@@ -335,7 +333,7 @@ public class SkinManagerImpl implements SkinManager {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
             LinkedHashTreeMap map = gson.fromJson(reader, LinkedHashTreeMap.class);
             if (map.get("state").equals("SUCCESS")) {
-                PlayerSkin skin = new PlayerSkin(null, new String[][]{{"textures", (String) map.get("skin"), (String) map.get("signature")}});
+                Icon skin = new Icon(null, new String[][]{{"textures", (String) map.get("skin"), (String) map.get("signature")}});
                 headCache.put(Head.of(headArray), skin);
 
                 // save to cache
@@ -346,13 +344,13 @@ public class SkinManagerImpl implements SkinManager {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(cacheFile, true));
                 writer.write(Base64.getEncoder().encodeToString(headArray));
                 writer.write(' ');
-                writer.write(skin.toProperty()[0][1]);
+                writer.write(skin.getProperties()[0][1]);
                 writer.write(' ');
-                writer.write(skin.toProperty()[0][2]);
+                writer.write(skin.getProperties()[0][2]);
                 writer.newLine();
                 writer.close();
 
-                callback.accept(new Icon(skin.getOwner(), skin.toProperty()));
+                callback.accept(new Icon(skin.getPlayer(), skin.getProperties()));
             } else {
                 ProxyServer.getInstance().getScheduler().schedule(plugin, () -> createIcon(image, callback), 5, TimeUnit.SECONDS);
             }
@@ -424,7 +422,7 @@ public class SkinManagerImpl implements SkinManager {
             }
 
             if (uuid != null) {
-                Skin skin = fetchSkin(uuid);
+                Icon skin = fetchSkin(uuid);
                 if (skin != null) {
                     cache.put(nameOrUUID, skin);
                     fetchingSkins.remove(nameOrUUID);

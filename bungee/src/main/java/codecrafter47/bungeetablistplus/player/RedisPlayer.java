@@ -20,7 +20,6 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.NullDataHolder;
 import codecrafter47.bungeetablistplus.data.TrackingDataCache;
@@ -94,11 +93,6 @@ public class RedisPlayer implements Player {
     public int getPing() {
         // no way to know the real ping, so we just assume the best
         return 0;
-    }
-
-    @Override
-    public Skin getSkin() {
-        return BungeeTabListPlus.getInstance().getSkinManager().getSkin(uuid.toString());
     }
 
     @Override

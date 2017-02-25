@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.template;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.player.Player;
@@ -59,8 +58,8 @@ public abstract class IconTemplate {
                 };
             } else {
                 getIcon = context -> {
-                    Skin skin = BungeeTabListPlus.getInstance().getSkinManager().getSkin(text);
-                    return new Icon(skin.getOwner(), skin.toProperty());
+                    Icon icon = BungeeTabListPlus.getInstance().getSkinManager().getIcon(text);
+                    return icon != null ? icon : Icon.DEFAULT;
                 };
             }
         }

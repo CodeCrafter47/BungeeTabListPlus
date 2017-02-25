@@ -19,9 +19,7 @@
 
 package codecrafter47.bungeetablistplus.config.components;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.context.Context;
-import codecrafter47.bungeetablistplus.layout.LayoutException;
 import codecrafter47.bungeetablistplus.tablist.component.ComponentTablistAccess;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
@@ -29,7 +27,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @Getter
 @Setter
@@ -127,21 +124,17 @@ public class ListComponent extends Component {
         @Override
         public void update2ndStep() {
             super.update2ndStep();
-            try {
-                ComponentTablistAccess cta = getTablistAccess();
-                if (cta != null) {
-                    updateLayout(cta);
-                    for (int i = 0; i < components.size(); i++) {
-                        Component.Instance component = components.get(i);
-                        component.update2ndStep();
-                    }
+            ComponentTablistAccess cta = getTablistAccess();
+            if (cta != null) {
+                updateLayout(cta);
+                for (int i = 0; i < components.size(); i++) {
+                    Component.Instance component = components.get(i);
+                    component.update2ndStep();
                 }
-            } catch (LayoutException e) {
-                BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "Config error.", e);
             }
         }
 
-        void updateLayout(ComponentTablistAccess cta) throws LayoutException {
+        void updateLayout(ComponentTablistAccess cta) {
             int[] sectionSize = new int[components.size()];
             for (int i = 0; i < components.size(); i++) {
                 sectionSize[i] = components.get(i).getMinSize();

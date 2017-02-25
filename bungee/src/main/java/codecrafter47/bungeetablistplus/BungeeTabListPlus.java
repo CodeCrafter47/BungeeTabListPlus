@@ -19,8 +19,6 @@
 package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.bungee.*;
-import codecrafter47.bungeetablistplus.api.bungee.placeholder.PlaceholderProvider;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
@@ -30,14 +28,13 @@ import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
-import codecrafter47.bungeetablistplus.placeholder.*;
+import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.protocol.ProtocolManager;
 import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
-import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.PingTask;
@@ -45,10 +42,7 @@ import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
-import codecrafter47.util.chat.ChatUtil;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
@@ -57,7 +51,6 @@ import lombok.Getter;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -131,11 +124,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private MainConfig config;
 
     private FakePlayerManagerImpl fakePlayerManager;
-
-    /**
-     * provides access to the Placeholder Manager use this to add Placeholders
-     */
-    private PlaceholderManagerImpl placeholderManager;
 
     private PermissionManager pm;
 
@@ -307,18 +295,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         dataManager = new DataManager(this);
 
-        placeholderManager = new PlaceholderManagerImpl();
-        placeholderManager.internalRegisterPlaceholderProvider(new BasicPlaceholders());
-        placeholderManager.internalRegisterPlaceholderProvider(new BukkitPlaceholders());
-        placeholderManager.internalRegisterPlaceholderProvider(new ColorPlaceholder());
-        placeholderManager.internalRegisterPlaceholderProvider(new ConditionalPlaceholders());
-        placeholderManager.internalRegisterPlaceholderProvider(new OnlineStatePlaceholder());
-        placeholderManager.internalRegisterPlaceholderProvider(new PlayerCountPlaceholder());
-        if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
-            placeholderManager.internalRegisterPlaceholderProvider(new RedisBungeePlaceholders());
-        }
-        placeholderManager.internalRegisterPlaceholderProvider(new TimePlaceholders());
-
         if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
             protocolVersionProvider = new ProtocolSupportVersionProvider();
         } else {
@@ -372,18 +348,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         ProxyServer.getInstance().getPluginManager().registerListener(plugin, listener);
         plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
         restartRefreshThread();
-
-        plugin.getProxy().getScheduler().schedule(plugin, () -> {
-            ImmutableList<String> filesNeedingUpgrade = tabLists.getFilesNeedingUpgrade();
-            if (!filesNeedingUpgrade.isEmpty()) {
-                BaseComponent[] message = ChatUtil.parseBBCode("&c[BungeeTabListPlus] Warning: &eThe following tablist configuration files need to be upgraded: &f" + Joiner.on(", ").join(filesNeedingUpgrade) + "\n&eYou can find more information at &b[url]https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating[/url]&e.");
-                for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
-                    if (getPermissionManager().hasPermission(player, "bungeetablistplus.admin")) {
-                        player.sendMessage(message);
-                    }
-                }
-            }
-        }, 15, 15, TimeUnit.MINUTES);
     }
 
     public void onDisable() {
@@ -398,34 +362,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (refreshThread != null) {
             refreshThread.cancel();
         }
-        double updateInterval = config.tablistUpdateInterval;
-        if (updateInterval <= 0 || updateInterval > 2) {
-            updateInterval = 2;
-        }
-        if (requestedUpdateInterval != null && (requestedUpdateInterval < updateInterval || updateInterval <= 0)) {
-            updateInterval = requestedUpdateInterval;
-        }
-        if (updateInterval > 0) {
             try {
-                refreshThread = ProxyServer.getInstance().getScheduler().
-                        schedule(
-                                plugin, this::resendTabLists,
-                                (long) (updateInterval * 1000),
-                                (long) (updateInterval * 1000),
-                                TimeUnit.MILLISECONDS);
+                refreshThread = ProxyServer.getInstance().getScheduler().schedule(plugin, this::resendTabLists, 1, 1, TimeUnit.SECONDS);
             } catch (RejectedExecutionException ignored) {
                 // this occurs on proxy shutdown -> we can safely ignore it
             }
-        } else {
-            refreshThread = null;
-        }
-    }
-
-    public void requireUpdateInterval(double updateInterval) {
-        if (requestedUpdateInterval == null || updateInterval < requestedUpdateInterval) {
-            requestedUpdateInterval = updateInterval;
-            restartRefreshThread();
-        }
     }
 
     /**
@@ -451,7 +392,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             // todo requestedUpdateInterval = null;
             fakePlayerManager.removeConfigFakePlayers();
             config = YamlConfig.read(new FileInputStream(new File(plugin.getDataFolder(), "config.yml")), MainConfig.class);
-            placeholderManager.reload();
             if (reloadTablists()) return false;
             fakePlayerManager.reload();
             resendTabLists();
@@ -470,7 +410,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (!tabListManager.loadTabLists()) {
             return true;
         }
-        tabListManager.customTabLists = tabLists.customTabLists;
         tabLists = tabListManager;
         return false;
     }
@@ -497,11 +436,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             }
 
         }, 1, 1, TimeUnit.SECONDS);
-        runInMainThread(this::reloadTablists);
-    }
-
-    public void registerPlaceholderProvider0(PlaceholderProvider placeholderProvider) {
-        getPlaceholderManager0().internalRegisterPlaceholderProvider(placeholderProvider);
         runInMainThread(this::reloadTablists);
     }
 
@@ -533,15 +467,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         resendThread.add(player);
     }
 
-    /**
-     * Getter for an instance of the PlayerManager. For internal use only.
-     *
-     * @return an instance of the PlayerManager or null
-     */
-    public PlayerManager constructPlayerManager(ProxiedPlayer viewer) {
-        return new PlayerManagerImpl(this, playerProviders, viewer);
-    }
-
     public SkinManager getSkinManager() {
         return skins;
     }
@@ -553,10 +478,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
      */
     public PermissionManager getPermissionManager() {
         return pm;
-    }
-
-    public PlaceholderManagerImpl getPlaceholderManager0() {
-        return placeholderManager;
     }
 
     @Override
@@ -690,51 +611,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return plugin.getProxy();
     }
 
-    public boolean isServer(String s) {
-        for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
-            if (s.equalsIgnoreCase(server.getName())) {
-                return true;
-            }
-            int i = s.indexOf('#');
-            if (i > 1) {
-                if (s.substring(0, i).equalsIgnoreCase(server.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
-
-    @Override
-    protected Skin getSkinForPlayer0(String nameOrUUID) {
-        if (!PATTERN_VALID_USERNAME.matcher(nameOrUUID).matches()) {
-            try {
-                UUID.fromString(nameOrUUID); // TODO: 02.06.16 this is slow
-            } catch (IllegalArgumentException ex) {
-                throw new IllegalArgumentException("Given string is neither valid username nor uuid: " + nameOrUUID);
-            }
-        }
-        Preconditions.checkState(getSkinManager() != null, "BungeeTabListPlus not initialized");
-        return getSkinManager().getSkin(nameOrUUID);
-    }
-
-    @Override
-    protected Skin getDefaultSkin0() {
-        return SkinManager.defaultSkin;
-    }
-
-    @Override
-    protected void requireTabListUpdateInterval0(double interval) {
-        requireUpdateInterval(interval);
-    }
-
-    @Override
-    protected void setCustomTabList0(ProxiedPlayer player, TabListProvider tabListProvider) {
-        Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
-        getTabListManager().setCustomTabList(player, new CheckedTabListProvider(tabListProvider));
-    }
 
     @Override
     protected void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist) {
@@ -747,13 +624,15 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     @Override
     protected void removeCustomTabList0(ProxiedPlayer player) {
-        Preconditions.checkState(getTabListManager() != null, "BungeeTabListPlus not initialized");
-        getTabListManager().removeCustomTabList(player);
-        ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
+        ConnectedPlayerManager connectedPlayerManager = getConnectedPlayerManager();
+        if (connectedPlayerManager == null) {
+            return;
+        }
+        ConnectedPlayer connectedPlayer = connectedPlayerManager.getPlayerIfPresent(player);
         if (connectedPlayer != null) {
             connectedPlayer.setCustomTablist(null);
+            updateTabListForPlayer(player);
         }
-        updateTabListForPlayer(player);
     }
 
     @Nonnull

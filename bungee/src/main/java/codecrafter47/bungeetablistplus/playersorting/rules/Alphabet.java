@@ -19,20 +19,12 @@
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
 
 import java.text.Collator;
 
 public class Alphabet implements SortingRule {
-
-    @Override
-    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        String name1 = player1.getName();
-        String name2 = player2.getName();
-        return Collator.getInstance().compare(name1, name2);
-    }
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {

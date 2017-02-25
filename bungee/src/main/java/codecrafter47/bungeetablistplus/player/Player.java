@@ -30,4 +30,7 @@ public interface Player extends IPlayer, DataHolder {
     default <T> Optional<T> getOpt(DataKey<T> key) {
         return Optional.ofNullable(get(key));
     }
+
+    @Deprecated
+    int getGameMode();
 }

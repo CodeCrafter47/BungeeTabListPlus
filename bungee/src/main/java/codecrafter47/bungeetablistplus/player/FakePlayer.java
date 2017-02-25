@@ -21,7 +21,6 @@ package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import com.google.common.base.Charsets;
 import de.codecrafter47.data.api.DataCache;
@@ -56,6 +55,11 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
     @Override
     public UUID getUniqueID() {
         return uuid;
+    }
+
+    @Override
+    public Icon getIcon() {
+        return data.get(BTLPBungeeDataKeys.DATA_KEY_ICON);
     }
 
     @SneakyThrows
@@ -95,8 +99,8 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
     }
 
     @Override
-    public void setSkin(Skin skin) {
-        executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, new Icon(skin.getOwner(), skin.toProperty())));
+    public void setIcon(Icon icon) {
+        executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, icon));
     }
 
     @Override

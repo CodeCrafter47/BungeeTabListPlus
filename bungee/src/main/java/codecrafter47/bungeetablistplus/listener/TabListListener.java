@@ -28,7 +28,6 @@ import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ProxyReloadEvent;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -54,9 +53,6 @@ public class TabListListener implements Listener {
             ConnectedPlayer connectedPlayer = new ConnectedPlayer(e.getPlayer());
             manager.onPlayerConnected(connectedPlayer);
 
-            if (plugin.getConfig().updateOnPlayerJoinLeave) {
-                plugin.resendTabLists();
-            }
             plugin.updateTabListForPlayer(e.getPlayer());
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
@@ -80,23 +76,6 @@ public class TabListListener implements Listener {
             ((UserConnection) e.getPlayer()).setServer(null);
         } catch (Throwable th){
             BungeeTabListPlus.getInstance().reportError(th);
-        }
-
-        plugin.getTabListManager().removeCustomTabList(e.getPlayer());
-    }
-
-    @EventHandler
-    public void onServerSwitch(ServerSwitchEvent e) {
-        plugin.updateTabListForPlayer(e.getPlayer());
-        if (plugin.getConfig().updateOnServerChange) {
-            plugin.resendTabLists();
-        }
-    }
-
-    @EventHandler
-    public void onPlayerLeave(PlayerDisconnectEvent e) {
-        if (plugin.getConfig().updateOnPlayerJoinLeave) {
-            plugin.resendTabLists();
         }
     }
 

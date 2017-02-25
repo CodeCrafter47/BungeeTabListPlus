@@ -58,21 +58,4 @@ public interface IPlayer {
      * @return the ping
      */
     int getPing();
-
-    /**
-     * get the skin of the player
-     * @return the skin
-     */
-    Skin getSkin();
-
-    /**
-     * get the gamemode of the player
-     * 0 is survival
-     * 1 is creative
-     * 2 is adventure
-     * 3 is spectator
-     * @return the gamemode
-     */
-    @Deprecated
-    int getGameMode();
 }

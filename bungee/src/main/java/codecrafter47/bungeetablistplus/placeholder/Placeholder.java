@@ -207,7 +207,7 @@ public abstract class Placeholder {
             String server = tokens[0].split(":")[1];
             return parseServerPlaceholder(Arrays.copyOfRange(tokens, 1, tokens.length), context -> server);
         } else if ("time".equals(tokens[0])) {
-            return new TimePlaceholder(TimePlaceholders.getFormat(tokens[1]));
+            return new TimePlaceholder(getFormat(tokens[1]));
         } else if ("server_player_count".equals(tokens[0])) {
             return SERVER_PLAYER_COUNT_PLACEHOLDER;
         } else if ("other_count".equals(tokens[0])) {
@@ -404,5 +404,11 @@ public abstract class Placeholder {
                 return new PlayerBoundPlaceholder(playerFunction, player -> player.getOpt(dataKey).map(i -> String.format(format, i)).orElse(""));
             }
         };
+    }
+
+    public static SimpleDateFormat getFormat(String pattern) {
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        format.setTimeZone(BungeeTabListPlus.getInstance().getConfig().getTimeZone());
+        return format;
     }
 }

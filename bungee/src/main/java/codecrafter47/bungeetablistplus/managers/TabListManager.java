@@ -19,39 +19,27 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListProvider;
 import codecrafter47.bungeetablistplus.config.Config;
 import codecrafter47.bungeetablistplus.config.ITabListConfig;
-import codecrafter47.bungeetablistplus.config.old.ConfigParser;
-import codecrafter47.bungeetablistplus.config.old.TabListConfig;
+import codecrafter47.bungeetablistplus.config.UnsupportedConfig;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.expression.ExpressionResult;
-import codecrafter47.bungeetablistplus.tablistproviders.legacy.CheckedTabListProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.legacy.IConfigTabListProvider;
 import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
-import lombok.Getter;
-import lombok.val;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class TabListManager {
 
     private final BungeeTabListPlus plugin;
-    private final List<IConfigTabListProvider> tabLists = new ArrayList<>();
     private final List<Config> configs = new ArrayList<>();
-    @Getter
-    private ImmutableList<String> filesNeedingUpgrade = ImmutableList.of();
-
-    public Map<ProxiedPlayer, TabListProvider> customTabLists = new HashMap<>();
 
     public TabListManager(BungeeTabListPlus plugin) {
         this.plugin = plugin;
@@ -71,7 +59,6 @@ public class TabListManager {
             }
         }
 
-        val needUpgrade = ImmutableList.<String>builder();
         for (File file : tablistFolder.listFiles()) {
             if (file.isFile() && file.getName().endsWith(".yml")) {
                 try {
@@ -79,13 +66,8 @@ public class TabListManager {
 
                     ITabListConfig tabListConfig = Objects.requireNonNull(YamlConfig.read(new FileInputStream(file), ITabListConfig.class));
 
-                    if (tabListConfig instanceof TabListConfig) {
-                        needUpgrade.add(file.getName());
-                        plugin.getLogger().log(Level.WARNING, "{0} needs to be updated, see https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating", file.getName());
-                        TabListConfig c = (TabListConfig) tabListConfig;
-                        plugin.getPlaceholderAPIHook().searchTabList(c);
-                        validateShowTo(c);
-                        this.tabLists.add(new ConfigParser(plugin, c.tab_size).parse(c));
+                    if (tabListConfig instanceof UnsupportedConfig) {
+                        plugin.getLogger().log(Level.WARNING, "Failed to load {0}. Still using the old format? https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Updating", file.getName());
                     } else {
                         configs.add((Config) tabListConfig);
                     }
@@ -94,7 +76,6 @@ public class TabListManager {
                 }
             }
         }
-        this.filesNeedingUpgrade = needUpgrade.build();
         return true;
     }
 
@@ -108,110 +89,5 @@ public class TabListManager {
             }
         }
         return config;
-    }
-
-    public TabListProvider getTabListForPlayer(ProxiedPlayer player) {
-        if (customTabLists.get(player) != null) return customTabLists.get(player);
-        TabListProvider provider = null;
-        int priority = Integer.MIN_VALUE;
-        for (IConfigTabListProvider tabList : tabLists) {
-            if (tabList.appliesTo(player)) {
-                if (tabList.getPriority() > priority) {
-                    priority = tabList.getPriority();
-                    provider = tabList;
-                }
-            }
-        }
-        if (provider != null) {
-            return provider;
-        }
-        return null;
-    }
-
-    private void validateShowTo(TabListConfig config) {
-        String showTo = config.showTo;
-
-        if (showTo.equalsIgnoreCase("ALL")) {
-            return;
-        }
-
-        if (showTo.equalsIgnoreCase("1.7")) {
-            return;
-        }
-
-        if (showTo.equalsIgnoreCase("1.8")) {
-            return;
-        }
-
-        String[] s = showTo.split(":");
-
-        if (s.length != 2) {
-            invalidShowTo(config);
-            return;
-        }
-
-        if (s[0].equalsIgnoreCase("player")) {
-            if (s[1].contains(",")) {
-                invalidShowTo(config);
-            }
-            return;
-        }
-
-        if (s[0].equalsIgnoreCase("players")) {
-            return;
-        }
-
-        if (s[0].equalsIgnoreCase("server")) {
-            if (s[1].contains(",")) {
-                invalidShowTo(config);
-            }
-            if (plugin.isServer(s[1])) {
-                return;
-            } else {
-
-                invalidShowTo(config);
-            }
-        }
-
-        if (s[0].equalsIgnoreCase("servers")) {
-            for (String sv : s[1].split(",")) {
-                if (!plugin.isServer(sv)) {
-
-                    invalidShowTo(config);
-                }
-            }
-            return;
-        }
-
-        if (s[0].equalsIgnoreCase("group")) {
-            if (s[1].contains(",")) {
-                invalidShowTo(config);
-            }
-            return;
-        }
-
-        if (s[0].equals("groups")) {
-            return;
-        }
-
-        invalidShowTo(config);
-    }
-
-    private void invalidShowTo(TabListConfig config) {
-        plugin.getLogger().log(
-                Level.WARNING, "{0}{1}: showTo is partly or completely invalid",
-                new Object[]{ChatColor.RED,
-                        config.getName()});
-    }
-
-    public void setCustomTabList(ProxiedPlayer player, TabListProvider tabList) {
-        if (!(tabList instanceof CheckedTabListProvider)) {
-            setCustomTabList(player, new CheckedTabListProvider(tabList));
-        }
-        customTabLists.put(player, tabList);
-    }
-
-    public void removeCustomTabList(ProxiedPlayer player) {
-        customTabLists.remove(player);
     }
 }

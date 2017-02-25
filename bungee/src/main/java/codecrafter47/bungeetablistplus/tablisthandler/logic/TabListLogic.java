@@ -20,24 +20,18 @@
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.player.FakePlayer;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
-import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class TabListLogic extends AbstractTabListLogic {
@@ -76,23 +70,6 @@ public class TabListLogic extends AbstractTabListLogic {
             }
         }
         player.unsafe().sendPacket(packet);
-    }
-
-    public List<IPlayer> getServerTabList() {
-        List<IPlayer> list = new ArrayList<>(serverTabList.size());
-
-        Server server = player.getServer();
-        if (server != null) {
-            for (TabListItem item : serverTabList.values()) {
-                FakePlayer fakePlayer = new FakePlayer(item.getUsername(), server.getInfo(), false);
-                fakePlayer.setPing(item.getPing());
-                fakePlayer.setGamemode(item.getGamemode());
-                fakePlayer.setSkin(new PlayerSkin(item.getUuid(), item.getProperties()));
-                list.add(fakePlayer);
-            }
-        }
-
-        return list;
     }
 
     private void failIfNotInEventLoop() {

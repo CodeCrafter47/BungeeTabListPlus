@@ -19,7 +19,6 @@
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
@@ -28,20 +27,6 @@ import de.codecrafter47.data.bungee.api.BungeeData;
 import java.time.Duration;
 
 public class ConnectedLast implements SortingRule {
-
-    @Override
-    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        Duration duration1 = ((Player) player1).get(BungeeData.BungeeCord_SessionDuration);
-        Duration duration2 = ((Player) player2).get(BungeeData.BungeeCord_SessionDuration);
-        if (duration1 != null && duration2 != null) {
-            return duration1.compareTo(duration2);
-        } else if (duration1 != null) {
-            return -1;
-        } else if (duration2 != null) {
-            return 1;
-        }
-        return 0;
-    }
 
     @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {

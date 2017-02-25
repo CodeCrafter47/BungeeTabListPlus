@@ -72,7 +72,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         }
     }
 
-    protected final Map<UUID, TabListItem> serverTabList = new ConcurrentHashMap<>();
+    protected final Map<UUID, TabListItem> serverTabList = new ConcurrentHashMap<>(); // todo doesn't need to be thread safe anymore
     protected String serverHeader = null;
     protected String serverFooter = null;
 

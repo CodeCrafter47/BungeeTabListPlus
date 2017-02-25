@@ -19,12 +19,11 @@
 
 package codecrafter47.bungeetablistplus.config;
 
-import codecrafter47.bungeetablistplus.config.old.TabListConfig;
 import codecrafter47.bungeetablistplus.yamlconfig.Subtype;
 
 @Subtype(type = FixedSizeConfig.class, property = "type", value = "FIXED_SIZE")
 @Subtype(type = FixedColumnsConfig.class, property = "type", value = "DYNAMIC_SIZE_FIXED_COLUMNS")
 @Subtype(type = DynamicSizeConfig.class, property = "type", value = "DYNAMIC_SIZE")
-@Subtype(type = TabListConfig.class)
+@Subtype(type = UnsupportedConfig.class)
 public interface ITabListConfig {
 }

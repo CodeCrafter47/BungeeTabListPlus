@@ -17,29 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api.bungee.placeholder;
+package codecrafter47.bungeetablistplus.config;
 
-import codecrafter47.bungeetablistplus.api.bungee.tablist.SlotTemplate;
+import java.util.HashMap;
 
-/**
- * The PlaceholderManager
- */
-public interface PlaceholderManager {
-    /**
-     * Parse a string to a SlotTemplate
-     * Parses all placeholders in the string
-     *
-     * @param text the string
-     * @return the created SlotTemplate
-     */
-    SlotTemplate parseSlot(String text);
-
-    /**
-     * Registers a PlaceholderProvider
-     * <p>
-     * A PlaceholderProvider can add multiple placeholders
-     *
-     * @param placeholderProvider the PlaceholderProvider
-     */
-    void registerPlaceholderProvider(PlaceholderProvider placeholderProvider);
+public class UnsupportedConfig extends HashMap<String, Object> implements ITabListConfig {
 }

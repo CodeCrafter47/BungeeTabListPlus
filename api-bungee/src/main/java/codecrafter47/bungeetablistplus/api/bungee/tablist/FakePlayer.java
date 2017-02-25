@@ -20,7 +20,7 @@
 package codecrafter47.bungeetablistplus.api.bungee.tablist;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.util.Optional;
@@ -59,11 +59,11 @@ public interface FakePlayer extends IPlayer {
     int getPing();
 
     /**
-     * get the skin of the player
+     * get the icon displayed on the tab list
      *
-     * @return the skin
+     * @return the icon
      */
-    Skin getSkin();
+    Icon getIcon();
 
     /**
      * Change the server
@@ -73,11 +73,11 @@ public interface FakePlayer extends IPlayer {
     void changeServer(ServerInfo newServer);
 
     /**
-     * Set the skin of the fake player. Affects the head displayed in the tab list.
+     * Set the icon displayed on the tab list.
      *
-     * @param skin the skin
+     * @param icon the icon
      */
-    void setSkin(Skin skin);
+    void setIcon(Icon icon);
 
     /**
      * Set the ping of the fake player.

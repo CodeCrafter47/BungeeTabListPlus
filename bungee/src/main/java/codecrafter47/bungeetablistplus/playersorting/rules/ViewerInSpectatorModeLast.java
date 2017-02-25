@@ -19,32 +19,22 @@
 package codecrafter47.bungeetablistplus.playersorting.rules;
 
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
-import codecrafter47.bungeetablistplus.api.bungee.tablist.TabListContext;
 import codecrafter47.bungeetablistplus.context.Context;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.playersorting.SortingRule;
-
-import java.util.Objects;
 
 public class ViewerInSpectatorModeLast implements SortingRule {
 
     @Override
-    public int compare(TabListContext context, IPlayer player1, IPlayer player2) {
-        if (Objects.equals(player1.getName(), context.getViewer().getName()) && player1.getGameMode() == 3) {
-            return 1;
-        }
-        if (Objects.equals(player2.getName(), context.getViewer().getName()) && player2.getGameMode() == 3) {
-            return -1;
-        }
-        return 0;
-    }
-
-    @Override
     public int compare(Context context, IPlayer player1, IPlayer player2) {
-        if (Objects.equals(player1.getName(), context.get(Context.KEY_VIEWER).getName()) && player1.getGameMode() == 3) {
-            return 1;
-        }
-        if (Objects.equals(player2.getName(), context.get(Context.KEY_VIEWER).getName()) && player2.getGameMode() == 3) {
-            return -1;
+        Integer gamemode = context.get(Context.KEY_VIEWER).get(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE);
+        if (gamemode != null && gamemode == 3) {
+            if (player1 == context.get(Context.KEY_VIEWER)) {
+                return 1;
+            }
+            if (player2 == context.get(Context.KEY_VIEWER)) {
+                return -1;
+            }
         }
         return 0;
     }

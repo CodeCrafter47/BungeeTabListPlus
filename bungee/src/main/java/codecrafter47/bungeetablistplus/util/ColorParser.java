@@ -109,24 +109,4 @@ public class ColorParser {
         }
         return s.length() - 1;
     }
-
-    public static String substringIgnoreColors(String s, int num) {
-        StringBuilder ret = new StringBuilder();
-        boolean escaped = false;
-        int size = 0;
-        for (char ch : s.toCharArray()) {
-            ret.append(ch);
-            if (escaped) {
-                escaped = false;
-            } else if (ch == ChatColor.COLOR_CHAR) {
-                escaped = true;
-            } else {
-                size++;
-                if (size >= num) {
-                    return ret.toString();
-                }
-            }
-        }
-        return ret.toString();
-    }
 }

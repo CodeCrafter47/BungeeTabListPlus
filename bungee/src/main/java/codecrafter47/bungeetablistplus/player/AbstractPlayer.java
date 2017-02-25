@@ -19,10 +19,7 @@
 
 package codecrafter47.bungeetablistplus.player;
 
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.api.bungee.Skin;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
-import codecrafter47.bungeetablistplus.skin.PlayerSkin;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -45,12 +42,6 @@ public abstract class AbstractPlayer implements Player {
     public int getPing() {
         Integer ping = get(BungeeData.BungeeCord_Ping);
         return ping != null ? ping : 0;
-    }
-
-    @Override
-    public Skin getSkin() {
-        Icon icon = get(BTLPBungeeDataKeys.DATA_KEY_ICON);
-        return icon != null ? PlayerSkin.fromIcon(icon) : null;
     }
 
     @Override
