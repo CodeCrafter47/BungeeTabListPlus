@@ -146,6 +146,14 @@ public abstract class Placeholder {
                 });
             }
         });
+        serverPlaceholders.put("name", (tokens, serverFunction) -> {
+            if (tokens.length == 0) {
+                return new ServerBoundPlaceholder(serverFunction, server -> server);
+            } else {
+                int length = Integer.valueOf(tokens[0]);
+                return new ServerBoundPlaceholder(serverFunction, server -> server.substring(0, length));
+            }
+        });
         serverPlaceholders.put("online", (tokens, serverFunction) -> {
             return new ServerBoundPlaceholder(serverFunction, serverName -> {
                 PingTask serverState = BungeeTabListPlus.getInstance().getServerState(serverName);
