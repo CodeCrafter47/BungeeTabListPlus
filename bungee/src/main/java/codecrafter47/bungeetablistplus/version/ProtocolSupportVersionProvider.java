@@ -43,11 +43,4 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
         }
     }
 
-    @Override
-    public String getVersionString(ProxiedPlayer player) {
-        if (!psb12) {
-            return ProtocolSupportAPI.getProtocolVersion(player).getName();
-        }
-        return null;
-    }
 }
