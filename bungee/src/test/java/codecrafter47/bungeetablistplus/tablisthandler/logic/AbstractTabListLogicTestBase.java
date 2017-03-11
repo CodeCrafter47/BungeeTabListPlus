@@ -20,14 +20,19 @@
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
+import codecrafter47.bungeetablistplus.handler.AbstractTabOverlayHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import de.codecrafter47.taboverlay.ProfileProperty;
+import de.codecrafter47.taboverlay.handler.ContentOperationMode;
+import de.codecrafter47.taboverlay.handler.SimpleTabOverlay;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.score.Team;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -36,13 +41,14 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import java.util.*;
+import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class AbstractTabListLogicTestBase {
-    UUID clientUUID;
+    final UUID clientUUID = UUID.randomUUID();
     ClientTabList clientTabList;
-    AbstractTabListLogic tabListHandler;
+    TabListHandler tabListHandler;
 
     @Before
     public void setUp() throws Exception {
@@ -111,7 +117,12 @@ public class AbstractTabListLogicTestBase {
         }
 
         String getText(int index) {
-            return getVisibleEntries().get(index).getDisplayName();
+            String displayName = getVisibleEntries().get(index).getDisplayName();
+            String text = displayName == null ? null : BaseComponent.toLegacyText(ComponentSerializer.parse(displayName));
+            if (text != null && text.startsWith("§f")) {
+                text = text.substring(2);
+            }
+            return text;
         }
 
         int getPing(int index) {
@@ -119,121 +130,12 @@ public class AbstractTabListLogicTestBase {
         }
     }
 
-    class MockTabListLogic extends AbstractTabListLogic {
+    class MockTabOverlayHandler extends AbstractTabOverlayHandler {
         private final ClientTabList clientTabList;
 
-        public MockTabListLogic(ClientTabList clientTabList) {
-            super(null);
+        public MockTabOverlayHandler(ClientTabList clientTabList) {
+            super(Logger.getGlobal(), Runnable::run, clientUUID, false);
             this.clientTabList = clientTabList;
-        }
-
-        private void validateConstraints() {
-            boolean isCitizensDisordered = false;
-            // validate client tab list
-            if (passtrough) {
-                Assert.assertEquals("server client tab size mismatch", serverTabList.size(), clientTabList.entries.size());
-                for (TabListItem item : serverTabList.values()) {
-                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
-                    TabListEntry entry = clientTabList.entries.get(item.getUuid());
-                    Assert.assertEquals("display name passthrough", item.getDisplayName(), entry.getDisplayName());
-                    Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
-                    Assert.assertEquals("ping passthrough", item.getPing(), entry.getPing());
-                    Assert.assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
-                    Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
-                    Assert.assertArrayEquals("display name passthrough", item.getProperties(), entry.getProperties());
-                }
-            } else if (size == 80) {
-                Assert.assertEquals("server client tab size mismatch", 80, clientTabList.getSize());
-                Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 80, clientTabList.entries.size());
-                // fake players
-                for (int i = 0; i < size; i++) {
-                    assertEquals("uuid", fakePlayerUUIDs[i], clientUuid[i]);
-                    assertEquals("username", fakePlayerUsernames[i], clientUsername[i]);
-                    Assert.assertEquals("uuid[" + i + "]", clientUuid[i], clientTabList.getVisibleEntries().get(i).getUuid());
-                    Assert.assertEquals("username", clientUsername[i], clientTabList.getVisibleEntries().get(i).getUsername());
-                    Assert.assertEquals("text", clientText[i], clientTabList.getText(i));
-                    Assert.assertEquals("ping", clientPing[i], clientTabList.getPing(i));
-                    Assert.assertArrayEquals("skin", clientSkin[i].getProperties(), clientTabList.getProperties(i));
-                }
-                // real players
-                for (TabListItem item : serverTabList.values()) {
-                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
-                    TabListEntry entry = clientTabList.entries.get(item.getUuid());
-                    Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
-                    Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
-                    //assertEquals("display name passthrough", item.getDisplayName(), entry.getDisplayName());
-                    //assertEquals("ping passthrough", item.getPing(), entry.getPing());
-                    Assert.assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
-                    Assert.assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
-                }
-            } else {
-                // validate inner constraints
-                for (Object2IntMap.Entry<UUID> entry : uuidToSlotMap.object2IntEntrySet()) {
-                    assertEquals("uuidToSlotMap constraint violation", clientUuid[entry.getIntValue()], entry.getKey());
-                }
-
-                for (TabListItem item : serverTabList.values()) {
-                    assertTrue("uuidToSlotMap is missing an entry", uuidToSlotMap.containsKey(item.getUuid()));
-                }
-
-                Assert.assertEquals("server client tab size mismatch", size, clientTabList.getSize());
-                isCitizensDisordered = serverTabList.keySet().stream().anyMatch(u -> u.version() == 2);
-                if (!isCitizensDisordered) {
-                    // validate inner constraints
-                    for (Map.Entry<String, Integer> entry : nameToSlotMap.entrySet()) {
-                        if (clientTabList.entries.values().stream().anyMatch(e -> e.username.equals(entry.getKey()))) {
-                            assertEquals("nameToSlotMap constraint violation", clientUsername[entry.getValue()], entry.getKey());
-                            assertTrue("missing team", clientTabList.teams.containsKey(teamNames[entry.getValue()]));
-                            assertTrue("missing player in team[" + entry.getKey() + " in " + entry.getValue() + "]", clientTabList.teams.get(teamNames[entry.getValue()]).getPlayers().contains(entry.getKey()));
-                        }
-                    }
-
-                    for (TabListItem item : serverTabList.values()) {
-                        assertTrue("nameToSlotMap constraint violation", nameToSlotMap.containsKey(item.getUsername()));
-                    }
-
-                    // validate client view
-                    for (int i = 0; i < size; i++) {
-                        Assert.assertEquals("uuid", clientUuid[i], clientTabList.getVisibleEntries().get(i).getUuid());
-                        Assert.assertEquals("username", clientUsername[i], clientTabList.getVisibleEntries().get(i).getUsername());
-                        Assert.assertEquals("text", clientText[i], clientTabList.getText(i));
-                        Assert.assertEquals("ping", clientPing[i], clientTabList.getPing(i));
-                        if (clientUuid[i] == fakePlayerUUIDs[i]) {
-                            Assert.assertArrayEquals("skin", clientSkin[i].getProperties(), clientTabList.getProperties(i));
-                        } else {
-                            Assert.assertArrayEquals("skin", serverTabList.get(clientUuid[i]).getProperties(), clientTabList.getProperties(i));
-                        }
-                        assertEquals("nameToSlotMap", i, nameToSlotMap.getInt(clientUsername[i]));
-                    }
-                }
-                // real players
-                for (TabListItem item : serverTabList.values()) {
-                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
-                    TabListEntry entry = clientTabList.entries.get(item.getUuid());
-                    Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
-                    Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
-                    //assertEquals("display name passthrough", item.getDisplayName(), entry.getDisplayName());
-                    //assertEquals("ping passthrough", item.getPing(), entry.getPing());
-                    //assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
-                    Assert.assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
-                }
-            }
-            if (!isCitizensDisordered) {
-                for (Map.Entry<String, String> entry : playerToTeamMap.entrySet()) {
-                    String s = clientTabList.playerToTeamMap.get(entry.getKey());
-                    assertNotNull(s);
-                    Team team = clientTabList.teams.get(s);
-                    assertNotNull(team);
-                    TeamData serverTeam = serverTeams.get(entry.getValue());
-                    assertEquals(serverTeam.getPrefix(), team.getPrefix());
-                    assertEquals(serverTeam.getSuffix(), team.getSuffix());
-                }
-            }
-        }
-
-        @Override
-        protected UUID getUniqueId() {
-            return clientUUID;
         }
 
         @Override
@@ -317,96 +219,260 @@ public class AbstractTabListLogicTestBase {
         }
 
         @Override
-        protected boolean is113OrLater() {
-            return false;
-        }
-
-        @Override
-        public void onConnected() {
-            validateConstraints();
-            super.onConnected();
-            validateConstraints();
-        }
-
-        @Override
-        public void onDisconnected() {
-            validateConstraints();
-            super.onDisconnected();
-            validateConstraints();
-        }
-
-        @Override
         public PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
-            validateConstraints();
             PacketListenerResult packetListenerResult = super.onPlayerListPacket(packet);
             if (packetListenerResult != PacketListenerResult.CANCEL) {
                 sendPacket(packet);
             }
-            validateConstraints();
             return packetListenerResult;
         }
 
         @Override
         public PacketListenerResult onTeamPacket(net.md_5.bungee.protocol.packet.Team packet) {
-            validateConstraints();
             PacketListenerResult packetListenerResult = super.onTeamPacket(packet);
             if (packetListenerResult != PacketListenerResult.CANCEL) {
                 sendPacket(packet);
             }
-            validateConstraints();
             return packetListenerResult;
         }
 
         @Override
         public PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet) {
-            validateConstraints();
             PacketListenerResult packetListenerResult = super.onPlayerListHeaderFooterPacket(packet);
             if (packetListenerResult != PacketListenerResult.CANCEL) {
                 sendPacket(packet);
             }
-            validateConstraints();
             return packetListenerResult;
+        }
+    }
+
+    class MockTabListLogic extends TabListHandler {
+        private final MockTabOverlayHandler tabOverlayHandler;
+
+        private boolean passtrough = true;
+        final Map<UUID, TabListEntry> serverTabList = new HashMap<>();
+        private int size = 0;
+        private String[] clientText = new String[80];
+        private int[] clientPing = new int[80];
+        private String[][][] clientSkin = new String[80][][];
+        private UUID[] clientUuid = new UUID[80];
+        private SimpleTabOverlay simpleTabOverlay;
+
+        public MockTabListLogic(ClientTabList clientTabList) {
+            super(null);
+            this.tabOverlayHandler = new MockTabOverlayHandler(clientTabList);
+        }
+
+        private void validateConstraints() {
+            boolean isCitizensDisordered = false;
+            // validate client tab list
+            if (passtrough) {
+                Assert.assertEquals("server client tab size mismatch", serverTabList.size(), clientTabList.entries.size());
+                for (TabListEntry item : serverTabList.values()) {
+                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
+                    TabListEntry entry = clientTabList.entries.get(item.getUuid());
+                    Assert.assertEquals("display name passthrough", item.getDisplayName(), entry.getDisplayName());
+                    Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
+                    Assert.assertEquals("ping passthrough", item.getPing(), entry.getPing());
+                    Assert.assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
+                    Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
+                    Assert.assertArrayEquals("display name passthrough", item.getProperties(), entry.getProperties());
+                }
+            } else if (size == 80) {
+                // todo teams/ player to team map
+                Assert.assertEquals("server client tab size mismatch", 80, clientTabList.getSize());
+                Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 80, clientTabList.entries.size());
+                // fake players
+                for (int i = 0; i < size; i++) {
+                    Assert.assertEquals("text", clientText[i], clientTabList.getText(i));
+                    Assert.assertEquals("ping", clientPing[i], clientTabList.getPing(i));
+                    Assert.assertArrayEquals("skin", clientSkin[i], clientTabList.getProperties(i));
+                }
+                // real players
+                for (TabListEntry item : serverTabList.values()) {
+                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
+                    TabListEntry entry = clientTabList.entries.get(item.getUuid());
+                    Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
+                    Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
+                    Assert.assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
+                }
+            } else {
+                // todo teams/ player to team map
+                Assert.assertEquals("server client tab size mismatch", Math.min(80, Math.max(size, serverTabList.size())), clientTabList.getSize());
+                isCitizensDisordered = serverTabList.keySet().stream().anyMatch(u -> u.version() == 2);
+                if (!isCitizensDisordered) {
+                    // validate client view
+                    for (int i = 0; i < size; i++) {
+                        Assert.assertEquals("text", clientText[i], clientTabList.getText(i));
+                        Assert.assertEquals("ping", clientPing[i], clientTabList.getPing(i));
+                        if (!serverTabList.containsKey(clientTabList.getVisibleEntries().get(i).getUuid())) {
+                            Assert.assertArrayEquals("skin", clientSkin[i], clientTabList.getProperties(i));
+                        }
+                    }
+                }
+                // real players
+                for (TabListEntry item : serverTabList.values()) {
+                    assertTrue("Missing player", clientTabList.entries.containsKey(item.getUuid()));
+                    TabListEntry entry = clientTabList.entries.get(item.getUuid());
+                    Assert.assertEquals("uuid passthrough", item.getUuid(), entry.getUuid());
+                    Assert.assertEquals("username passthrough", item.getUsername(), entry.getUsername());
+                    //assertEquals("display name passthrough", item.getDisplayName(), entry.getDisplayName());
+                    //assertEquals("ping passthrough", item.getPing(), entry.getPing());
+                    //assertEquals("gamemode passthrough", item.getGamemode(), entry.getGamemode());
+                    Assert.assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
+                }
+            }
+        }
+
+        @Override
+        public void onConnected() {
+            simpleTabOverlay = tabOverlayHandler.enterContentOperationMode(ContentOperationMode.SIMPLE);
+            tabOverlayHandler.enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
+            for (int i = 0; i < 80; i++) {
+                clientPing[i] = 0;
+                clientSkin[i] = new String[][]{};
+                clientText[i] = "";
+            }
+        }
+
+        @Override
+        public void onDisconnected() {
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
+            validateConstraints();
+
+            switch (packet.getAction()) {
+                case ADD_PLAYER:
+                    for (PlayerListItem.Item item : packet.getItems()) {
+                        serverTabList.put(item.getUuid(), new TabListEntry(item));
+                    }
+                    break;
+                case UPDATE_GAMEMODE:
+                    for (PlayerListItem.Item item : packet.getItems()) {
+                        TabListEntry playerListEntry = serverTabList.get(item.getUuid());
+                        if (playerListEntry != null) {
+                            playerListEntry.setGamemode(item.getGamemode());
+                        }
+                    }
+                    break;
+                case UPDATE_LATENCY:
+                    for (PlayerListItem.Item item : packet.getItems()) {
+                        TabListEntry playerListEntry = serverTabList.get(item.getUuid());
+                        if (playerListEntry != null) {
+                            playerListEntry.setPing(item.getPing());
+                        }
+                    }
+                    break;
+                case UPDATE_DISPLAY_NAME:
+                    for (PlayerListItem.Item item : packet.getItems()) {
+                        TabListEntry playerListEntry = serverTabList.get(item.getUuid());
+                        if (playerListEntry != null) {
+                            playerListEntry.setDisplayName(item.getDisplayName());
+                        }
+                    }
+                    break;
+                case REMOVE_PLAYER:
+                    for (PlayerListItem.Item item : packet.getItems()) {
+                        serverTabList.remove(item.getUuid());
+                    }
+                    break;
+            }
+
+            tabOverlayHandler.onPlayerListPacket(packet);
+            validateConstraints();
+            return PacketListenerResult.CANCEL;
+        }
+
+        @Override
+        public PacketListenerResult onTeamPacket(net.md_5.bungee.protocol.packet.Team packet) {
+            validateConstraints();
+            tabOverlayHandler.onTeamPacket(packet);
+            validateConstraints();
+            return PacketListenerResult.CANCEL;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet) {
+            validateConstraints();
+            tabOverlayHandler.onPlayerListHeaderFooterPacket(packet);
+            validateConstraints();
+            return PacketListenerResult.CANCEL;
         }
 
         @Override
         public void onServerSwitch() {
             validateConstraints();
-            super.onServerSwitch();
+            tabOverlayHandler.onServerSwitch();
+            serverTabList.clear();
             validateConstraints();
         }
 
         @Override
         public void setPassThrough(boolean passTrough) {
             validateConstraints();
-            super.setPassThrough(passTrough);
+            passtrough = passTrough;
+            if (passTrough) {
+                tabOverlayHandler.enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
+            } else {
+                simpleTabOverlay = tabOverlayHandler.enterContentOperationMode(ContentOperationMode.SIMPLE);
+                simpleTabOverlay.setSize(size);
+                for (int i = 0; i < size; i++) {
+                    simpleTabOverlay.setSlot(i, clientUuid[i], makeIcon(clientSkin[i]), clientText[i], clientPing[i]);
+                }
+            }
             validateConstraints();
+        }
+
+        private de.codecrafter47.taboverlay.Icon makeIcon(String[][] strings) {
+            if (strings.length == 0) {
+                return de.codecrafter47.taboverlay.Icon.DEFAULT_STEVE;
+            }
+            return new de.codecrafter47.taboverlay.Icon(new ProfileProperty(strings[0][0], strings[0][1], strings[0][2]));
+        }
+
+        private String[][] normalizeProperties(String[][] properties) {
+            return properties;
         }
 
         @Override
         public void setSize(int size) {
             validateConstraints();
-            super.setSize(size);
+            this.size = size;
+            simpleTabOverlay.setSize(size);
+            for (int i = 0; i < size; i++) {
+                simpleTabOverlay.setSlot(i, clientUuid[i], makeIcon(clientSkin[i]), clientText[i], clientPing[i]);
+            }
             validateConstraints();
         }
 
         @Override
         public void setSlot(int index, Icon skin, String text, int ping) {
             validateConstraints();
-            super.setSlot(index, skin, text, ping);
+            clientText[index] = text;
+            clientPing[index] = ping;
+            clientSkin[index] = normalizeProperties(skin.getProperties());
+            clientUuid[index] = skin.getPlayer();
+            if (index < size) {
+                simpleTabOverlay.setSlot(index, skin.getPlayer(), makeIcon(clientSkin[index]), text, ping);
+            }
             validateConstraints();
         }
 
         @Override
         public void updateText(int index, String text) {
             validateConstraints();
-            super.updateText(index, text);
+            clientText[index] = text;
+            simpleTabOverlay.setText(index, text);
             validateConstraints();
         }
 
         @Override
         public void updatePing(int index, int ping) {
             validateConstraints();
-            super.updatePing(index, ping);
+            clientPing[index] = ping;
+            simpleTabOverlay.setPing(index, ping);
             validateConstraints();
         }
 

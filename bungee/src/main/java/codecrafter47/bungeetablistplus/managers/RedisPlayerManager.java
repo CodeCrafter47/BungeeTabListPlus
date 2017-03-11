@@ -25,9 +25,7 @@ import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.BTLPDataTypes;
-import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
-import codecrafter47.bungeetablistplus.player.IPlayerProvider;
-import codecrafter47.bungeetablistplus.player.Player;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.RedisPlayer;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteArrayDataInput;
@@ -42,27 +40,25 @@ import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.data.sponge.api.SpongeData;
+import de.codecrafter47.taboverlay.config.player.Player;
+import de.codecrafter47.taboverlay.config.player.PlayerProvider;
+import io.netty.util.concurrent.EventExecutor;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-public class RedisPlayerManager implements IPlayerProvider, Listener {
+public class RedisPlayerManager implements Listener, PlayerProvider {
 
     private static final TypeAdapterRegistry typeRegistry = TypeAdapterRegistry.of(
             TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS,
@@ -81,11 +77,12 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
     private static String CHANNEL_DATA_REQUEST = "btlp-data-req";
     private static String CHANNEL_DATA_UPDATE = "btlp-data-upd";
 
-    private List<RedisPlayer> playerList = Collections.emptyList();
     private final Map<UUID, RedisPlayer> byUUID = new ConcurrentHashMap<>();
-    private final ConnectedPlayerManager connectedPlayerManager;
+    private final BungeePlayerProvider bungeePlayerProvider;
     private final BungeeTabListPlus plugin;
+    private final EventExecutor mainThread;
     private final Logger logger;
+    private final Set<Listener> listeners = new ReferenceOpenHashSet<>();
 
     private boolean redisBungeeAPIError = false;
 
@@ -101,19 +98,25 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
         }
     };
 
-    public RedisPlayerManager(ConnectedPlayerManager connectedPlayerManager, BungeeTabListPlus plugin, Logger logger) {
-        this.connectedPlayerManager = connectedPlayerManager;
+    private boolean redisConnectionSuccessful = false;
+
+    public RedisPlayerManager(BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus plugin, Logger logger) {
+        this.bungeePlayerProvider = bungeePlayerProvider;
         this.plugin = plugin;
         this.logger = logger;
+        this.mainThread = plugin.getMainThreadExecutor();
+
         RedisBungee.getApi().registerPubSubChannels(CHANNEL_REQUEST_DATA_OLD, CHANNEL_DATA_OLD);
         RedisBungee.getApi().registerPubSubChannels(CHANNEL_DATA_REQUEST, CHANNEL_DATA_UPDATE);
-        ProxyServer.getInstance().getScheduler().schedule(BungeeTabListPlus.getInstance().getPlugin(), this::updatePlayers, 1, 1, TimeUnit.SECONDS);
+
+        ProxyServer.getInstance().getScheduler().schedule(BungeeTabListPlus.getInstance().getPlugin(), this::updatePlayers, 5, 5, TimeUnit.SECONDS);
+
         ProxyServer.getInstance().getPluginManager().registerListener(BungeeTabListPlus.getInstance().getPlugin(), this);
     }
 
     @Override
     public Collection<RedisPlayer> getPlayers() {
-        return playerList;
+        return byUUID.values();
     }
 
     @EventHandler
@@ -125,15 +128,18 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
             try {
                 UUID uuid = DataStreamUtils.readUUID(input);
 
-                ConnectedPlayer player = connectedPlayerManager.getPlayerIfPresent(uuid);
-                if (player != null) {
-                    DataKey<?> key = DataStreamUtils.readDataKey(input, keyRegistry, missingDataKeyLogger);
+                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+                if (proxiedPlayer != null) {
+                    BungeePlayer player = bungeePlayerProvider.getPlayerIfPresent(proxiedPlayer);
+                    if (player != null) {
+                        DataKey<?> key = DataStreamUtils.readDataKey(input, keyRegistry, missingDataKeyLogger);
 
-                    if (key != null) {
-                        player.addDataChangeListener((DataKey<Object>) key, new DataChangeListener(player, (DataKey<Object>) key));
-                        updateData(uuid, (DataKey<Object>) key, player.get(key));
+                        if (key != null) {
+                            player.addDataChangeListener((DataKey<Object>) key, new DataChangeListener(player, (DataKey<Object>) key));
+                            updateData(uuid, (DataKey<Object>) key, player.get(key));
+                        }
+
                     }
-
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "Unexpected error reading redis message", ex);
@@ -153,11 +159,11 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
 
                         if (removed) {
 
-                            plugin.runInMainThread(() -> cache.updateValue(key, null));
+                            mainThread.execute(() -> cache.updateValue(key, null));
                         } else {
 
                             Object value = typeRegistry.getTypeAdapter(key.getType()).read(input);
-                            plugin.runInMainThread(() -> cache.updateValue((DataKey<Object>) key, value));
+                            mainThread.execute(() -> cache.updateValue((DataKey<Object>) key, value));
                         }
                     }
                 }
@@ -182,23 +188,53 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
         }
         redisBungeeAPIError = false;
 
-        // remove players which have gone offline
-        for (Iterator<UUID> iterator = byUUID.keySet().iterator(); iterator.hasNext(); ) {
-            UUID uuid = iterator.next();
-            if (!playersOnline.contains(uuid) || connectedPlayerManager.getPlayerIfPresent(uuid) != null) {
-                iterator.remove();
-            }
-        }
-
-        // add new players
+        // fetch names for new players
+        Map<UUID, String> uuidToNameMap = new Object2ObjectOpenHashMap<>();
         for (UUID uuid : playersOnline) {
-            if (!byUUID.containsKey(uuid) && connectedPlayerManager.getPlayerIfPresent(uuid) == null) {
-                byUUID.put(uuid, new RedisPlayer(uuid));
+            if (!byUUID.containsKey(uuid) && ProxyServer.getInstance().getPlayer(uuid) == null) {
+                try {
+                    uuidToNameMap.put(uuid, RedisBungee.getApi().getNameFromUuid(uuid));
+                } catch (Throwable ex) {
+                    logger.log(Level.WARNING, "Error while using RedisBungee API", ex);
+                }
             }
         }
 
-        // update list
-        playerList = byUUID.values().stream().filter(RedisPlayer::hasName).collect(Collectors.toList());
+        redisConnectionSuccessful = true;
+
+        try {
+            mainThread.submit(() -> {
+                // remove players which have gone offline
+                for (Iterator<UUID> iterator = byUUID.keySet().iterator(); iterator.hasNext(); ) {
+                    UUID uuid = iterator.next();
+                    if (!playersOnline.contains(uuid) || ProxyServer.getInstance().getPlayer(uuid) != null) {
+                        RedisPlayer redisPlayer = byUUID.get(uuid);
+                        iterator.remove();
+                        listeners.forEach(listener -> listener.onPlayerRemoved(redisPlayer));
+                    }
+                }
+
+                // add new players
+                for (UUID uuid : uuidToNameMap.keySet()) {
+                    if (!byUUID.containsKey(uuid) && ProxyServer.getInstance().getPlayer(uuid) == null) {
+                        RedisPlayer redisPlayer = new RedisPlayer(uuid, uuidToNameMap.get(uuid));
+                        byUUID.put(uuid, redisPlayer);
+                        listeners.forEach(listener -> listener.onPlayerAdded(redisPlayer));
+                    }
+                }
+            }).await();
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    @Override
+    public void registerListener(Listener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void unregisterListener(Listener listener) {
+        listeners.remove(listener);
     }
 
     public <T> void request(UUID uuid, DataKey<T> key) {

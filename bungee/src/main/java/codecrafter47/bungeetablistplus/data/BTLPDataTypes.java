@@ -19,12 +19,13 @@
 
 package codecrafter47.bungeetablistplus.data;
 
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapter;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import com.google.common.collect.ImmutableMap;
 import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.ProfileProperty;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,25 +46,15 @@ public class BTLPDataTypes {
                     }
                     String value = input.readUTF();
                     String signature = input.readUTF();
-                    return new Icon(uuid, new String[][]{{"textures", value, signature}});
+                    return new Icon(new ProfileProperty("textures", value, signature));
                 }
 
                 @Override
                 public void write(DataOutput output, Icon icon) throws IOException {
-                    UUID uuid = icon.getPlayer();
-                    output.writeBoolean(uuid != null);
-                    if (uuid != null) {
-                        DataStreamUtils.writeUUID(output, uuid);
-                    }
-                    for (String[] property : icon.getProperties()) {
-                        if (property.length == 3 && "textures".equals(property[0])) {
-                            output.writeUTF(property[1]);
-                            output.writeUTF(property[2]);
-                            return;
-                        }
-                    }
-                    output.writeUTF("");
-                    output.writeUTF("");
+                    output.writeBoolean(false);
+                    ProfileProperty property = icon.getTextureProperty();
+                    output.writeUTF(property == null ? "" : property.getValue());
+                    output.writeUTF(property == null ? "" : property.getSignature());
                 }
             }
     ));

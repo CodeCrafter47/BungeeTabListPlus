@@ -19,28 +19,38 @@
 
 package codecrafter47.bungeetablistplus.data;
 
+import com.google.common.collect.Sets;
 import de.codecrafter47.data.api.DataCache;
 import de.codecrafter47.data.api.DataKey;
 import lombok.Getter;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class TrackingDataCache extends DataCache {
     @Getter
-    private Set<DataKey<?>> queriedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Set<DataKey<?>> activeKeys = Sets.newConcurrentHashSet();
 
     @Override
-    public <V> V get(DataKey<V> key) {
-        V v = super.get(key);
-        if (v == null && !queriedKeys.contains(key)) {
-            onMissingData(key);
+    public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
+        if (!hasListeners(key)) {
+            addActiveKey(key);
         }
-        return v;
+        super.addDataChangeListener(key, listener);
     }
 
-    protected <V> void onMissingData(DataKey<V> key) {
-        queriedKeys.add(key);
+    protected <T> void addActiveKey(DataKey<T> key) {
+        activeKeys.add(key);
+    }
+
+    @Override
+    public <T> void removeDataChangeListener(DataKey<T> key, Runnable listener) {
+        super.removeDataChangeListener(key, listener);
+        if (!hasListeners(key)) {
+            removeActiveKey(key);
+        }
+    }
+
+    protected <T> void removeActiveKey(DataKey<T> key) {
+        activeKeys.remove(key);
     }
 }

@@ -19,7 +19,6 @@
 
 package codecrafter47.bungeetablistplus.api.bungee.tablist;
 
-import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -29,7 +28,7 @@ import java.util.UUID;
 /**
  * Represents a fake player on the tab list.
  */
-public interface FakePlayer extends IPlayer {
+public interface FakePlayer {
     /**
      * get the username of the player
      *

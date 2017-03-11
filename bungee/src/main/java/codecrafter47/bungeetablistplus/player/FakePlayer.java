@@ -22,65 +22,61 @@ package codecrafter47.bungeetablistplus.player;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
+import codecrafter47.bungeetablistplus.data.NullDataHolder;
+import codecrafter47.bungeetablistplus.util.IconUtil;
 import com.google.common.base.Charsets;
 import de.codecrafter47.data.api.DataCache;
+import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.bungee.api.BungeeData;
-import lombok.Getter;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
+import io.netty.util.concurrent.EventExecutor;
 import lombok.SneakyThrows;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.FutureTask;
 
 public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer {
-    private final String name;
-    private final UUID uuid;
-    @Getter
-    private boolean requiresSkinFix;
+
     private boolean randomServerSwitchEnabled;
 
-    private final DataCache data = new DataCache();
+    final DataCache data = new DataCache();
 
-    public FakePlayer(String name, ServerInfo server, boolean randomServerSwitchEnabled, boolean requiresSkinFix) {
+    private final EventExecutor mainThread;
+
+    public FakePlayer(String name, ServerInfo server, boolean randomServerSwitchEnabled, EventExecutor mainThread) {
+        super(UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8)), name);
         this.randomServerSwitchEnabled = randomServerSwitchEnabled;
-        this.name = name;
-        this.uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
-        this.requiresSkinFix = requiresSkinFix;
-
+        this.mainThread = mainThread;
         data.updateValue(BungeeData.BungeeCord_Server, server.getName());
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Optional<ServerInfo> getServer() {
+        return Optional.ofNullable(get(BungeeData.BungeeCord_Server)).map(ProxyServer.getInstance()::getServerInfo);
     }
 
     @Override
-    public UUID getUniqueID() {
-        return uuid;
+    public int getPing() {
+        Integer ping = get(BungeeData.BungeeCord_Ping);
+        return ping != null ? ping : 0;
     }
 
     @Override
     public Icon getIcon() {
-        return data.get(BTLPBungeeDataKeys.DATA_KEY_ICON);
-    }
-
-    @SneakyThrows
-    private void executeInMainThread(Runnable task) {
-        BungeeTabListPlus btlp = BungeeTabListPlus.getInstance();
-        if (btlp.getResendThread().isInMainThread()) {
-            task.run();
-        } else {
-            FutureTask<Void> futureTask = new FutureTask<>(task, null);
-            btlp.runInMainThread(futureTask);
-            futureTask.get();
-        }
+        return IconUtil.convert(data.get(BTLPBungeeDataKeys.DATA_KEY_ICON));
     }
 
     @Override
+    @SneakyThrows
     public void setPing(int ping) {
-        executeInMainThread(() -> data.updateValue(BungeeData.BungeeCord_Ping, ping));
+        if (!mainThread.inEventLoop()) {
+            mainThread.submit(() -> setPing(ping)).await();
+            return;
+        }
+        data.updateValue(BungeeData.BungeeCord_Ping, ping);
     }
 
     @Override
@@ -93,33 +89,38 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
         randomServerSwitchEnabled = value;
     }
 
-    public void setGamemode(int gamemode) {
-        executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE, gamemode));
-    }
-
     @Override
+    @SneakyThrows
     public void changeServer(ServerInfo newServer) {
-        executeInMainThread(() -> data.updateValue(BungeeData.BungeeCord_Server, newServer.getName()));
+        if (!mainThread.inEventLoop()) {
+            mainThread.submit(() -> changeServer(newServer)).await();
+            return;
+        }
+        data.updateValue(BungeeData.BungeeCord_Server, newServer.getName());
     }
 
     @Override
+    @SneakyThrows
     public void setIcon(Icon icon) {
-        requiresSkinFix = false;
-        executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, icon));
+        if (!mainThread.inEventLoop()) {
+            mainThread.submit(() -> setIcon(icon)).await();
+            return;
+        }
+        data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, IconUtil.convert(icon));
     }
 
     @Override
-    public <V> V get(DataKey<V> key) {
-        return data.get(key);
-    }
+    protected DataHolder getResponsibleDataHolder(DataKey<?> key) {
 
-    @Override
-    public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
-        data.addDataChangeListener(key, listener);
-    }
+        if (key.getScope().equals(BungeeData.SCOPE_BUNGEE_PLAYER) || key.getScope().equals(MinecraftData.SCOPE_PLAYER)) {
+            return data;
+        }
 
-    @Override
-    public <T> void removeDataChangeListener(DataKey<T> key, Runnable listener) {
-        data.removeDataChangeListener(key, listener);
+        if (key.getScope().equals(MinecraftData.SCOPE_SERVER) || key.getScope().equals(BungeeData.SCOPE_BUNGEE_SERVER)) {
+            return serverData;
+        }
+
+        BungeeTabListPlus.getInstance().getLogger().warning("Data key with unknown scope: " + key);
+        return NullDataHolder.INSTANCE;
     }
 }

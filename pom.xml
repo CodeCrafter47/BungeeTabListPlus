@@ -19,7 +19,6 @@
         <module>api-sponge</module>
         <module>sponge</module>
         <module>example</module>
-        <module>yaml-config</module>
         <module>bridge</module>
     </modules>
 
@@ -32,7 +31,8 @@
         <sponge-api.version>5.0.0</sponge-api.version>
         <lombok.version>1.16.12</lombok.version>
         <spigot-api.version>1.11-R0.1-SNAPSHOT</spigot-api.version>
-        <bungeecord.version>1.13-SNAPSHOT</bungeecord.version>
+        <bungeecord.version>1.15-SNAPSHOT</bungeecord.version>
+        <yaml.version>1.25</yaml.version>
     </properties>
 
     <scm>

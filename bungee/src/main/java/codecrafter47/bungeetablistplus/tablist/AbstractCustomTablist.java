@@ -20,7 +20,8 @@
 package codecrafter47.bungeetablistplus.tablist;
 
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
+import codecrafter47.bungeetablistplus.util.IconUtil;
+import de.codecrafter47.taboverlay.Icon;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
@@ -50,7 +51,7 @@ public abstract class AbstractCustomTablist implements CustomTablist {
     /**
      * Create a new custom tab list with size 0.
      */
-    public AbstractCustomTablist() {
+    AbstractCustomTablist() {
         this.size = 0;
         this.columns = 1;
         this.rows = 0;
@@ -67,12 +68,12 @@ public abstract class AbstractCustomTablist implements CustomTablist {
      * @param size the size
      * @throws IllegalArgumentException if the size is not allowed
      */
-    public AbstractCustomTablist(int size) {
+    AbstractCustomTablist(int size) {
         this();
         setSize(size);
     }
 
-    private int index(int row, int column) {
+    int index(int row, int column) {
         int index = row * this.columns + column;
         if (index >= size) {
             throw new IndexOutOfBoundsException(String.format("Index [row=%s,column=%s] not inside tab list [rows=%s,columns=%s]", row, column, this.rows, this.columns));
@@ -109,7 +110,7 @@ public abstract class AbstractCustomTablist implements CustomTablist {
             Icon[] icon = new Icon[size];
             String[] text = new String[size];
             int[] ping = new int[size];
-            Arrays.fill(icon, Icon.DEFAULT);
+            Arrays.fill(icon, Icon.DEFAULT_STEVE);
             Arrays.fill(text, "");
             Arrays.fill(ping, 0);
             for (int col = min(this.columns, columns) - 1; col >= 0; col--) {
@@ -146,8 +147,12 @@ public abstract class AbstractCustomTablist implements CustomTablist {
 
     @Override
     @Nonnull
-    public Icon getIcon(int row, int column) {
-        return this.icon[index(row, column)];
+    public codecrafter47.bungeetablistplus.api.bungee.Icon getIcon(int row, int column) {
+        return IconUtil.convert(this.icon[index(row, column)]);
+    }
+
+    Icon getIcon(int index) {
+        return this.icon[index];
     }
 
     @Override
@@ -156,20 +161,26 @@ public abstract class AbstractCustomTablist implements CustomTablist {
         return this.text[index(row, column)];
     }
 
+    String getText(int index) {
+        return this.text[index];
+    }
+
     @Override
     public int getPing(int row, int column) {
         return this.ping[index(row, column)];
     }
 
+    int getPing(int index) {
+        return this.ping[index];
+    }
+
     @Override
-    public synchronized void setSlot(int row, int column, @Nonnull @NonNull Icon icon, @Nonnull @NonNull String text, int ping) {
+    public synchronized void setSlot(int row, int column, @Nonnull @NonNull codecrafter47.bungeetablistplus.api.bungee.Icon icon, @Nonnull @NonNull String text, int ping) {
         int index = index(row, column);
-        if (!this.icon[index].equals(icon) || !this.text[index].equals(text) || this.ping[index] != ping) {
-            this.icon[index] = icon;
-            this.text[index] = text;
-            this.ping[index] = ping;
-            onSlotChanged(row, column);
-        }
+        this.icon[index] = IconUtil.convert(icon);
+        this.text[index] = text;
+        this.ping[index] = ping;
+        onSlotChanged(index);
     }
 
     @Override
@@ -202,7 +213,7 @@ public abstract class AbstractCustomTablist implements CustomTablist {
 
     protected abstract void onSizeChanged();
 
-    protected abstract void onSlotChanged(int row, int column);
+    protected abstract void onSlotChanged(int index);
 
     protected abstract void onHeaderOrFooterChanged();
 }

@@ -18,14 +18,17 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
-import codecrafter47.bungeetablistplus.yamlconfig.Comment;
-import codecrafter47.bungeetablistplus.yamlconfig.Path;
-import codecrafter47.bungeetablistplus.yamlconfig.UpdatableConfig;
-import codecrafter47.bungeetablistplus.yamlconfig.YamlNode;
+import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
-public class MainConfig implements UpdatableConfig {
+public class MainConfig {
 
     @Comment({
             "if enabled the plugin checks for new versions automatically.",
@@ -77,53 +80,65 @@ public class MainConfig implements UpdatableConfig {
             "or custom id like \"GMT+8\""
     })
     @Path("time-zone")
-    public String timezone = TimeZone.getDefault().getID();
+    public String time_zone = TimeZone.getDefault().getID();
 
     @Comment("Custom placeholders")
-    public Map<String, CustomPlaceholder> customPlaceholders = new HashMap<>();
+    public Map<String, CustomPlaceholderConfiguration> customPlaceholders = new HashMap<>();
 
     public TimeZone getTimeZone() {
-        return TimeZone.getTimeZone(timezone);
+        return TimeZone.getTimeZone(time_zone);
     }
 
     public transient boolean needWrite = false;
 
-    @Override
-    public void update(YamlNode section) {
-        remove(section, "tablistUpdateIntervall");
-        remove(section, "tablistUpdateInterval");
+    public void writeWithComments(Writer writer, Yaml yaml) throws IOException {
+        writeCommentLine(writer, "This is the configuration file of BungeeTabListPlus");
+        writeCommentLine(writer, "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
 
-        remove(section, "updateOnPlayerJoinLeave");
-        remove(section, "updateOnServerChange");
+        String ser = yaml.dumpAs(this, Tag.MAP, null);
 
-        remove(section, "offline");
-        remove(section, "offline-text");
+        Map<String, String[]> comments = new HashMap<>();
+        for (Field field : MainConfig.class.getDeclaredFields()) {
+            Comment comment = field.getAnnotation(Comment.class);
+            if (comment != null) {
+                int modifiers = field.getModifiers();
+                if (!Modifier.isStatic(modifiers) && !Modifier.isTransient(modifiers)) {
+                    if (Modifier.isPublic(modifiers)) {
+                        Path path = field.getAnnotation(Path.class);
+                        comments.put(path != null ? path.value() : field.getName(), comment.value());
+                    }
+                }
+            }
+        }
 
-        remove(section, "online");
-        remove(section, "online-text");
+        ArrayList<String> lines = new ArrayList<>(Arrays.asList(ser.split("\n")));
 
-        remove(section, "permissionSource");
+        ListIterator<String> iterator = lines.listIterator();
 
-        remove(section, "useScoreboardToBypass16CharLimit");
+        while (iterator.hasNext()) {
+            String line = iterator.next();
+            for (Map.Entry<String, String[]> entry : comments.entrySet()) {
+                if (line.startsWith(entry.getKey())) {
+                    String[] value = entry.getValue();
+                    iterator.previous();
+                    iterator.add("");
+                    for (String comment : value) {
+                        iterator.add("# " + comment);
+                    }
+                    iterator.next();
+                }
+            }
+        }
 
-        remove(section, "autoExcludeServers");
+        for (String line : lines) {
+            writer.write(line);
+            writer.write("\n");
+        }
 
-        remove(section, "showPlayersInGamemode3");
-
-        remove(section, "serverAlias");
-        remove(section, "worldAlias");
-        remove(section, "serverPrefixes");
-        remove(section, "prefixes");
-
-        remove(section, "charLimit");
-
-        remove(section, "automaticallySendBugReports");
+        writer.close();
     }
 
-    private void remove(YamlNode section, String id) {
-        if (section.contains(id)) {
-            section.remove(id);
-            needWrite = true;
-        }
+    private static void writeCommentLine(Writer writer, String comment) throws IOException {
+        writer.write("# " + comment + "\n");
     }
 }

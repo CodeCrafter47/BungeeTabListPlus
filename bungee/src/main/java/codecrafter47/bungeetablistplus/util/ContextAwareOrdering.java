@@ -27,29 +27,29 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class ContextAwareOrdering<Context, T> {
+public abstract class ContextAwareOrdering<C1, C2, T> {
 
-    public abstract int compare(Context context, T first, T second);
+    public abstract int compare(C1 c1, C2 c2, T first, T second);
 
-    public static <Context, T> ContextAwareOrdering<Context, T> from(Comparator<T> comparator) {
+    public static <C1, C2, T> ContextAwareOrdering<C1, C2, T> from(Comparator<T> comparator) {
         return new ComparatorContextAwareOrdering<>(comparator);
     }
 
-    public static <Context, T> ContextAwareOrdering<Context, T> compound(Iterable<ContextAwareOrdering<Context, T>> comparators) {
+    public static <C1, C2, T> ContextAwareOrdering<C1, C2, T> compound(Iterable<ContextAwareOrdering<C1, C2, T>> comparators) {
         return new CompoundContextAwareOrdering<>(ImmutableList.copyOf(comparators));
     }
 
-    public List<T> immutableSortedCopy(Context context, Collection<T> elements) {
+    public List<T> immutableSortedCopy(C1 c1, C2 c2, Collection<T> elements) {
         return new Ordering<T>() {
 
             @Override
             public int compare(@Nullable T left, @Nullable T right) {
-                return ContextAwareOrdering.this.compare(context, left, right);
+                return ContextAwareOrdering.this.compare(c1, c2, left, right);
             }
         }.immutableSortedCopy(elements);
     }
 
-    private static class ComparatorContextAwareOrdering<Context, T> extends ContextAwareOrdering<Context, T> {
+    private static class ComparatorContextAwareOrdering<C1, C2, T> extends ContextAwareOrdering<C1, C2, T> {
         private final Comparator<T> comperator;
 
         public ComparatorContextAwareOrdering(Comparator<T> comperator) {
@@ -57,23 +57,23 @@ public abstract class ContextAwareOrdering<Context, T> {
         }
 
         @Override
-        public int compare(Context context, T first, T second) {
+        public int compare(C1 c1, C2 c2, T first, T second) {
             return comperator.compare(first, second);
         }
     }
 
-    private static class CompoundContextAwareOrdering<Context, T> extends ContextAwareOrdering<Context, T> {
-        private final ImmutableList<ContextAwareOrdering<Context, T>> comperators;
+    private static class CompoundContextAwareOrdering<C1, C2, T> extends ContextAwareOrdering<C1, C2, T> {
+        private final ImmutableList<ContextAwareOrdering<C1, C2, T>> comperators;
 
-        private CompoundContextAwareOrdering(ImmutableList<ContextAwareOrdering<Context, T>> comperators) {
+        private CompoundContextAwareOrdering(ImmutableList<ContextAwareOrdering<C1, C2, T>> comperators) {
             this.comperators = comperators;
         }
 
         @Override
-        public int compare(Context context, T first, T second) {
+        public int compare(C1 c1, C2 c2, T first, T second) {
             int result;
             for (int i = 0; i < comperators.size(); i++) {
-                if (0 != (result = comperators.get(i).compare(context, first, second))) {
+                if (0 != (result = comperators.get(i).compare(c1, c2, first, second))) {
                     return result;
                 }
             }

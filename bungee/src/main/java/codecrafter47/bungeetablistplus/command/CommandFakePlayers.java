@@ -20,8 +20,6 @@
 package codecrafter47.bungeetablistplus.command;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.api.bungee.FakePlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer;
 import codecrafter47.bungeetablistplus.command.util.CommandBase;
 import codecrafter47.bungeetablistplus.command.util.CommandExecutor;
@@ -59,7 +57,7 @@ public class CommandFakePlayers extends CommandExecutor {
             sender.sendMessage(ChatUtil.parseBBCode("&cUsage: [suggest=/btlp fake add ]/btlp fake add <name>[/suggest]"));
         } else {
             for (String name : args) {
-                FakePlayer fakePlayer = manager().createFakePlayer(name, randomServer(), true);
+                FakePlayer fakePlayer = manager().createFakePlayer(name, randomServer(), false, true);
                 fakePlayer.setRandomServerSwitchEnabled(true);
                 sender.sendMessage(ChatUtil.parseBBCode("&aAdded fake player " + name + "."));
             }

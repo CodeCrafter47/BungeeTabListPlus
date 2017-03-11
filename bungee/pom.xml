@@ -102,12 +102,6 @@
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
-            <artifactId>yaml-config</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>bungee-compat</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
@@ -117,18 +111,6 @@
             <artifactId>ProtocolSupportBungee</artifactId>
             <version>1.3.dev</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.sabbertran.proxysuite</groupId>
-            <artifactId>ProxySuite</artifactId>
-            <version>1.2</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>codecrafter47.bungeetablistplus</groupId>
-                    <artifactId>BungeeTabListPlus</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
@@ -149,9 +131,20 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>de.codecrafter47.taboverlay</groupId>
+            <artifactId>TabOverlayCommon</artifactId>
+            <version>0.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bungeecord</artifactId>
             <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${yaml.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

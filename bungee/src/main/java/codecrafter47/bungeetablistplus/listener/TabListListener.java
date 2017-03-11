@@ -19,9 +19,11 @@
 package codecrafter47.bungeetablistplus.listener;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
-import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.managers.BungeePlayerProvider;
+import codecrafter47.bungeetablistplus.managers.TabViewManager;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
+import de.codecrafter47.taboverlay.TabView;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.Server;
@@ -44,16 +46,9 @@ public class TabListListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PostLoginEvent e) {
         try {
-            ConnectedPlayerManager manager = plugin.getConnectedPlayerManager();
-            ConnectedPlayer oldConnectedPlayer = manager.getPlayerIfPresent(e.getPlayer().getUniqueId());
-            if (oldConnectedPlayer != null) {
-                ChannelWrapper channelWrapper = ReflectionUtil.getChannelWrapper(oldConnectedPlayer.getPlayer());
-                channelWrapper.getHandle().eventLoop().execute(() -> manager.onPlayerDisconnected(oldConnectedPlayer));
-            }
-            ConnectedPlayer connectedPlayer = new ConnectedPlayer(e.getPlayer());
-            manager.onPlayerConnected(connectedPlayer);
-
-            plugin.updateTabListForPlayer(e.getPlayer());
+            BungeePlayer player = plugin.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
+            TabView tabView = plugin.getTabViewManager().onPlayerJoin(e.getPlayer());
+            plugin.getListener().onTabViewAdded(tabView, player);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }
@@ -62,11 +57,9 @@ public class TabListListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDisconnect(PlayerDisconnectEvent e) {
         try {
-            ConnectedPlayerManager manager = plugin.getConnectedPlayerManager();
-            ConnectedPlayer connectedPlayer = manager.getPlayerIfPresent(e.getPlayer().getUniqueId());
-            if (connectedPlayer != null && connectedPlayer.getPlayer() == e.getPlayer()) {
-                manager.onPlayerDisconnected(connectedPlayer);
-            }
+            TabView tabView = plugin.getTabViewManager().onPlayerDisconnect(e.getPlayer());
+            plugin.getListener().onTabViewRemoved(tabView);
+            plugin.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
 
             // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
             Server server = e.getPlayer().getServer();
@@ -76,16 +69,6 @@ public class TabListListener implements Listener {
             ((UserConnection) e.getPlayer()).setServer(null);
         } catch (Throwable th){
             BungeeTabListPlus.getInstance().reportError(th);
-        }
-    }
-
-    @EventHandler
-    public void onDevJoin(PostLoginEvent e) {
-        if (plugin.getPlugin().getDescription().getAuthor().equalsIgnoreCase(e.getPlayer().
-                getName())) {
-            e.getPlayer().sendMessage(ChatColor.LIGHT_PURPLE + "Hello " + e.
-                    getPlayer().getName() + ", this server uses " + plugin.getPlugin().
-                    getDescription().getName() + ", one of you incredible good plugins");
         }
     }
 

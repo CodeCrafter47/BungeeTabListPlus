@@ -32,9 +32,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)
 public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
@@ -137,6 +139,7 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
             String line;
             int lineNumber = 0;
             boolean connected = false;
+            String fakeClientID = null;
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
                 if (line.isEmpty()) {
@@ -149,7 +152,7 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
                     switch (tokens[0]) {
                         case "connect":
                             assertFalse(connected);
-                            clientUUID = UUID.fromString(gson.fromJson(tokens[1], String.class));
+                            fakeClientID = gson.fromJson(tokens[1], String.class);
                             connected = true;
                             break;
                         case "disconnect":
@@ -159,6 +162,11 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
                         case "pli":
                             assertTrue(connected);
                             Transformer.PlayerListPacketWrapper wrapper = gson.fromJson(tokens[1], Transformer.PlayerListPacketWrapper.class);
+                            for (Transformer.TabListItemWrapper item : wrapper.items) {
+                                if (fakeClientID.equals(item.uuid)) {
+                                    item.uuid = clientUUID.toString();
+                                }
+                            }
                             tabListHandler.onPlayerListPacket(wrapper.unwrap());
                             break;
                         case "team":
@@ -179,6 +187,9 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
                         case "set":
                             assertTrue(connected);
                             EventLogger.SetData data = gson.fromJson(tokens[1], EventLogger.SetData.class);
+                            if (fakeClientID.equals(data.skin.owner)) {
+                                data.skin.owner = clientUUID.toString();
+                            }
                             tabListHandler.setSlot(data.index, data.skin.unwrap(), data.text, data.ping);
                             break;
                         default:

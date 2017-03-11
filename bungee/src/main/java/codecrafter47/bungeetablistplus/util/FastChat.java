@@ -73,7 +73,7 @@ public final class FastChat {
 
     public static String legacyTextToJson(String legacyText) {
         if (legacyText == null) {
-            return null;
+            return emptyJsonText;
         }
         if (legacyText.isEmpty()) {
             return emptyJsonText;
@@ -105,7 +105,7 @@ public final class FastChat {
 
     public static String legacyTextToJson(String legacyText, char alternateColorChar) {
         if (legacyText == null) {
-            return null;
+            return emptyJsonText;
         }
         if (legacyText.isEmpty()) {
             return emptyJsonText;
@@ -141,7 +141,7 @@ public final class FastChat {
 
     public static String legacyTextToJsonSafe(String legacyText) {
         if (legacyText == null) {
-            return null;
+            return emptyJsonText;
         }
         if (legacyText.isEmpty()) {
             return emptyJsonText;
@@ -271,7 +271,7 @@ public final class FastChat {
 
     public static String legacyTextToJsonSafe(String legacyText, char alternateColorChar) {
         if (legacyText == null) {
-            return null;
+            return emptyJsonText;
         }
         if (legacyText.isEmpty()) {
             return emptyJsonText;

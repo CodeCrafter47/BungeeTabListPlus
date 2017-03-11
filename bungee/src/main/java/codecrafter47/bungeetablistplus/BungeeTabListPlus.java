@@ -18,65 +18,62 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.bungee.*;
+import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
-import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
-import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
+import codecrafter47.bungeetablistplus.compat.SortingRuleAliasProcessor;
 import codecrafter47.bungeetablistplus.config.MainConfig;
+import codecrafter47.bungeetablistplus.config.PlayersByServerComponentConfiguration;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
-import codecrafter47.bungeetablistplus.placeholder.Placeholder;
-import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.placeholder.GlobalServerPlaceholderResolver;
+import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
+import codecrafter47.bungeetablistplus.placeholder.ServerCountPlaceholderResolver;
+import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
-import codecrafter47.bungeetablistplus.player.IPlayerProvider;
-import codecrafter47.bungeetablistplus.player.Player;
-import codecrafter47.bungeetablistplus.protocol.ProtocolManager;
-import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
+import codecrafter47.bungeetablistplus.player.JoinedPlayerProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
-import codecrafter47.bungeetablistplus.util.PingTask;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
-import codecrafter47.bungeetablistplus.yamlconfig.YamlConfig;
-import com.google.common.base.Preconditions;
-import de.codecrafter47.data.api.DataCache;
-import de.codecrafter47.data.api.DataKey;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
-import de.sabbertran.proxysuite.ProxySuiteAPI;
+import de.codecrafter47.data.minecraft.api.MinecraftData;
+import de.codecrafter47.taboverlay.config.ComponentSpec;
+import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
+import de.codecrafter47.taboverlay.config.ErrorHandler;
+import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
+import de.codecrafter47.taboverlay.config.platform.EventListener;
+import de.codecrafter47.taboverlay.config.platform.Platform;
+import de.codecrafter47.taboverlay.config.player.PlayerProvider;
+import io.netty.util.concurrent.*;
 import lombok.Getter;
-import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
-import net.md_5.bungee.connection.LoginResult;
 import org.bstats.bungeecord.Metrics;
+import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
-import javax.annotation.Nonnull;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -85,7 +82,7 @@ import java.util.zip.ZipInputStream;
  *
  * @author Florian Stober
  */
-public class BungeeTabListPlus extends BungeeTabListPlusAPI {
+public class BungeeTabListPlus {
 
     /**
      * Holds an INSTANCE of itself if the plugin is enabled
@@ -93,14 +90,22 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private static BungeeTabListPlus INSTANCE;
     @Getter
     private final Plugin plugin;
-    public Collection<IPlayerProvider> playerProviders;
+
+    public PlayerProvider playerProvider;
     @Getter
-    private ResendThread resendThread;
+    private EventExecutor mainThreadExecutor;
+    @Getter
+    private EventExecutorGroup asyncExecutor;
 
     @Getter
     private RedisPlayerManager redisPlayerManager;
     @Getter
     private DataManager dataManager;
+    private ServerStateManager serverStateManager;
+    @Getter
+    private ServerPlaceholderResolver serverPlaceholderResolver;
+
+    private Yaml yaml;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -126,56 +131,32 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     @Getter
     private MainConfig config;
     MatchingStringsCollection excludedServers;
-    MatchingStringsCollection hiddenServers;
 
     @Getter
     private FakePlayerManagerImpl fakePlayerManagerImpl;
-
-    private PermissionManager pm;
-
-    private TabListManager tabLists;
-    private final TabListListener listener = new TabListListener(this);
-
-    private ScheduledTask refreshThread = null;
-
-    private final static Collection<String> hiddenPlayers = new HashSet<>();
 
     private BukkitBridge bukkitBridge;
 
     private UpdateChecker updateChecker = null;
 
-    private final Map<String, PingTask> serverState = new HashMap<>();
-
-    private SkinManager skins;
+    @Getter
+    private DefaultIconManager iconManager;
 
     @Getter
-    private ConnectedPlayerManager connectedPlayerManager = new ConnectedPlayerManager();
-
-    @Getter
-    private PlaceholderAPIHook placeholderAPIHook;
-
-    public PingTask getServerState(String serverName) {
-        if (serverState.containsKey(serverName)) {
-            return serverState.get(serverName);
-        }
-        ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
-        if (serverInfo != null) {
-            // start server ping tasks
-            int delay = config.pingDelay;
-            if (delay <= 0 || delay > 10) {
-                delay = 10;
-            }
-            PingTask task = new PingTask(serverInfo);
-            serverState.put(serverName, task);
-            plugin.getProxy().getScheduler().schedule(plugin, task, delay, delay, TimeUnit.SECONDS);
-        }
-        return serverState.get(serverName);
-    }
+    private BungeePlayerProvider bungeePlayerProvider;
 
     @Getter
     private ProtocolVersionProvider protocolVersionProvider;
 
-    private Map<Float, Set<Runnable>> scheduledTasks = new ConcurrentHashMap<>();
+    @Getter
+    private TabViewManager tabViewManager;
+
+    private ConfigTabOverlayManager configTabOverlayManager;
+
+    @Getter
+    private EventListener listener;
+
+    private Future<?> softReloadTask;
 
     /**
      * Called when the plugin is enabled
@@ -197,56 +178,163 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             throw new RuntimeException("You need to run at least BungeeCord version #1110");
         }
 
+        INSTANCE = this;
+
+        ConfigTabOverlayManager.Options options = ConfigTabOverlayManager.Options.createBuilderWithDefaults()
+                .playerIconDataKey(BTLPBungeeDataKeys.DATA_KEY_ICON)
+                .playerPingDataKey(BungeeData.BungeeCord_Ping)
+                .playerInvisibleDataKey(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN)
+                .playerCanSeeInvisibleDataKey(MinecraftData.permission("bungeetablistplus.seevanished"))
+                .component(new ComponentSpec("!players_by_server", PlayersByServerComponentConfiguration.class))
+                .sortingRulePreprocessor(new SortingRuleAliasProcessor())
+                .build();
+        yaml = ConfigTabOverlayManager.constructYamlInstance(options);
+
+        if (readMainConfig())
+            return;
+
+        Executor executor = (task) -> ProxyServer.getInstance().getScheduler().runAsync(getPlugin(), task);
+
+        asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
+            @Override
+            protected EventExecutor newChild(Executor executor, Object... args) {
+                return new DefaultEventExecutor(this, executor, 512, RejectedExecutionHandlers.reject());
+            }
+        };
+        mainThreadExecutor = new DefaultEventExecutor(null,
+                executor,
+                128_000, RejectedExecutionHandlers.reject());
+
+        File headsFolder = new File(plugin.getDataFolder(), "heads");
+        extractDefaultIcons(headsFolder);
+
+        iconManager = new DefaultIconManager(asyncExecutor, mainThreadExecutor, headsFolder.toPath(), getLogger());
+
+        bungeePlayerProvider = new BungeePlayerProvider(mainThreadExecutor);
+
+        HiddenPlayersManager hiddenPlayersManager = new HiddenPlayersManager();
+        hiddenPlayersManager.addVanishProvider("/btlp hide", BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND);
+        hiddenPlayersManager.addVanishProvider("config.yml (hiddenPlayers)", BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_CONFIG);
+        hiddenPlayersManager.addVanishProvider("config.yml (hiddenServers)", BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_SERVER_CONFIG);
+        hiddenPlayersManager.addVanishProvider("VanishNoPacket", BukkitData.VanishNoPacket_IsVanished);
+        hiddenPlayersManager.addVanishProvider("SuperVanish", BukkitData.SuperVanish_IsVanished);
+        hiddenPlayersManager.addVanishProvider("PremiumVanish (Bungee)", BungeeData.PremiumVanish_IsHidden);
+        hiddenPlayersManager.addVanishProvider("CMI", BukkitData.CMI_IsVanished);
+        hiddenPlayersManager.addVanishProvider("Essentials", BukkitData.Essentials_IsVanished);
+        hiddenPlayersManager.addVanishProvider("ProxySuite", BungeeData.ProxyCore_IsHidden);
+        hiddenPlayersManager.enable();
+
+        fakePlayerManagerImpl = new FakePlayerManagerImpl(plugin, iconManager, mainThreadExecutor);
+
+        List<PlayerProvider> playerProviders = new ArrayList<>();
+        if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
+            redisPlayerManager = new RedisPlayerManager(bungeePlayerProvider, this, getLogger());
+            playerProviders.add(redisPlayerManager);
+            plugin.getLogger().info("Hooked RedisBungee");
+        }
+        playerProviders.add(bungeePlayerProvider);
+        playerProviders.add(fakePlayerManagerImpl);
+        this.playerProvider = new JoinedPlayerProvider(playerProviders);
+
+        serverPlaceholderResolver = new ServerPlaceholderResolver();
+        PlayerPlaceholderResolver playerPlaceholderResolver = new PlayerPlaceholderResolver(serverPlaceholderResolver);
+
+        plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
+        bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), getLogger(), bungeePlayerProvider, this);
+        API api = new API(tabViewManager, iconManager, playerPlaceholderResolver, serverPlaceholderResolver, getLogger(), fakePlayerManagerImpl, bungeePlayerProvider, this);
+        serverStateManager = new ServerStateManager(config, plugin);
+        dataManager = new DataManager(api, this.getPlugin(), this.getLogger(), bungeePlayerProvider, mainThreadExecutor, hiddenPlayersManager, serverStateManager, bukkitBridge);
+
+        updateExcludedAndHiddenServerLists();
+
+        if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
+            protocolVersionProvider = new ProtocolSupportVersionProvider();
+        } else {
+            protocolVersionProvider = new BungeeProtocolVersionProvider();
+        }
+
+        // register commands and update Notifier
+        ProxyServer.getInstance().getPluginManager().registerCommand(
+                plugin,
+                new CommandBungeeTabListPlus());
+        ProxyServer.getInstance().getScheduler().schedule(plugin,
+                new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
+
+        // Start metrics
+        Metrics metrics = new Metrics(plugin);
+
+        // Load updateCheck thread
+        if (config.checkForUpdates) {
+            updateChecker = new UpdateChecker(plugin);
+            plugin.getLogger().info("Starting UpdateChecker Task");
+            plugin.getProxy().getScheduler().schedule(plugin, updateChecker, 0,
+                    UpdateChecker.interval, TimeUnit.MINUTES).getId();
+        }
+
+        this.tabViewManager = new TabViewManager(this, protocolVersionProvider);
+
+        int[] serversHash = {getProxy().getServers().hashCode()};
+        getProxy().getScheduler().schedule(plugin, () -> {
+            int hash = getProxy().getServers().hashCode();
+            if (hash != serversHash[0]) {
+                serversHash[0] = hash;
+                scheduleSoftReload();
+            }
+        }, 1, 1, TimeUnit.MINUTES);
+
+        configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
+                bungeePlayerProvider,
+                playerPlaceholderResolver,
+                ImmutableList.of(new ServerCountPlaceholderResolver(dataManager),
+                        new GlobalServerPlaceholderResolver(dataManager, serverPlaceholderResolver)),
+                yaml,
+                options,
+                getLogger(),
+                mainThreadExecutor,
+                iconManager);
+
+        Path tabLists = getPlugin().getDataFolder().toPath().resolve("tabLists");
+        if (!Files.exists(tabLists)) {
+            try {
+                Files.createDirectories(tabLists);
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "Failed to create tabLists directory", e);
+                return;
+            }
+            try {
+                Files.copy(getClass().getClassLoader().getResourceAsStream("default.yml"), tabLists.resolve("default.yml"));
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Failed to save default config.", e);
+            }
+        }
+        configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
+
+        ProxyServer.getInstance().getPluginManager().registerListener(plugin, new TabListListener(this));
+
         try {
             Field field = BungeeTabListPlusAPI.class.getDeclaredField("instance");
             field.setAccessible(true);
-            field.set(null, this);
+            field.set(null, api);
         } catch (NoSuchFieldException | IllegalAccessException ex) {
             getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
         }
+    }
 
-        INSTANCE = this;
-
-        try {
-            File file = new File(plugin.getDataFolder(), "config.yml");
-            if (!file.exists()) {
-                config = new MainConfig();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-                YamlConfig.writeWithComments(writer, config,
-                        "This is the configuration file of BungeeTabListPlus",
-                        "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
-            } else {
-                config = YamlConfig.read(new FileInputStream(file), MainConfig.class);
-                if (config.needWrite) {
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-                    YamlConfig.addTag(CustomPlaceholder.Switch.class, "!switch");
-                    YamlConfig.addTag(CustomPlaceholder.Conditional.class, "!conditional");
-                    YamlConfig.writeWithComments(writer, config,
-                            "This is the configuration file of BungeeTabListPlus",
-                            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
-                }
-            }
-        } catch (IOException | YAMLException ex) {
-            plugin.getLogger().warning("Unable to load Config");
-            plugin.getLogger().log(Level.WARNING, null, ex);
-            plugin.getLogger().warning("Disabling Plugin");
-            return;
-        }
+    private void updateExcludedAndHiddenServerLists() {
         excludedServers = new MatchingStringsCollection(
                 config.excludeServers != null
                         ? config.excludeServers
                         : Collections.emptyList()
         );
-        hiddenServers = new MatchingStringsCollection(
+        dataManager.setHiddenServers(new MatchingStringsCollection(
                 config.hiddenServers != null
                         ? config.hiddenServers
                         : Collections.emptyList()
-        );
+        ));
+        dataManager.setPermanentlyHiddenPlayers(config.hiddenPlayers != null ? config.hiddenPlayers : Collections.emptyList());
+    }
 
-        resendThread = new ResendThread();
-
-        File headsFolder = new File(plugin.getDataFolder(), "heads");
-
+    private void extractDefaultIcons(File headsFolder) {
         if (!headsFolder.exists()) {
             headsFolder.mkdirs();
 
@@ -275,351 +363,76 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 getLogger().log(Level.SEVERE, "Error extracting files", ex);
             }
         }
+    }
 
-        skins = new SkinManagerImpl(plugin, headsFolder);
-
-        fakePlayerManagerImpl = new FakePlayerManagerImpl(plugin);
-
-        playerProviders = new ArrayList<>();
-
-        if (plugin.getProxy().getPluginManager().getPlugin("RedisBungee") != null) {
-            redisPlayerManager = new RedisPlayerManager(connectedPlayerManager, this, getLogger());
-            playerProviders.add(redisPlayerManager);
-            plugin.getLogger().info("Hooked RedisBungee");
-        }
-
-        playerProviders.add(connectedPlayerManager);
-
-        playerProviders.add(fakePlayerManagerImpl);
-
-        plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
-        bukkitBridge = new BukkitBridge(this);
-
-        pm = new PermissionManager(this);
-
-        dataManager = new DataManager(this);
-
-        if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
-            protocolVersionProvider = new ProtocolSupportVersionProvider();
-        } else {
-            protocolVersionProvider = new BungeeProtocolVersionProvider();
-        }
-
-        // register commands and update Notifier
-        ProxyServer.getInstance().getPluginManager().registerCommand(
-                plugin,
-                new CommandBungeeTabListPlus());
-        ProxyServer.getInstance().getScheduler().schedule(plugin,
-                new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
-
-        // Start metrics
-        Metrics metrics = new Metrics(plugin);
-
-        // Load updateCheck thread
-        if (config.checkForUpdates) {
-            updateChecker = new UpdateChecker(plugin);
-            plugin.getLogger().info("Starting UpdateChecker Task");
-            plugin.getProxy().getScheduler().schedule(plugin, updateChecker, 0,
-                    UpdateChecker.interval, TimeUnit.MINUTES).getId();
-        }
-
-        // Start packet listeners
-        ProtocolManager protocolManager = new ProtocolManager(plugin);
-        protocolManager.enable();
-
-        int[] serversHash = {getProxy().getServers().hashCode()};
-        getProxy().getScheduler().schedule(plugin, () -> {
-            int hash = getProxy().getServers().hashCode();
-            if (hash != serversHash[0]) {
-                serversHash[0] = hash;
-                getLogger().info("Network topology change detected. Reloading plugin.");
-                reload();
+    private boolean readMainConfig() {
+        try {
+            File file = new File(plugin.getDataFolder(), "config.yml");
+            if (!file.exists()) {
+                config = new MainConfig();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+                config.writeWithComments(writer, yaml);
+            } else {
+                ErrorHandler.set(new ErrorHandler());
+                config = yaml.loadAs(new FileInputStream(file), MainConfig.class);
+                if (!ErrorHandler.get().getEntries().isEmpty()) {
+                    plugin.getLogger().log(Level.WARNING, ErrorHandler.get().formatErrors(file.getName()));
+                }
+                if (config.needWrite) {
+                    // todo this never happens
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+                    config.writeWithComments(writer, yaml);
+                }
             }
-        }, 1, 1, TimeUnit.MINUTES);
-
-        placeholderAPIHook = new PlaceholderAPIHook(this);
-
-        tabLists = new TabListManager(this);
-        if (!tabLists.loadTabLists()) {
-            return;
+        } catch (IOException | YAMLException ex) {
+            plugin.getLogger().log(Level.WARNING, "Unable to load config.yml", ex);
+            return true;
         }
-
-        ProxyServer.getInstance().getPluginManager().registerListener(plugin, listener);
-        plugin.getProxy().getScheduler().runAsync(plugin, resendThread);
-        restartRefreshThread();
+        return false;
     }
 
     public void onDisable() {
         // nothing to do
     }
 
-    private Double requestedUpdateInterval = null;
-
-    private void restartRefreshThread() {
-        if (refreshThread != null) {
-            refreshThread.cancel();
-        }
-        try {
-            refreshThread = ProxyServer.getInstance().getScheduler().schedule(plugin, this::resendTabLists, 1, 1, TimeUnit.SECONDS);
-        } catch (RejectedExecutionException ignored) {
-            // this occurs on proxy shutdown -> we can safely ignore it
-        }
-    }
-
     /**
      * Reloads most settings of the plugin
      */
     public boolean reload() {
-        if (!resendThread.isInMainThread()) {
-            AtomicReference<Boolean> ref = new AtomicReference<>(null);
-            resendThread.execute(() -> {
-                ref.set(reload());
-            });
-            while (ref.get() == null) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ignored) {
-                    return false;
-                }
-            }
-            return ref.get();
-        }
-        failIfNotMainThread();
-        try {
-            // todo requestedUpdateInterval = null;
-            fakePlayerManagerImpl.removeConfigFakePlayers();
-            File file = new File(plugin.getDataFolder(), "config.yml");
-            config = YamlConfig.read(new FileInputStream(file), MainConfig.class);
-            if (config.needWrite) {
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
-                YamlConfig.addTag(CustomPlaceholder.Switch.class, "!switch");
-                YamlConfig.addTag(CustomPlaceholder.Conditional.class, "!conditional");
-                YamlConfig.writeWithComments(writer, config,
-                        "This is the configuration file of BungeeTabListPlus",
-                        "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
-            }
-            excludedServers = new MatchingStringsCollection(
-                    config.excludeServers != null
-                            ? config.excludeServers
-                            : Collections.emptyList()
-            );
-            hiddenServers = new MatchingStringsCollection(
-                    config.hiddenServers != null
-                            ? config.hiddenServers
-                            : Collections.emptyList()
-            );
-            if (reloadTablists()) return false;
-            fakePlayerManagerImpl.reload();
-            resendTabLists();
-            restartRefreshThread();
-            skins.onReload();
-        } catch (Throwable th) {
-            plugin.getLogger().log(Level.WARNING, "Unable to reload Config", th);
-            return false;
-        }
-        return true;
-    }
+        fakePlayerManagerImpl.removeConfigFakePlayers();
 
-    private boolean reloadTablists() {
-        failIfNotMainThread();
-        TabListManager tabListManager = new TabListManager(this);
-        if (!tabListManager.loadTabLists()) {
+        if (readMainConfig()) {
+            plugin.getLogger().log(Level.WARNING, "Unable to reload Config");
+            return false;
+        } else {
+            updateExcludedAndHiddenServerLists();
+
+            Path tabLists = getPlugin().getDataFolder().toPath().resolve("tabLists");
+            configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
+
+            fakePlayerManagerImpl.reload();
+
+            serverStateManager.updateConfig(config);
             return true;
         }
-        tabLists = tabListManager;
-        return false;
     }
 
-    @Override
-    protected void registerVariable0(Plugin plugin, Variable variable) {
-        Preconditions.checkNotNull(plugin, "plugin");
-        Preconditions.checkNotNull(variable, "variable");
-        Preconditions.checkArgument(!Placeholder.thirdPartyDataKeys.containsKey(variable.getName()), "Variable name already registered.");
-        DataKey<String> dataKey = BTLPBungeeDataKeys.createBungeeThirdPartyVariableDataKey(variable.getName());
-        Placeholder.thirdPartyDataKeys.put(variable.getName(), dataKey);
-        getProxy().getScheduler().schedule(plugin, () -> {
-            for (ConnectedPlayer player : connectedPlayerManager.getPlayers()) {
-                try {
-                    String replacement = variable.getReplacement(player.getPlayer());
-                    if (!Objects.equals(replacement, player.getLocalDataCache().get(dataKey))) {
-                        runInMainThread(() -> {
-                            player.getLocalDataCache().updateValue(dataKey, replacement);
-                        });
-                    }
-                } catch (Throwable th) {
-                    getLogger().log(Level.WARNING, "Failed to resolve Placeholder " + variable.getName(), th);
-                }
-            }
-
-        }, 1, 1, TimeUnit.SECONDS);
-        runInMainThread(this::reloadTablists);
-    }
-
-    @Override
-    protected void registerVariable0(Plugin plugin, ServerVariable variable) {
-        Preconditions.checkNotNull(plugin, "plugin");
-        Preconditions.checkNotNull(variable, "variable");
-        Preconditions.checkArgument(!Placeholder.thirdPartyServerDataKeys.containsKey(variable.getName()), "Variable name already registered.");
-        DataKey<String> dataKey = BTLPBungeeDataKeys.createBungeeThirdPartyServerVariableDataKey(variable.getName());
-        Placeholder.thirdPartyServerDataKeys.put(variable.getName(), dataKey);
-        getProxy().getScheduler().schedule(plugin, () -> {
-            try {
-                for (String serverName : ProxyServer.getInstance().getServers().keySet()) {
-                    try {
-                        String replacement = variable.getReplacement(serverName);
-                        DataCache dataHolder = (DataCache) bukkitBridge.getServerDataHolder(serverName);
-                        if (!Objects.equals(replacement, dataHolder.get(dataKey))) {
-                            runInMainThread(() -> {
-                                dataHolder.updateValue(dataKey, replacement);
-                            });
-                        }
-                    } catch (Throwable th) {
-                        getLogger().log(Level.WARNING, "Failed to resolve server Placeholder " + variable.getName(), th);
-                    }
-                }
-            } catch (ConcurrentModificationException ignored) {
-                // can happen because server map is not thread safe & sometimes modified by plugin
-            }
-
-        }, 1, 1, TimeUnit.SECONDS);
-        runInMainThread(this::reloadTablists);
-    }
-
-    @Override
-    protected CustomTablist createCustomTablist0() {
-        return new DefaultCustomTablist();
-    }
-
-    /**
-     * updates the tabList on all connected clients
-     */
-    public void resendTabLists() {
-        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-            resendThread.add(player);
+    public void scheduleSoftReload() {
+        if (softReloadTask == null) {
+            softReloadTask = asyncExecutor.submit(this::softReload);
         }
     }
 
-    public void runInMainThread(Runnable runnable) {
-        resendThread.execute(runnable);
+    private void softReload() {
+        softReloadTask = null;
+        configTabOverlayManager.refreshConfigs();
     }
 
-    public void failIfNotMainThread() {
-        if (!resendThread.isInMainThread()) {
+    @Deprecated
+    public final void failIfNotMainThread() {
+        if (!mainThreadExecutor.inEventLoop()) {
             getLogger().log(Level.SEVERE, "Not in main thread", new IllegalStateException("Not in main thread"));
         }
-    }
-
-    public void updateTabListForPlayer(ProxiedPlayer player) {
-        resendThread.add(player);
-    }
-
-    public SkinManager getSkinManager() {
-        return skins;
-    }
-
-    /**
-     * Getter for the PermissionManager. For internal use only.
-     *
-     * @return an instance of the PermissionManager or null
-     */
-    public PermissionManager getPermissionManager() {
-        return pm;
-    }
-
-    @Override
-    protected FakePlayerManager getFakePlayerManager0() {
-        return fakePlayerManagerImpl;
-    }
-
-    /**
-     * Getter for the TabListManager. For internal use only
-     *
-     * @return an instance of the TabListManager
-     */
-    public TabListManager getTabListManager() {
-        return tabLists;
-    }
-
-    /**
-     * checks whether a player is hidden from the tablist
-     *
-     * @param player the player object for which the check should be performed
-     * @return true if the player is hidden, false otherwise
-     */
-    public static boolean isHidden(Player player) {
-        if (player.getOpt(BungeeData.BungeeCord_Server).map(BungeeTabListPlus::isHiddenServer).orElse(false)) {
-            return true;
-        }
-        final boolean[] hidden = new boolean[1];
-        synchronized (hiddenPlayers) {
-            String name = player.getName();
-            hidden[0] = hiddenPlayers.contains(name);
-        }
-        List<String> permanentlyHiddenPlayers = getInstance().config.hiddenPlayers;
-        if (permanentlyHiddenPlayers != null) {
-            if (permanentlyHiddenPlayers.contains(player.getName())) {
-                hidden[0] = true;
-            }
-            if (permanentlyHiddenPlayers.contains(player.getUniqueID().toString())) {
-                hidden[0] = true;
-            }
-        }
-        player.getOpt(BukkitData.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
-        player.getOpt(BukkitData.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
-        player.getOpt(BukkitData.CMI_IsVanished).ifPresent(b -> hidden[0] |= b);
-        player.getOpt(BukkitData.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
-
-        // check ProxyCore
-        if (!hidden[0]) {
-            if (ProxyServer.getInstance().getPluginManager().getPlugin("ProxySuite") != null) {
-                try {
-                    ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(player.getName());
-                    if (proxiedPlayer != null) {
-                        hidden[0] |= ProxySuiteAPI.isVanished(proxiedPlayer);
-                    }
-                } catch (Throwable th) {
-                    getInstance().getLogger().log(Level.WARNING, "An error occurred while looking up a players vanish status from ProxyCore.", th);
-                }
-            }
-        }
-
-        return hidden[0];
-    }
-
-    @Override
-    protected boolean isHidden0(ProxiedPlayer player) {
-        return isHidden(getConnectedPlayerManager().getPlayer(player));
-    }
-
-    /**
-     * Hides a player from the tablist
-     *
-     * @param player The player which should be hidden.
-     */
-    public static void hidePlayer(ProxiedPlayer player) {
-        synchronized (hiddenPlayers) {
-            String name = player.getName();
-            if (!hiddenPlayers.contains(name))
-                hiddenPlayers.add(name);
-        }
-    }
-
-    /**
-     * Unhides a previously hidden player from the tablist. Only works if the
-     * playe has been hidden via the hidePlayer method. Not works for players
-     * hidden by VanishNoPacket
-     *
-     * @param player the player on which the operation should be performed
-     */
-    public static void unhidePlayer(ProxiedPlayer player) {
-        synchronized (hiddenPlayers) {
-            String name = player.getName();
-            hiddenPlayers.remove(name);
-        }
-    }
-
-    public static boolean isHiddenServer(String serverName) {
-        return getInstance().hiddenServers.contains(serverName);
     }
 
     /**
@@ -632,11 +445,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     /**
-     * Checks whether an update for BungeeTabListPlus is available. Acctually
+     * Checks whether an update for BungeeTabListPlus is available. Actually
      * the check is performed in a background task and this only returns the
      * result.
      *
-     * @return true if an newer version of BungeeTabListPlus is available
+     * @return true if a newer version of BungeeTabListPlus is available
      */
     public boolean isUpdateAvailable() {
         return updateChecker != null && updateChecker.isUpdateAvailable();
@@ -662,62 +475,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return plugin.getProxy();
     }
 
-    private final static Pattern PATTERN_VALID_USERNAME = Pattern.compile("(?:\\p{Alnum}|_){1,16}");
+    private final class MyPlatform implements Platform {
 
-    @Override
-    protected void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist) {
-        ConnectedPlayer connectedPlayer = getConnectedPlayerManager().getPlayerIfPresent(player);
-        if (connectedPlayer != null) {
-            connectedPlayer.setCustomTablist(customTablist);
+        @Override
+        public void addEventListener(EventListener listener) {
+            BungeeTabListPlus.this.listener = listener;
         }
-        updateTabListForPlayer(player);
-    }
-
-    @Override
-    protected void removeCustomTabList0(ProxiedPlayer player) {
-        ConnectedPlayerManager connectedPlayerManager = getConnectedPlayerManager();
-        if (connectedPlayerManager == null) {
-            return;
-        }
-        ConnectedPlayer connectedPlayer = connectedPlayerManager.getPlayerIfPresent(player);
-        if (connectedPlayer != null) {
-            connectedPlayer.setCustomTablist(null);
-            updateTabListForPlayer(player);
-        }
-    }
-
-    @Nonnull
-    @Override
-    protected Icon getIconFromPlayer0(ProxiedPlayer player) {
-        LoginResult loginResult = ((UserConnection) player).
-                getPendingConnection().getLoginProfile();
-        if (loginResult != null) {
-            LoginResult.Property[] properties = loginResult.getProperties();
-            if (properties != null) {
-                for (LoginResult.Property s : properties) {
-                    if (s.getName().equals("textures")) {
-                        return new Icon(player.getUniqueId(), new String[][]{{s.getName(), s.getValue(), s.getSignature()}});
-                    }
-                }
-            }
-        }
-        return new Icon(player.getUniqueId(), new String[0][]);
-    }
-
-    @Override
-    protected void createIcon0(BufferedImage image, Consumer<Icon> callback) {
-        getSkinManager().createIcon(image, callback);
-    }
-
-    public void registerTask(float interval, Runnable task) {
-        boolean first = !scheduledTasks.containsKey(interval);
-        scheduledTasks.computeIfAbsent(interval, f -> Collections.newSetFromMap(new ConcurrentHashMap<>())).add(task);
-        if (first) {
-            getProxy().getScheduler().schedule(getPlugin(), () -> scheduledTasks.get(interval).forEach(Runnable::run), (long) (interval * 1000), (long) (interval * 1000), TimeUnit.MILLISECONDS);
-        }
-    }
-
-    public void unregisterTask(float interval, Runnable task) {
-        scheduledTasks.get(interval).remove(task);
     }
 }

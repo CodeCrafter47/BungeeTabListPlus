@@ -25,8 +25,10 @@ import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
 import codecrafter47.bungeetablistplus.data.TrackingDataCache;
-import codecrafter47.bungeetablistplus.placeholder.Placeholder;
-import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
+import codecrafter47.bungeetablistplus.managers.BungeePlayerProvider;
+import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
+import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.codecrafter47.data.api.DataCache;
@@ -35,6 +37,7 @@ import de.codecrafter47.data.api.DataKey;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -43,46 +46,49 @@ import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BukkitBridge implements Listener {
 
     private static final TypeAdapterRegistry typeAdapterRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
-
     private static final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);
-
-    @Nonnull
-    private final BungeeTabListPlus plugin;
 
     private final Map<ProxiedPlayer, PlayerConnectionInfo> playerPlayerConnectionInfoMap = new ConcurrentHashMap<>();
     private final Map<String, ServerBridgeDataCache> serverInformation = new ConcurrentHashMap<>();
-
-    private final Set<String> registeredThirdPartyVariables = new HashSet<>();
-    private final Set<String> registeredThirdPartyServerVariables = new HashSet<>();
-    private final ReentrantLock thirdPartyVariablesLock = new ReentrantLock();
-
     private final int proxyIdentifier = ThreadLocalRandom.current().nextInt();
-
     private final NetDataKeyIdMap idMap = new NetDataKeyIdMap();
 
-    public BukkitBridge(@Nonnull BungeeTabListPlus plugin) {
+    private final ScheduledExecutorService asyncExecutor;
+    private final ScheduledExecutorService mainLoop;
+    private final PlayerPlaceholderResolver playerPlaceholderResolver;
+    private final ServerPlaceholderResolver serverPlaceholderResolver;
+    private final Plugin plugin;
+    private final Logger logger;
+    private final BungeePlayerProvider bungeePlayerProvider;
+    private final BungeeTabListPlus btlp;
+
+    public BukkitBridge(ScheduledExecutorService asyncExecutor, ScheduledExecutorService mainLoop, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, Plugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus btlp) {
+        this.asyncExecutor = asyncExecutor;
+        this.mainLoop = mainLoop;
+        this.playerPlaceholderResolver = playerPlaceholderResolver;
+        this.serverPlaceholderResolver = serverPlaceholderResolver;
         this.plugin = plugin;
-        plugin.getProxy().getPluginManager().registerListener(plugin.getPlugin(), this);
-        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), () -> plugin.runInMainThread(this::checkForThirdPartyVariables), 2, 2, TimeUnit.SECONDS);
-        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::sendIntroducePackets, 100, 100, TimeUnit.MILLISECONDS);
-        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::resendUnconfirmedMessages, 2, 2, TimeUnit.SECONDS);
-        plugin.getProxy().getScheduler().schedule(plugin.getPlugin(), this::removeObsoleteServerConnections, 5, 5, TimeUnit.SECONDS);
+        this.logger = logger;
+        this.bungeePlayerProvider = bungeePlayerProvider;
+        this.btlp = btlp;
+        ProxyServer.getInstance().getPluginManager().registerListener(plugin, this);
+        asyncExecutor.scheduleWithFixedDelay(this::sendIntroducePackets, 100, 100, TimeUnit.MILLISECONDS);
+        asyncExecutor.scheduleWithFixedDelay(this::resendUnconfirmedMessages, 2, 2, TimeUnit.SECONDS);
+        asyncExecutor.scheduleWithFixedDelay(this::removeObsoleteServerConnections, 5, 5, TimeUnit.SECONDS);
     }
 
     @EventHandler
@@ -125,7 +131,7 @@ public class BukkitBridge implements Listener {
                     handlePluginMessage(player, server, input);
                 } catch (Throwable e) {
                     rlExecutor.execute(() -> {
-                        plugin.getLogger().log(Level.SEVERE, "Unexpected error: ", e);
+                        logger.log(Level.SEVERE, "Unexpected error: ", e);
                     });
                 }
             } else {
@@ -215,7 +221,7 @@ public class BukkitBridge implements Listener {
 
             if (BridgeProtocolConstants.VERSION < minimumCompatibleProtocolVersion) {
                 rlExecutor.execute(() -> {
-                    plugin.getLogger().log(Level.WARNING, "Incompatible version of BTLP on server " + server.getInfo().getName() + " detected: " + proxyPluginVersion);
+                    logger.log(Level.WARNING, "Incompatible version of BTLP on server " + server.getInfo().getName() + " detected: " + proxyPluginVersion);
                 });
                 return;
             }
@@ -228,11 +234,11 @@ public class BukkitBridge implements Listener {
             connectionInfo.hasReceived = false;
             connectionInfo.protocolVersion = Integer.min(BridgeProtocolConstants.VERSION, protocolVersion);
 
-            ConnectedPlayer connectedPlayer = plugin.getConnectedPlayerManager().getPlayerIfPresent(player);
-            if (connectedPlayer == null) {
-                plugin.getLogger().severe("Internal error - Bridge functionality not available for " + player.getName());
+            BungeePlayer bungeePlayer = bungeePlayerProvider.getPlayerIfPresent(player);
+            if (bungeePlayer == null) {
+                logger.severe("Internal error - Bridge functionality not available for " + player.getName());
             } else {
-                connectionInfo.playerBridgeData = connectedPlayer.getBridgeDataCache();
+                connectionInfo.playerBridgeData = bungeePlayer.getBridgeDataCache();
                 connectionInfo.playerBridgeData.setConnectionId(connectionId);
                 connectionInfo.playerBridgeData.connection = server;
                 connectionInfo.playerBridgeData.requestMissingData();
@@ -348,11 +354,11 @@ public class BukkitBridge implements Listener {
 
             if (removed) {
 
-                plugin.runInMainThread(() -> cache.updateValue(key, null));
+                mainLoop.execute(() -> cache.updateValue(key, null));
             } else {
 
                 Object value = typeAdapterRegistry.getTypeAdapter(key.getType()).read(input);
-                plugin.runInMainThread(() -> cache.updateValue((DataKey<Object>) key, value));
+                mainLoop.execute(() -> cache.updateValue((DataKey<Object>) key, value));
             }
         } else {
             Object[] update = new Object[size * 2];
@@ -376,7 +382,7 @@ public class BukkitBridge implements Listener {
                 update[i + 1] = value;
             }
 
-            plugin.runInMainThread(() -> {
+            mainLoop.execute(() -> {
                 for (int i = 0; i < update.length; i += 2) {
                     cache.updateValue((DataKey<Object>) update[i], update[i + 1]);
                 }
@@ -406,13 +412,13 @@ public class BukkitBridge implements Listener {
                         output.writeInt(proxyIdentifier);
                         output.writeInt(BridgeProtocolConstants.VERSION);
                         output.writeInt(BridgeProtocolConstants.VERSION);
-                        output.writeUTF(plugin.getPlugin().getDescription().getVersion());
+                        output.writeUTF(plugin.getDescription().getVersion());
 
                         byte[] message = byteArrayOutput.toByteArray();
                         server.sendData(BridgeProtocolConstants.CHANNEL, message);
                     } catch (Throwable th) {
                         rlExecutor.execute(() -> {
-                            plugin.getLogger().log(Level.SEVERE, "Unexpected error", th);
+                            logger.log(Level.SEVERE, "Unexpected error", th);
                         });
                     }
                 }
@@ -461,48 +467,41 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    private void checkForThirdPartyVariables() {
-        try {
-            for (ServerInfo serverInfo : plugin.getProxy().getServers().values()) {
-                List<String> variables = getServerDataCache(serverInfo.getName()).get(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES);
-                if (variables != null) {
-                    thirdPartyVariablesLock.lock();
-                    try {
-                        for (String variable : variables) {
-                            if (!registeredThirdPartyVariables.contains(variable)) {
-                                Placeholder.remoteThirdPartyDataKeys.put(variable, BTLPDataKeys.createThirdPartyVariableDataKey(variable));
-                                plugin.reload();
-                                registeredThirdPartyVariables.add(variable);
-                            }
-                        }
-                    } catch (Throwable th) {
-                        plugin.getLogger().log(Level.SEVERE, "Unexpected exception", th);
-                    } finally {
-                        thirdPartyVariablesLock.unlock();
-                    }
-                }
-                List<String> serverVariables = getServerDataCache(serverInfo.getName()).get(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES);
-                if (serverVariables != null) {
-                    thirdPartyVariablesLock.lock();
-                    try {
-                        for (String variable : serverVariables) {
-                            if (!registeredThirdPartyServerVariables.contains(variable)) {
-                                Placeholder.remoteThirdPartyServerDataKeys.put(variable, BTLPDataKeys.createThirdPartyServerVariableDataKey(variable));
-                                plugin.reload();
-                                registeredThirdPartyServerVariables.add(variable);
-                            }
-                        }
-                    } catch (Throwable th) {
-                        plugin.getLogger().log(Level.SEVERE, "Unexpected exception", th);
-                    } finally {
-                        thirdPartyVariablesLock.unlock();
-                    }
-                }
+    private void checkForThirdPartyVariables(ServerBridgeDataCache dataCache) {
+        mainLoop.execute(() -> {
+            dataCache.addDataChangeListener(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, () -> updateBridgePlaceholders(dataCache));
+            updateBridgePlaceholders(dataCache);
+            dataCache.addDataChangeListener(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES, () -> updateBridgeServerPlaceholders(dataCache));
+            updateBridgeServerPlaceholders(dataCache);
+            dataCache.addDataChangeListener(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS, () -> updatePlaceholderAPIPlaceholders(dataCache));
+            updatePlaceholderAPIPlaceholders(dataCache);
+        });
+    }
+
+    private void updateBridgePlaceholders(ServerBridgeDataCache dataCache) {
+        List<String> variables = dataCache.get(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES);
+        if (variables != null) {
+            for (String variable : variables) {
+                playerPlaceholderResolver.addBridgeCustomPlaceholderDataKey(variable, BTLPDataKeys.createThirdPartyVariableDataKey(variable));
+                btlp.scheduleSoftReload();
             }
-        } catch (ConcurrentModificationException ignored) {
-            // The map returned from ProxyServer#getServers is mutable
-            // If it is mutated while we are iterating over its values
-            // an exception is thrown
+        }
+    }
+
+    private void updateBridgeServerPlaceholders(ServerBridgeDataCache dataCache) {
+        List<String> variables = dataCache.get(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES);
+        if (variables != null) {
+            for (String variable : variables) {
+                serverPlaceholderResolver.addBridgeCustomPlaceholderServerDataKey(variable, BTLPDataKeys.createThirdPartyServerVariableDataKey(variable));
+                btlp.scheduleSoftReload();
+            }
+        }
+    }
+
+    private void updatePlaceholderAPIPlaceholders(ServerBridgeDataCache dataCache) {
+        List<String> plugins = dataCache.get(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS);
+        if (plugins != null) {
+            playerPlaceholderResolver.addPlaceholderAPIPluginPrefixes(plugins);
         }
     }
 
@@ -512,7 +511,7 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    public PlayerBridgeDataCache createDataCacheForPlayer(@Nonnull ConnectedPlayer player) {
+    public PlayerBridgeDataCache createDataCacheForPlayer(@Nonnull BungeePlayer player) {
         return new PlayerBridgeDataCache();
     }
 
@@ -522,7 +521,11 @@ public class BukkitBridge implements Listener {
 
     private ServerBridgeDataCache getServerDataCache(@Nonnull String serverName) {
         if (!serverInformation.containsKey(serverName)) {
-            serverInformation.putIfAbsent(serverName, new ServerBridgeDataCache());
+            serverInformation.computeIfAbsent(serverName, key -> {
+                ServerBridgeDataCache dataCache = new ServerBridgeDataCache();
+                checkForThirdPartyVariables(dataCache);
+                return dataCache;
+            });
         }
         return serverInformation.get(serverName);
     }
@@ -555,8 +558,9 @@ public class BukkitBridge implements Listener {
         abstract Server getConnection();
 
         @Override
-        protected <V> void onMissingData(DataKey<V> key) {
-            super.onMissingData(key);
+        protected <T> void addActiveKey(DataKey<T> key) {
+            super.addActiveKey(key);
+
             try {
                 synchronized (this) {
                     Server connection = getConnection();
@@ -578,7 +582,7 @@ public class BukkitBridge implements Listener {
                 }
             } catch (Throwable th) {
                 rlExecutor.execute(() -> {
-                    plugin.getLogger().log(Level.SEVERE, "Unexpected exception", th);
+                    logger.log(Level.SEVERE, "Unexpected exception", th);
                 });
                 requestAll = true;
             }
@@ -599,8 +603,8 @@ public class BukkitBridge implements Listener {
                 nextOutgoingMessageId = 1;
                 nextIncomingMessageId = 1;
                 lastMessageSent = 0;
-                Collection<DataKey<?>> queriedKeys = new ArrayList<>(getQueriedKeys());
-                plugin.runInMainThread(() -> {
+                Collection<DataKey<?>> queriedKeys = new ArrayList<>(getActiveKeys());
+                mainLoop.execute(() -> {
                     for (DataKey<?> key : queriedKeys) {
                         updateValue(key, null);
                     }
@@ -613,7 +617,7 @@ public class BukkitBridge implements Listener {
                 if (requestAll) {
                     Server connection = getConnection();
                     if (connection != null) {
-                        List<DataKey<?>> keys = new ArrayList<>(getQueriedKeys());
+                        List<DataKey<?>> keys = new ArrayList<>(getActiveKeys());
 
                         ByteArrayDataOutput data = ByteStreams.newDataOutput();
                         data.writeByte(this instanceof PlayerBridgeDataCache ? BridgeProtocolConstants.MESSAGE_ID_REQUEST_DATA : BridgeProtocolConstants.MESSAGE_ID_REQUEST_DATA_SERVER);

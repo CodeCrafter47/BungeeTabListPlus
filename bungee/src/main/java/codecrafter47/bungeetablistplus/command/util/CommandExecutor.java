@@ -19,7 +19,6 @@
 
 package codecrafter47.bungeetablistplus.command.util;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.util.chat.ChatUtil;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -81,7 +80,7 @@ public class CommandExecutor extends Command implements TabExecutor {
                     .collect(Collectors.toList());
         } else if (args.length > 1) {
             Command command = subCommands.get(args[0]);
-            if (command != null && command instanceof TabExecutor) {
+            if (command instanceof TabExecutor) {
                 if (command.getPermission() == null || checkPermission(sender, command)) {
                     ((TabExecutor) command).onTabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
                 }
@@ -91,6 +90,6 @@ public class CommandExecutor extends Command implements TabExecutor {
     }
 
     private static boolean checkPermission(CommandSender sender, Command command) {
-        return BungeeTabListPlus.getInstance().getPermissionManager().hasPermission(sender, command.getPermission());
+        return sender.hasPermission(command.getPermission());
     }
 }

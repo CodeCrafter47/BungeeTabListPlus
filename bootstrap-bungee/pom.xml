@@ -66,6 +66,10 @@
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>codecrafter47.bungeetablistplus.libs.bstats</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.yaml.snakeyaml</pattern>
+                                    <shadedPattern>codecrafter47.bungeetablistplus.libs.snakeyaml</shadedPattern>
+                                </relocation>
                             </relocations>
                             <minimizeJar>true</minimizeJar>
                         </configuration>

@@ -19,76 +19,40 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
-import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
-import com.google.common.base.Preconditions;
+import codecrafter47.bungeetablistplus.util.IconUtil;
+import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.TabOverlayProvider;
+import de.codecrafter47.taboverlay.TabView;
+import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 
 import static java.lang.Integer.min;
 
-public class DefaultCustomTablist extends AbstractCustomTablist implements TablistProvider {
-    private ReferenceSet<PlayerTablistHandler> handlers = new ReferenceOpenHashSet<>();
+public class DefaultCustomTablist extends AbstractCustomTablist {
+    private final ReferenceSet<TabOverlayProviderImpl> handlers = new ReferenceOpenHashSet<>();
 
-    @Override
-    public synchronized void onActivated(PlayerTablistHandler handler) {
-        Preconditions.checkState(!handlers.contains(handler));
-        handlers.add(handler);
-        handler.runInEventLoop(() -> {
-            synchronized (DefaultCustomTablist.this) {
-                handler.setResizePolicy(PlayerTablistHandler.ResizePolicy.DEFAULT);
-                int size = min(80, getSize());
-                handler.setSize(size);
-                handler.setPassThrough(false);
-
-                updateAllSlots(handler);
-
-                handler.setHeaderFooter(getHeader(), getFooter());
-            }
-        });
+    public DefaultCustomTablist() {
     }
 
-    private void updateAllSlots(PlayerTablistHandler handler) {
-        for (int column = 0; column < getColumns(); column++) {
-            for (int row = 0; row < getRows(); row++) {
-                Icon icon = getIcon(row, column);
-                String text = getText(row, column);
-                int ping = getPing(row, column);
-
-                handler.setSlot(row, column, icon, text, ping);
-            }
-        }
-    }
-
-    @Override
-    public synchronized void onDeactivated(PlayerTablistHandler handler) {
-        if (!handlers.remove(handler)) {
-            throw new IllegalStateException();
-        }
+    public DefaultCustomTablist(int size) {
+        super(size);
     }
 
     @Override
     protected void onSizeChanged() {
-        int size = getSize();
-        for (PlayerTablistHandler handler : handlers) {
-            handler.runInEventLoop(() -> {
-                handler.setSize(size);
-
-                synchronized (DefaultCustomTablist.this) {
-                    updateAllSlots(handler);
-                }
-            });
+        for (TabOverlayProviderImpl handler : handlers) {
+            handler.onSizeChanged();
         }
     }
 
     @Override
-    protected void onSlotChanged(int row, int column) {
-        Icon icon = getIcon(row, column);
-        String text = getText(row, column);
-        int ping = getPing(row, column);
-        for (PlayerTablistHandler handler : handlers) {
-            handler.runInEventLoop(() -> handler.setSlot(row, column, icon, text, ping));
+    protected void onSlotChanged(int index) {
+        Icon icon = getIcon(index);
+        String text = getText(index);
+        int ping = getPing(index);
+        for (TabOverlayProviderImpl handler : handlers) {
+            handler.onSlotChanged(index, icon, text, ping);
         }
     }
 
@@ -96,8 +60,83 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
     protected void onHeaderOrFooterChanged() {
         String header = getHeader();
         String footer = getFooter();
-        for (PlayerTablistHandler handler : handlers) {
-            handler.runInEventLoop(() -> handler.setHeaderFooter(header, footer));
+        for (TabOverlayProviderImpl handler : handlers) {
+            handler.setHeaderFooter(header, footer);
+        }
+    }
+
+    public void addToPlayer(TabView tabView) {
+        TabOverlayProviderImpl provider = new TabOverlayProviderImpl();
+        tabView.getTabOverlayProviders().addProvider(provider);
+    }
+
+    public class TabOverlayProviderImpl extends TabOverlayProvider {
+
+        private SimpleTabOverlay tabOverlay;
+        private HeaderAndFooterHandle headerAndFooterHandle;
+
+        TabOverlayProviderImpl() {
+            super("custom-tab-overlay", 10000);
+        }
+
+        @Override
+        protected void attach(TabView tabView) {
+            handlers.add(this);
+        }
+
+        @Override
+        protected void detach(TabView tabView) {
+            handlers.remove(this);
+        }
+
+        @Override
+        protected void activate(TabView tabView, TabOverlayHandler handler) {
+            synchronized (DefaultCustomTablist.this) {
+                tabOverlay = handler.enterContentOperationMode(ContentOperationMode.SIMPLE);
+                headerAndFooterHandle = handler.enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.CUSTOM);
+                int size = min(80, getSize());
+                tabOverlay.setSize(size);
+                updateAllSlots();
+                headerAndFooterHandle.setHeaderFooter(getHeader(), getFooter());
+            }
+        }
+
+        @Override
+        protected void deactivate(TabView tabView) {
+
+        }
+
+        @Override
+        protected boolean shouldActivate(TabView tabView) {
+            return true;
+        }
+
+        private void updateAllSlots() {
+            for (int column = 0; column < getColumns(); column++) {
+                for (int row = 0; row < getRows(); row++) {
+                    Icon icon = IconUtil.convert(getIcon(row, column));
+                    String text = getText(row, column);
+                    int ping = getPing(row, column);
+
+                    tabOverlay.setSlot(index(row, column), icon, text, ping);
+                }
+            }
+        }
+
+        void onSizeChanged() {
+            synchronized (DefaultCustomTablist.this) {
+                int size = getSize();
+                tabOverlay.setSize(size);
+                updateAllSlots();
+            }
+        }
+
+        void onSlotChanged(int index, Icon icon, String text, int ping) {
+            tabOverlay.setSlot(index, icon, text, ping);
+        }
+
+        void setHeaderFooter(String header, String footer) {
+            headerAndFooterHandle.setHeaderFooter(header, footer);
         }
     }
 }

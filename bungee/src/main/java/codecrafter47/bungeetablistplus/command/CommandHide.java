@@ -22,6 +22,8 @@ package codecrafter47.bungeetablistplus.command;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.command.util.CommandBase;
 import codecrafter47.bungeetablistplus.command.util.CommandExecutor;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.util.chat.ChatUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -42,30 +44,51 @@ public class CommandHide extends CommandExecutor {
     }
 
     private void commandToggle(ProxiedPlayer player) {
-        if (BungeeTabListPlus.isHidden(BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(player))) {
-            BungeeTabListPlus.unhidePlayer(player);
-            player.sendMessage(ChatUtil.parseBBCode("&aYour name is no longer hidden from the tab list."));
-        } else {
-            BungeeTabListPlus.hidePlayer(player);
-            player.sendMessage(ChatUtil.parseBBCode("&aYou've been hidden from the tab list."));
-        }
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().submit(() -> {
+            if (isHidden(player)) {
+                unhidePlayer(player);
+                player.sendMessage(ChatUtil.parseBBCode("&aYour name is no longer hidden from the tab list."));
+            } else {
+                hidePlayer(player);
+                player.sendMessage(ChatUtil.parseBBCode("&aYou've been hidden from the tab list."));
+            }
+        });
     }
 
     private void commandHide(ProxiedPlayer player) {
-        if (BungeeTabListPlus.isHidden(BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(player))) {
-            player.sendMessage(ChatUtil.parseBBCode("&cYou're already hidden."));
-        } else {
-            BungeeTabListPlus.hidePlayer(player);
-            player.sendMessage(ChatUtil.parseBBCode("&aYou've been hidden from the tab list."));
-        }
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().submit(() -> {
+            if (isHidden(player)) {
+                player.sendMessage(ChatUtil.parseBBCode("&cYou're already hidden."));
+            } else {
+                hidePlayer(player);
+                player.sendMessage(ChatUtil.parseBBCode("&aYou've been hidden from the tab list."));
+            }
+        });
     }
 
     private void commandUnhide(ProxiedPlayer player) {
-        if (BungeeTabListPlus.isHidden(BungeeTabListPlus.getInstance().getConnectedPlayerManager().getPlayer(player))) {
-            BungeeTabListPlus.unhidePlayer(player);
-            player.sendMessage(ChatUtil.parseBBCode("&aYour name is no longer hidden from the tab list."));
-        } else {
-            player.sendMessage(ChatUtil.parseBBCode("&cYou've not been hidden."));
-        }
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().submit(() -> {
+            if (isHidden(player)) {
+                unhidePlayer(player);
+                player.sendMessage(ChatUtil.parseBBCode("&aYour name is no longer hidden from the tab list."));
+            } else {
+                player.sendMessage(ChatUtil.parseBBCode("&cYou've not been hidden."));
+            }
+        });
+    }
+
+    private boolean isHidden(ProxiedPlayer player) {
+        BungeePlayer bungeePlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
+        return bungeePlayer.get(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND);
+    }
+
+    private void hidePlayer(ProxiedPlayer player) {
+        BungeePlayer bungeePlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
+        bungeePlayer.getLocalDataCache().updateValue(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND, true);
+    }
+
+    private void unhidePlayer(ProxiedPlayer player) {
+        BungeePlayer bungeePlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
+        bungeePlayer.getLocalDataCache().updateValue(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND, false);
     }
 }
