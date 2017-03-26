@@ -589,11 +589,13 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             hidden[0] = hiddenPlayers.contains(name);
         }
         List<String> permanentlyHiddenPlayers = getInstance().config.hiddenPlayers;
-        if (permanentlyHiddenPlayers.contains(player.getName())) {
-            hidden[0] = true;
-        }
-        if (permanentlyHiddenPlayers.contains(player.getUniqueID().toString())) {
-            hidden[0] = true;
+        if (permanentlyHiddenPlayers != null) {
+            if (permanentlyHiddenPlayers.contains(player.getName())) {
+                hidden[0] = true;
+            }
+            if (permanentlyHiddenPlayers.contains(player.getUniqueID().toString())) {
+                hidden[0] = true;
+            }
         }
         player.getOpt(BukkitData.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
         player.getOpt(BukkitData.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
