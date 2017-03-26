@@ -646,7 +646,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     public static boolean isHiddenServer(String serverName) {
-        return getInstance().config.hiddenServers.contains(serverName);
+        List<String> hiddenServers = getInstance().config.hiddenServers;
+        return hiddenServers != null && hiddenServers.contains(serverName);
     }
 
     /**
