@@ -130,7 +130,7 @@ public abstract class CustomPlaceholder {
         @Override
         public Placeholder instantiate(String[] args) {
             Expression expression = new Expression(replaceParameters(this.expression, args));
-            Map<String, TextTemplate> replacements = new HashMap<>(Maps.transformValues(this.replacements, template -> new TextTemplate(replaceParameters(template, args))));
+            Map<String, TextTemplate> replacements = new HashMap<>(Maps.transformValues(this.replacements, template -> template != null ? new TextTemplate(replaceParameters(template, args)) : TextTemplate.EMPTY));
             TextTemplate defaultReplacement = new TextTemplate(replaceParameters(this.defaultReplacement, args));
             return new Instance(expression, replacements, defaultReplacement);
         }
