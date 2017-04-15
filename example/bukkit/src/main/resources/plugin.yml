@@ -1,0 +1,6 @@
+name: BungeeTabListPlus-API-Demo
+main: de.codecrafter47.bungeetablistplus.demo.DemoPlugin
+version: ${project.version}
+authors:
+  - CodeCrafter47
+softdepend: [BungeeTabListPlus]
