@@ -109,12 +109,12 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
     }
 
     @Override
-    public <T> void addDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+    public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
         data.addDataChangeListener(key, listener);
     }
 
     @Override
-    public <T> void removeDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+    public <T> void removeDataChangeListener(DataKey<T> key, Runnable listener) {
         data.removeDataChangeListener(key, listener);
     }
 }

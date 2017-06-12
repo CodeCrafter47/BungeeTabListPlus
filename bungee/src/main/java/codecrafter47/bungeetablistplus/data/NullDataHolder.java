@@ -36,12 +36,12 @@ public class NullDataHolder implements DataHolder {
     }
 
     @Override
-    public <T> void addDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+    public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
 
     }
 
     @Override
-    public <T> void removeDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+    public <T> void removeDataChangeListener(DataKey<T> key, Runnable listener) {
 
     }
 }

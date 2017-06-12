@@ -27,6 +27,7 @@ import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.BTLPDataTypes;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.IPlayerProvider;
+import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.player.RedisPlayer;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteArrayDataInput;
@@ -35,7 +36,6 @@ import com.google.common.io.ByteStreams;
 import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
 import de.codecrafter47.data.api.DataCache;
-import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.DataKeyRegistry;
 import de.codecrafter47.data.bukkit.api.BukkitData;
@@ -47,7 +47,14 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -121,7 +128,7 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
                     DataKey<?> key = DataStreamUtils.readDataKey(input, keyRegistry, missingDataKeyLogger);
 
                     if (key != null) {
-                        player.addDataChangeListener((DataKey<Object>) key, new DataChangeListener(uuid, (DataKey<Object>) key));
+                        player.addDataChangeListener((DataKey<Object>) key, new DataChangeListener(player, (DataKey<Object>) key));
                         updateData(uuid, (DataKey<Object>) key, player.get(key));
                     }
 
@@ -212,12 +219,12 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
         }
     }
 
-    private class DataChangeListener implements DataHolder.DataChangeListener<Object> {
-        private final UUID uuid;
+    private class DataChangeListener implements Runnable {
+        private final Player player;
         private final DataKey<Object> dataKey;
 
-        private DataChangeListener(UUID uuid, DataKey<Object> dataKey) {
-            this.uuid = uuid;
+        private DataChangeListener(Player player, DataKey<Object> dataKey) {
+            this.player = player;
             this.dataKey = dataKey;
         }
 
@@ -228,20 +235,20 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
 
             DataChangeListener that = (DataChangeListener) o;
 
-            return uuid.equals(that.uuid) && dataKey.equals(that.dataKey);
+            return player.equals(that.player) && dataKey.equals(that.dataKey);
 
         }
 
         @Override
         public int hashCode() {
-            int result = uuid.hashCode();
+            int result = player.hashCode();
             result = 31 * result + dataKey.hashCode();
             return result;
         }
 
         @Override
-        public void onChange(Object value) {
-            RedisPlayerManager.this.updateData(uuid, dataKey, value);
+        public void run() {
+            RedisPlayerManager.this.updateData(player.getUniqueID(), dataKey, player.get(dataKey));
         }
     }
 }

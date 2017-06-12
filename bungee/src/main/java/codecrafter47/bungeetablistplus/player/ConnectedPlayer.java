@@ -154,12 +154,12 @@ public class ConnectedPlayer extends AbstractPlayer {
     }
 
     @Override
-    public <T> void addDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+    public <T> void addDataChangeListener(DataKey<T> key, Runnable listener) {
         getResponsibleDataHolder(key).addDataChangeListener(key, listener);
     }
 
     @Override
-    public <T> void removeDataChangeListener(DataKey<T> key, DataChangeListener<T> listener) {
+    public <T> void removeDataChangeListener(DataKey<T> key, Runnable listener) {
         getResponsibleDataHolder(key).removeDataChangeListener(key, listener);
     }
 }
