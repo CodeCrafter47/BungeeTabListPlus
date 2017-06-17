@@ -139,7 +139,7 @@ public class ConnectedPlayer extends AbstractPlayer {
         if (key.getScope().equals(MinecraftData.SCOPE_SERVER)) {
             Server server = player.getServer();
             if (server != null) {
-                BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server.getInfo().getName());
+                return BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server.getInfo().getName());
             }
             return NullDataHolder.INSTANCE;
         }

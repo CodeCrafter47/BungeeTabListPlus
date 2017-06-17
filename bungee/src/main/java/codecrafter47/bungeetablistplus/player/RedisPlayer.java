@@ -113,7 +113,7 @@ public class RedisPlayer implements Player {
         if (key.getScope().equals(MinecraftData.SCOPE_SERVER)) {
             Optional<ServerInfo> server = getServer();
             if (server.isPresent()) {
-                BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server.get().getName());
+                return BungeeTabListPlus.getInstance().getBridge().getServerDataHolder(server.get().getName());
             }
             return NullDataHolder.INSTANCE;
         }
