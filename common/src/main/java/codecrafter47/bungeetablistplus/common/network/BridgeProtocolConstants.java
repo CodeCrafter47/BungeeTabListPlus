@@ -23,20 +23,17 @@ package codecrafter47.bungeetablistplus.common.network;
  */
 public class BridgeProtocolConstants {
 
-    public static final String CHANNEL = "BTLP";
+    public static final String CHANNEL = "BTLP/Bridge";
 
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
-    public static final int MESSAGE_ID_PROXY_HANDSHAKE = 0x80;
-    public static final int MESSAGE_ID_PROXY_REQUEST_DATA = 0x81;
-    public static final int MESSAGE_ID_PROXY_REQUEST_SERVER_DATA = 0x82;
-    public static final int MESSAGE_ID_PROXY_REQUEST_RESET_SERVER_DATA = 0x83;
-    public static final int MESSAGE_ID_PROXY_OUTDATED = 0xAC;
+    public static final int MESSAGE_ID_INTRODUCE = 0x00;
 
-    public static final int MESSAGE_ID_SERVER_HANDSHAKE = 0x00;
-    public static final int MESSAGE_ID_SERVER_UPDATE_DATA = 0x01;
-    public static final int MESSAGE_ID_SERVER_UPDATE_SERVER_DATA = 0x02;
-    public static final int MESSAGE_ID_SERVER_DISABLE_CONNECTION = 0x20;
-    public static final int MESSAGE_ID_SERVER_ENABLE_CONNECTION = 0x21;
-    public static final int MESSAGE_ID_SERVER_OUTDATED = 0xAC;
+    public static final int MESSAGE_ID_ACK = 0x01;
+    public static final int MESSAGE_ID_REQUEST_DATA = 0x02;
+    public static final int MESSAGE_ID_UPDATE_DATA = 0x03;
+
+    public static final int MESSAGE_ID_ACK_SERVER = 0x81;
+    public static final int MESSAGE_ID_REQUEST_DATA_SERVER = 0x82;
+    public static final int MESSAGE_ID_UPDATE_DATA_SERVER = 0x83;
 }

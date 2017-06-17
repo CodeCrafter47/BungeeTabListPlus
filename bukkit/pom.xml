@@ -55,9 +55,21 @@
         </dependency>
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
+            <artifactId>bungeetablistplus-bridge</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>bungeetablistplus-api-bukkit</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

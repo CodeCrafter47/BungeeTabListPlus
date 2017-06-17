@@ -25,13 +25,12 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
-import codecrafter47.bungeetablistplus.spongebridge.messages.*;
+import codecrafter47.bungeetablistplus.spongebridge.util.ChannelBufInputStream;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import de.codecrafter47.data.api.DataAccess;
+import de.codecrafter47.bungeetablistplus.bridge.AbstractBridge;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.DataKeyRegistry;
 import de.codecrafter47.data.api.JoinedDataAccess;
@@ -41,29 +40,28 @@ import de.codecrafter47.data.sponge.AbstractSpongeDataAccess;
 import de.codecrafter47.data.sponge.PlayerDataAccess;
 import de.codecrafter47.data.sponge.ServerDataAccess;
 import de.codecrafter47.data.sponge.api.SpongeData;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.network.ChannelRegistrationEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.PlayerConnection;
-import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.Plugin;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.io.DataInput;
+import java.io.DataInputStream;
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -71,9 +69,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Plugin(id = "bungeetablistplus", name = "BungeeTabListPlus-SpongeBridge", version = PomData.VERSION)
 public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
 
-    public static final TypeAdapterRegistry typeRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
+    private static final TypeAdapterRegistry typeRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
 
-    public static final DataKeyRegistry keyRegistry = DataKeyRegistry.of(
+    private static final DataKeyRegistry keyRegistry = DataKeyRegistry.of(
             MinecraftData.class,
             BungeeData.class,
             BTLPDataKeys.class,
@@ -81,21 +79,15 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
 
     private final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);
 
-    public static final UUID serverId = UUID.randomUUID();
-
     @Inject
     private Game game;
 
     @Inject
     private Logger logger;
 
-    private ChannelBinding.IndexedMessageChannel channel;
+    private Bridge bridge;
 
-    private final Map<Player, PlayerBridgeData> playerData = new ConcurrentHashMap<>();
-    private final Map<UUID, ServerBridgeData> serverData = new ConcurrentHashMap<>();
-
-    private DataAccess<Player> playerDataAccess;
-    private DataAccess<Server> serverDataAccess;
+    private ChannelBinding.RawDataChannel channel;
 
     private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
     private final Map<String, Variable> variablesByName = new HashMap<>();
@@ -110,196 +102,96 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         } catch (NoSuchFieldException | IllegalAccessException ex) {
             logger.error("Failed to initialize API", ex);
         }
-
-        /*
-        AbstractMessageProxyRequestData.missingDataKeyLogger = new Consumer<String>() {
-
-            private final Set<String> missingKeys = Sets.newConcurrentHashSet();
-
-            @Override
-            public void accept(String id) {
-                if (missingKeys.add(id)) {
-                    logger.warn("Missing data key with id " + id + ". Is the plugin up-to-date?");
-                }
-            }
-        };
-        */
     }
 
     @Listener
     public void onServerAboutToStart(GameAboutToStartServerEvent event) {
 
         // register plugin message channel
-        channel = game.getChannelRegistrar().createChannel(this, BridgeProtocolConstants.CHANNEL);
-        channel.registerMessage(MessageProxyHandshake.class, BridgeProtocolConstants.MESSAGE_ID_PROXY_HANDSHAKE, this::onMessageHandshake);
-        channel.registerMessage(MessageProxyRequestData.class, BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_DATA, this::onMessageRequestData);
-        channel.registerMessage(MessageProxyRequestServerData.class, BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_SERVER_DATA, this::onMessageRequestServerData);
-        channel.registerMessage(MessageProxyRequestServerDataReset.class, BridgeProtocolConstants.MESSAGE_ID_PROXY_REQUEST_RESET_SERVER_DATA, this::onMessageRequestServerDataReset);
-        channel.registerMessage(MessageProxyPluginOutdated.class, BridgeProtocolConstants.MESSAGE_ID_PROXY_OUTDATED, this::onMessagePluginOutdated);
-        channel.registerMessage(MessageServerHandshake.class, BridgeProtocolConstants.MESSAGE_ID_SERVER_HANDSHAKE);
-        channel.registerMessage(MessageServerUpdateData.class, BridgeProtocolConstants.MESSAGE_ID_SERVER_UPDATE_DATA);
-        channel.registerMessage(MessageServerUpdateServerData.class, BridgeProtocolConstants.MESSAGE_ID_SERVER_UPDATE_SERVER_DATA);
-        channel.registerMessage(MessageServerEnableConnection.class, BridgeProtocolConstants.MESSAGE_ID_SERVER_ENABLE_CONNECTION);
-
-        // init data hooks
-        playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(logger), new BTLPPlayerDataAccess());
-        serverDataAccess = JoinedDataAccess.of(new ServerDataAccess(logger), new BTLPServerDataAccess());
-    }
-
-    private void onMessageHandshake(MessageProxyHandshake message, RemoteConnection remoteConnection, Platform.Type platform) {
-        if (!(remoteConnection instanceof PlayerConnection)) {
-            throw new AssertionError("Expect plugin message to be sent from a player.");
-        }
-        Player player = ((PlayerConnection) remoteConnection).getPlayer();
-
-        if (message.getProtocolVersion() > BridgeProtocolConstants.VERSION) {
-            rlExecutor.execute(() -> logger.warn("BungeeTabListPlus_SpongeBridge is outdated."));
-        } else if (message.getProtocolVersion() < BridgeProtocolConstants.VERSION) {
-            rlExecutor.execute(() -> logger.warn("BungeeTabListPlus proxy plugin outdated."));
-        } else {
-            playerData.put(player, new PlayerBridgeData(message.getProxyId()));
-            serverData.computeIfAbsent(message.getProxyId(), uuid -> new ServerBridgeData());
-            channel.sendTo(player, new MessageServerHandshake());
-        }
-    }
-
-    private void onMessageRequestData(MessageProxyRequestData message, RemoteConnection remoteConnection, Platform.Type platform) {
-        if (!(remoteConnection instanceof PlayerConnection)) {
-            throw new AssertionError("Expect plugin message to be sent from a player.");
-        }
-        Player player = ((PlayerConnection) remoteConnection).getPlayer();
-
-        BridgeData bridgeData = playerData.get(player);
-        if (bridgeData != null) {
-            handleDataRequest(bridgeData, message);
-        }
-    }
-
-    private void onMessageRequestServerData(MessageProxyRequestServerData message, RemoteConnection remoteConnection, Platform.Type platform) {
-        if (!(remoteConnection instanceof PlayerConnection)) {
-            throw new AssertionError("Expect plugin message to be sent from a player.");
-        }
-        Player player = ((PlayerConnection) remoteConnection).getPlayer();
-
-        PlayerBridgeData playerBridgeData = playerData.get(player);
-        if (playerBridgeData != null) {
-            BridgeData bridgeData = serverData.get(playerBridgeData.proxyId);
-            if (bridgeData != null) {
-                handleDataRequest(bridgeData, message);
+        channel = game.getChannelRegistrar().createRawChannel(this, BridgeProtocolConstants.CHANNEL);
+        channel.addListener(Platform.Type.SERVER, (data, connection, side) -> {
+            if (connection instanceof PlayerConnection) {
+                Player player = ((PlayerConnection) connection).getPlayer();
+                DataInput input = new DataInputStream(new ChannelBufInputStream(data));
+                try {
+                    bridge.onMessage(player, input);
+                } catch (Throwable e) {
+                    rlExecutor.execute(() -> {
+                        logger.error("Unexpected error", e);
+                    });
+                }
             }
-        }
-    }
+        });
 
-    private void onMessageRequestServerDataReset(MessageProxyRequestServerDataReset message, RemoteConnection remoteConnection, Platform.Type platform) {
-        if (!(remoteConnection instanceof PlayerConnection)) {
-            throw new AssertionError("Expect plugin message to be sent from a player.");
-        }
-        Player player = ((PlayerConnection) remoteConnection).getPlayer();
-
-        PlayerBridgeData playerBridgeData = playerData.get(player);
-        if (playerBridgeData != null) {
-            ServerBridgeData bridgeData = serverData.get(playerBridgeData.proxyId);
-            if (bridgeData != null) {
-                serverData.put(playerBridgeData.proxyId, new ServerBridgeData());
-            }
-        }
-    }
-
-    private void onMessagePluginOutdated(MessageProxyPluginOutdated message, RemoteConnection remoteConnection, Platform.Type platform) {
-        rlExecutor.execute(() -> logger.warn("BungeeTabListPlus proxy plugin outdated."));
-    }
-
-    private void handleDataRequest(BridgeData bridgeData, AbstractMessageProxyRequestData message) {
-        for (AbstractMessageProxyRequestData.Item item : message.getItems()) {
-            bridgeData.addRequest(item.getKey(), item.getNetId());
-        }
+        // init bridge
+        initBridge();
     }
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
 
         // start data update task
-        game.getScheduler().createTaskBuilder().async().delay(1, TimeUnit.SECONDS).interval(1, TimeUnit.SECONDS).execute(() -> {
-            long now = System.currentTimeMillis();
-            Map<UUID, Player> proxyIds = new HashMap<>();
-            List<AbstractMessageServerUpdateData.Item> update = new ArrayList<>();
-
-            for (Map.Entry<Player, PlayerBridgeData> e : playerData.entrySet()) {
-                Player player = e.getKey();
-                PlayerBridgeData bridgeData = e.getValue();
-
-                proxyIds.putIfAbsent(bridgeData.proxyId, player);
-
-                for (CacheEntry entry : bridgeData.requestedData) {
-                    Object value = playerDataAccess.get(entry.key, player);
-                    if (!Objects.equals(value, entry.value)) {
-                        update.add(new AbstractMessageServerUpdateData.Item(entry.netId, typeRegistry.getTypeAdapter(((DataKey<Object>) entry.key).getType()), value));
-                    }
-                    entry.value = value;
-                }
-
-                if (!update.isEmpty()) {
-                    MessageServerUpdateData message = new MessageServerUpdateData();
-                    message.setItems(ImmutableList.copyOf(update));
-                    channel.sendTo(player, message);
-                    update.clear();
-                }
+        game.getScheduler().createTaskBuilder().name("updateData").async().delay(1, TimeUnit.SECONDS).interval(1, TimeUnit.SECONDS).execute(() -> {
+            try {
+                bridge.updateData();
+            } catch (Throwable e) {
+                rlExecutor.execute(() -> {
+                    logger.error("Unexpected error", e);
+                });
             }
+        }).submit(this);
 
-            for (Map.Entry<UUID, Player> e : proxyIds.entrySet()) {
-                UUID proxyId = e.getKey();
-                Player player = e.getValue();
-                ServerBridgeData bridgeData = serverData.get(proxyId);
-
-                if (bridgeData == null) {
-                    continue;
-                }
-
-                bridgeData.lastUpdate = now;
-
-                for (CacheEntry entry : bridgeData.requestedData) {
-                    Object value = serverDataAccess.get(entry.key, game.getServer());
-                    if (!Objects.equals(value, entry.value)) {
-                        update.add(new AbstractMessageServerUpdateData.Item(entry.netId, typeRegistry.getTypeAdapter(((DataKey<Object>) entry.key).getType()), value));
-                    }
-                    entry.value = value;
-                }
-
-                if (!update.isEmpty()) {
-                    bridgeData.revision++;
-                }
-
-                MessageServerUpdateServerData message = new MessageServerUpdateServerData();
-                message.setRevision(bridgeData.revision);
-                message.setItems(ImmutableList.copyOf(update));
-                channel.sendTo(player, message);
-                update.clear();
+        // start introduce task, it discovers the proxy plugins
+        game.getScheduler().createTaskBuilder().name("discoverProxy").async().delay(100, TimeUnit.MILLISECONDS).interval(100, TimeUnit.MILLISECONDS).execute(() -> {
+            try {
+                bridge.sendIntroducePackets();
+            } catch (Throwable e) {
+                rlExecutor.execute(() -> {
+                    logger.error("Unexpected error", e);
+                });
             }
+        }).submit(this);
 
-            for (Iterator<ServerBridgeData> iterator = serverData.values().iterator(); iterator.hasNext(); ) {
-                ServerBridgeData data = iterator.next();
-                if (now - data.lastUpdate > 900000) {
-                    iterator.remove();
+        // start resendUnconfirmedMessages task, it ensures packets arrive in case of failing connections
+        game.getScheduler().createTaskBuilder().name("housekeeping").async().delay(2500, TimeUnit.MILLISECONDS).interval(2500, TimeUnit.MILLISECONDS).execute(() -> {
+            try {
+                bridge.resendUnconfirmedMessages();
+            } catch (Throwable e) {
+                rlExecutor.execute(() -> {
+                    logger.error("Unexpected error", e);
+                });
+            }
+        }).submit(this);
+
+        // start reset task, it resets the bridge state every 24h to clear up stale proxy handles
+        game.getScheduler().createTaskBuilder().name("reset").delay(24, TimeUnit.HOURS).interval(24, TimeUnit.HOURS).execute(() -> {
+            try {
+                initBridge();
+                for (Player player : game.getServer().getOnlinePlayers()) {
+                    bridge.onPlayerConnect(player);
                 }
+            } catch (Throwable e) {
+                rlExecutor.execute(() -> {
+                    logger.error("Unexpected error", e);
+                });
             }
         }).submit(this);
     }
 
-    @Listener
-    public void onDisconnect(ClientConnectionEvent.Disconnect event) {
-        playerData.remove(event.getTargetEntity());
+    private void initBridge() {
+        bridge = new Bridge();
+        bridge.setPlayerDataAccess(JoinedDataAccess.of(new PlayerDataAccess(logger), new BTLPPlayerDataAccess()));
+        bridge.setServerDataAccess(JoinedDataAccess.of(new ServerDataAccess(logger), new BTLPServerDataAccess()));
     }
 
     @Listener
-    public void onChannelRegistration(ChannelRegistrationEvent.Register event) {
-        if (BridgeProtocolConstants.CHANNEL.equals(event.getChannel())) {
-            Optional<Player> player = event.getCause().get(NamedCause.SOURCE, Player.class);
-            if (player.isPresent()) {
-                channel.sendTo(player.get(), new MessageServerEnableConnection());
-            } else {
-                throw new AssertionError("Source is not present.");
-            }
-        }
+    public void onDisconnect(ClientConnectionEvent.Join event) {
+        bridge.onPlayerConnect(event.getTargetEntity());
+    }
+
+    @Listener
+    public void onDisconnect(ClientConnectionEvent.Disconnect event) {
+        bridge.onPlayerDisconnect(event.getTargetEntity());
     }
 
     @Override
@@ -342,7 +234,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     }
 
     private class BTLPPlayerDataAccess extends AbstractSpongeDataAccess<Player> {
-        public BTLPPlayerDataAccess() {
+        BTLPPlayerDataAccess() {
             super(logger);
 
             addProvider(BTLPDataKeys.ThirdPartyPlaceholder, this::resolveVariable);
@@ -369,7 +261,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     }
 
     private class BTLPServerDataAccess extends AbstractSpongeDataAccess<Server> {
-        public BTLPServerDataAccess() {
+        BTLPServerDataAccess() {
             super(logger);
 
             addProvider(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, server -> {
@@ -384,37 +276,15 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         }
     }
 
-    @RequiredArgsConstructor
-    private static class CacheEntry {
-        private final DataKey<?> key;
-        private final int netId;
-        private Object value = null;
-    }
+    private class Bridge extends AbstractBridge<Player, Server> {
 
-    private static class BridgeData {
-        protected final List<CacheEntry> requestedData = new CopyOnWriteArrayList<>();
-
-        private void addRequest(DataKey<?> key, int netId) {
-            for (CacheEntry registration : requestedData) {
-                if (Objects.equals(registration.key, key)) {
-                    return;
-                }
-            }
-
-            requestedData.add(new CacheEntry(key, netId));
+        Bridge() {
+            super(SpongePlugin.keyRegistry, SpongePlugin.typeRegistry, PomData.VERSION, Sponge.getServer());
         }
-    }
 
-    private static class PlayerBridgeData extends BridgeData {
-        private UUID proxyId;
-
-        public PlayerBridgeData(UUID proxyId) {
-            this.proxyId = proxyId;
+        @Override
+        protected void sendMessage(@Nonnull Player player, @Nonnull byte[] message) {
+            channel.sendTo(player, buf -> buf.writeBytes(message));
         }
-    }
-
-    private static class ServerBridgeData extends BridgeData {
-        private int revision = 0;
-        private long lastUpdate;
     }
 }

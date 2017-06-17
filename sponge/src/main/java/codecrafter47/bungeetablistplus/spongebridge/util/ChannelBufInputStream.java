@@ -34,6 +34,6 @@ public class ChannelBufInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        return channelBuf.available() > 0 ? channelBuf.readByte() : -1;
+        return channelBuf.available() > 0 ? Byte.toUnsignedInt(channelBuf.readByte()) : -1;
     }
 }
