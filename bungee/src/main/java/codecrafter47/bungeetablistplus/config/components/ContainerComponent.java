@@ -28,12 +28,14 @@ import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
 public class ContainerComponent extends Component implements Validate {
 
-    @Getter
-    @Setter
     private boolean fillSlotsVertical = false;
     private ListComponent components;
+    int minSize = 0;
+    int maxSize = -1;
 
     public List<Component> getComponents() {
         return components.getList();
@@ -43,14 +45,24 @@ public class ContainerComponent extends Component implements Validate {
         this.components = new ListComponent(components);
     }
 
+    public void setMinSize(int minSize) {
+        Preconditions.checkArgument(maxSize == -1 || minSize <= maxSize, "minSize needs to be smaller than maxSize.");
+        this.minSize = minSize;
+    }
+
+    public void setMaxSize(int maxSize) {
+        Preconditions.checkArgument(minSize <= maxSize, "minSize needs to be smaller than maxSize.");
+        this.maxSize = maxSize;
+    }
+
     @Override
     public boolean hasConstantSize() {
-        return components.hasConstantSize();
+        return components.hasConstantSize() || minSize == maxSize;
     }
 
     @Override
     public int getSize() {
-        return components.getSize();
+        return Integer.max(components.getSize(), minSize);
     }
 
     @Override
@@ -61,6 +73,11 @@ public class ContainerComponent extends Component implements Validate {
     @Override
     public void validate() {
         Preconditions.checkNotNull(components, "components is null");
+        if (components.hasConstantSize() && maxSize != -1) {
+            if (components.getSize() > maxSize) {
+                throw new IllegalArgumentException("maxSize set to " + maxSize + " but components need " + components.getSize());
+            }
+        }
     }
 
     public class Instance extends Component.Instance {
@@ -117,17 +134,25 @@ public class ContainerComponent extends Component implements Validate {
 
         @Override
         public int getMinSize() {
-            return delegate.getMinSize();
+            return Integer.max(delegate.getMinSize(), minSize);
         }
 
         @Override
         public int getPreferredSize() {
-            return fillSlotsVertical ? delegate.getPreferredSize() * context.get(Context.KEY_COLUMNS) : delegate.getPreferredSize();
+            int pref = fillSlotsVertical ? delegate.getPreferredSize() * context.get(Context.KEY_COLUMNS) : delegate.getPreferredSize();
+            if (maxSize != -1) {
+                pref = Integer.min(pref, maxSize);
+            }
+            return Integer.max(pref, minSize);
         }
 
         @Override
         public int getMaxSize() {
-            return fillSlotsVertical ? delegate.getMaxSize() * context.get(Context.KEY_COLUMNS) : delegate.getMaxSize();
+            int max = fillSlotsVertical ? delegate.getMaxSize() * context.get(Context.KEY_COLUMNS) : delegate.getMaxSize();
+            if (maxSize != -1) {
+                max = Integer.min(max, maxSize);
+            }
+            return Integer.max(max, minSize);
         }
 
         @Override
