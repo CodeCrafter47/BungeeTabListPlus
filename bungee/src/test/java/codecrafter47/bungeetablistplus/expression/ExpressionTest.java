@@ -41,12 +41,12 @@ public class ExpressionTest {
 
         expression = new Expression("\"four\"");
         Assert.assertFalse(expression.evaluate(null, ExpressionResult.BOOLEAN));
-        Assert.assertEquals(4, expression.evaluate(null, ExpressionResult.NUMBER), 0.001);
+        Assert.assertEquals(0, expression.evaluate(null, ExpressionResult.NUMBER), 0.001);
         Assert.assertEquals("four", expression.evaluate(null, ExpressionResult.STRING));
 
         expression = new Expression("\"true\"");
         Assert.assertTrue(expression.evaluate(null, ExpressionResult.BOOLEAN));
-        Assert.assertEquals(4, expression.evaluate(null, ExpressionResult.NUMBER), 0.001);
+        Assert.assertEquals(0, expression.evaluate(null, ExpressionResult.NUMBER), 0.001);
         Assert.assertEquals("true", expression.evaluate(null, ExpressionResult.STRING));
 
         expression = new Expression("true");
