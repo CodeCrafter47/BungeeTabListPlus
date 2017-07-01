@@ -25,7 +25,14 @@ import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public class Expression {
     private static final Map<Token, Integer> OPERATORS = ImmutableMap.<Token, Integer>builder()
@@ -163,6 +170,21 @@ public class Expression {
         return root.evaluate(context, resultType);
     }
 
+    private static final NumberFormat format;
+
+    static {
+        format = NumberFormat.getNumberInstance(Locale.ROOT);
+        format.setGroupingUsed(false);
+    }
+
+    private static double parseNumber(String text) {
+        try {
+            return format.parse(text).doubleValue();
+        } catch (ParseException e) {
+            return 0;
+        }
+    }
+
     private static abstract class Part {
         public abstract <T> T evaluate(Context context, ExpressionResult<T> resultType);
     }
@@ -197,18 +219,9 @@ public class Expression {
     private static class StringPart extends LiteralPart {
 
         private StringPart(@Nonnull String text) {
-            super(text, asDouble(text), Boolean.parseBoolean(text));
+            super(text, parseNumber(text), Boolean.parseBoolean(text));
         }
 
-        private static double asDouble(@Nonnull String text) {
-            double v;
-            try {
-                v = Double.parseDouble(text);
-            } catch (NumberFormatException ex) {
-                v = text.length();
-            }
-            return v;
-        }
     }
 
     private static class NumberPart extends LiteralPart {
@@ -238,12 +251,7 @@ public class Expression {
             if (resultType == ExpressionResult.STRING) {
                 return (T) result;
             } else if (resultType == ExpressionResult.NUMBER) {
-                try {
-                    return (T) (Double) Double.parseDouble(result);
-                } catch (NumberFormatException ex) {
-                    double length = result.length();
-                    return (T) (Double) length;
-                }
+                return (T) (Double) parseNumber(result);
             } else if (resultType == ExpressionResult.BOOLEAN) {
                 return (T) (Boolean) Boolean.parseBoolean(result);
             } else {
@@ -294,7 +302,7 @@ public class Expression {
             boolean res = true;
             for (int i = 0; res && i < parts.size(); i++) {
                 Part part = parts.get(i);
-                res &= part.evaluate(context, ExpressionResult.BOOLEAN);
+                res = part.evaluate(context, ExpressionResult.BOOLEAN);
             }
             return res;
         }
@@ -312,7 +320,7 @@ public class Expression {
             boolean res = false;
             for (int i = 0; !res && i < parts.size(); i++) {
                 Part part = parts.get(i);
-                res |= part.evaluate(context, ExpressionResult.BOOLEAN);
+                res = part.evaluate(context, ExpressionResult.BOOLEAN);
             }
             return res;
         }
