@@ -42,7 +42,15 @@ public final class BTLPDataKeys implements DataKeyCatalogue {
         return ThirdPartyPlaceholder.withParameter(name);
     }
 
+    public static final DataKey<String> ThirdPartyServerPlaceholder = new DataKey<>("btlp:thirdPartyServerPlaceholder", MinecraftData.SCOPE_SERVER, TypeToken.STRING);
+
+    public static DataKey<String> createThirdPartyServerVariableDataKey(String name) {
+        return ThirdPartyServerPlaceholder.withParameter(name);
+    }
+
     public final static DataKey<List<String>> REGISTERED_THIRD_PARTY_VARIABLES = new DataKey<>("thirdparty-variables", MinecraftData.SCOPE_SERVER, TypeToken.STRING_LIST);
+
+    public final static DataKey<List<String>> REGISTERED_THIRD_PARTY_SERVER_VARIABLES = new DataKey<>("thirdparty-server-variables", MinecraftData.SCOPE_SERVER, TypeToken.STRING_LIST);
 
     public final static DataKey<Boolean> PLACEHOLDERAPI_PRESENT = new DataKey<>("placeholderapi-present", MinecraftData.SCOPE_SERVER, TypeToken.BOOLEAN);
 }

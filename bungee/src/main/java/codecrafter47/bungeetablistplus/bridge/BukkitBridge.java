@@ -82,6 +82,7 @@ public class BukkitBridge implements Listener {
     private final Map<String, ServerBridgeDataCache> serverInformation = new ConcurrentHashMap<>();
 
     private final Set<String> registeredThirdPartyVariables = new HashSet<>();
+    private final Set<String> registeredThirdPartyServerVariables = new HashSet<>();
     private final ReentrantLock thirdPartyVariablesLock = new ReentrantLock();
 
     private final int proxyIdentifier = ThreadLocalRandom.current().nextInt();
@@ -429,6 +430,23 @@ public class BukkitBridge implements Listener {
                                 Placeholder.remoteThirdPartyDataKeys.put(variable, BTLPDataKeys.createThirdPartyVariableDataKey(variable));
                                 plugin.reload();
                                 registeredThirdPartyVariables.add(variable);
+                            }
+                        }
+                    } catch (Throwable th) {
+                        plugin.getLogger().log(Level.SEVERE, "Unexpected exception", th);
+                    } finally {
+                        thirdPartyVariablesLock.unlock();
+                    }
+                }
+                List<String> serverVariables = getServerDataCache(serverInfo.getName()).get(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES);
+                if (serverVariables != null) {
+                    thirdPartyVariablesLock.lock();
+                    try {
+                        for (String variable : serverVariables) {
+                            if (!registeredThirdPartyServerVariables.contains(variable)) {
+                                Placeholder.remoteThirdPartyServerDataKeys.put(variable, BTLPDataKeys.createThirdPartyServerVariableDataKey(variable));
+                                plugin.reload();
+                                registeredThirdPartyServerVariables.add(variable);
                             }
                         }
                     } catch (Throwable th) {

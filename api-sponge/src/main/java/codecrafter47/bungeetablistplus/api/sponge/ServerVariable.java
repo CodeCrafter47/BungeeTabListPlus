@@ -17,23 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package codecrafter47.bungeetablistplus.api.bukkit;
-
-import org.bukkit.entity.Player;
+package codecrafter47.bungeetablistplus.api.sponge;
 
 /**
  * Base class for creating custom Variables.
  * <p>
- * To create a custom Variable you need to create a subclass of this class
- * and register an instance of it with {@link BungeeTabListPlusBukkitAPI#registerVariable}
+ * To create a custom per server Variable you need to create a subclass of this class
+ * and register an instance of it with {@link BungeeTabListPlusSpongeAPI#registerVariable}
  * <p>
  * After registration the variable can be used in the config file in several ways:
- * Use {@code ${viewer <name>}} to resolve the variable for the
+ * Use {@code ${viewer server <name>}} to resolve the variable for the server of the
  * player looking at the tab list.
- * Use {@code ${player <name>}} to resolve the variable for a player displayed on
- * the tab list, this one can only be used inside the playerComponent.
+ * Use {@code ${player server <name>}} to resolve the variable for the server of a
+ * player displayed on the tab list, this one can only be used inside the playerComponent.
+ * Use {@code ${server <name>}} to resolve the variable for a particular server inside the
+ * serverHeader option of the players by server component.
+ * Use {@code ${server:<serverName> <name>}} to resolve the variable for a specific server.
  */
-public abstract class Variable {
+public abstract class ServerVariable {
     private final String name;
 
     /**
@@ -41,7 +42,7 @@ public abstract class Variable {
      *
      * @param name name of the variable without { }
      */
-    public Variable(String name) {
+    public ServerVariable(String name) {
         this.name = name;
     }
 
@@ -50,10 +51,9 @@ public abstract class Variable {
      * <p>
      * This method will be invoked by threads other than the games main thread and may also be invoked concurrently.
      *
-     * @param player the player for which the variable should be replaced
      * @return the replacement for the variable
      */
-    public abstract String getReplacement(Player player);
+    public abstract String getReplacement();
 
     /**
      * getter for the variable name

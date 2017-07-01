@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.bukkitbridge;
 
 import codecrafter47.bungeetablistplus.api.bukkit.BungeeTabListPlusBukkitAPI;
+import codecrafter47.bungeetablistplus.api.bukkit.ServerVariable;
 import codecrafter47.bungeetablistplus.api.bukkit.Variable;
 import codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
@@ -80,6 +81,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
     private final Map<String, Variable> variablesByName = new HashMap<>();
     private final Multimap<Plugin, Variable> variablesByPlugin = HashMultimap.create();
+    private final Map<String, ServerVariable> serverVariablesByName = new HashMap<>();
+    private final Multimap<Plugin, ServerVariable> serverVariablesByPlugin = HashMultimap.create();
 
     private Bridge bridge;
 
@@ -206,12 +209,38 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     }
 
     @Override
+    protected void registerVariable0(Plugin plugin, ServerVariable variable) {
+        Preconditions.checkNotNull(plugin, "plugin");
+        Preconditions.checkNotNull(variable, "variable");
+        apiLock.writeLock().lock();
+        try {
+            Preconditions.checkArgument(!variablesByName.containsKey(variable.getName()), "variable already registered");
+            serverVariablesByName.put(variable.getName(), variable);
+            serverVariablesByPlugin.put(plugin, variable);
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    @Override
     protected void unregisterVariable0(Variable variable) {
         Preconditions.checkNotNull(variable, "variable");
         apiLock.writeLock().lock();
         try {
             Preconditions.checkArgument(variablesByName.remove(variable.getName(), variable), "variable not registered");
             variablesByPlugin.values().remove(variable);
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    protected void unregisterVariable0(ServerVariable variable) {
+        Preconditions.checkNotNull(variable, "variable");
+        apiLock.writeLock().lock();
+        try {
+            Preconditions.checkArgument(serverVariablesByName.remove(variable.getName(), variable), "variable not registered");
+            serverVariablesByPlugin.values().remove(variable);
         } finally {
             apiLock.writeLock().unlock();
         }
@@ -225,7 +254,9 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
             for (Variable variable : variablesByPlugin.removeAll(plugin)) {
                 variablesByName.remove(variable.getName());
             }
-
+            for (ServerVariable variable : serverVariablesByPlugin.removeAll(plugin)) {
+                serverVariablesByName.remove(variable.getName());
+            }
         } finally {
             apiLock.writeLock().unlock();
         }
@@ -268,8 +299,36 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
                     apiLock.readLock().unlock();
                 }
             });
+            addProvider(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES, server -> {
+                apiLock.readLock().lock();
+                try {
+                    return Lists.newArrayList(serverVariablesByName.keySet());
+                } finally {
+                    apiLock.readLock().unlock();
+                }
+            });
             addProvider(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> placeholderAPIHook != null);
             addProvider(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS, server -> placeholderAPIHook != null ? placeholderAPIHook.getRegisteredPlaceholderPlugins() : null);
+            addProvider(BTLPDataKeys.ThirdPartyServerPlaceholder, this::resolveServerVariable);
+        }
+
+        private String resolveServerVariable(Server server, DataKey<String> key) {
+            apiLock.readLock().lock();
+            try {
+                ServerVariable variable = serverVariablesByName.get(key.getParameter());
+                if (variable != null) {
+                    String replacement = null;
+                    try {
+                        replacement = variable.getReplacement();
+                    } catch (Throwable th) {
+                        plugin.getLogger().log(Level.WARNING, "An exception occurred while resolving a variable provided by a third party plugin", th);
+                    }
+                    return replacement;
+                }
+                return null;
+            } finally {
+                apiLock.readLock().unlock();
+            }
         }
     }
 

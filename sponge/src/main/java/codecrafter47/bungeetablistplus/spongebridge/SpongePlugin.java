@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.spongebridge;
 
 import codecrafter47.bungeetablistplus.api.sponge.BungeeTabListPlusSpongeAPI;
+import codecrafter47.bungeetablistplus.api.sponge.ServerVariable;
 import codecrafter47.bungeetablistplus.api.sponge.Variable;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
@@ -92,6 +93,8 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
     private final Map<String, Variable> variablesByName = new HashMap<>();
     private final Multimap<Object, Variable> variablesByPlugin = HashMultimap.create();
+    private final Map<String, ServerVariable> serverVariablesByName = new HashMap<>();
+    private final Multimap<Object, ServerVariable> serverVariablesByPlugin = HashMultimap.create();
 
     @Listener
     public void onInitialization(GameInitializationEvent event) {
@@ -209,6 +212,20 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     }
 
     @Override
+    protected void registerVariable0(Object plugin, ServerVariable variable) {
+        Preconditions.checkNotNull(plugin, "plugin");
+        Preconditions.checkNotNull(variable, "variable");
+        apiLock.writeLock().lock();
+        try {
+            Preconditions.checkArgument(!variablesByName.containsKey(variable.getName()), "variable already registered");
+            serverVariablesByName.put(variable.getName(), variable);
+            serverVariablesByPlugin.put(plugin, variable);
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    @Override
     protected void unregisterVariable0(Variable variable) {
         Preconditions.checkNotNull(variable, "variable");
         apiLock.writeLock().lock();
@@ -221,12 +238,27 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     }
 
     @Override
+    protected void unregisterVariable0(ServerVariable variable) {
+        Preconditions.checkNotNull(variable, "variable");
+        apiLock.writeLock().lock();
+        try {
+            Preconditions.checkArgument(serverVariablesByName.remove(variable.getName(), variable), "variable not registered");
+            serverVariablesByPlugin.values().remove(variable);
+        } finally {
+            apiLock.writeLock().unlock();
+        }
+    }
+
+    @Override
     protected void unregisterVariables0(Object plugin) {
         Preconditions.checkNotNull(plugin, "plugin");
         apiLock.writeLock().lock();
         try {
             for (Variable variable : variablesByPlugin.removeAll(plugin)) {
                 variablesByName.remove(variable.getName());
+            }
+            for (ServerVariable variable : serverVariablesByPlugin.removeAll(plugin)) {
+                serverVariablesByName.remove(variable.getName());
             }
         } finally {
             apiLock.writeLock().unlock();
@@ -272,7 +304,35 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
                     apiLock.readLock().unlock();
                 }
             });
+            addProvider(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES, server -> {
+                apiLock.readLock().lock();
+                try {
+                    return Lists.newArrayList(serverVariablesByName.keySet());
+                } finally {
+                    apiLock.readLock().unlock();
+                }
+            });
             addProvider(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> false);
+            addProvider(BTLPDataKeys.ThirdPartyServerPlaceholder, this::resolveServerVariable);
+        }
+
+        private String resolveServerVariable(Server server, DataKey<String> key) {
+            apiLock.readLock().lock();
+            try {
+                ServerVariable variable = serverVariablesByName.get(key.getParameter());
+                if (variable != null) {
+                    String replacement = null;
+                    try {
+                        replacement = variable.getReplacement();
+                    } catch (Throwable th) {
+                        logger.warn("An exception occurred while resolving a variable provided by a third party plugin", th);
+                    }
+                    return replacement;
+                }
+                return null;
+            } finally {
+                apiLock.readLock().unlock();
+            }
         }
     }
 

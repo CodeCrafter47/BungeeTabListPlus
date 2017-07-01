@@ -26,6 +26,12 @@ import org.spongepowered.api.entity.living.player.Player;
  * <p>
  * To create a custom Variable you need to create a subclass of this class
  * and register an instance of it with {@link BungeeTabListPlusSpongeAPI#registerVariable}
+ * <p>
+ * After registration the variable can be used in the config file in several ways:
+ * Use {@code ${viewer <name>}} to resolve the variable for the
+ * player looking at the tab list.
+ * Use {@code ${player <name>}} to resolve the variable for a player displayed on
+ * the tab list, this one can only be used inside the playerComponent.
  */
 public abstract class Variable {
     private final String name;

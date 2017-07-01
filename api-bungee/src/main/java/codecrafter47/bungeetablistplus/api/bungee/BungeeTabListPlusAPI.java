@@ -48,6 +48,23 @@ public abstract class BungeeTabListPlusAPI {
     protected abstract void registerVariable0(Plugin plugin, Variable variable);
 
     /**
+     * Registers a custom variable bound to a specific server
+     * <p>
+     * You cannot use this to replace existing variables. If registering a variable which already
+     * exists there may be an exception thrown but there is no guarantee that an exception
+     * is thrown in that case.
+     *
+     * @param plugin   your plugin
+     * @param variable your variable
+     */
+    public static void registerVariable(Plugin plugin, ServerVariable variable) {
+        Preconditions.checkState(instance != null, "instance is null, is the plugin enabled?");
+        instance.registerVariable0(plugin, variable);
+    }
+
+    protected abstract void registerVariable0(Plugin plugin, ServerVariable variable);
+
+    /**
      * Create a new {@link CustomTablist}
      *
      * @return thte created {@link CustomTablist}
