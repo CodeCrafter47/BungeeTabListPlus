@@ -87,6 +87,8 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
     private final BungeeTabListPlus plugin;
     private final Logger logger;
 
+    private boolean redisBungeeAPIError = false;
+
     private final Consumer<String> missingDataKeyLogger = new Consumer<String>() {
 
         private final Set<String> missingKeys = Sets.newConcurrentHashSet();
@@ -168,7 +170,17 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
     }
 
     private void updatePlayers() {
-        Set<UUID> playersOnline = RedisBungee.getApi().getPlayersOnline();
+        Set<UUID> playersOnline;
+        try {
+            playersOnline = RedisBungee.getApi().getPlayersOnline();
+        } catch (Throwable th) {
+            if (!redisBungeeAPIError) {
+                logger.log(Level.WARNING, "Error using RedisBungee API", th);
+                redisBungeeAPIError = true;
+            }
+            return;
+        }
+        redisBungeeAPIError = false;
 
         // remove players which have gone offline
         for (Iterator<UUID> iterator = byUUID.keySet().iterator(); iterator.hasNext(); ) {
@@ -195,8 +207,12 @@ public class RedisPlayerManager implements IPlayerProvider, Listener {
             DataStreamUtils.writeUUID(data, uuid);
             DataStreamUtils.writeDataKey(data, key);
             RedisBungee.getApi().sendChannelMessage(CHANNEL_DATA_REQUEST, Base64.getEncoder().encodeToString(data.toByteArray()));
+            redisBungeeAPIError = false;
         } catch (RuntimeException ex) {
-            BungeeTabListPlus.getInstance().getLogger().log(Level.WARNING, "RedisBungee Error", ex);
+            if (!redisBungeeAPIError) {
+                logger.log(Level.WARNING, "Error using RedisBungee API", ex);
+                redisBungeeAPIError = true;
+            }
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().getLogger().log(Level.SEVERE, "Failed to request data", th);
         }
