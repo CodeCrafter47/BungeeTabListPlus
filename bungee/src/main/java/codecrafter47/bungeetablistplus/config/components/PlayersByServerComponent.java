@@ -38,7 +38,15 @@ import lombok.val;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,6 +71,7 @@ public class PlayersByServerComponent extends Component implements Validate {
     int maxSizePerServer = 200;
     int minSize = 0;
     int maxSize = -1;
+    private List<String> hiddenServers = null;
 
     public List<String> getCustomServerOrder() {
         // dummy method for snakeyaml to detect property type
@@ -235,6 +244,11 @@ public class PlayersByServerComponent extends Component implements Validate {
                 Optional<String> server = player.getOpt(BungeeData.BungeeCord_Server);
                 if (server.isPresent()) {
                     playersByServer.computeIfAbsent(server.get(), s -> new ArrayList<>()).add(player);
+                }
+            }
+            if (hiddenServers != null) {
+                for (String hiddenServer : hiddenServers) {
+                    playersByServer.remove(hiddenServer);
                 }
             }
             for (List<Player> list : playersByServer.values()) {
