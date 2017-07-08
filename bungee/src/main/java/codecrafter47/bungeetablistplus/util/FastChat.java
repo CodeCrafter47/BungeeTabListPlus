@@ -44,6 +44,33 @@ public final class FastChat {
         return (int) Math.ceil(length);
     }
 
+    public static String cropLegacyText(String legacyText, char alternateColorChar, int maxLength) {
+        StringBuilder result = new StringBuilder(legacyText.length());
+        double length = 0;
+        boolean bold = false;
+        for (int i = 0; i < legacyText.length(); ++i) {
+            char c = legacyText.charAt(i);
+            if (i + 1 < legacyText.length() && (c == ChatColor.COLOR_CHAR || (c == alternateColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(legacyText.charAt(i + 1)) > -1))) {
+                result.append(c);
+                c = legacyText.charAt(++i);
+                result.append(c);
+                if ("0123456789AaBbCcDdEeFf".indexOf(c) > -1) {
+                    bold = false;
+                } else if ("Ll".indexOf(c) > -1) {
+                    bold = true;
+                }
+            } else {
+                length += ChatUtil.getCharWidth(c, bold);
+                if (length <= maxLength) {
+                    result.append(c);
+                } else {
+                    break;
+                }
+            }
+        }
+        return result.toString();
+    }
+
     public static String legacyTextToJson(String legacyText, char alternateColorChar) {
         if (legacyText == null) {
             return null;

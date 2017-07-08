@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.context;
 
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
+import codecrafter47.bungeetablistplus.config.components.BasicComponent;
 import codecrafter47.bungeetablistplus.player.Player;
 import codecrafter47.bungeetablistplus.template.IconTemplate;
 import codecrafter47.bungeetablistplus.template.PingTemplate;
@@ -45,6 +46,7 @@ public class Context {
     public static final ContextKey<Map<String, CustomPlaceholder>> KEY_CUSTOM_PLACEHOLDERS = new ContextKey<>();
     public static final ContextKey<IconTemplate> KEY_DEFAULT_ICON = new ContextKey<>();
     public static final ContextKey<PingTemplate> KEY_DEFAULT_PING = new ContextKey<>();
+    public static final ContextKey<BasicComponent.LongTextBehaviour> KEY_DEFAULT_LONG_TEXT_BEHAVIOUR = new ContextKey<>();
 
     // Parent
     private final Object[] elements;

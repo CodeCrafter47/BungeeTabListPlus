@@ -76,6 +76,7 @@ public abstract class ConfigTablistProvider<C extends Config> extends DefaultCus
         }
         this.context.put(Context.KEY_CUSTOM_PLACEHOLDERS, customPlaceholderMap);
         this.context.put(Context.KEY_TAB_LIST, this);
+        this.context.put(Context.KEY_DEFAULT_LONG_TEXT_BEHAVIOUR, config.getLongText());
         init();
     }
 

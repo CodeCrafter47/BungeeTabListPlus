@@ -43,6 +43,7 @@ public class BasicComponent extends Component implements Validate {
     private IconTemplate icon = IconTemplate.DEFAULT_ICON;
     private PingTemplate ping = PingTemplate.DEFAULT_PING;
     private Alignment alignment = Alignment.LEFT;
+    private LongTextBehaviour longText = null;
 
     public BasicComponent(String text) {
         this.text = new TextTemplate(text);
@@ -87,18 +88,31 @@ public class BasicComponent extends Component implements Validate {
                 CustomTablist tablist = context.get(Context.KEY_TAB_LIST);
                 String text = getText().evaluate(context);
 
-                if (alignment != Alignment.LEFT) {
-                    int slotWidth = 80;
-                    if (tablist.getSize() <= 60) {
-                        slotWidth = 110;
-                    } else if (tablist.getSize() <= 40) {
-                        slotWidth = 180;
-                    } else if (tablist.getSize() <= 20) {
-                        slotWidth = 360;
-                    }
+                // get long text behaviour
+                LongTextBehaviour longTextBehaviour = BasicComponent.this.longText;
+                if (longTextBehaviour == null) {
+                    longTextBehaviour = context.get(Context.KEY_DEFAULT_LONG_TEXT_BEHAVIOUR);
+                }
+
+                // handle alignment
+                if (alignment != Alignment.LEFT || longTextBehaviour != LongTextBehaviour.DISPLAY_ALL) {
+                    int slotWidth = getSlotWidth(tablist);
                     int textLength = FastChat.legacyTextLength(text, '&');
+
+                    if (longTextBehaviour != LongTextBehaviour.DISPLAY_ALL && textLength > slotWidth) {
+                        String suffix = "";
+                        if (longTextBehaviour == LongTextBehaviour.CROP_2DOTS) {
+                            suffix = "..";
+                        } else if (longTextBehaviour == LongTextBehaviour.CROP_3DOTS) {
+                            suffix = "...";
+                        }
+                        int suffixLength = FastChat.legacyTextLength(suffix, '&');
+                        text = FastChat.cropLegacyText(text, '&', slotWidth - suffixLength) + suffix;
+                        textLength = slotWidth;
+                    }
+
                     int space = slotWidth - textLength;
-                    if (space > 0) {
+                    if (alignment != Alignment.LEFT && space > 0) {
                         int spaces = (int) (space / ChatUtil.getCharWidth(' ', false));
                         int spacesBefore = spaces;
                         int spacesBehind = 0;
@@ -110,8 +124,21 @@ public class BasicComponent extends Component implements Validate {
                     }
                 }
 
+                // update the tab list
                 cta.setSlot(0, getIcon().evaluate(context), text, getPing().evaluate(context));
             }
+        }
+
+        private int getSlotWidth(CustomTablist tablist) {
+            int slotWidth = 80;
+            if (tablist.getSize() <= 60) {
+                slotWidth = 110;
+            } else if (tablist.getSize() <= 40) {
+                slotWidth = 180;
+            } else if (tablist.getSize() <= 20) {
+                slotWidth = 360;
+            }
+            return slotWidth;
         }
 
         @Override
@@ -137,5 +164,9 @@ public class BasicComponent extends Component implements Validate {
 
     public enum Alignment {
         LEFT, CENTER, RIGHT
+    }
+
+    public enum LongTextBehaviour {
+        DISPLAY_ALL, CROP, CROP_2DOTS, CROP_3DOTS;
     }
 }

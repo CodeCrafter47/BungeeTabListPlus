@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.config;
 
+import codecrafter47.bungeetablistplus.config.components.BasicComponent;
 import codecrafter47.bungeetablistplus.expression.Expression;
 import codecrafter47.bungeetablistplus.template.TextTemplate;
 import codecrafter47.bungeetablistplus.yamlconfig.Validate;
@@ -54,6 +55,8 @@ public class Config implements ITabListConfig, Validate {
 
     private Map<String, PlayerSet> playerSets;
 
+    private BasicComponent.LongTextBehaviour longText = BasicComponent.LongTextBehaviour.DISPLAY_ALL;
+
     @Override
     public void validate() {
         Preconditions.checkNotNull(showTo, "showTo is null");
@@ -67,6 +70,7 @@ public class Config implements ITabListConfig, Validate {
         }
         Preconditions.checkNotNull(customPlaceholders, "customPlaceholders is null");
         Preconditions.checkNotNull(playerSets, "playerSets is null");
+        Preconditions.checkNotNull(longText, "longText is null");
         for (Map.Entry<String, PlayerSet> entry : playerSets.entrySet()) {
             Preconditions.checkNotNull(entry.getKey(), "playerSet with null key");
             Preconditions.checkNotNull(entry.getValue(), "playerSet definition for " + entry.getKey() + " is incomplete");
