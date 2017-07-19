@@ -28,7 +28,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.logging.Level;
 
 public class UpdateChecker implements Runnable {
 
@@ -113,8 +112,7 @@ public class UpdateChecker implements Runnable {
                             }
                         }
                     }
-                } catch (Throwable th) {
-                    plugin.getLogger().log(Level.WARNING, "Failed to check whether a new dev-build is available.", th);
+                } catch (Throwable ignored) {
                 }
             }
         } catch (Throwable t) {
