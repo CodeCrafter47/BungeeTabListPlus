@@ -20,6 +20,7 @@
 package codecrafter47.bungeetablistplus.util;
 
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 
 public class PingTask implements Runnable {
@@ -58,8 +59,14 @@ public class PingTask implements Runnable {
                 return;
             }
             online = true;
-            maxPlayers = v.getPlayers().getMax();
-            onlinePlayers = v.getPlayers().getOnline();
+            ServerPing.Players players = v.getPlayers();
+            if (players != null) {
+                maxPlayers = players.getMax();
+                onlinePlayers = players.getOnline();
+            } else {
+                maxPlayers = 0;
+                onlinePlayers = 0;
+            }
         });
     }
 }
