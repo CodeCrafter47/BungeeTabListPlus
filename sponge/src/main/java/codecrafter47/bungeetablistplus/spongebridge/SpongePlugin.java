@@ -55,6 +55,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -95,6 +96,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     private final Multimap<Object, Variable> variablesByPlugin = HashMultimap.create();
     private final Map<String, ServerVariable> serverVariablesByName = new HashMap<>();
     private final Multimap<Object, ServerVariable> serverVariablesByPlugin = HashMultimap.create();
+    private SpongeExecutorService asyncExecutor;
 
     @Listener
     public void onInitialization(GameInitializationEvent event) {
@@ -134,6 +136,8 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     public void onServerStart(GameStartedServerEvent event) {
 
         // start data update task
+        asyncExecutor = game.getScheduler().createAsyncExecutor(this);
+
         game.getScheduler().createTaskBuilder().name("updateData").async().delay(1, TimeUnit.SECONDS).interval(1, TimeUnit.SECONDS).execute(() -> {
             try {
                 bridge.updateData();
@@ -345,6 +349,11 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         @Override
         protected void sendMessage(@Nonnull Player player, @Nonnull byte[] message) {
             channel.sendTo(player, buf -> buf.writeBytes(message));
+        }
+
+        @Override
+        protected void runAsync(@Nonnull Runnable task) {
+            asyncExecutor.execute(task);
         }
     }
 }

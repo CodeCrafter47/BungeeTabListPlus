@@ -213,7 +213,13 @@ public abstract class AbstractBridge<Player, Server> {
                     }
                 }
 
-                updatePlayerData(player, connectionInfo);
+                runAsync(() -> {
+                    try {
+                        updatePlayerData(player, connectionInfo);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             } else {
                 throw new IllegalArgumentException("Unexpected message id: " + messageId);
             }
@@ -420,6 +426,8 @@ public abstract class AbstractBridge<Player, Server> {
     }
 
     protected abstract void sendMessage(@Nonnull Player player, @Nonnull byte[] message);
+
+    protected abstract void runAsync(@Nonnull Runnable task);
 
     private static class PlayerConnectionInfo {
         boolean isConnectionValid = false;

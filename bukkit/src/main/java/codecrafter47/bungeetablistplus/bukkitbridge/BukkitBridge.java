@@ -342,5 +342,10 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         protected void sendMessage(@Nonnull Player player, @Nonnull byte[] message) {
             player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, message);
         }
+
+        @Override
+        protected void runAsync(@Nonnull Runnable task) {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, task);
+        }
     }
 }
