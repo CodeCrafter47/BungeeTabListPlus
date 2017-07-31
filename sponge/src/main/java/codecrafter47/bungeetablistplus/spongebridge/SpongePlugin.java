@@ -192,7 +192,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     }
 
     @Listener
-    public void onDisconnect(ClientConnectionEvent.Join event) {
+    public void onConnect(ClientConnectionEvent.Join event) {
         bridge.onPlayerConnect(event.getTargetEntity());
     }
 
