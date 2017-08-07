@@ -14,6 +14,10 @@
             <id>sponge</id>
             <url>http://repo.spongepowered.org/maven</url>
         </repository>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -21,6 +25,12 @@
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
             <version>${sponge-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.rojo8399</groupId>
+            <artifactId>PlaceholderAPI</artifactId>
+            <version>v4.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

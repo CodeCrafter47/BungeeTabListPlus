@@ -26,6 +26,7 @@ import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
+import codecrafter47.bungeetablistplus.spongebridge.placeholderapi.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.spongebridge.util.ChannelBufInputStream;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -90,6 +91,8 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     private Bridge bridge;
 
     private ChannelBinding.RawDataChannel channel;
+
+    private PlaceholderAPIHook placeholderAPIHook = null;
 
     private final ReadWriteLock apiLock = new ReentrantReadWriteLock();
     private final Map<String, Variable> variablesByName = new HashMap<>();
@@ -187,7 +190,13 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
 
     private void initBridge() {
         bridge = new Bridge();
-        bridge.setPlayerDataAccess(JoinedDataAccess.of(new PlayerDataAccess(logger), new BTLPPlayerDataAccess()));
+        if (classExists("me.rojo8399.placeholderapi.PlaceholderService")) {
+            placeholderAPIHook = new PlaceholderAPIHook(this);
+            bridge.setPlayerDataAccess(JoinedDataAccess.of(new PlayerDataAccess(logger), new BTLPPlayerDataAccess(), placeholderAPIHook.getDataAccess()));
+        } else {
+            placeholderAPIHook = null;
+            bridge.setPlayerDataAccess(JoinedDataAccess.of(new PlayerDataAccess(logger), new BTLPPlayerDataAccess()));
+        }
         bridge.setServerDataAccess(JoinedDataAccess.of(new ServerDataAccess(logger), new BTLPServerDataAccess()));
     }
 
@@ -269,6 +278,10 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         }
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     private class BTLPPlayerDataAccess extends AbstractSpongeDataAccess<Player> {
         BTLPPlayerDataAccess() {
             super(logger);
@@ -316,7 +329,8 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
                     apiLock.readLock().unlock();
                 }
             });
-            addProvider(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> false);
+            addProvider(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, server -> placeholderAPIHook != null);
+            addProvider(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS, server -> placeholderAPIHook != null ? placeholderAPIHook.getRegisteredPlaceholderPlugins() : null);
             addProvider(BTLPDataKeys.ThirdPartyServerPlaceholder, this::resolveServerVariable);
         }
 
@@ -355,5 +369,14 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         protected void runAsync(@Nonnull Runnable task) {
             asyncExecutor.execute(task);
         }
+    }
+
+    private static boolean classExists(String name) {
+        try {
+            Class.forName(name);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 }
