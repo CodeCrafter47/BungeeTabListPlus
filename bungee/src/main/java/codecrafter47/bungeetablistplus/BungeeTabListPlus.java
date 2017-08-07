@@ -48,6 +48,7 @@ import codecrafter47.bungeetablistplus.protocol.ProtocolManager;
 import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
+import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
 import codecrafter47.bungeetablistplus.util.PingTask;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
@@ -149,6 +150,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     @Getter
     private MainConfig config;
+    MatchingStringsCollection excludedServers;
+    MatchingStringsCollection hiddenServers;
 
     private FakePlayerManagerImpl fakePlayerManager;
 
@@ -239,6 +242,16 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             plugin.getLogger().warning("Disabling Plugin");
             return;
         }
+        excludedServers = new MatchingStringsCollection(
+                config.excludeServers != null
+                        ? config.excludeServers
+                        : Collections.emptyList()
+        );
+        hiddenServers = new MatchingStringsCollection(
+                config.hiddenServers != null
+                        ? config.hiddenServers
+                        : Collections.emptyList()
+        );
 
         if (config.automaticallySendBugReports) {
             String revision = "unknown";
@@ -389,11 +402,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         if (refreshThread != null) {
             refreshThread.cancel();
         }
-            try {
-                refreshThread = ProxyServer.getInstance().getScheduler().schedule(plugin, this::resendTabLists, 1, 1, TimeUnit.SECONDS);
-            } catch (RejectedExecutionException ignored) {
-                // this occurs on proxy shutdown -> we can safely ignore it
-            }
+        try {
+            refreshThread = ProxyServer.getInstance().getScheduler().schedule(plugin, this::resendTabLists, 1, 1, TimeUnit.SECONDS);
+        } catch (RejectedExecutionException ignored) {
+            // this occurs on proxy shutdown -> we can safely ignore it
+        }
     }
 
     /**
@@ -419,6 +432,16 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             // todo requestedUpdateInterval = null;
             fakePlayerManager.removeConfigFakePlayers();
             config = YamlConfig.read(new FileInputStream(new File(plugin.getDataFolder(), "config.yml")), MainConfig.class);
+            excludedServers = new MatchingStringsCollection(
+                    config.excludeServers != null
+                            ? config.excludeServers
+                            : Collections.emptyList()
+            );
+            hiddenServers = new MatchingStringsCollection(
+                    config.hiddenServers != null
+                            ? config.hiddenServers
+                            : Collections.emptyList()
+            );
             if (reloadTablists()) return false;
             fakePlayerManager.reload();
             resendTabLists();
@@ -624,8 +647,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     public static boolean isHiddenServer(String serverName) {
-        List<String> hiddenServers = getInstance().config.hiddenServers;
-        return hiddenServers != null && hiddenServers.contains(serverName);
+        return getInstance().hiddenServers.contains(serverName);
     }
 
     /**
