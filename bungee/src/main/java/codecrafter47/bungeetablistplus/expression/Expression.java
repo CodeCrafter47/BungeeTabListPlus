@@ -180,7 +180,7 @@ public class Expression {
     private static double parseNumber(String text) {
         try {
             return format.parse(text).doubleValue();
-        } catch (ParseException e) {
+        } catch (ParseException | NumberFormatException e) {
             return 0;
         }
     }
