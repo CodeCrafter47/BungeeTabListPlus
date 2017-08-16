@@ -66,8 +66,10 @@ public class DataManager implements Listener {
     private void updateData() {
         for (ConnectedPlayer player : bungeeTabListPlus.getConnectedPlayerManager().getPlayers()) {
             for (DataKey<?> dataKey : player.getLocalDataCache().getQueriedKeys()) {
-                DataKey<Object> key = (DataKey<Object>) dataKey;
-                updateIfNecessary(player, key, playerDataAccess.get(key, player.getPlayer()));
+                if (playerDataAccess.provides(dataKey)) {
+                    DataKey<Object> key = (DataKey<Object>) dataKey;
+                    updateIfNecessary(player, key, playerDataAccess.get(key, player.getPlayer()));
+                }
             }
         }
     }
