@@ -130,7 +130,7 @@ public abstract class PlayerTablistHandler {
 
         @Override
         public void setHeaderFooter(String header, String footer) {
-            handle.setHeaderFooter(FastChat.legacyTextToJson(header, '&'), FastChat.legacyTextToJson(footer, '&'));
+            handle.setHeaderFooter(FastChat.legacyTextToJsonSafe(header, '&'), FastChat.legacyTextToJsonSafe(footer, '&'));
         }
 
         @Override
