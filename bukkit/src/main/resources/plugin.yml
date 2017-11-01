@@ -3,4 +3,4 @@ main: codecrafter47.bungeetablistplus.BukkitPlugin
 version: ${project.version}
 authors:
   - CodeCrafter47
-softdepend: [Factions, Vault, VanishNoPacket, PlayerPoints, PlaceholderAPI]
+softdepend: [Factions, Vault, VanishNoPacket, SuperVanish, PremiumVanish, PlayerPoints, PlaceholderAPI]
