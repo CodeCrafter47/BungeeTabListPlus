@@ -292,7 +292,7 @@ public class YamlConfig {
             protected Object createEmptyJavaBean(MappingNode node) {
                 Object javaBean = super.createEmptyJavaBean(node);
                 if (javaBean instanceof UpdatableConfig) {
-                    ((UpdatableConfig) javaBean).update(node);
+                    ((UpdatableConfig) javaBean).update(new YamlNode(node));
                 }
                 return javaBean;
             }

@@ -19,13 +19,23 @@
 
 package codecrafter47.bungeetablistplus.yamlconfig;
 
-import org.yaml.snakeyaml.nodes.*;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import java.util.Iterator;
 
-public class YamlUtil {
+public class YamlNode {
 
-    public static Node get(MappingNode node, String id) {
+    private final MappingNode node;
+
+    public YamlNode(MappingNode node) {
+        this.node = node;
+    }
+
+    public Node get(String id) {
         for (NodeTuple tuple : node.getValue()) {
             if (tuple.getKeyNode() instanceof ScalarNode) {
                 String key = ((ScalarNode) tuple.getKeyNode()).getValue();
@@ -37,11 +47,11 @@ public class YamlUtil {
         return null;
     }
 
-    public static boolean contains(MappingNode node, String id) {
-        return get(node, id) != null;
+    public boolean contains(String id) {
+        return get(id) != null;
     }
 
-    public static void remove(MappingNode node, String id) {
+    public void remove(String id) {
         for (Iterator<NodeTuple> iterator = node.getValue().iterator(); iterator.hasNext(); ) {
             NodeTuple tuple = iterator.next();
             if (tuple.getKeyNode() instanceof ScalarNode) {
@@ -53,8 +63,8 @@ public class YamlUtil {
         }
     }
 
-    public static void put(MappingNode node, String id, Node value) {
-        remove(node, id);
+    public void put(String id, Node value) {
+        remove(id);
         node.getValue().add(new NodeTuple(new ScalarNode(Tag.STR, id, null, null, null), value));
     }
 }

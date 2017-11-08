@@ -21,11 +21,13 @@ package codecrafter47.bungeetablistplus.config;
 import codecrafter47.bungeetablistplus.yamlconfig.Comment;
 import codecrafter47.bungeetablistplus.yamlconfig.Path;
 import codecrafter47.bungeetablistplus.yamlconfig.UpdatableConfig;
-import org.yaml.snakeyaml.nodes.MappingNode;
+import codecrafter47.bungeetablistplus.yamlconfig.YamlNode;
 
-import java.util.*;
-
-import static codecrafter47.bungeetablistplus.yamlconfig.YamlUtil.remove;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 public class MainConfig implements UpdatableConfig {
 
@@ -104,30 +106,30 @@ public class MainConfig implements UpdatableConfig {
     }
 
     @Override
-    public void update(MappingNode section) {
-        remove(section, "tablistUpdateIntervall");
-        remove(section, "tablistUpdateInterval");
+    public void update(YamlNode section) {
+        section.remove("tablistUpdateIntervall");
+        section.remove("tablistUpdateInterval");
 
-        remove(section, "updateOnPlayerJoinLeave");
-        remove(section, "updateOnServerChange");
+        section.remove("updateOnPlayerJoinLeave");
+        section.remove("updateOnServerChange");
 
-        remove(section, "offline");
-        remove(section, "offline-text");
+        section.remove("offline");
+        section.remove("offline-text");
 
-        remove(section, "online");
-        remove(section, "online-text");
+        section.remove("online");
+        section.remove("online-text");
 
-        remove(section, "permissionSource");
+        section.remove("permissionSource");
 
-        remove(section, "useScoreboardToBypass16CharLimit");
+        section.remove("useScoreboardToBypass16CharLimit");
 
-        remove(section, "autoExcludeServers");
+        section.remove("autoExcludeServers");
 
-        remove(section, "showPlayersInGamemode3");
+        section.remove("showPlayersInGamemode3");
 
-        remove(section, "serverAlias");
-        remove(section, "worldAlias");
-        remove(section, "serverPrefixes");
-        remove(section, "prefixes");
+        section.remove("serverAlias");
+        section.remove("worldAlias");
+        section.remove("serverPrefixes");
+        section.remove("prefixes");
     }
 }

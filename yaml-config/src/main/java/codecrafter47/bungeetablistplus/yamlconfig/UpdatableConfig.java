@@ -19,9 +19,7 @@
 
 package codecrafter47.bungeetablistplus.yamlconfig;
 
-import org.yaml.snakeyaml.nodes.MappingNode;
-
 public interface UpdatableConfig {
 
-    void update(MappingNode node);
+    void update(YamlNode node);
 }
