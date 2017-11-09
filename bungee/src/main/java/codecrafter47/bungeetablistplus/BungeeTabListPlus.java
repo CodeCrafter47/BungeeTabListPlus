@@ -29,6 +29,7 @@ import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
+import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
@@ -235,6 +236,14 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                         "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
             } else {
                 config = YamlConfig.read(new FileInputStream(file), MainConfig.class);
+                if (config.needWrite) {
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+                    YamlConfig.addTag(CustomPlaceholder.Switch.class, "!switch");
+                    YamlConfig.addTag(CustomPlaceholder.Conditional.class, "!conditional");
+                    YamlConfig.writeWithComments(writer, config,
+                            "This is the configuration file of BungeeTabListPlus",
+                            "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
+                }
             }
         } catch (IOException | YAMLException ex) {
             plugin.getLogger().warning("Unable to load Config");
@@ -431,7 +440,16 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         try {
             // todo requestedUpdateInterval = null;
             fakePlayerManager.removeConfigFakePlayers();
-            config = YamlConfig.read(new FileInputStream(new File(plugin.getDataFolder(), "config.yml")), MainConfig.class);
+            File file = new File(plugin.getDataFolder(), "config.yml");
+            config = YamlConfig.read(new FileInputStream(file), MainConfig.class);
+            if (config.needWrite) {
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+                YamlConfig.addTag(CustomPlaceholder.Switch.class, "!switch");
+                YamlConfig.addTag(CustomPlaceholder.Conditional.class, "!conditional");
+                YamlConfig.writeWithComments(writer, config,
+                        "This is the configuration file of BungeeTabListPlus",
+                        "See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki for additional information");
+            }
             excludedServers = new MatchingStringsCollection(
                     config.excludeServers != null
                             ? config.excludeServers

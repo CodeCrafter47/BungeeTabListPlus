@@ -105,31 +105,40 @@ public class MainConfig implements UpdatableConfig {
         return TimeZone.getTimeZone(timezone);
     }
 
+    public transient boolean needWrite = false;
+
     @Override
     public void update(YamlNode section) {
-        section.remove("tablistUpdateIntervall");
-        section.remove("tablistUpdateInterval");
+        remove(section, "tablistUpdateIntervall");
+        remove(section, "tablistUpdateInterval");
 
-        section.remove("updateOnPlayerJoinLeave");
-        section.remove("updateOnServerChange");
+        remove(section, "updateOnPlayerJoinLeave");
+        remove(section, "updateOnServerChange");
 
-        section.remove("offline");
-        section.remove("offline-text");
+        remove(section, "offline");
+        remove(section, "offline-text");
 
-        section.remove("online");
-        section.remove("online-text");
+        remove(section, "online");
+        remove(section, "online-text");
 
-        section.remove("permissionSource");
+        remove(section, "permissionSource");
 
-        section.remove("useScoreboardToBypass16CharLimit");
+        remove(section, "useScoreboardToBypass16CharLimit");
 
-        section.remove("autoExcludeServers");
+        remove(section, "autoExcludeServers");
 
-        section.remove("showPlayersInGamemode3");
+        remove(section, "showPlayersInGamemode3");
 
-        section.remove("serverAlias");
-        section.remove("worldAlias");
-        section.remove("serverPrefixes");
-        section.remove("prefixes");
+        remove(section, "serverAlias");
+        remove(section, "worldAlias");
+        remove(section, "serverPrefixes");
+        remove(section, "prefixes");
+    }
+
+    private void remove(YamlNode section, String id) {
+        if (section.contains(id)) {
+            section.remove(id);
+            needWrite = true;
+        }
     }
 }

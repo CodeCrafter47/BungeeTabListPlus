@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -81,14 +82,15 @@ public class YamlConfig {
         add(Tag.MAP);
     }};
 
-    private static final ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() {
+    private static final ThreadLocal<MyYaml> yaml = new ThreadLocal<MyYaml>() {
         @Override
-        protected Yaml initialValue() {
+        @SneakyThrows
+        protected MyYaml initialValue() {
             MyConstructor constructor = new MyConstructor();
             constructor.setPropertyUtils(new MyPropertyUtils());
             DumperOptions dumperOptions = new DumperOptions();
             dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-            return new Yaml(constructor, new Representer(), dumperOptions);
+            return new MyYaml(constructor, new Representer(), dumperOptions);
         }
     };
 
@@ -98,6 +100,10 @@ public class YamlConfig {
 
     public static <T> T read(Reader reader, Class<T> type) {
         return yaml.get().loadAs(reader, type);
+    }
+
+    public static void addTag(Class<?> type, String tag) {
+        YamlConfig.yaml.get().getRepresenter().addClassTag(type, new Tag(tag));
     }
 
     public static void writeWithComments(Writer writer, Object object, String... header) throws IOException {
@@ -355,4 +361,13 @@ public class YamlConfig {
         }
     }
 
+    private static class MyYaml extends Yaml {
+        public MyYaml(BaseConstructor constructor, Representer representer, DumperOptions dumperOptions) {
+            super(constructor, representer, dumperOptions);
+        }
+
+        private Representer getRepresenter() {
+            return representer;
+        }
+    }
 }
