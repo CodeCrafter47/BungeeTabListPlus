@@ -202,6 +202,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
         // if passthrough is enabled send the packet to the client
         if (passtrough || size == 80) {
             sendPacket(packet);
+
+            if (size != requestedSize && serverTabList.size() <= requestedSize) {
+                setSizeInternal(requestedSize);
+            }
+
             return PacketListenerResult.CANCEL;
         }
 
@@ -311,7 +316,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 break;
         }
 
-        if (size != requestedSize && serverTabList.size() < requestedSize) {
+        if (size != requestedSize && serverTabList.size() <= requestedSize) {
             setSizeInternal(requestedSize);
         }
 
