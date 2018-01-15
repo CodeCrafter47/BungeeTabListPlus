@@ -18,12 +18,7 @@
  */
 package codecrafter47.bungeetablistplus;
 
-import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
-import codecrafter47.bungeetablistplus.api.bungee.FakePlayerManager;
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
-import codecrafter47.bungeetablistplus.api.bungee.ServerVariable;
-import codecrafter47.bungeetablistplus.api.bungee.Variable;
+import codecrafter47.bungeetablistplus.api.bungee.*;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
@@ -33,13 +28,7 @@ import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
-import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
-import codecrafter47.bungeetablistplus.managers.DataManager;
-import codecrafter47.bungeetablistplus.managers.PermissionManager;
-import codecrafter47.bungeetablistplus.managers.RedisPlayerManager;
-import codecrafter47.bungeetablistplus.managers.SkinManager;
-import codecrafter47.bungeetablistplus.managers.SkinManagerImpl;
-import codecrafter47.bungeetablistplus.managers.TabListManager;
+import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.placeholder.Placeholder;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
@@ -66,6 +55,7 @@ import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
@@ -74,26 +64,11 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -213,7 +188,13 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         try {
             Class.forName("net.md_5.bungee.api.Title");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #995");
+            throw new RuntimeException("You need to run at least BungeeCord version #1110");
+        }
+
+        try {
+            Connection.class.getMethod("isConnected");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("You need to run at least BungeeCord version #1110");
         }
 
         try {
