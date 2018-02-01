@@ -38,7 +38,7 @@ public class PlaceholderAPIDataAccess extends AbstractSpongeDataAccess<Player> {
             try {
                 return Sponge.getServiceManager().getRegistration(PlaceholderService.class).map(registration -> {
                     PlaceholderService service = registration.getProvider();
-                    Text text = service.replacePlaceholders(key.getParameter(), player);
+                    Text text = service.replaceSourcePlaceholders(key.getParameter(), player);
                     return TextSerializers.FORMATTING_CODE.serialize(text);
                 }).orElse(null);
             } catch (Throwable th) {
