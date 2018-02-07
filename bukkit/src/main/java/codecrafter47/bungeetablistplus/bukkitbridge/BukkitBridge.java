@@ -340,7 +340,13 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
 
         @Override
         protected void sendMessage(@Nonnull Player player, @Nonnull byte[] message) {
-            player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, message);
+            try {
+                player.sendPluginMessage(plugin, BridgeProtocolConstants.CHANNEL, message);
+            } catch (IllegalArgumentException e) {
+                if (plugin.isEnabled()) {
+                    throw e;
+                }
+            }
         }
 
         @Override
