@@ -42,19 +42,23 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
                 handler.setSize(size);
                 handler.setPassThrough(false);
 
-                for (int column = 0; column < getColumns(); column++) {
-                    for (int row = 0; row < getRows(); row++) {
-                        Icon icon = getIcon(row, column);
-                        String text = getText(row, column);
-                        int ping = getPing(row, column);
-
-                        handler.setSlot(row, column, icon, text, ping);
-                    }
-                }
+                updateAllSlots(handler);
 
                 handler.setHeaderFooter(getHeader(), getFooter());
             }
         });
+    }
+
+    private void updateAllSlots(PlayerTablistHandler handler) {
+        for (int column = 0; column < getColumns(); column++) {
+            for (int row = 0; row < getRows(); row++) {
+                Icon icon = getIcon(row, column);
+                String text = getText(row, column);
+                int ping = getPing(row, column);
+
+                handler.setSlot(row, column, icon, text, ping);
+            }
+        }
     }
 
     @Override
@@ -68,7 +72,13 @@ public class DefaultCustomTablist extends AbstractCustomTablist implements Tabli
     protected void onSizeChanged() {
         int size = getSize();
         for (PlayerTablistHandler handler : handlers) {
-            handler.runInEventLoop(() -> handler.setSize(size));
+            handler.runInEventLoop(() -> {
+                handler.setSize(size);
+
+                synchronized (DefaultCustomTablist.this) {
+                    updateAllSlots(handler);
+                }
+            });
         }
     }
 
