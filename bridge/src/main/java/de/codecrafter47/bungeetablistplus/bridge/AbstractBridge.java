@@ -22,24 +22,12 @@ package de.codecrafter47.bungeetablistplus.bridge;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
-import de.codecrafter47.data.api.DataAccess;
-import de.codecrafter47.data.api.DataKey;
-import de.codecrafter47.data.api.DataKeyRegistry;
-import de.codecrafter47.data.api.JoinedDataAccess;
-import de.codecrafter47.data.api.TypeToken;
+import de.codecrafter47.data.api.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -291,7 +279,7 @@ public abstract class AbstractBridge<Player, Server> {
             Player player = e.getValue();
             BridgeData bridgeData = serverBridgeDataMap.get(proxyIdentifier);
 
-            if (bridgeData.messagesPendingConfirmation.size() > 0 && (now > bridgeData.lastMessageSent + 1000 || bridgeData.messagesPendingConfirmation.size() > 5)) {
+            if (bridgeData != null && bridgeData.messagesPendingConfirmation.size() > 0 && (now > bridgeData.lastMessageSent + 1000 || bridgeData.messagesPendingConfirmation.size() > 5)) {
                 for (byte[] message : bridgeData.messagesPendingConfirmation) {
                     sendMessage(player, message);
                 }
