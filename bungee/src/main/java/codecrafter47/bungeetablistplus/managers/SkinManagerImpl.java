@@ -124,7 +124,7 @@ public class SkinManagerImpl implements SkinManager {
             return missingSkinTexture;
         }
 
-        // todo fileSkinCache.put(file, loadingSkinTexture);
+        fileSkinCache.put(file, loading0);
         ProxyServer.getInstance().getScheduler().runAsync(plugin, () -> {
             if (!file.exists()) {
                 plugin.getLogger().warning("Requested file does not exists: " + file.getAbsolutePath());
