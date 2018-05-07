@@ -446,8 +446,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
             resendTabLists();
             restartRefreshThread();
             skins.onReload();
-        } catch (IOException | YAMLException ex) {
-            plugin.getLogger().log(Level.WARNING, "Unable to reload Config", ex);
+        } catch (Throwable th) {
+            plugin.getLogger().log(Level.WARNING, "Unable to reload Config", th);
             return false;
         }
         return true;
