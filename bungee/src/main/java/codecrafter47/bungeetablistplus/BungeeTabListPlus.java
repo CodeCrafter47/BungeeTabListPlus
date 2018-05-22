@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.api.bungee.*;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.bridge.PlaceholderAPIHook;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
-import codecrafter47.bungeetablistplus.common.BugReportingService;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.config.CustomPlaceholder;
 import codecrafter47.bungeetablistplus.config.MainConfig;
@@ -101,7 +100,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     private RedisPlayerManager redisPlayerManager;
     @Getter
     private DataManager dataManager;
-    private BugReportingService bugReportingService;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -243,32 +241,6 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                         : Collections.emptyList()
         );
 
-        if (config.automaticallySendBugReports) {
-            String revision = "unknown";
-            try {
-                Properties current = new Properties();
-                current.load(getClass().getClassLoader().getResourceAsStream("version.properties"));
-                revision = current.getProperty("revision", revision);
-            } catch (IOException ex) {
-                getLogger().log(Level.SEVERE, "Unexpected exception", ex);
-            }
-
-            String version = getPlugin().getDescription().getVersion();
-
-            if (!"unknown".equals(revision)) {
-                version += "-git-" + revision;
-            }
-
-            String systemInfo = "" +
-                    "System Info\n" +
-                    "===========\n" +
-                    "Bungee: " + getProxy().getVersion() + "\n" +
-                    "Java: " + System.getProperty("java.version") + "\n";
-
-            bugReportingService = new BugReportingService(Level.SEVERE, getPlugin().getDescription().getName(), version, command -> plugin.getProxy().getScheduler().runAsync(plugin, command), systemInfo);
-            bugReportingService.registerLogger(getLogger());
-        }
-
         resendThread = new ResendThread();
 
         File headsFolder = new File(plugin.getDataFolder(), "heads");
@@ -381,9 +353,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     }
 
     public void onDisable() {
-        if (bugReportingService != null) {
-            bugReportingService.unregisterLogger(getLogger());
-        }
+        // nothing to do
     }
 
     private Double requestedUpdateInterval = null;

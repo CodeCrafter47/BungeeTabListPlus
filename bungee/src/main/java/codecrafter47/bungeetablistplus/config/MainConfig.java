@@ -23,11 +23,7 @@ import codecrafter47.bungeetablistplus.yamlconfig.Path;
 import codecrafter47.bungeetablistplus.yamlconfig.UpdatableConfig;
 import codecrafter47.bungeetablistplus.yamlconfig.YamlNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 public class MainConfig implements UpdatableConfig {
 
@@ -52,11 +48,10 @@ public class MainConfig implements UpdatableConfig {
     public boolean notifyAdminsIfUpdateAvailable = true;
 
     @Comment({
-            "If this is set to true and the plugin encounters an issue a bug report is sent automatically",
-            "Bug reports do not contain any sensitive or identifying information",
-            "Bug reports contain the plugin name, plugin version and the error message that also appears in the server log"
+            "This option is no longer in use as of version 2.8.4 of BungeeTabListPlus.",
+            "It will be remove in a future update."
     })
-    public boolean automaticallySendBugReports = true;
+    public boolean automaticallySendBugReports = false;
 
     @Comment({
             "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
