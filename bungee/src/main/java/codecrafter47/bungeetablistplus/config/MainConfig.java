@@ -28,13 +28,6 @@ import java.util.*;
 public class MainConfig implements UpdatableConfig {
 
     @Comment({
-            "You can limit the number of characters per slot here",
-            "Color codes do not count as a character; -1 means unlimited",
-            "This option will be removed soon. Don't use it anymore."
-    })
-    public int charLimit = -1;
-
-    @Comment({
             "if enabled the plugin checks for new versions automatically.",
             "Use /BTLP to see whether a new version is available",
             "this does NOT automatically install an update"
@@ -128,6 +121,8 @@ public class MainConfig implements UpdatableConfig {
         remove(section, "worldAlias");
         remove(section, "serverPrefixes");
         remove(section, "prefixes");
+
+        remove(section, "charLimit");
     }
 
     private void remove(YamlNode section, String id) {
