@@ -46,6 +46,7 @@ import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class ConnectedPlayer extends AbstractPlayer {
@@ -93,11 +94,8 @@ public class ConnectedPlayer extends AbstractPlayer {
         return packetHandler;
     }
 
-    @Synchronized
+    @Nullable
     public PlayerTablistHandler getPlayerTablistHandler() {
-        if (playerTablistHandler == null) {
-            createTabListHandler();
-        }
         return playerTablistHandler;
     }
 

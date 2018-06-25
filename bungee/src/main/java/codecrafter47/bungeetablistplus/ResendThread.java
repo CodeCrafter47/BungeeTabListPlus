@@ -26,12 +26,7 @@ import codecrafter47.bungeetablistplus.context.Context;
 import codecrafter47.bungeetablistplus.managers.ConnectedPlayerManager;
 import codecrafter47.bungeetablistplus.player.ConnectedPlayer;
 import codecrafter47.bungeetablistplus.tablisthandler.PlayerTablistHandler;
-import codecrafter47.bungeetablistplus.tablistproviders.ConfigTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.DefaultTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.DynamicSizeConfigTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.FixedColumnsConfigTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.FixedSizeConfigTablistProvider;
-import codecrafter47.bungeetablistplus.tablistproviders.TablistProvider;
+import codecrafter47.bungeetablistplus.tablistproviders.*;
 import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -123,6 +118,10 @@ public class ResendThread implements Runnable, Executor {
 
     private void update(ProxiedPlayer player, ConnectedPlayer connectedPlayer) {
         PlayerTablistHandler tablistHandler = connectedPlayer.getPlayerTablistHandler();
+
+        if (tablistHandler == null) {
+            return;
+        }
 
         try {
             if (connectedPlayer.getCustomTablist() != null) {
