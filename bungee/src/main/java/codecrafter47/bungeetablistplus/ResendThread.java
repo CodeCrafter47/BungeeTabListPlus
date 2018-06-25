@@ -31,6 +31,7 @@ import gnu.trove.set.hash.THashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Queue;
@@ -65,7 +66,7 @@ public class ResendThread implements Runnable, Executor {
     }
 
     @Override
-    public void execute(Runnable runnable) {
+    public void execute(@Nonnull Runnable runnable) {
         lock.lock();
         try {
             tasks.add(runnable);
@@ -92,11 +93,12 @@ public class ResendThread implements Runnable, Executor {
                         lock.unlock();
                     }
                 }
-                while (!tasks.isEmpty()) {
-                    tasks.poll().run();
+                Runnable task;
+                while (null != (task = tasks.poll())) {
+                    task.run();
                 }
-                if (!queue.isEmpty()) {
-                    ProxiedPlayer player = queue.poll();
+                ProxiedPlayer player = queue.poll();
+                if (null != player) {
                     set.remove(player);
                     if (player.getServer() != null) {
                         ConnectedPlayerManager connectedPlayerManager = BungeeTabListPlus.getInstance().getConnectedPlayerManager();
