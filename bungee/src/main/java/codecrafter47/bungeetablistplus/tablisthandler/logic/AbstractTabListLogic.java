@@ -26,6 +26,7 @@ import codecrafter47.bungeetablistplus.util.Object2IntHashMultimap;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import de.codecrafter47.bungeetablistplus.bungee.compat.PacketUtil;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -55,6 +56,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
     protected static final String[][] EMPTY_PROPRTIES = new String[0][];
 
     private static boolean teamCollisionRuleSupported;
+    private static boolean teamColorIsByte;
 
     static {
         for (int i = 0; i < 80; i++) {
@@ -69,6 +71,13 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             teamCollisionRuleSupported = true;
         } catch (NoSuchMethodException e) {
             teamCollisionRuleSupported = false;
+        }
+
+        try {
+            Team.class.getDeclaredMethod("setColor", byte.class);
+            teamColorIsByte = true;
+        } catch (NoSuchMethodException e) {
+            teamColorIsByte = false;
         }
     }
 
@@ -129,7 +138,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             if (teamCollisionRuleSupported) {
                 team.setCollisionRule("always");
             }
-            team.setColor((byte) 0);
+            if (teamColorIsByte) {
+                PacketUtil.setTeamColorByte(team, (byte) 0);
+            } else {
+                team.setColor(0);
+            }
             team.setPlayers(new String[0]);
             sendPacket(team);
         }
@@ -442,7 +455,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             if (teamCollisionRuleSupported) {
                 team.setCollisionRule(serverTeam.getCollisionRule());
             }
-            team.setColor(serverTeam.getColor());
+            if (teamColorIsByte) {
+                PacketUtil.setTeamColorByte(team, serverTeam.getColor());
+            } else {
+                team.setColor(serverTeam.getColor());
+            }
             sendPacket(team);
         }
     }
@@ -471,7 +488,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 if (teamCollisionRuleSupported) {
                     team.setCollisionRule("always");
                 }
-                team.setColor((byte) 0);
+                if (teamColorIsByte) {
+                    PacketUtil.setTeamColorByte(team, (byte) 0);
+                } else {
+                    team.setColor(0);
+                }
                 sendPacket(team);
             }
         }
@@ -504,7 +525,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         if (teamCollisionRuleSupported) {
                             packet1.setCollisionRule("always");
                         }
-                        packet1.setColor((byte) 0);
+                        if (teamColorIsByte) {
+                            PacketUtil.setTeamColorByte(packet1, (byte) 0);
+                        } else {
+                            packet1.setColor(0);
+                        }
                         sendPacket(packet1);
                     }
                 }
@@ -531,7 +556,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                     if (teamCollisionRuleSupported) {
                         t.setCollisionRule(packet.getCollisionRule());
                     }
-                    t.setColor(packet.getColor());
+                    if (teamColorIsByte) {
+                        t.setColor(PacketUtil.getTeamColorByte(packet));
+                    } else {
+                        t.setColor((byte) packet.getColor());
+                    }
                 }
                 if (packet.getPlayers() != null) {
                     for (String s : packet.getPlayers()) {
@@ -576,7 +605,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         if (teamCollisionRuleSupported) {
                             team.setCollisionRule(packet.getCollisionRule());
                         }
-                        team.setColor(packet.getColor());
+                        if (teamColorIsByte) {
+                            PacketUtil.setTeamColorByte(team, PacketUtil.getTeamColorByte(packet));
+                        } else {
+                            team.setColor(packet.getColor());
+                        }
                         sendPacket(team);
                     }
                 }
@@ -605,7 +638,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             if (teamCollisionRuleSupported) {
                                 team.setCollisionRule("always");
                             }
-                            team.setColor((byte) 0);
+                            if (teamColorIsByte) {
+                                PacketUtil.setTeamColorByte(team, (byte) 0);
+                            } else {
+                                team.setColor(0);
+                            }
                             sendPacket(team);
                         }
                     } else {
@@ -622,7 +659,11 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             if (teamCollisionRuleSupported) {
                                 team.setCollisionRule(serverTeam.getCollisionRule());
                             }
-                            team.setColor(serverTeam.getColor());
+                            if (teamColorIsByte) {
+                                PacketUtil.setTeamColorByte(team, serverTeam.getColor());
+                            } else {
+                                team.setColor(serverTeam.getColor());
+                            }
                             sendPacket(team);
                         }
                     }
