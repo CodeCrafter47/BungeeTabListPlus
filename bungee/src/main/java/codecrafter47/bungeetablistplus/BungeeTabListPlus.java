@@ -569,6 +569,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         }
         player.getOpt(BukkitData.VanishNoPacket_IsVanished).ifPresent(b -> hidden[0] |= b);
         player.getOpt(BukkitData.SuperVanish_IsVanished).ifPresent(b -> hidden[0] |= b);
+        player.getOpt(BukkitData.CMI_IsVanished).ifPresent(b -> hidden[0] |= b);
         player.getOpt(BukkitData.Essentials_IsVanished).ifPresent(b -> hidden[0] |= b);
 
         // check ProxyCore
