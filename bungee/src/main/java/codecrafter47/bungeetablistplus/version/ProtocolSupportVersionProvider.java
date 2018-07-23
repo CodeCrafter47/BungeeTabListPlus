@@ -43,4 +43,14 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
         }
     }
 
+    @Override
+    public boolean has113OrLater(ProxiedPlayer player) {
+        ProtocolVersion protocolVersion = ProtocolSupportAPI.getProtocolVersion(player);
+        if (psb12) {
+            return false;
+        } else {
+            return protocolVersion.getId() >= 393;
+        }
+    }
+
 }

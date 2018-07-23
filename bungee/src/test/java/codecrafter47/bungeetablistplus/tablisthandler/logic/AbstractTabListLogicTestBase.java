@@ -315,6 +315,11 @@ public class AbstractTabListLogicTestBase {
         }
 
         @Override
+        protected boolean is113OrLater() {
+            return false;
+        }
+
+        @Override
         public void onConnected() {
             validateConstraints();
             super.onConnected();

@@ -25,4 +25,5 @@ public interface ProtocolVersionProvider {
 
     boolean has18OrLater(ProxiedPlayer player);
 
+    boolean has113OrLater(ProxiedPlayer player);
 }
