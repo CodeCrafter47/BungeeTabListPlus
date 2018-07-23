@@ -23,7 +23,7 @@ package codecrafter47.bungeetablistplus.common.network;
  */
 public class BridgeProtocolConstants {
 
-    public static final String CHANNEL = "BTLP/Bridge";
+    public static final String CHANNEL = "btlp:bridge";
 
     public static final int VERSION = 5;
 
