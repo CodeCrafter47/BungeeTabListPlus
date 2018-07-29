@@ -153,7 +153,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
             if (teamColorIsByte) {
                 PacketUtil.setTeamColorByte(team, (byte) 0);
             } else {
-                team.setColor(0);
+                team.setColor(is113OrLater() ? 21 : 0); // Reset
             }
             team.setPlayers(new String[0]);
             sendPacket(team);
@@ -509,7 +509,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                 if (teamColorIsByte) {
                     PacketUtil.setTeamColorByte(team, (byte) 0);
                 } else {
-                    team.setColor(0);
+                    team.setColor(is113OrLater() ? 21 : 0); // Reset
                 }
                 sendPacket(team);
             }
@@ -552,7 +552,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                         if (teamColorIsByte) {
                             PacketUtil.setTeamColorByte(packet1, (byte) 0);
                         } else {
-                            packet1.setColor(0);
+                            packet1.setColor(is113OrLater() ? 21 : 0); // Reset
                         }
                         sendPacket(packet1);
                     }
@@ -671,7 +671,7 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             if (teamColorIsByte) {
                                 PacketUtil.setTeamColorByte(team, (byte) 0);
                             } else {
-                                team.setColor(0);
+                                team.setColor(is113OrLater() ? 21 : 0); // Reset
                             }
                             sendPacket(team);
                         }
