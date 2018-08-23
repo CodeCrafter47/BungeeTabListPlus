@@ -34,11 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -127,6 +123,8 @@ public abstract class Placeholder {
         playerPlaceholders.put("bungeeonlinetime_seconds", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) (duration.getSeconds() % 60)).orElse(0)));
         playerPlaceholders.put("bungeeonlinetime_minutes", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) ((duration.getSeconds() % 3600) / 60)).orElse(0)));
         playerPlaceholders.put("bungeeonlinetime_hours", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) (duration.getSeconds() / 3600)).orElse(0)));
+        playerPlaceholders.put("bungeeonlinetime_hours_of_24", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) ((duration.getSeconds() / 3600) % 24)).orElse(0)));
+        playerPlaceholders.put("bungeeonlinetime_days", ofIntFunction(player -> player.getOpt(BungeeData.BungeeOnlineTime_OnlineTime).map(duration -> (int) (duration.getSeconds() / 86400)).orElse(0)));
         playerPlaceholders.put("redisbungee_server_id", ofStringData(BTLPBungeeDataKeys.DATA_KEY_RedisBungee_ServerId));
         playerPlaceholders.put("askyblock_island_level", ofIntData(BukkitData.ASkyBlock_IslandLevel));
         playerPlaceholders.put("askyblock_island_name", ofStringData(BukkitData.ASkyBlock_IslandName));
