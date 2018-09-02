@@ -38,18 +38,11 @@ import lombok.val;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 @Getter
@@ -259,6 +252,7 @@ public class PlayersByServerComponent extends Component implements Validate {
             preferredSize = 0;
             for (List<Player> list : playersByServer.values()) {
                 int serverSize = serverHeader.getSize() + list.size() * playerComponent.getSize() + (serverFooter != null ? serverFooter.getSize() : 0);
+                serverSize = max(serverSize, minSizePerServer);
                 serverSize = ((serverSize + columns - 1) / columns) * columns;
                 preferredSize += min(serverSize, maxSizePerServer);
             }
@@ -356,11 +350,11 @@ public class PlayersByServerComponent extends Component implements Validate {
                     pos += serverHeader.getSize();
                     // Players
                     int playersMaxSize = playersByServer.get(server).size() * playerComponent.getSize();
-                    int serverSize = min(serverRows[i] * columns - serverHeader.getSize() - (serverFooter != null ? serverFooter.getSize() : 0), playersMaxSize);
+                    int serverSize = serverRows[i] * columns - serverHeader.getSize() - (serverFooter != null ? serverFooter.getSize() : 0);
                     boolean allFit = serverSize >= playersMaxSize;
                     int j;
                     int pos2 = 0;
-                    for (j = 0; (allFit || pos2 + morePlayersComponent.getSize() < serverSize) && j < players.size(); j++) {
+                    for (j = 0; (allFit || pos2 + playerComponent.getSize() + morePlayersComponent.getSize() <= serverSize) && j < players.size(); j++) {
                         Player player = players.get(j);
                         Component.Instance component = playerComponent.toInstance(serverContext.derived().put(Context.KEY_PLAYER, player).put(Context.KEY_DEFAULT_ICON, IconTemplate.PLAYER_ICON).put(Context.KEY_DEFAULT_PING, PingTemplate.PLAYER_PING));
                         component.activate();
@@ -390,7 +384,7 @@ public class PlayersByServerComponent extends Component implements Validate {
                         activeComponents.add(footer);
                         pos += serverFooter.getSize();
                     } else {
-                        pos += pos2;
+                        pos += serverSize;
                     }
                 }
             }
