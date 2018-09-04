@@ -44,10 +44,10 @@ public class PlaceholderAPIHook implements Listener {
     }
 
     public void addMaybePlaceholder(String s) {
-        placeholdersToCheck.add("%" + s + "%");
+        placeholdersToCheck.add(s);
     }
 
-    public void askServersForPlaceholders() {
+    private void askServersForPlaceholders() {
         try {
             bungeeTabListPlus.getProxy().getServers().values().stream().filter(Objects::nonNull).forEach(this::askForPlaceholders);
         } catch (ConcurrentModificationException ignored) {
@@ -55,7 +55,7 @@ public class PlaceholderAPIHook implements Listener {
         }
     }
 
-    public void askForPlaceholders(ServerInfo server) {
+    private void askForPlaceholders(ServerInfo server) {
         DataHolder dataHolder = bungeeTabListPlus.getBridge().getServerDataHolder(server.getName());
         Boolean b;
         if (dataHolder != null && null != (b = dataHolder.get(BTLPDataKeys.PLACEHOLDERAPI_PRESENT)) && b) {
@@ -63,11 +63,11 @@ public class PlaceholderAPIHook implements Listener {
             if (plugins != null) {
                 for (String placeholder : placeholdersToCheck) {
                     if (!registeredPlaceholders.contains(placeholder)) {
-                        String pl = placeholder.split("_")[0].substring(1);
+                        String pl = placeholder.split("_")[0];
                         if (plugins.stream().anyMatch(s -> s.equalsIgnoreCase(pl))) {
                             if (!registeredPlaceholders.contains(placeholder)) {
                                 registeredPlaceholders.add(placeholder);
-                                Placeholder.placeholderAPIDataKeys.put(placeholder.substring(1, placeholder.length() - 1), BTLPDataKeys.createPlaceholderAPIDataKey(placeholder));
+                                Placeholder.placeholderAPIDataKeys.put(placeholder, BTLPDataKeys.createPlaceholderAPIDataKey("%" + placeholder + "%"));
                                 bungeeTabListPlus.reload();
                             }
                         }
