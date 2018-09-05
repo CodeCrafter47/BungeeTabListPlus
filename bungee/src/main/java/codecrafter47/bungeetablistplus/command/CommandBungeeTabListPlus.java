@@ -80,9 +80,9 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
         UpdateChecker updateChecker = new UpdateChecker(BungeeTabListPlus.getInstance().getPlugin());
         updateChecker.run();
         if (updateChecker.isUpdateAvailable()) {
-            sender.sendMessage(ChatUtil.parseBBCode("&eAn update is available at [url]http://www.spigotmc.org/resources/bungeetablistplus.313/[/url]"));
+            sender.sendMessage(ChatUtil.parseBBCode("&aAn update is available at [url]http://www.spigotmc.org/resources/bungeetablistplus.313/[/url]"));
         } else if (updateChecker.isNewDevBuildAvailable()) {
-            sender.sendMessage(ChatUtil.parseBBCode("&eA new dev-build is available at [url]https://ci.codecrafter47.de/job/BungeeTabListPlus/[/url]"));
+            sender.sendMessage(ChatUtil.parseBBCode("&aA new dev-build is available at [url]https://ci.codecrafter47.de/job/BungeeTabListPlus/[/url]"));
         } else {
             sender.sendMessage(ChatUtil.parseBBCode("&aYou are already running the latest version."));
         }
@@ -91,7 +91,7 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
         BukkitBridge bridge = BungeeTabListPlus.getInstance().getBridge();
         List<ServerInfo> servers = new ArrayList<>(ProxyServer.getInstance().getServers().values());
         List<String> withBridge = new ArrayList<>();
-        List<String> withoutBridge = new ArrayList<>();
+        List<ServerInfo> withoutBridge = new ArrayList<>();
         List<String> maybeBridge = new ArrayList<>();
         for (ServerInfo server : servers) {
             DataHolder dataHolder = bridge.getServerDataHolder(server.getName());
@@ -101,21 +101,10 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
                 if (server.getPlayers().isEmpty()) {
                     maybeBridge.add(server.getName());
                 } else {
-                    withoutBridge.add(server.getName());
+                    withoutBridge.add(server);
                 }
             }
         }
-        if (!withBridge.isEmpty()) {
-            sender.sendMessage(ChatUtil.parseBBCode("&eServers with the bridge plugin: &f" + Joiner.on(", ").join(withBridge)));
-        }
-        if (!withoutBridge.isEmpty()) {
-            sender.sendMessage(ChatUtil.parseBBCode("&eServers without the bridge plugin: &f" + Joiner.on(", ").join(withoutBridge)));
-        }
-        if (!maybeBridge.isEmpty()) {
-            sender.sendMessage(ChatUtil.parseBBCode("&eStatus of the bridge plugin is not known on: &f" + Joiner.on(", ").join(maybeBridge)));
-        }
-
-        // PlaceholderAPI
         List<String> withPAPI = servers.stream()
                 .filter(server -> {
                     DataHolder dataHolder = bridge.getServerDataHolder(server.getName());
@@ -124,11 +113,22 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
                 })
                 .map(ServerInfo::getName)
                 .collect(Collectors.toList());
+
+        sender.sendMessage(ChatUtil.parseBBCode("&eBridge plugin status:"));
+        if (!withBridge.isEmpty()) {
+            sender.sendMessage(ChatUtil.parseBBCode("&fInstalled on: &a" + Joiner.on("&f,&a ").join(withBridge)));
+        }
         if (!withPAPI.isEmpty()) {
-            sender.sendMessage(ChatUtil.parseBBCode("&eServers with PlaceholderAPI: &f" + Joiner.on(", ").join(withPAPI)));
+            sender.sendMessage(ChatUtil.parseBBCode("&fServers with PlaceholderAPI: &a" + Joiner.on("&f, &a").join(withPAPI)));
+        }
+        for (ServerInfo server : withoutBridge) {
+            sender.sendMessage(ChatUtil.parseBBCode("&c" + server.getName() + "&f: " + bridge.getStatus(server)));
+        }
+        if (!maybeBridge.isEmpty()) {
+            sender.sendMessage(ChatUtil.parseBBCode("&eBridge status is not available for servers without players."));
         }
 
         // That's it
-        sender.sendMessage(ChatUtil.parseBBCode("&eThanks for using BungeeTabListPlus."));
+        sender.sendMessage(ChatUtil.parseBBCode("&aThank you for using BungeeTabListPlus."));
     }
 }

@@ -47,21 +47,8 @@ import net.md_5.bungee.event.EventHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
@@ -146,6 +133,62 @@ public class BukkitBridge implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    public String getStatus(ServerInfo server) {
+        Collection<ProxiedPlayer> players = server.getPlayers();
+        if (players.isEmpty()) {
+            return "no players";
+        }
+        int error_bungee = 0, unavailable = 0, working = 0, stale = 0, incomplete = 0;
+        for (ProxiedPlayer player : players) {
+            PlayerConnectionInfo connectionInfo = playerPlayerConnectionInfoMap.get(player);
+
+            if (connectionInfo == null) {
+                error_bungee++;
+                continue;
+            }
+
+            if (connectionInfo.isConnectionValid == false) {
+                unavailable++;
+                continue;
+            }
+
+            if (connectionInfo.hasReceived == false) {
+                incomplete++;
+                continue;
+            }
+
+            PlayerBridgeDataCache bridgeData = connectionInfo.playerBridgeData;
+            if (bridgeData == null) {
+                error_bungee++;
+                continue;
+            }
+
+            if (bridgeData.nextOutgoingMessageId - bridgeData.lastConfirmed > 2 && System.currentTimeMillis() - bridgeData.lastMessageSent > 5000) {
+                stale++;
+                continue;
+            }
+        }
+
+        if (unavailable == players.size()) {
+            return "not installed or incompatible version";
+        }
+
+        String status = "working: " + working;
+        if (unavailable != 0) {
+            status += ", unavailable: " + unavailable;
+        }
+        if (incomplete != 0) {
+            status += ", unavailable: " + incomplete;
+        }
+        if (stale != 0) {
+            status += ", stale: " + stale;
+        }
+        if (error_bungee != 0) {
+            status += ", error_bungee: " + error_bungee;
+        }
+        return status;
     }
 
     private void handlePluginMessage(ProxiedPlayer player, Server server, DataInput input) throws IOException {
