@@ -26,6 +26,7 @@ import com.google.common.base.Charsets;
 import de.codecrafter47.data.api.DataCache;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.bungee.api.BungeeData;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
 
@@ -35,14 +36,17 @@ import java.util.concurrent.FutureTask;
 public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer {
     private final String name;
     private final UUID uuid;
+    @Getter
+    private boolean requiresSkinFix;
     private boolean randomServerSwitchEnabled;
 
     private final DataCache data = new DataCache();
 
-    public FakePlayer(String name, ServerInfo server, boolean randomServerSwitchEnabled) {
+    public FakePlayer(String name, ServerInfo server, boolean randomServerSwitchEnabled, boolean requiresSkinFix) {
         this.randomServerSwitchEnabled = randomServerSwitchEnabled;
         this.name = name;
         this.uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
+        this.requiresSkinFix = requiresSkinFix;
 
         data.updateValue(BungeeData.BungeeCord_Server, server.getName());
     }
@@ -100,6 +104,7 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
 
     @Override
     public void setIcon(Icon icon) {
+        requiresSkinFix = false;
         executeInMainThread(() -> data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, icon));
     }
 

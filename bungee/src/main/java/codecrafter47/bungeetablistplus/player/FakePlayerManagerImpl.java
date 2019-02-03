@@ -22,6 +22,7 @@ package codecrafter47.bungeetablistplus.player;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.FakePlayerManager;
 import codecrafter47.bungeetablistplus.api.bungee.IPlayer;
+import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -45,6 +46,18 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
             sanitizeFakePlayerNames();
         }
         plugin.getProxy().getScheduler().schedule(plugin, this::triggerRandomEvent, 10, 10, TimeUnit.SECONDS);
+        plugin.getProxy().getScheduler().schedule(plugin, this::fixSkins, 1, 1, TimeUnit.SECONDS);
+    }
+
+    private void fixSkins() {
+        for (FakePlayer fakePlayer : online) {
+            if (fakePlayer.isRequiresSkinFix()) {
+                Icon icon = BungeeTabListPlus.getInstance().getSkinManager().getIcon(fakePlayer.getName());
+                if (icon != null) {
+                    fakePlayer.setIcon(icon);
+                }
+            }
+        }
     }
 
     private void triggerRandomEvent() {
@@ -59,7 +72,7 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
                 if (Math.random() < 0.7 && offline.size() > 0) {
                     // add player
                     String name = offline.get((int) (Math.random() * offline.size()));
-                    FakePlayer player = new FakePlayer(name, new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size())), true);
+                    FakePlayer player = new FakePlayer(name, new ArrayList<>(plugin.getProxy().getServers().values()).get((int) (Math.random() * plugin.getProxy().getServers().values().size())), true, true);
                     offline.remove(name);
                     online.add(player);
                 } else if (online.size() > 0) {
@@ -124,7 +137,11 @@ public class FakePlayerManagerImpl implements IPlayerProvider, FakePlayerManager
 
     @Override
     public codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer createFakePlayer(String name, ServerInfo server) {
-        FakePlayer fakePlayer = new FakePlayer(name, server, false);
+        return createFakePlayer(name, server, false);
+    }
+
+    public codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer createFakePlayer(String name, ServerInfo server, boolean skinFromName) {
+        FakePlayer fakePlayer = new FakePlayer(name, server, false, skinFromName);
         online.add(fakePlayer);
         return fakePlayer;
     }

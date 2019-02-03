@@ -127,7 +127,8 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
     MatchingStringsCollection excludedServers;
     MatchingStringsCollection hiddenServers;
 
-    private FakePlayerManagerImpl fakePlayerManager;
+    @Getter
+    private FakePlayerManagerImpl fakePlayerManagerImpl;
 
     private PermissionManager pm;
 
@@ -276,7 +277,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         skins = new SkinManagerImpl(plugin, headsFolder);
 
-        fakePlayerManager = new FakePlayerManagerImpl(plugin);
+        fakePlayerManagerImpl = new FakePlayerManagerImpl(plugin);
 
         playerProviders = new ArrayList<>();
 
@@ -288,7 +289,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
         playerProviders.add(connectedPlayerManager);
 
-        playerProviders.add(fakePlayerManager);
+        playerProviders.add(fakePlayerManagerImpl);
 
         plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
         bukkitBridge = new BukkitBridge(this);
@@ -390,7 +391,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         failIfNotMainThread();
         try {
             // todo requestedUpdateInterval = null;
-            fakePlayerManager.removeConfigFakePlayers();
+            fakePlayerManagerImpl.removeConfigFakePlayers();
             File file = new File(plugin.getDataFolder(), "config.yml");
             config = YamlConfig.read(new FileInputStream(file), MainConfig.class);
             if (config.needWrite) {
@@ -412,7 +413,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                             : Collections.emptyList()
             );
             if (reloadTablists()) return false;
-            fakePlayerManager.reload();
+            fakePlayerManagerImpl.reload();
             resendTabLists();
             restartRefreshThread();
             skins.onReload();
@@ -531,7 +532,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
 
     @Override
     protected FakePlayerManager getFakePlayerManager0() {
-        return fakePlayerManager;
+        return fakePlayerManagerImpl;
     }
 
     /**

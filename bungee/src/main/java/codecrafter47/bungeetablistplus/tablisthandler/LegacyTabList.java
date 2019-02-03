@@ -39,16 +39,4 @@ public class LegacyTabList extends AbstractLegacyTabList {
     protected void sendPacket(DefinedPacket packet) {
         player.unsafe().sendPacket(packet);
     }
-
-    public List<IPlayer> getServerTabList() {
-        ArrayList<IPlayer> list = new ArrayList<>(serverTabListEntryNames.size());
-
-        for (String name : serverTabListEntryNames) {
-            FakePlayer fakePlayer = new FakePlayer(name, player.getServer().getInfo(), false);
-            list.add(fakePlayer);
-        }
-
-        return list;
-    }
-
 }
