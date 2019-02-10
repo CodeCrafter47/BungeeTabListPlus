@@ -149,7 +149,7 @@ public class AbstractTabListLogicTestBase {
                 for (int i = 0; i < size; i++) {
                     assertEquals("uuid", fakePlayerUUIDs[i], clientUuid[i]);
                     assertEquals("username", fakePlayerUsernames[i], clientUsername[i]);
-                    Assert.assertEquals("uuid", clientUuid[i], clientTabList.getVisibleEntries().get(i).getUuid());
+                    Assert.assertEquals("uuid[" + i + "]", clientUuid[i], clientTabList.getVisibleEntries().get(i).getUuid());
                     Assert.assertEquals("username", clientUsername[i], clientTabList.getVisibleEntries().get(i).getUsername());
                     Assert.assertEquals("text", clientText[i], clientTabList.getText(i));
                     Assert.assertEquals("ping", clientPing[i], clientTabList.getPing(i));
@@ -181,9 +181,11 @@ public class AbstractTabListLogicTestBase {
                 if (!isCitizensDisordered) {
                     // validate inner constraints
                     for (Map.Entry<String, Integer> entry : nameToSlotMap.entrySet()) {
-                        assertEquals("nameToSlotMap constraint violation", clientUsername[entry.getValue()], entry.getKey());
-                        assertTrue("missing team", clientTabList.teams.containsKey(fakePlayerUsernames[entry.getValue()]));
-                        assertTrue("missing player in team", clientTabList.teams.get(fakePlayerUsernames[entry.getValue()]).getPlayers().contains(entry.getKey()));
+                        if (clientTabList.entries.values().stream().anyMatch(e -> e.username.equals(entry.getKey()))) {
+                            assertEquals("nameToSlotMap constraint violation", clientUsername[entry.getValue()], entry.getKey());
+                            assertTrue("missing team", clientTabList.teams.containsKey(teamNames[entry.getValue()]));
+                            assertTrue("missing player in team[" + entry.getKey() + " in " + entry.getValue() + "]", clientTabList.teams.get(teamNames[entry.getValue()]).getPlayers().contains(entry.getKey()));
+                        }
                     }
 
                     for (TabListItem item : serverTabList.values()) {
