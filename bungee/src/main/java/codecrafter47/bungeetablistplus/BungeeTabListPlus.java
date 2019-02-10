@@ -590,6 +590,11 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
         return hidden[0];
     }
 
+    @Override
+    protected boolean isHidden0(ProxiedPlayer player) {
+        return isHidden(getConnectedPlayerManager().getPlayer(player));
+    }
+
     /**
      * Hides a player from the tablist
      *

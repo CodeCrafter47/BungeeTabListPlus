@@ -142,4 +142,23 @@ public abstract class BungeeTabListPlusAPI {
     }
 
     protected abstract FakePlayerManager getFakePlayerManager0();
+
+    /**
+     * Check if a player is hidden from the tab list.
+     *
+     * A player is regarded as hidden if one of the following conditions is true:
+     * - The player is hidden using a vanish plugin(e.g. SuperVanish, Essentials, ...)
+     * - The player has been hidden using the /btlp hide command
+     * - The player is in the list of hidden players in the configuration
+     * - The player is on one of the hidden servers(configuration)
+     *
+     * @param player the player
+     * @return true if hidden, false otherwise
+     */
+    public static boolean isHidden(ProxiedPlayer player) {
+        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
+        return instance.isHidden0(player);
+    }
+
+    protected abstract boolean isHidden0(ProxiedPlayer player);
 }
