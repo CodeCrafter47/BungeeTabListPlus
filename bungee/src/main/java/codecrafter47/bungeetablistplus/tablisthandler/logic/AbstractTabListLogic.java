@@ -249,12 +249,6 @@ public abstract class AbstractTabListLogic extends TabListHandler {
                             sendPacket(addPlayer(80, item.getUsername()));
                         }
                     }
-                } else if (packet.getAction() == REMOVE_PLAYER) {
-                    for (PlayerListItem.Item item : packet.getItems()) {
-                        if (!playerToTeamMap.containsKey(item.getUsername())) {
-                            sendPacket(removePlayer(80, item.getUsername()));
-                        }
-                    }
                 }
             }
 
