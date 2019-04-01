@@ -59,6 +59,10 @@
             <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/public/</url>
         </repository>
         <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
+        <repository>
             <id>md_5-snapshots</id>
             <url>http://repo.md-5.net/content/repositories/snapshots/</url>
         </repository>

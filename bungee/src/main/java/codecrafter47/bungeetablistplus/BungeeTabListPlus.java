@@ -59,6 +59,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.connection.LoginResult;
+import org.bstats.bungeecord.Metrics;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import javax.annotation.Nonnull;
@@ -312,12 +313,7 @@ public class BungeeTabListPlus extends BungeeTabListPlusAPI {
                 new UpdateNotifier(this), 15, 15, TimeUnit.MINUTES);
 
         // Start metrics
-        try {
-            Metrics metrics = new Metrics(plugin);
-            metrics.start();
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to initialize Metrics", e);
-        }
+        Metrics metrics = new Metrics(plugin);
 
         // Load updateCheck thread
         if (config.checkForUpdates) {
