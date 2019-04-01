@@ -41,12 +41,6 @@ public class MainConfig implements UpdatableConfig {
     public boolean notifyAdminsIfUpdateAvailable = true;
 
     @Comment({
-            "This option is no longer in use as of version 2.8.4 of BungeeTabListPlus.",
-            "It will be remove in a future update."
-    })
-    public boolean automaticallySendBugReports = false;
-
-    @Comment({
             "Interval (in seconds) at which all servers of your network get pinged to check whether they are online",
             "If you intend to use the {onlineState:SERVER} variable set this to 2 or any value you like",
             "setting this to -1 disables this feature"
@@ -59,15 +53,14 @@ public class MainConfig implements UpdatableConfig {
     public List<String> fakePlayers = new ArrayList<>();
 
     @Comment({
-            "servers which you wish to show their own tabList (The one provided by bukkit)"
+            "Servers which you wish to show their own tabList (The one provided by bukkit)",
+            "Players on these servers don't see the custom tab list provided by BungeeTabListPlus"
     })
     public List<String> excludeServers = new ArrayList<>();
 
     @Comment({
-            "servers which you wish to hide from the global tabList",
-            "Note that this is different from excludeServers above: this hides all players on the hidden servers from appearing",
-            "on the tablist, whereas excluded servers' players are still on the BungeeTabListPlus tablist, but they do not see",
-            "the global tab list"
+            "Players on these servers are hidden from the tab list.",
+            "Doesn't necessarily hide the server from the tab list."
     })
     public List<String> hiddenServers = new ArrayList<>();
 
@@ -123,6 +116,8 @@ public class MainConfig implements UpdatableConfig {
         remove(section, "prefixes");
 
         remove(section, "charLimit");
+
+        remove(section, "automaticallySendBugReports");
     }
 
     private void remove(YamlNode section, String id) {
