@@ -45,6 +45,10 @@ public class Expression {
             .put(Token.LESSER_THAN, 5)
             .put(Token.GREATER_OR_EQUAL_THAN, 5)
             .put(Token.LESSER_OR_EQUAL_THAN, 5)
+            .put(Token.ADD, 4)
+            .put(Token.SUB, 3)
+            .put(Token.MULT, 2)
+            .put(Token.DIV, 1)
             .build();
 
     private final Part root;
@@ -103,6 +107,20 @@ public class Expression {
             Part replacement;
             if (operators.get(start) == Token.CONCAT_STRING) {
                 replacement = new ConcatStringPart(new ArrayList<>(parts.subList(start, end + 1)));
+            } else if (operators.get(start) == Token.ADD) {
+                replacement = new AddPart(new ArrayList<>(parts.subList(start, end + 1)));
+            } else if (operators.get(start) == Token.SUB) {
+                if (start + 1 != end) {
+                    throw new IllegalArgumentException("Invalid expression syntax.");
+                }
+                replacement = new SubPart(parts.get(start), parts.get(end));
+            } else if (operators.get(start) == Token.MULT) {
+                replacement = new MultPart(new ArrayList<>(parts.subList(start, end + 1)));
+            } else if (operators.get(start) == Token.DIV) {
+                if (start + 1 != end) {
+                    throw new IllegalArgumentException("Invalid expression syntax.");
+                }
+                replacement = new DivPart(parts.get(start), parts.get(end));
             } else if (operators.get(start) == Token.AND) {
                 replacement = new AndPart(new ArrayList<>(parts.subList(start, end + 1)));
             } else if (operators.get(start) == Token.OR) {
@@ -443,6 +461,88 @@ public class Expression {
             } else {
                 throw new IllegalArgumentException("Unknown result type" + resultType);
             }
+        }
+    }
+
+    private static abstract class ArithmeticPart extends Part {
+        @Override
+        public <T> T evaluate(Context context, ExpressionResult<T> resultType) {
+            double result = evaluate(context);
+            if (resultType == ExpressionResult.STRING) {
+                return (T) (((int) result) == result ? Integer.toString((int) result) : Double.toString(result));
+            } else if (resultType == ExpressionResult.NUMBER) {
+                return (T) (Double) result;
+            } else if (resultType == ExpressionResult.BOOLEAN) {
+                return (T) (Boolean) (result != 0);
+            } else {
+                throw new IllegalArgumentException("Unknown result type" + resultType);
+            }
+        }
+
+        protected abstract double evaluate(Context context);
+    }
+
+    private static class AddPart extends ArithmeticPart {
+        private final List<Part> parts;
+
+        private AddPart(List<Part> parts) {
+            this.parts = parts;
+        }
+
+        @Override
+        protected double evaluate(Context context) {
+            double result = 0;
+            for (Part part : parts) {
+                result += part.evaluate(context, ExpressionResult.NUMBER);
+            }
+            return result;
+        }
+    }
+
+    private static class MultPart extends ArithmeticPart {
+        private final List<Part> parts;
+
+        private MultPart(List<Part> parts) {
+            this.parts = parts;
+        }
+
+        @Override
+        protected double evaluate(Context context) {
+            double result = 1;
+            for (Part part : parts) {
+                result *= part.evaluate(context, ExpressionResult.NUMBER);
+            }
+            return result;
+        }
+    }
+
+    private static class SubPart extends ArithmeticPart {
+        private final Part a;
+        private final Part b;
+
+        private SubPart(Part a, Part b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        protected double evaluate(Context context) {
+            return a.evaluate(context, ExpressionResult.NUMBER) - b.evaluate(context, ExpressionResult.NUMBER);
+        }
+    }
+
+    private static class DivPart extends ArithmeticPart {
+        private final Part a;
+        private final Part b;
+
+        private DivPart(Part a, Part b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        protected double evaluate(Context context) {
+            return a.evaluate(context, ExpressionResult.NUMBER) / b.evaluate(context, ExpressionResult.NUMBER);
         }
     }
 }

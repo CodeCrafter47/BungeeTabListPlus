@@ -90,4 +90,13 @@ public class ExpressionTest {
         assertTrue("true && true && false || true");
     }
 
+    @Test
+    public void testArithmeticExpressions() {
+        assertTrue("1 + 1 == 2");
+        assertTrue("1 + 1 + 1 == 3");
+        assertTrue("1 + 1 - 1 == 1");
+        assertTrue("4/2 == 2");
+        assertTrue("2*2 == 4");
+    }
+
 }

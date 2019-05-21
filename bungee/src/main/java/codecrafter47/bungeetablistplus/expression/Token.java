@@ -36,6 +36,10 @@ public class Token {
     public static final Token GREATER_OR_EQUAL_THAN = new Token(">=");
     public static final Token LESSER_OR_EQUAL_THAN = new Token("<=");
     public static final Token CONCAT_STRING = new Token(".");
+    public static final Token ADD = new Token("+");
+    public static final Token SUB = new Token("-");
+    public static final Token MULT = new Token("*");
+    public static final Token DIV = new Token("/");
 
     private final String value;
 

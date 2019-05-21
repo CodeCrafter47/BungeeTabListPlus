@@ -32,7 +32,8 @@ public class ExpressionTokenizer {
     private static final Pattern PATTERN_NUMBER = Pattern.compile("[-0-9.]");
     private static final ImmutableMap<String, Token> tokens3 = ImmutableMap.<String, Token>builder()
             .put("all", BooleanToken.TRUE)
-            .put("and", Token.AND).build();
+            .put("and", Token.AND)
+            .build();
     private static final ImmutableMap<String, Token> tokens2 = ImmutableMap.<String, Token>builder()
             .put("&&", Token.AND)
             .put("||", Token.OR)
@@ -40,7 +41,8 @@ public class ExpressionTokenizer {
             .put("==", Token.EQUAL)
             .put("!=", Token.NOT_EQUAL)
             .put(">=", Token.GREATER_OR_EQUAL_THAN)
-            .put("<=", Token.LESSER_OR_EQUAL_THAN).build();
+            .put("<=", Token.LESSER_OR_EQUAL_THAN)
+            .build();
     private static final ImmutableMap<String, Token> tokens1 = ImmutableMap.<String, Token>builder()
             .put("(", Token.OPENING_PARENTHESIS)
             .put(")", Token.CLOSING_PARENTHESIS)
@@ -48,7 +50,12 @@ public class ExpressionTokenizer {
             .put(">", Token.GREATER_THAN)
             .put("<", Token.LESSER_THAN)
             .put("=", Token.EQUAL)
-            .put(".", Token.CONCAT_STRING).build();
+            .put(".", Token.CONCAT_STRING)
+            .put("+", Token.ADD)
+            .put("-", Token.SUB)
+            .put("*", Token.MULT)
+            .put("/", Token.DIV)
+            .build();
 
     private final String expression;
 

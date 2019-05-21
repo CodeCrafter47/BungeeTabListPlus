@@ -30,6 +30,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import java.util.Map;
 
 @Subtype(type = CustomPlaceholder.Conditional.class, tag = "!conditional")
 @Subtype(type = CustomPlaceholder.Switch.class, tag = "!switch")
+@Subtype(type = CustomPlaceholder.Compute.class, tag = "!compute")
 @Getter
 @Setter
 public abstract class CustomPlaceholder {
@@ -157,6 +159,35 @@ public abstract class CustomPlaceholder {
                 } else {
                     return "";
                 }
+            }
+        }
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class Compute extends CustomPlaceholder implements Validate {
+        private String expression;
+
+        @Override
+        public Placeholder instantiate(String[] args) {
+            Expression expression = new Expression(replaceParameters(this.expression, args));
+            return new Instance(expression);
+        }
+
+        @Override
+        public void validate() {
+            Preconditions.checkNotNull(expression, "expression is null");
+        }
+
+        @AllArgsConstructor
+        private static class Instance extends Placeholder {
+            private final Expression expression;
+
+            @Override
+            public String evaluate(Context context) {
+                return expression.evaluate(context, ExpressionResult.STRING);
             }
         }
     }
