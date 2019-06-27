@@ -33,6 +33,12 @@ public class ExpressionTest {
     }
 
     @Test
+    public void testNegativeNumbers() {
+        Expression expression = new Expression("-1");
+        Assert.assertEquals(-1, expression.evaluate(null, ExpressionResult.NUMBER), 0.001);
+    }
+
+    @Test
     public void testExpressions() {
         Expression expression = new Expression("4");
         Assert.assertTrue(expression.evaluate(null, ExpressionResult.BOOLEAN));

@@ -173,6 +173,8 @@ public class Expression {
             return new PlaceholderPart(((PlaceholderToken) token).getPlaceholder());
         } else if (token == Token.NEGATION) {
             return new NegatedPart(readPartToken(tokens));
+        } else if (token == Token.SUB) {
+            return new SubPart(new NumberPart(0), readPartToken(tokens));
         } else if (token == Token.OPENING_PARENTHESIS) {
             Part part = parse(tokens);
             if (tokens.isEmpty() || tokens.remove(0) != Token.CLOSING_PARENTHESIS) {
