@@ -130,6 +130,7 @@ public class BungeeTabListPlus {
 
     @Getter
     private MainConfig config;
+    @Getter
     MatchingStringsCollection excludedServers;
 
     @Getter

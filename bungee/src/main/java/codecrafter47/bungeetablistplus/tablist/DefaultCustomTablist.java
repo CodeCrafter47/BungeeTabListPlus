@@ -76,7 +76,7 @@ public class DefaultCustomTablist extends AbstractCustomTablist {
         private HeaderAndFooterHandle headerAndFooterHandle;
 
         TabOverlayProviderImpl() {
-            super("custom-tab-overlay", 10000);
+            super("custom-tab-overlay", 10001);
         }
 
         @Override
