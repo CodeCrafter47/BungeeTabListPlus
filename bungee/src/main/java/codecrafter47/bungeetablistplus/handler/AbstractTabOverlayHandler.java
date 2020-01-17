@@ -50,7 +50,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// todo make sure this still works
 public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     // some options
@@ -72,7 +71,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final Set<UUID> CUSTOM_SLOT_UUIDS;
     private static final String[] CUSTOM_SLOT_USERNAME;
     private static final Set<String> CUSTOM_SLOT_USERNAMES;
-    // todo consistently use TEAMNAME over USERNAME
     private static final String[] CUSTOM_SLOT_TEAMNAME;
     private static final Set<String> CUSTOM_SLOT_TEAMNAMES;
 

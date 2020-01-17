@@ -279,7 +279,6 @@ public class AbstractTabListLogicTestBase {
                     Assert.assertArrayEquals("display name passthrough", item.getProperties(), entry.getProperties());
                 }
             } else if (size == 80) {
-                // todo teams/ player to team map
                 Assert.assertEquals("server client tab size mismatch", 80, clientTabList.getSize());
                 Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 80, clientTabList.entries.size());
                 // fake players
@@ -297,7 +296,6 @@ public class AbstractTabListLogicTestBase {
                     Assert.assertArrayEquals("skin passthrough", item.getProperties(), entry.getProperties());
                 }
             } else {
-                // todo teams/ player to team map
                 Assert.assertEquals("server client tab size mismatch", Math.min(80, Math.max(size, serverTabList.size())), clientTabList.getSize());
                 isCitizensDisordered = serverTabList.keySet().stream().anyMatch(u -> u.version() == 2);
                 if (!isCitizensDisordered) {
