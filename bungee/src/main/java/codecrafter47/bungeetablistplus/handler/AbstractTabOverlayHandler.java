@@ -198,7 +198,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private final Runnable updateTask = this::update;
 
     private final boolean is13OrLater;
-    private boolean active;
+    protected boolean active;
 
     public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is13OrLater) {
         this.logger = logger;

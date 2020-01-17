@@ -972,6 +972,7 @@ public class AbstractTabOverlayHandlerTest {
         public MockTabOverlayHandler(ClientTabList clientTabList) {
             super(Logger.getGlobal(), Runnable::run, clientUUID, false);
             this.clientTabList = clientTabList;
+            this.active = true;
         }
 
         @Override
