@@ -750,9 +750,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
 
             // fix header/ footer
-            if (serverHeader != null && serverFooter != null) {
-                sendPacket(new PlayerListHeaderFooter(serverHeader, serverFooter));
-            }
+            sendPacket(new PlayerListHeaderFooter(serverHeader != null ? serverHeader : EMPTY_JSON_TEXT, serverFooter != null ? serverFooter : EMPTY_JSON_TEXT));
         }
     }
 
@@ -2309,9 +2307,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         @Override
         void onActivated(AbstractHeaderFooterOperationModeHandler<?> previous) {
             // remove header/ footer
-            if (serverHeader != null && serverFooter != null) {
-                sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
-            }
+            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
         }
 
         @Override
