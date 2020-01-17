@@ -73,6 +73,7 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
         return LayoutInfo.builder()
                 .constantSize(false)
                 .minSize(0)
+                .blockAligned(true)
                 .build();
     }
 

@@ -10,7 +10,7 @@ import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.PlayerOrderConfiguration;
-import de.codecrafter47.taboverlay.config.dsl.exception.ConfigurationException;
+import de.codecrafter47.taboverlay.config.dsl.components.BasicComponentConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.util.ConfigValidationUtil;
 import de.codecrafter47.taboverlay.config.dsl.yaml.*;
 import de.codecrafter47.taboverlay.config.placeholder.OtherCountPlaceholderResolver;
@@ -38,7 +38,7 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
 
     private PlayerOrderConfiguration playerOrder = PlayerOrderConfiguration.DEFAULT;
     private MarkedStringProperty playerSet;
-    private ComponentConfiguration playerComponent; // todo add defaults
+    private ComponentConfiguration playerComponent = new BasicComponentConfiguration("${player name}");
     @Nullable
     private ComponentConfiguration morePlayersComponent;
     private boolean fillSlotsVertical = false;
@@ -80,14 +80,14 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
     }
 
     @Override
-    public ComponentTemplate toTemplate(TemplateCreationContext tcc) throws ConfigurationException {
+    public ComponentTemplate toTemplate(TemplateCreationContext tcc) {
         if (ConfigValidationUtil.checkNotNull(tcc, "!players_by_server component", "playerSet", playerSet, getStartMark())) {
             if (!tcc.getPlayerSets().containsKey(playerSet.getValue())) {
                 tcc.getErrorHandler().addError("No player set definition available for player set \"" + playerSet.getValue() + "\"", playerSet.getStartMark());
             }
         }
 
-        PlayerOrderTemplate playerOrderTemplate = null; // todo better dummy value
+        PlayerOrderTemplate playerOrderTemplate = PlayerOrderConfiguration.DEFAULT.toTemplate(tcc);
         if (ConfigValidationUtil.checkNotNull(tcc, "!players_by_server component", "playerOrder", playerOrder, getStartMark())) {
             playerOrderTemplate = this.playerOrder.toTemplate(tcc);
 
@@ -119,10 +119,16 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
         TemplateCreationContext childContextM = tcc.clone();
         childContextM.addPlaceholderResolver(new OtherCountPlaceholderResolver());
 
-        // todo check playerComponent for fixed size and not block aligned
         ComponentTemplate playerComponentTemplate = tcc.emptyComponent(); // dummy
         if (ConfigValidationUtil.checkNotNull(tcc, "!players_by_server component", "playerComponent", playerComponent, getStartMark())) {
             playerComponentTemplate = this.playerComponent.toTemplate(childContextP);
+            ComponentTemplate.LayoutInfo layoutInfo = playerComponentTemplate.getLayoutInfo();
+            if (!layoutInfo.isConstantSize()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_server component. Attribute playerComponent must not have variable size.", playerComponent.getStartMark());
+            }
+            if (layoutInfo.isBlockAligned()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_server component. Attribute playerComponent must not require block alignment.", playerComponent.getStartMark());
+            }
         }
 
         if (!ConfigValidationUtil.checkNotNull(tcc, "!players_by_server component", "hiddenServers", hiddenServers, getStartMark())) {
@@ -159,12 +165,26 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
             }
         }
 
-        // todo check more players component for fixed size and not block aligned
+        ComponentTemplate morePlayersComponentTemplate;
+        if (this.morePlayersComponent != null) {
+
+            morePlayersComponentTemplate = this.morePlayersComponent.toTemplate(childContextM);
+            ComponentTemplate.LayoutInfo layoutInfo = morePlayersComponentTemplate.getLayoutInfo();
+            if (!layoutInfo.isConstantSize()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_server component. Attribute playerComponent cannot have variable size.", morePlayersComponent.getStartMark());
+            }
+            if (layoutInfo.isBlockAligned()) {
+                tcc.getErrorHandler().addError("Failed to configure !players_by_server component. Attribute playerComponent must not require block alignment.", morePlayersComponent.getStartMark());
+            }
+        } else {
+            morePlayersComponentTemplate = childContextM.emptyComponent();
+        }
+
         return PlayersByServerComponentTemplate.builder()
                 .playerOrder(playerOrderTemplate)
                 .playerSet(tcc.getPlayerSets().get(playerSet.getValue()))
                 .playerComponent(playerComponentTemplate)
-                .morePlayersComponent(morePlayersComponent != null ? morePlayersComponent.toTemplate(childContextM) : childContextM.emptyComponent())
+                .morePlayersComponent(morePlayersComponentTemplate)
                 .serverHeader(serverHeader != null ? serverHeader.toTemplate(childContextS) : null)
                 .serverFooter(serverFooter != null ? serverFooter.toTemplate(childContextS) : null)
                 .serverSeparator(serverSeparator != null ? serverSeparator.toTemplate(tcc) : null)
