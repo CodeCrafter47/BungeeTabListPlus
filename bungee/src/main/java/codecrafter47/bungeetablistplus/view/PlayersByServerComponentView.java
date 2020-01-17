@@ -152,7 +152,7 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
 
     @Override
     protected void addPartition(String id, PlayerSet playerSet, boolean notify) {
-        if (hiddenServers.contains(id)) {
+        if (id == null || hiddenServers.contains(id)) {
             return;
         }
         if (persistentSections.contains(id)) {
@@ -163,7 +163,7 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
 
     @Override
     public void onPartitionRemoved(String id) {
-        if (hiddenServers.contains(id)) {
+        if (id == null || hiddenServers.contains(id)) {
             return;
         }
         super.onPartitionRemoved(id);
