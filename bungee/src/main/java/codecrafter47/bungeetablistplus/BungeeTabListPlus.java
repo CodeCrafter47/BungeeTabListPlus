@@ -34,6 +34,7 @@ import codecrafter47.bungeetablistplus.placeholder.ServerCountPlaceholderResolve
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.JoinedPlayerProvider;
+import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
@@ -325,6 +326,7 @@ public class BungeeTabListPlus {
                         ? config.excludeServers
                         : Collections.emptyList()
         );
+        ExcludedServersTabOverlayProvider.onReload();
         dataManager.setHiddenServers(new MatchingStringsCollection(
                 config.hiddenServers != null
                         ? config.hiddenServers

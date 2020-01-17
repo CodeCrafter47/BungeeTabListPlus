@@ -9,6 +9,10 @@ import de.codecrafter47.taboverlay.config.player.Player;
 import de.codecrafter47.taboverlay.handler.ContentOperationMode;
 import de.codecrafter47.taboverlay.handler.HeaderAndFooterOperationMode;
 import de.codecrafter47.taboverlay.handler.TabOverlayHandle;
+import lombok.SneakyThrows;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ExcludedServersTabOverlayProvider extends AbstractTabOverlayProvider<TabOverlayHandle, TabOverlayHandle> implements Runnable {
 
@@ -16,6 +20,7 @@ public class ExcludedServersTabOverlayProvider extends AbstractTabOverlayProvide
     private final BungeeTabListPlus btlp;
     private boolean shouldBeActive = false;
     private TabOverlayProviderSet tabOverlayProviderSet;
+    private static Set<ExcludedServersTabOverlayProvider> attachedProviders = new HashSet<>();
 
     public ExcludedServersTabOverlayProvider(Player player, BungeeTabListPlus btlp) {
         super("excluded-servers", 10003, ContentOperationMode.PASS_TROUGH, HeaderAndFooterOperationMode.PASS_TROUGH);
@@ -30,15 +35,23 @@ public class ExcludedServersTabOverlayProvider extends AbstractTabOverlayProvide
     }
 
     @Override
+    @SneakyThrows
     protected void attach(TabView tabView) {
-        tabOverlayProviderSet = tabView.getTabOverlayProviders();
-        player.addDataChangeListener(BungeeData.BungeeCord_Server, this);
-        shouldBeActive = btlp.getExcludedServers().contains(player.get(BungeeData.BungeeCord_Server));
+        btlp.getMainThreadExecutor().submit(() -> {
+            tabOverlayProviderSet = tabView.getTabOverlayProviders();
+            player.addDataChangeListener(BungeeData.BungeeCord_Server, this);
+            shouldBeActive = btlp.getExcludedServers().contains(player.get(BungeeData.BungeeCord_Server));
+            attachedProviders.add(this);
+        }).get();
     }
 
     @Override
+    @SneakyThrows
     protected void detach(TabView tabView) {
-        player.removeDataChangeListener(BungeeData.BungeeCord_Server, this);
+        btlp.getMainThreadExecutor().submit(() -> {
+            attachedProviders.remove(this);
+            player.removeDataChangeListener(BungeeData.BungeeCord_Server, this);
+        }).get();
     }
 
     @Override
@@ -55,5 +68,13 @@ public class ExcludedServersTabOverlayProvider extends AbstractTabOverlayProvide
     public void run() {
         shouldBeActive = btlp.getExcludedServers().contains(player.get(BungeeData.BungeeCord_Server));
         tabOverlayProviderSet.scheduleUpdate();
+    }
+
+    public static void onReload() {
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().execute(() -> {
+            for (ExcludedServersTabOverlayProvider provider : attachedProviders) {
+                provider.run();
+            }
+        });
     }
 }
