@@ -198,12 +198,10 @@ public class BungeeTabListPlus {
         asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
             @Override
             protected EventExecutor newChild(Executor executor, Object... args) {
-                return new DefaultEventExecutor(this, executor, 512, RejectedExecutionHandlers.reject());
+                return new DefaultEventExecutor(this, executor);
             }
         };
-        mainThreadExecutor = new DefaultEventExecutor(null,
-                executor,
-                128_000, RejectedExecutionHandlers.reject());
+        mainThreadExecutor = new DefaultEventExecutor(null, executor);
 
         File headsFolder = new File(plugin.getDataFolder(), "heads");
         extractDefaultIcons(headsFolder);
