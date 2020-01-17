@@ -30,6 +30,7 @@ import lombok.Value;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -125,11 +126,16 @@ public abstract class AbstractPlayer implements Player {
             this.serverDataHolderResolver = serverDataHolderResolver;
 
             AbstractPlayer.this.addDataChangeListener(BungeeData.BungeeCord_Server, this);
-            run();
+            update(false);
         }
 
         public void run() {
+            update(true);
+        }
+
+        private void update(boolean notify) {
             String server = AbstractPlayer.this.get(BungeeData.BungeeCord_Server);
+            T oldVal = activeDataHolder.get(dataKey);
             activeDataHolder.removeDataChangeListener(dataKey, delegate);
             if (server == null) {
                 activeDataHolder = NullDataHolder.INSTANCE;
@@ -137,6 +143,12 @@ public abstract class AbstractPlayer implements Player {
                 activeDataHolder = serverDataHolderResolver.apply(server);
             }
             activeDataHolder.addDataChangeListener(dataKey, delegate);
+            if (notify) {
+                T newVal = activeDataHolder.get(dataKey);
+                if (!Objects.equals(oldVal, newVal)) {
+                    delegate.run();
+                }
+            }
         }
 
         void deactivate() {
