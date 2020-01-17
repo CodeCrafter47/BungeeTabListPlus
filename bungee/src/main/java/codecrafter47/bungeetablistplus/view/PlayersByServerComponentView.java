@@ -107,7 +107,7 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
 
     private void addEmptySection(String id, boolean notify) {
         Context sectionContext = sectionContextFactory.createSectionContext(getContext(), id, EmptyPlayerSet.INSTANCE);
-        ComponentView componentView = createEmptySectionView(id, sectionContext);
+        ComponentView componentView = createEmptySectionView();
         componentView.activate(sectionContext, this);
         emptySectionMap.put(id, componentView);
         if (sectionSeparator != null && !super.components.isEmpty()) {
@@ -139,7 +139,7 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
         updateLayoutRequirements(notify);
     }
 
-    private ComponentView createEmptySectionView(String id, Context sectionContext) {
+    private ComponentView createEmptySectionView() {
         List<ComponentView> components = new ArrayList<>();
         if (sectionHeader != null) {
             components.add(sectionHeader.instantiate());
