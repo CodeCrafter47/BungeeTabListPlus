@@ -293,6 +293,8 @@ public class BungeeTabListPlus {
                 mainThreadExecutor,
                 iconManager);
 
+        configTabOverlayManager.setTimeZone(config.getTimeZone());
+
         Path tabLists = getPlugin().getDataFolder().toPath().resolve("tabLists");
         if (!Files.exists(tabLists)) {
             try {
