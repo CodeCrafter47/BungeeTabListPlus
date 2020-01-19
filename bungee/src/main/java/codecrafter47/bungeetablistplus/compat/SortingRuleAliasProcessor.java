@@ -27,7 +27,7 @@ public class SortingRuleAliasProcessor implements SortingRulePreprocessor {
             .put("playerserverfirst", new RewriteData("server viewer-first", true))
             .put("afklast", new RewriteData("essentials_afk as number asc", true))
             .put("vaultgroupinfo", new RewriteData("vault_primary_group_weight asc", true))
-            .put("vaultgroupinforeversed", new RewriteData("vault_primary_group_weight decs", true))
+            .put("vaultgroupinforeversed", new RewriteData("vault_primary_group_weight desc", true))
             .put("bungeepermsgroupinfo", new RewriteData("bungeeperms_primary_group_weight asc", true))
             .put("bungeepermsgroupinforeversed", new RewriteData("bungeeperms_primary_group_weight desc", true))
             .put("luckpermsgroupinfo", new RewriteData("luckpermsbungee_primary_group_weight asc", true))
