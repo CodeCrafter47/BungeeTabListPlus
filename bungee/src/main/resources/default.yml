@@ -33,10 +33,9 @@ header:
   - "&cWelcom&ee &f${viewer name}"
   - "&cWelcome &f${viewer name}"
 headerAnimationUpdateInterval: 0.2
-footer:
-  - "&4Powered by BungeeTabListPlus\n&fWiki:&7 https://github.com/CodeCrafter47/BungeeTabListPlus/wiki"
-  - "&4Powered by BungeeTabListPlus\n&fDonate:&7 https://tinyurl.com/DonateCodeCrafter47"
-footerAnimationUpdateInterval: 5
+footer: |-
+  &4Powered by BungeeTabListPlus
+  &fWiki:&7 https://github.com/CodeCrafter47/BungeeTabListPlus/wiki
 
 # Custom placeholders are a powerful mechanism to add more dynamic content
 # to the tab list.
@@ -68,8 +67,7 @@ customPlaceholders:
 # Player sets are required to display players and player counts on the tab list.
 # See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Configuration-Basics-Part-4---Player-sets
 playerSets:
-  all_players:
-    filter: true
+  all_players: all
 
 # Type of the tab list
 # See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Configuration-Basics-Part-5---Dynamic-Size-Tablist
@@ -106,4 +104,4 @@ components:
   -
   - {text: "&cTime: &6${time H:mm:ss}", icon: "default/clock.png", ping: 0}
   - {text: "&cPlayers: &6${playerset:all_players size}", icon: "default/players.png", ping: 0}
-  - {text: "&cBalance: &6${viewer vault_balance 1.2}", icon: "default/balance.png", ping: 0}
+  - {text: "&cBalance: &6${viewer vault_balance}", icon: "default/balance.png", ping: 0}
