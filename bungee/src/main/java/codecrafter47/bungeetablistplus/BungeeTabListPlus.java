@@ -38,6 +38,7 @@ import codecrafter47.bungeetablistplus.player.JoinedPlayerProvider;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
+import codecrafter47.bungeetablistplus.util.ExceptionHandlingEventExecutor;
 import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
@@ -54,7 +55,10 @@ import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
-import io.netty.util.concurrent.*;
+import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.EventExecutorGroup;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.MultithreadEventExecutorGroup;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -205,10 +209,10 @@ public class BungeeTabListPlus {
         asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
             @Override
             protected EventExecutor newChild(Executor executor, Object... args) {
-                return new DefaultEventExecutor(this, executor);
+                return new ExceptionHandlingEventExecutor(this, executor, getLogger());
             }
         };
-        mainThreadExecutor = new DefaultEventExecutor(null, executor);
+        mainThreadExecutor = new ExceptionHandlingEventExecutor(null, executor, getLogger());
 
         File headsFolder = new File(plugin.getDataFolder(), "heads");
         extractDefaultIcons(headsFolder);
