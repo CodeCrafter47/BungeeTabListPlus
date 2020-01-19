@@ -10,7 +10,7 @@
 
 # Configure who can see the tab lists
 # See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/MultipleTablists
-showTo: "all"
+showTo: all
 priority: 0
 
 # Configure header and footer
@@ -37,32 +37,9 @@ footer: |-
   &4Powered by BungeeTabListPlus
   &fWiki:&7 https://github.com/CodeCrafter47/BungeeTabListPlus/wiki
 
-# Custom placeholders are a powerful mechanism to add more dynamic content
-# to the tab list.
-# See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/CustomPlaceholders
-customPlaceholders:
-  # Defines the ${afk_tag} placeholder which is used to add "|away"
-  # to the players name if he is afk.
-  afk_tag:
-    !conditional
-    condition: ${player essentials_afk}
-    true: "&7|&oaway"
-    false: ""
-  # Defines the ${viewer_colored_ping} placeholder which adds a color code to
-  # the ping using the following color scheme:
-  # 0 - 49   -> green
-  # 50 - 149 -> yellow
-  # 150+     -> red
-  viewer_colored_ping:
-    !conditional
-    condition: "${viewer ping} < 150"
-    true: ${viewer_colored_ping0}
-    false: "&c${viewer ping}"
-  viewer_colored_ping0:
-    !conditional
-    condition: "${viewer ping} < 50"
-    true: "&a${viewer ping}"
-    false: "&e${viewer ping}"
+# Configure whether hidden players appear on the tab list
+# see https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Hidden-Players
+hiddenPlayers: VISIBLE_TO_ADMINS
 
 # Player sets are required to display players and player counts on the tab list.
 # See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Configuration-Basics-Part-4---Player-sets
@@ -105,3 +82,30 @@ components:
   - {text: "&cTime: &6${time H:mm:ss}", icon: "default/clock.png", ping: 0}
   - {text: "&cPlayers: &6${playerset:all_players size}", icon: "default/players.png", ping: 0}
   - {text: "&cBalance: &6${viewer vault_balance}", icon: "default/balance.png", ping: 0}
+
+# Custom placeholders are a powerful mechanism to add more dynamic content
+# to the tab list.
+# See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/CustomPlaceholders
+customPlaceholders:
+  # Defines the ${afk_tag} placeholder which is used to add "|away"
+  # to the players name if he is afk.
+  afk_tag:
+    !conditional
+    condition: ${player essentials_afk}
+    true: "&7|&oaway"
+    false: ""
+  # Defines the ${viewer_colored_ping} placeholder which adds a color code to
+  # the ping using the following color scheme:
+  # 0 - 49   -> green
+  # 50 - 149 -> yellow
+  # 150+     -> red
+  viewer_colored_ping:
+    !conditional
+    condition: "${viewer ping} < 150"
+    true: ${viewer_colored_ping0}
+    false: "&c${viewer ping}"
+  viewer_colored_ping0:
+    !conditional
+    condition: "${viewer ping} < 50"
+    true: "&a${viewer ping}"
+    false: "&e${viewer ping}"
