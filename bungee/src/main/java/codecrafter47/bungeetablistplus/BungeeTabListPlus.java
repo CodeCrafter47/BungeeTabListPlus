@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.cache.Cache;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.compat.SortingRuleAliasProcessor;
@@ -131,6 +132,8 @@ public class BungeeTabListPlus {
 
     @Getter
     private MainConfig config;
+
+    private Cache cache;
     @Getter
     MatchingStringsCollection excludedServers;
 
@@ -195,6 +198,8 @@ public class BungeeTabListPlus {
         if (readMainConfig())
             return;
 
+        cache = Cache.load(new File(plugin.getDataFolder(), "cache.dat"));
+
         Executor executor = (task) -> ProxyServer.getInstance().getScheduler().runAsync(getPlugin(), task);
 
         asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
@@ -236,11 +241,11 @@ public class BungeeTabListPlus {
         playerProviders.add(fakePlayerManagerImpl);
         this.playerProvider = new JoinedPlayerProvider(playerProviders);
 
-        serverPlaceholderResolver = new ServerPlaceholderResolver();
-        PlayerPlaceholderResolver playerPlaceholderResolver = new PlayerPlaceholderResolver(serverPlaceholderResolver);
+        serverPlaceholderResolver = new ServerPlaceholderResolver(cache);
+        PlayerPlaceholderResolver playerPlaceholderResolver = new PlayerPlaceholderResolver(serverPlaceholderResolver, cache);
 
         plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
-        bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), getLogger(), bungeePlayerProvider, this);
+        bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), getLogger(), bungeePlayerProvider, this, cache);
         API api = new API(tabViewManager, iconManager, playerPlaceholderResolver, serverPlaceholderResolver, getLogger(), fakePlayerManagerImpl, bungeePlayerProvider, this);
         serverStateManager = new ServerStateManager(config, plugin);
         dataManager = new DataManager(api, this.getPlugin(), this.getLogger(), bungeePlayerProvider, mainThreadExecutor, hiddenPlayersManager, serverStateManager, bukkitBridge);
@@ -395,7 +400,8 @@ public class BungeeTabListPlus {
     }
 
     public void onDisable() {
-        // nothing to do
+        // save cache
+        cache.save();
     }
 
     /**
@@ -429,6 +435,9 @@ public class BungeeTabListPlus {
     private void softReload() {
         softReloadTask = null;
         configTabOverlayManager.refreshConfigs();
+
+        // this is a good time to save the cache
+        asyncExecutor.execute(cache::save);
     }
 
     @Deprecated

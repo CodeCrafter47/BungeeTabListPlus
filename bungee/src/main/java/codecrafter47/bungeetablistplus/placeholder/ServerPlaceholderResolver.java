@@ -1,5 +1,6 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
+import codecrafter47.bungeetablistplus.cache.Cache;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
@@ -19,7 +20,10 @@ public class ServerPlaceholderResolver extends AbstractDataHolderPlaceholderReso
     private final Map<String, DataKey<String>> bridgeCustomPlaceholderServerDataKeys = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, DataKey<String>> customPlaceholderServerDataKeys = Collections.synchronizedMap(new HashMap<>());
 
-    public ServerPlaceholderResolver() {
+    private final Cache cache;
+
+    public ServerPlaceholderResolver(Cache cache) {
+        this.cache = cache;
 
         setDefaultPlaceholder(builder -> builder.acquireData(new DataHolderPlaceholderDataProviderSupplier<>(TypeToken.STRING, BTLPBungeeDataKeys.DATA_KEY_ServerName, (c, d) -> d), TypeToken.STRING));
         addPlaceholder("tps", create(MinecraftData.TPS));
@@ -42,6 +46,8 @@ public class ServerPlaceholderResolver extends AbstractDataHolderPlaceholderReso
                 } else if (bridgeCustomPlaceholderServerDataKeys.containsKey(id)) {
                     DataKey<String> dataKey = bridgeCustomPlaceholderServerDataKeys.get(id);
                     result = builder.acquireData(new DataHolderPlaceholderDataProviderSupplier<>(TypeToken.STRING, dataKey, (player, replacement) -> replacement), TypeToken.STRING);
+                } else if (cache.getCustomServerPlaceholdersBridge().contains(id)) {
+                    result = nullPlaceholder(builder);
                 }
                 if (result != null) {
                     args.remove(0);
@@ -50,6 +56,26 @@ public class ServerPlaceholderResolver extends AbstractDataHolderPlaceholderReso
             }
             throw e;
         }
+    }
+
+    private PlaceholderBuilder<DataHolder, String> nullPlaceholder(PlaceholderBuilder<DataHolder, ?> builder) {
+        return builder.acquireData(() -> new PlaceholderDataProvider<DataHolder, String>() {
+
+            @Override
+            public void activate(DataHolder context, Runnable listener) {
+
+            }
+
+            @Override
+            public void deactivate() {
+
+            }
+
+            @Override
+            public String getData() {
+                return "";
+            }
+        }, TypeToken.STRING);
     }
 
     public void addCustomPlaceholderServerDataKey(String id, DataKey<String> dataKey) {

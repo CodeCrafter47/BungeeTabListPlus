@@ -19,6 +19,7 @@
 package codecrafter47.bungeetablistplus.bridge;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.cache.Cache;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
 import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
@@ -75,8 +76,9 @@ public class BukkitBridge implements Listener {
     private final Logger logger;
     private final BungeePlayerProvider bungeePlayerProvider;
     private final BungeeTabListPlus btlp;
+    private final Cache cache;
 
-    public BukkitBridge(ScheduledExecutorService asyncExecutor, ScheduledExecutorService mainLoop, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, Plugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus btlp) {
+    public BukkitBridge(ScheduledExecutorService asyncExecutor, ScheduledExecutorService mainLoop, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, Plugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus btlp, Cache cache) {
         this.asyncExecutor = asyncExecutor;
         this.mainLoop = mainLoop;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
@@ -85,6 +87,7 @@ public class BukkitBridge implements Listener {
         this.logger = logger;
         this.bungeePlayerProvider = bungeePlayerProvider;
         this.btlp = btlp;
+        this.cache = cache;
         ProxyServer.getInstance().getPluginManager().registerListener(plugin, this);
         asyncExecutor.scheduleWithFixedDelay(this::sendIntroducePackets, 100, 100, TimeUnit.MILLISECONDS);
         asyncExecutor.scheduleWithFixedDelay(this::resendUnconfirmedMessages, 2, 2, TimeUnit.SECONDS);
@@ -467,41 +470,45 @@ public class BukkitBridge implements Listener {
         }
     }
 
-    private void checkForThirdPartyVariables(ServerBridgeDataCache dataCache) {
+    private void checkForThirdPartyVariables(String serverName, ServerBridgeDataCache dataCache) {
         mainLoop.execute(() -> {
-            dataCache.addDataChangeListener(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, () -> updateBridgePlaceholders(dataCache));
-            updateBridgePlaceholders(dataCache);
-            dataCache.addDataChangeListener(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES, () -> updateBridgeServerPlaceholders(dataCache));
-            updateBridgeServerPlaceholders(dataCache);
-            dataCache.addDataChangeListener(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS, () -> updatePlaceholderAPIPlaceholders(dataCache));
-            updatePlaceholderAPIPlaceholders(dataCache);
+            dataCache.addDataChangeListener(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES, () -> updateBridgePlaceholders(serverName, dataCache));
+            updateBridgePlaceholders(serverName, dataCache);
+            dataCache.addDataChangeListener(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES, () -> updateBridgeServerPlaceholders(serverName, dataCache));
+            updateBridgeServerPlaceholders(serverName, dataCache);
+            dataCache.addDataChangeListener(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS, () -> updatePlaceholderAPIPlaceholders(serverName, dataCache));
+            updatePlaceholderAPIPlaceholders(serverName, dataCache);
         });
     }
 
-    private void updateBridgePlaceholders(ServerBridgeDataCache dataCache) {
+    private void updateBridgePlaceholders(String serverName, ServerBridgeDataCache dataCache) {
         List<String> variables = dataCache.get(BTLPDataKeys.REGISTERED_THIRD_PARTY_VARIABLES);
         if (variables != null) {
             for (String variable : variables) {
                 playerPlaceholderResolver.addBridgeCustomPlaceholderDataKey(variable, BTLPDataKeys.createThirdPartyVariableDataKey(variable));
-                btlp.scheduleSoftReload();
             }
+            cache.updateCustomPlaceholdersBridge(serverName, variables);
+            btlp.scheduleSoftReload();
         }
     }
 
-    private void updateBridgeServerPlaceholders(ServerBridgeDataCache dataCache) {
+    private void updateBridgeServerPlaceholders(String serverName, ServerBridgeDataCache dataCache) {
         List<String> variables = dataCache.get(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES);
         if (variables != null) {
             for (String variable : variables) {
                 serverPlaceholderResolver.addBridgeCustomPlaceholderServerDataKey(variable, BTLPDataKeys.createThirdPartyServerVariableDataKey(variable));
-                btlp.scheduleSoftReload();
             }
+            cache.updateCustomServerPlaceholdersBridge(serverName, variables);
+            btlp.scheduleSoftReload();
         }
     }
 
-    private void updatePlaceholderAPIPlaceholders(ServerBridgeDataCache dataCache) {
+    private void updatePlaceholderAPIPlaceholders(String serverName, ServerBridgeDataCache dataCache) {
         List<String> plugins = dataCache.get(BTLPDataKeys.PAPI_REGISTERED_PLACEHOLDER_PLUGINS);
         if (plugins != null) {
             playerPlaceholderResolver.addPlaceholderAPIPluginPrefixes(plugins);
+            cache.updatePAPIPrefixes(serverName, plugins);
+            btlp.scheduleSoftReload();
         }
     }
 
@@ -523,7 +530,7 @@ public class BukkitBridge implements Listener {
         if (!serverInformation.containsKey(serverName)) {
             serverInformation.computeIfAbsent(serverName, key -> {
                 ServerBridgeDataCache dataCache = new ServerBridgeDataCache();
-                checkForThirdPartyVariables(dataCache);
+                checkForThirdPartyVariables(serverName, dataCache);
                 return dataCache;
             });
         }

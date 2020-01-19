@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.placeholder;
 
+import codecrafter47.bungeetablistplus.cache.Cache;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import de.codecrafter47.data.api.DataKey;
@@ -43,6 +44,7 @@ import java.util.function.Function;
 public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver {
 
     private final ServerPlaceholderResolver serverPlaceholderResolver;
+    private final Cache cache;
 
     private final Set<String> placeholderAPIPluginPrefixes = Collections.synchronizedSet(new HashSet<>());
     private final Map<String, DataKey<String>> bridgeCustomPlaceholderDataKeys = Collections.synchronizedMap(new HashMap<>());
@@ -50,9 +52,10 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
 
     private final Map<String, String> aliasMap = new HashMap<>();
 
-    public PlayerPlaceholderResolver(ServerPlaceholderResolver serverPlaceholderResolver) {
+    public PlayerPlaceholderResolver(ServerPlaceholderResolver serverPlaceholderResolver, Cache cache) {
         super();
         this.serverPlaceholderResolver = serverPlaceholderResolver;
+        this.cache = cache;
         addPlaceholder("ping", create(BungeeData.BungeeCord_Ping));
         addPlaceholder("bungeecord_primary_group", create(BungeeData.BungeeCord_PrimaryGroup));
         addPlaceholder("bungeeperms_display", create(BungeeData.BungeePerms_DisplayPrefix));
@@ -198,6 +201,18 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
                         }
                     }
                 }
+                if (result == null) {
+                    // prevent errors because bridge information has not been synced yet
+                    if (cache.getCustomPlaceholdersBridge().contains(id)) {
+                        result = nullPlaceholder(builder);
+                    } else {
+                        for (String prefix : cache.getPAPIPrefixes()) {
+                            if (id.length() >= prefix.length() && id.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
+                                result = nullPlaceholder(builder);
+                            }
+                        }
+                    }
+                }
                 if (result != null) {
                     args.remove(0);
                     return result;
@@ -205,6 +220,26 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
             }
             throw e;
         }
+    }
+
+    private PlaceholderBuilder<Player, String> nullPlaceholder(PlaceholderBuilder<Player, ?> builder) {
+        return builder.acquireData(() -> new PlaceholderDataProvider<Player, String>() {
+
+            @Override
+            public void activate(Player context, Runnable listener) {
+
+            }
+
+            @Override
+            public void deactivate() {
+
+            }
+
+            @Override
+            public String getData() {
+                return "";
+            }
+        }, TypeToken.STRING);
     }
 
     public void addPlaceholderAPIPluginPrefixes(Collection<String> prefixes) {
