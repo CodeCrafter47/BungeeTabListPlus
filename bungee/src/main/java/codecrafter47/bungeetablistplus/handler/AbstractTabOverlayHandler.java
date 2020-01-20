@@ -1017,14 +1017,16 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (!using80Slots) {
                 if (packet.getMode() == 1) {
                     TeamEntry teamEntry = serverTeams.get(packet.getName());
-                    for (String playerName : teamEntry.getPlayers()) {
-                        int slot = playerUsernameToSlotMap.getInt(playerName);
-                        if (slot != -1) {
-                            // reset slot team
-                            if (is13OrLater) {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
-                            } else {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 3));
+                    if (teamEntry != null) {
+                        for (String playerName : teamEntry.getPlayers()) {
+                            int slot = playerUsernameToSlotMap.getInt(playerName);
+                            if (slot != -1) {
+                                // reset slot team
+                                if (is13OrLater) {
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                                } else {
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 3));
+                                }
                             }
                         }
                     }
@@ -1032,10 +1034,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             } else {
                 if (packet.getMode() == 1) {
                     TeamEntry teamEntry = serverTeams.get(packet.getName());
-                    for (String playerName : teamEntry.getPlayers()) {
-                        if (serverTabListPlayers.contains(playerName)) {
-                            // reset slot team
-                            sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
+                    if (teamEntry != null) {
+                        for (String playerName : teamEntry.getPlayers()) {
+                            if (serverTabListPlayers.contains(playerName)) {
+                                // reset slot team
+                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
+                            }
                         }
                     }
                 }
