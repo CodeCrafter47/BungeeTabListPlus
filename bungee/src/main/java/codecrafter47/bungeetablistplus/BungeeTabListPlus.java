@@ -292,7 +292,7 @@ public class BungeeTabListPlus {
         }, 1, 1, TimeUnit.MINUTES);
 
         configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
-                bungeePlayerProvider,
+                playerProvider,
                 playerPlaceholderResolver,
                 ImmutableList.of(new ServerCountPlaceholderResolver(dataManager),
                         new GlobalServerPlaceholderResolver(dataManager, serverPlaceholderResolver)),
