@@ -1656,8 +1656,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     item.setUuid(slotUuid[index]);
                                     itemQueueRemovePlayer.add(item);
                                 }
+                                String playerUsername = serverPlayerList.get(uuid).getUsername();
                                 if (uuid.version() != 2) { // dirty hack for Citizens compatibility
-                                    String playerUsername = serverPlayerList.get(uuid).getUsername();
                                     String playerTeamName;
                                     if (null != (playerTeamName = playerToTeamMap.get(playerUsername))) {
                                         // 1. remove player from old team
@@ -1668,7 +1668,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     }
                                     // 3. Add to new team
                                     sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{playerUsername}));
-                                    slotUsername[index] = playerUsername;
                                     playerUsernameToSlotMap.put(playerUsername, index);
                                 }
                                 // 4. Update display name
@@ -1686,6 +1685,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 // 6. Update slot state
                                 slotState[index] = SlotState.PLAYER;
                                 slotUuid[index] = uuid;
+                                slotUsername[index] = playerUsername;
                                 playerUuidToSlotMap.put(uuid, index);
                                 iterator.remove();
                                 break;
