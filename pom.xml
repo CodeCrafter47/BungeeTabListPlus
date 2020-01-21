@@ -6,7 +6,7 @@
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>BungeeTabListPlus-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.4</version>
+    <version>3.0.5-SNAPSHOT</version>
     <modules>
         <module>bungee</module>
         <module>bungee_compat</module>
@@ -37,7 +37,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/CodeCrafter47/BungeeTabListPlus</developerConnection>
-        <tag>3.0.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
