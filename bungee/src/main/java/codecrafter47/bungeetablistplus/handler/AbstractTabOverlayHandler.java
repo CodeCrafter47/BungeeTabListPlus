@@ -146,7 +146,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         int unique = ThreadLocalRandom.current().nextInt();
         CUSTOM_SLOT_USERNAME = new String[81];
         for (int i = 0; i < 81; i++) {
-            CUSTOM_SLOT_USERNAME[i] = String.format("~BTLP%08x %02d", unique, i);
+            CUSTOM_SLOT_USERNAME[i] = String.format(" BTLP%08x %02d", unique, i);
         }
         if (OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK) {
             CUSTOM_SLOT_USERNAMES = ImmutableSet.copyOf(CUSTOM_SLOT_USERNAME);
@@ -157,7 +157,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         // generate teams for custom slots
         CUSTOM_SLOT_TEAMNAME = new String[81];
         for (int i = 0; i < 81; i++) {
-            CUSTOM_SLOT_TEAMNAME[i] = String.format(" BTLP%08x %02d", unique, i);
+            CUSTOM_SLOT_TEAMNAME[i] = String.format("~BTLP%08x %02d", unique, i);
         }
         CUSTOM_SLOT_TEAMNAMES = ImmutableSet.copyOf(CUSTOM_SLOT_TEAMNAME);
 
