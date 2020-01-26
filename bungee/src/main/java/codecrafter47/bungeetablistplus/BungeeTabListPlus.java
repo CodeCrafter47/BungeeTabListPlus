@@ -387,8 +387,10 @@ public class BungeeTabListPlus {
             } else {
                 ErrorHandler.set(new ErrorHandler());
                 config = yaml.loadAs(new FileInputStream(file), MainConfig.class);
-                if (!ErrorHandler.get().getEntries().isEmpty()) {
-                    plugin.getLogger().log(Level.WARNING, ErrorHandler.get().formatErrors(file.getName()));
+                ErrorHandler errorHandler = ErrorHandler.get();
+                ErrorHandler.set(null);
+                if (!errorHandler.getEntries().isEmpty()) {
+                    plugin.getLogger().log(Level.WARNING, errorHandler.formatErrors(file.getName()));
                 }
                 if (config.needWrite) {
                     // todo this never happens
