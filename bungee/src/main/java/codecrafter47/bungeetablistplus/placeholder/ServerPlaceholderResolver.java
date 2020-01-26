@@ -1,6 +1,7 @@
 package codecrafter47.bungeetablistplus.placeholder;
 
 import codecrafter47.bungeetablistplus.cache.Cache;
+import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
@@ -47,7 +48,8 @@ public class ServerPlaceholderResolver extends AbstractDataHolderPlaceholderReso
                     DataKey<String> dataKey = bridgeCustomPlaceholderServerDataKeys.get(id);
                     result = builder.acquireData(new DataHolderPlaceholderDataProviderSupplier<>(TypeToken.STRING, dataKey, (player, replacement) -> replacement), TypeToken.STRING);
                 } else if (cache.getCustomServerPlaceholdersBridge().contains(id)) {
-                    result = nullPlaceholder(builder);
+                    // prevent warnings because bridge data has not been synced yet
+                    result = builder.acquireData(new DataHolderPlaceholderDataProviderSupplier<>(TypeToken.STRING, BTLPDataKeys.createThirdPartyServerVariableDataKey(id), (player, replacement) -> replacement), TypeToken.STRING);
                 }
                 if (result != null) {
                     args.remove(0);
@@ -56,26 +58,6 @@ public class ServerPlaceholderResolver extends AbstractDataHolderPlaceholderReso
             }
             throw e;
         }
-    }
-
-    private PlaceholderBuilder<DataHolder, String> nullPlaceholder(PlaceholderBuilder<DataHolder, ?> builder) {
-        return builder.acquireData(() -> new PlaceholderDataProvider<DataHolder, String>() {
-
-            @Override
-            public void activate(DataHolder context, Runnable listener) {
-
-            }
-
-            @Override
-            public void deactivate() {
-
-            }
-
-            @Override
-            public String getData() {
-                return "";
-            }
-        }, TypeToken.STRING);
     }
 
     public void addCustomPlaceholderServerDataKey(String id, DataKey<String> dataKey) {

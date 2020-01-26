@@ -204,11 +204,11 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
                 if (result == null) {
                     // prevent errors because bridge information has not been synced yet
                     if (cache.getCustomPlaceholdersBridge().contains(id)) {
-                        result = nullPlaceholder(builder);
+                        result = builder.acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.STRING, BTLPDataKeys.createThirdPartyVariableDataKey(id), (player, replacement) -> replacement), TypeToken.STRING);
                     } else {
                         for (String prefix : cache.getPAPIPrefixes()) {
                             if (id.length() >= prefix.length() && id.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
-                                result = nullPlaceholder(builder);
+                                result = builder.acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.STRING, BTLPDataKeys.createPlaceholderAPIDataKey("%" + id + "%"), (player, replacement) -> replacement), TypeToken.STRING);
                             }
                         }
                     }
@@ -220,26 +220,6 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
             }
             throw e;
         }
-    }
-
-    private PlaceholderBuilder<Player, String> nullPlaceholder(PlaceholderBuilder<Player, ?> builder) {
-        return builder.acquireData(() -> new PlaceholderDataProvider<Player, String>() {
-
-            @Override
-            public void activate(Player context, Runnable listener) {
-
-            }
-
-            @Override
-            public void deactivate() {
-
-            }
-
-            @Override
-            public String getData() {
-                return "";
-            }
-        }, TypeToken.STRING);
     }
 
     public void addPlaceholderAPIPluginPrefixes(Collection<String> prefixes) {
