@@ -850,13 +850,13 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 }
                             }
                         }
-                        viewerGamemodeChanged = true;
                     }
+                    viewerGamemodeChanged = true;
                 }
             }
 
             PacketListenerResult result;
-            boolean needUpdate = viewerGamemodeChanged;
+            boolean needUpdate = !using80Slots && viewerGamemodeChanged;
 
             switch (action) {
                 case ADD_PLAYER:

@@ -28,9 +28,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
     private static final String[] usernames = new String[160];
@@ -193,6 +191,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
 
         tabListHandler.setSlot(1, new Icon(clientUUID, new String[0][]), "Test 1", -1);
 
@@ -201,6 +200,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setGamemode(0);
         tabListHandler.onPlayerListPacket(packet);
 
+        assertEquals(0, clientTabList.entries.get(clientUUID).getGamemode());
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
 
         tabListHandler.setSlot(2, new Icon(clientUUID, new String[0][]), "Test 2", -1);
@@ -210,6 +210,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setGamemode(3);
         tabListHandler.onPlayerListPacket(packet);
 
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
 
         tabListHandler.setSlot(3, new Icon(clientUUID, new String[0][]), "Test 3", -1);
@@ -223,11 +224,100 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setGamemode(0);
         tabListHandler.onPlayerListPacket(packet);
 
+        assertEquals(0, clientTabList.entries.get(clientUUID).getGamemode());
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
 
         tabListHandler.setSlot(2, new Icon(clientUUID, new String[0][]), "Test 2", -1);
 
         assertEquals(clientUUID, clientTabList.getVisibleEntries().get(1).getUuid());
+    }
+
+    @Test
+    public void testSpectatorMode2() {
+        assertEquals(0, clientTabList.getSize());
+        tabListHandler.setPassThrough(false);
+        assertEquals(0, clientTabList.getSize());
+
+        tabListHandler.setSize(80);
+
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(uuids[47]);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(3);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabListHandler.onPlayerListPacket(packet);
+        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
+
+        item.setGamemode(0);
+        tabListHandler.onPlayerListPacket(packet);
+
+        assertEquals(0, clientTabList.entries.get(clientUUID).getGamemode());
+    }
+
+    @Test
+    public void testSpectatorMode3() {
+        assertEquals(0, clientTabList.getSize());
+        tabListHandler.setPassThrough(false);
+        assertEquals(0, clientTabList.getSize());
+
+        tabListHandler.setSize(80);
+
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(uuids[47]);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(0);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabListHandler.onPlayerListPacket(packet);
+        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+
+        assertEquals(0, clientTabList.entries.get(clientUUID).getGamemode());
+
+        item.setGamemode(3);
+        tabListHandler.onPlayerListPacket(packet);
+
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
+    }
+
+    @Test
+    public void testSpectatorMode4() {
+        assertEquals(0, clientTabList.getSize());
+        tabListHandler.setPassThrough(false);
+        assertEquals(0, clientTabList.getSize());
+
+        tabListHandler.setSize(80);
+
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(uuids[47]);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(3);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabListHandler.onPlayerListPacket(packet);
+        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
+
+        tabListHandler.setSize(20);
+
+        assertEquals(clientUUID, clientTabList.getVisibleEntries().get(19).getUuid());
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
+
+        tabListHandler.setSize(80);
+
+        assertEquals(3, clientTabList.entries.get(clientUUID).getGamemode());
     }
 
     @Test
