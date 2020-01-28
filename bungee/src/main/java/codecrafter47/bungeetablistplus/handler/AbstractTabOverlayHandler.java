@@ -819,6 +819,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
             PlayerListItem.Action action = packet.getAction();
 
+            if (using80Slots && action == PlayerListItem.Action.UPDATE_GAMEMODE) {
+                return PacketListenerResult.PASS;
+            }
+
             // check whether viewer gamemode changed
             boolean viewerGamemodeChanged = false;
             T tabOverlay = getTabOverlay();
@@ -861,13 +865,14 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             switch (action) {
                 case ADD_PLAYER:
                     PlayerListItem.Item[] items = packet.getItems();
-                    for (int i = 0; i < items.length; i++) {
-                        PlayerListItem.Item item = items[i];
-                        if (!viewerUuid.equals(item.getUuid())) {
-                            item.setGamemode(0);
-                        }
-                    }
                     if (!using80Slots) {
+                        for (int i = 0; i < items.length; i++) {
+                            PlayerListItem.Item item = items[i];
+                            if (!viewerUuid.equals(item.getUuid())) {
+                                item.setGamemode(0);
+                            }
+                        }
+
                         for (int i = 0; i < items.length; i++) {
                             PlayerListItem.Item item = items[i];
                             UUID uuid = item.getUuid();
@@ -1215,31 +1220,33 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 this.viewerIsSpectator = viewerEntry != null && viewerEntry.getGamemode() == 3;
 
                 // switch all players except for viewer in survival mode if they are in spectator mode
-                int count = 0;
-                for (PlayerListEntry entry : serverPlayerList.values()) {
-                    if (entry != viewerEntry && entry.getGamemode() == 3) {
-                        count++;
-                    }
-                }
-
-                if (count > 0) {
-                    PlayerListItem.Item[] items = new PlayerListItem.Item[count];
-                    int index = 0;
-
-                    for (Map.Entry<UUID, PlayerListEntry> mEntry : serverPlayerList.entrySet()) {
-                        PlayerListEntry entry = mEntry.getValue();
+                if (!using80Slots) {
+                    int count = 0;
+                    for (PlayerListEntry entry : serverPlayerList.values()) {
                         if (entry != viewerEntry && entry.getGamemode() == 3) {
-                            PlayerListItem.Item item = new PlayerListItem.Item();
-                            item.setUuid(mEntry.getKey());
-                            item.setGamemode(0);
-                            items[index++] = item;
+                            count++;
                         }
                     }
 
-                    PlayerListItem packet = new PlayerListItem();
-                    packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
-                    packet.setItems(items);
-                    sendPacket(packet);
+                    if (count > 0) {
+                        PlayerListItem.Item[] items = new PlayerListItem.Item[count];
+                        int index = 0;
+
+                        for (Map.Entry<UUID, PlayerListEntry> mEntry : serverPlayerList.entrySet()) {
+                            PlayerListEntry entry = mEntry.getValue();
+                            if (entry != viewerEntry && entry.getGamemode() == 3) {
+                                PlayerListItem.Item item = new PlayerListItem.Item();
+                                item.setUuid(mEntry.getKey());
+                                item.setGamemode(0);
+                                items[index++] = item;
+                            }
+                        }
+
+                        PlayerListItem packet = new PlayerListItem();
+                        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+                        packet.setItems(items);
+                        sendPacket(packet);
+                    }
                 }
 
                 // create teams if not already created
@@ -1421,6 +1428,21 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             item1.setGamemode(0);
                             itemQueueAddPlayer.add(item1);
                         }
+
+                        // restore player gamemode
+                        PlayerListItem packet;
+                        List<PlayerListItem.Item> items = new ArrayList<>(serverPlayerList.size());
+                        items.clear();
+                        for (PlayerListEntry entry : serverPlayerList.values()) {
+                            PlayerListItem.Item item = new PlayerListItem.Item();
+                            item.setUuid(entry.getUuid());
+                            item.setGamemode(entry.getGamemode());
+                            items.add(item);
+                        }
+                        packet = new PlayerListItem();
+                        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+                        packet.setItems(items.toArray(new PlayerListItem.Item[items.size()]));
+                        sendPacket(packet);
                     }
                     // save some memory
                     freePlayers.clear();
@@ -1435,6 +1457,35 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
                     if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
                         dirtySlots.set(highestUsedSlotIndex);
+                    }
+
+                    // switch all players except for viewer in survival mode if they are in spectator mode
+                    PlayerListEntry viewerEntry = serverPlayerList.get(viewerUuid);
+                    int count = 0;
+                    for (PlayerListEntry entry : serverPlayerList.values()) {
+                        if (entry != viewerEntry && entry.getGamemode() == 3) {
+                            count++;
+                        }
+                    }
+
+                    if (count > 0) {
+                        PlayerListItem.Item[] items = new PlayerListItem.Item[count];
+                        int index = 0;
+
+                        for (Map.Entry<UUID, PlayerListEntry> mEntry : serverPlayerList.entrySet()) {
+                            PlayerListEntry entry = mEntry.getValue();
+                            if (entry != viewerEntry && entry.getGamemode() == 3) {
+                                PlayerListItem.Item item = new PlayerListItem.Item();
+                                item.setUuid(mEntry.getKey());
+                                item.setGamemode(0);
+                                items[index++] = item;
+                            }
+                        }
+
+                        PlayerListItem packet = new PlayerListItem();
+                        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+                        packet.setItems(items);
+                        sendPacket(packet);
                     }
                 }
             }
