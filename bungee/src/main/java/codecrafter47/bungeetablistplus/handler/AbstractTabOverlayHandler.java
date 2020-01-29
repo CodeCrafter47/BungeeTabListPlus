@@ -1081,7 +1081,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 } else {
                                     // update slot team
                                     TeamEntry teamEntry = serverTeams.get(packet.getName());
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], teamEntry.getDisplayName(), teamEntry.getPrefix(), teamEntry.getSuffix(), teamEntry.getNameTagVisibility(), teamEntry.getCollisionRule(), teamEntry.getColor(), teamEntry.getFriendlyFire()));
+                                    if (teamEntry != null) {
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], teamEntry.getDisplayName(), teamEntry.getPrefix(), teamEntry.getSuffix(), teamEntry.getNameTagVisibility(), teamEntry.getCollisionRule(), teamEntry.getColor(), teamEntry.getFriendlyFire()));
+                                    }
                                 }
                             }
                             packet.setPlayers(filteredPlayers);
@@ -1119,10 +1121,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         break;
                     case 2:
                         TeamEntry teamEntry = serverTeams.get(packet.getName());
-                        for (String playerName : teamEntry.getPlayers()) {
-                            int slot = playerUsernameToSlotMap.getInt(playerName);
-                            if (slot != -1) {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], teamEntry.getDisplayName(), teamEntry.getPrefix(), teamEntry.getSuffix(), teamEntry.getNameTagVisibility(), teamEntry.getCollisionRule(), teamEntry.getColor(), teamEntry.getFriendlyFire()));
+                        if (teamEntry != null) {
+                            for (String playerName : teamEntry.getPlayers()) {
+                                int slot = playerUsernameToSlotMap.getInt(playerName);
+                                if (slot != -1) {
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], teamEntry.getDisplayName(), teamEntry.getPrefix(), teamEntry.getSuffix(), teamEntry.getNameTagVisibility(), teamEntry.getCollisionRule(), teamEntry.getColor(), teamEntry.getFriendlyFire()));
+                                }
                             }
                         }
 
