@@ -5,7 +5,7 @@
     <parent>
         <artifactId>BungeeTabListPlus-parent</artifactId>
         <groupId>codecrafter47.bungeetablistplus</groupId>
-        <version>3.0.7</version>
+        <version>3.0.8-SNAPSHOT</version>
     </parent>
 
     <artifactId>bukkit-plugin</artifactId>
