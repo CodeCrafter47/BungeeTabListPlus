@@ -75,7 +75,9 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("team", create(MinecraftData.Team));
         addPlaceholder("vault_balance", create(MinecraftData.Economy_Balance));
         addPlaceholder("vault_balance2", create(MinecraftData.Economy_Balance, b -> {
-            if (b >= 10_000_000) {
+            if (b == null) {
+                return "";
+            } else if (b >= 10_000_000) {
                 return String.format("%1.0fM", b / 1_000_000);
             } else if (b >= 10_000) {
                 return String.format("%1.0fK", b / 1_000);
