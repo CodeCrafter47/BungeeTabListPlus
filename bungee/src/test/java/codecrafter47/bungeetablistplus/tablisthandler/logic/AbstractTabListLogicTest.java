@@ -22,10 +22,12 @@ package codecrafter47.bungeetablistplus.tablisthandler.logic;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -104,67 +106,71 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         tabListHandler.setPassThrough(false);
         assertEquals(0, clientTabList.getSize());
 
+        Set<Integer> testSizes = Sets.newHashSet(1, 2, 19, 20, 21, 59, 60, 61, 79, 80);
+
         for (int size = 1; size <= 80; size++) {
             tabListHandler.setSize(size);
             assertEquals("Size check failed for size " + size, size, clientTabList.getSize());
 
             tabListHandler.setSlot(size - 1, Icon.DEFAULT, "Slot " + (size - 1), size - 1);
 
-            for (int i = 0; i < size; i++) {
-                assertArrayEquals("Skin check failed for size " + size + " slot " + i, Icon.DEFAULT.getProperties(), clientTabList.getProperties(i));
-                assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
-                assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
-            }
-
-            for (int p = 0; p < 160; p++) {
-
-                tabListHandler.setPassThrough(true);
-                assertEquals("passthrough test failed size " + size + " players " + p, p, clientTabList.entries.size());
-                tabListHandler.setPassThrough(false);
-
+            if (testSizes.contains(size)) {
                 for (int i = 0; i < size; i++) {
+                    assertArrayEquals("Skin check failed for size " + size + " slot " + i, Icon.DEFAULT.getProperties(), clientTabList.getProperties(i));
                     assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
                     assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
                 }
 
-                PlayerListItem packet = new PlayerListItem();
-                packet.setAction(PlayerListItem.Action.ADD_PLAYER);
-                PlayerListItem.Item item = new PlayerListItem.Item();
-                item.setUsername(usernames[p]);
-                item.setUuid(uuids[p]);
-                item.setPing(p + 13);
-                item.setProperties(new String[0][]);
-                item.setGamemode(p % 4);
-                packet.setItems(new PlayerListItem.Item[]{item});
-                tabListHandler.onPlayerListPacket(packet);
+                for (int p = 0; p < 160; p++) {
 
-                for (int i = 0; i < size; i++) {
-                    assertEquals("Text check failed for size " + size + " slot " + i + " players " + p, "Slot " + i, clientTabList.getText(i));
-                    assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
+                    tabListHandler.setPassThrough(true);
+                    assertEquals("passthrough test failed size " + size + " players " + p, p, clientTabList.entries.size());
+                    tabListHandler.setPassThrough(false);
+
+                    for (int i = 0; i < size; i++) {
+                        assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
+                        assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
+                    }
+
+                    PlayerListItem packet = new PlayerListItem();
+                    packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+                    PlayerListItem.Item item = new PlayerListItem.Item();
+                    item.setUsername(usernames[p]);
+                    item.setUuid(uuids[p]);
+                    item.setPing(p + 13);
+                    item.setProperties(new String[0][]);
+                    item.setGamemode(p % 4);
+                    packet.setItems(new PlayerListItem.Item[]{item});
+                    tabListHandler.onPlayerListPacket(packet);
+
+                    for (int i = 0; i < size; i++) {
+                        assertEquals("Text check failed for size " + size + " slot " + i + " players " + p, "Slot " + i, clientTabList.getText(i));
+                        assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
+                    }
                 }
-            }
 
-            for (int p = 0; p < 160; p++) {
+                for (int p = 0; p < 160; p++) {
 
-                tabListHandler.setPassThrough(true);
-                assertEquals("passthrough test failed size " + size + " players " + p, 160 - p, clientTabList.entries.size());
-                tabListHandler.setPassThrough(false);
+                    tabListHandler.setPassThrough(true);
+                    assertEquals("passthrough test failed size " + size + " players " + p, 160 - p, clientTabList.entries.size());
+                    tabListHandler.setPassThrough(false);
 
-                for (int i = 0; i < size; i++) {
-                    assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
-                    assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
-                }
+                    for (int i = 0; i < size; i++) {
+                        assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
+                        assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
+                    }
 
-                PlayerListItem packet = new PlayerListItem();
-                packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
-                PlayerListItem.Item item = new PlayerListItem.Item();
-                item.setUuid(uuids[p]);
-                packet.setItems(new PlayerListItem.Item[]{item});
-                tabListHandler.onPlayerListPacket(packet);
+                    PlayerListItem packet = new PlayerListItem();
+                    packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+                    PlayerListItem.Item item = new PlayerListItem.Item();
+                    item.setUuid(uuids[p]);
+                    packet.setItems(new PlayerListItem.Item[]{item});
+                    tabListHandler.onPlayerListPacket(packet);
 
-                for (int i = 0; i < size; i++) {
-                    assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
-                    assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
+                    for (int i = 0; i < size; i++) {
+                        assertEquals("Text check failed for size " + size + " slot " + i, "Slot " + i, clientTabList.getText(i));
+                        assertEquals("Ping check failed for size " + size + " slot " + i, i, clientTabList.getPing(i));
+                    }
                 }
             }
         }
