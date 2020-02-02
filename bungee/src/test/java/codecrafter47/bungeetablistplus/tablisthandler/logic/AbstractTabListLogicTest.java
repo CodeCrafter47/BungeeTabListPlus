@@ -692,6 +692,10 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         for (int i = 0; i < 25; i++) {
             assertEquals("Team " + i, clientTabList.playerToTeamMap.get(usernames[i]));
         }
+
+        tabListHandler.setSlot(0, Icon.DEFAULT, "abcd", 120);
+        assertEquals("abcd", clientTabList.getText(0));
+        assertEquals(120, clientTabList.getPing(0));
         // This no longer holds as BungeeTabListPlus now assigns players to a team if they don't already have one
         //for (int i = 25; i < 50; i++) {
         //    assertFalse(clientTabList.playerToTeamMap.containsKey(usernames[i]));
@@ -805,7 +809,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
                 team.setMode((byte) 0);
                 team.setPrefix("prefix " + i);
                 team.setCollisionRule("always");
-                team.setNameTagVisibility("always");
+                team.setNameTagVisibility("never");
                 tabListHandler.onTeamPacket(team);
             }
         }
@@ -816,6 +820,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
 
         for (int i = 0; i < 25; i++) {
             assertEquals("prefix " + i, clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
+            assertEquals("never", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getNameTagVisibility());
         }
         for (int i = 25; i < 50; i++) {
             assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
@@ -835,6 +840,12 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         tabListHandler.onTeamPacket(team);
 
         assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[0])).getPrefix());
+
+        team = new net.md_5.bungee.protocol.packet.Team("Team " + 1);
+        team.setMode((byte) 1);
+        tabListHandler.onTeamPacket(team);
+
+        assertEquals("always", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[1])).getNameTagVisibility());
     }
 
     @Test
