@@ -872,6 +872,76 @@ public class AbstractTabOverlayHandlerTest {
     }
 
     @Test
+    public void testSpectatorModeServerSwitch() {
+        assertEquals(0, clientTabList.getSize());
+
+        SimpleTabOverlay tabOverlay = tabOverlayHandler.enterContentOperationMode(ContentOperationMode.SIMPLE);
+        tabOverlay.setSize(2);
+
+        assertEquals(2, clientTabList.getSize());
+
+        tabOverlay.setSlot(0, clientUUID, Icon.DEFAULT_STEVE, "A", 1);
+        tabOverlay.setSlot(1, uuids[48], Icon.DEFAULT_STEVE, "B", 2);
+
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[47]);
+        item.setUuid(clientUUID);
+        item.setPing(47);
+        item.setProperties(new String[0][]);
+        item.setGamemode(0);
+        packet.setItems(new PlayerListItem.Item[]{item});
+        tabOverlayHandler.onPlayerListPacket(packet);
+        item.setUuid(uuids[48]);
+        item.setUsername(usernames[48]);
+        tabOverlayHandler.onPlayerListPacket(packet);
+
+        assertEquals(2, clientTabList.getSize());
+        assertEquals("A", clientTabList.getText(0));
+        assertEquals("B", clientTabList.getText(1));
+        assertEquals(1, clientTabList.getPing(0));
+        assertEquals(2, clientTabList.getPing(1));
+        assertEquals(uuids[47], clientTabList.getVisibleEntries().get(0).getUuid());
+        assertEquals(uuids[48], clientTabList.getVisibleEntries().get(1).getUuid());
+
+        item.setGamemode(3);
+        item.setUuid(clientUUID);
+        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+        tabOverlayHandler.onPlayerListPacket(packet);
+
+        assertEquals(2, clientTabList.getSize());
+        assertEquals("A", clientTabList.getText(0));
+        assertEquals("B", clientTabList.getText(1));
+        assertEquals(1, clientTabList.getPing(0));
+        assertEquals(2, clientTabList.getPing(1));
+        assertEquals(uuids[48], clientTabList.getVisibleEntries().get(0).getUuid());
+        assertEquals(uuids[47], clientTabList.getVisibleEntries().get(1).getUuid());
+
+        tabOverlayHandler.onServerSwitch();
+
+        assertEquals(2, clientTabList.getSize());
+        assertEquals("A", clientTabList.getText(0));
+        assertEquals("B", clientTabList.getText(1));
+        assertEquals(1, clientTabList.getPing(0));
+        assertEquals(2, clientTabList.getPing(1));
+
+        item.setGamemode(3);
+        item.setUsername(usernames[47]);
+        item.setUuid(clientUUID);
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        tabOverlayHandler.onPlayerListPacket(packet);
+
+        assertEquals(2, clientTabList.getSize());
+        assertEquals("A", clientTabList.getText(0));
+        assertEquals("B", clientTabList.getText(1));
+        assertEquals(1, clientTabList.getPing(0));
+        assertEquals(2, clientTabList.getPing(1));
+        assertEquals(uuids[47], clientTabList.getVisibleEntries().get(1).getUuid());
+
+    }
+
+    @Test
     public void testNameChange() {
         assertEquals(0, clientTabList.getSize());
 

@@ -1212,6 +1212,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 freePlayers.clear();
                 playerUuidToSlotMap.clear();
                 playerUsernameToSlotMap.clear();
+                viewerIsSpectator = false;
             }
         }
 
