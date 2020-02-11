@@ -44,19 +44,19 @@
         <repository>
             <id>deployment</id>
             <name>Internal Releases</name>
-            <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/releases/</url>
+            <url>https://nexus.codecrafter47.dyndns.eu/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>deployment</id>
             <name>Internal Releases</name>
-            <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/snapshots/</url>
+            <url>https://nexus.codecrafter47.dyndns.eu/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
     <repositories>
         <repository>
             <id>codecrafter47-repo</id>
-            <url>http://nexus.codecrafter47.dyndns.eu/content/repositories/public/</url>
+            <url>https://nexus.codecrafter47.dyndns.eu/content/repositories/public/</url>
         </repository>
         <repository>
             <id>CodeMC</id>
@@ -64,7 +64,7 @@
         </repository>
         <repository>
             <id>md_5-snapshots</id>
-            <url>http://repo.md-5.net/content/repositories/snapshots/</url>
+            <url>https://repo.md-5.net/content/repositories/snapshots/</url>
         </repository>
         <repository>
             <id>spigot-repo</id>
