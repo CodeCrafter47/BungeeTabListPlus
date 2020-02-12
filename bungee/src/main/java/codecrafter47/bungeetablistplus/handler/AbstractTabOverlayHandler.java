@@ -1522,13 +1522,22 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 if (!dirtySlots.isEmpty() || !freePlayers.isEmpty()) {
                     // mark slots as dirty currently being used with the uuid of dirty slots
                     for (int index = dirtySlots.nextSetBit(0); index >= 0; index = dirtySlots.nextSetBit(index + 1)) {
-                        UUID uuid = tabOverlay.uuid[index];
-                        if (uuid != null) {
-                            int i = playerUuidToSlotMap.getInt(uuid);
-                            if (i != -1) {
+                        int i = index;
+                        do {
+                            UUID uuid = tabOverlay.uuid[i];
+                            if (uuid == null) {
+                                break;
+                            }
+                            i = playerUuidToSlotMap.getInt(uuid);
+                            if (i == -1) {
+                                break;
+                            }
+                            if (dirtySlots.get(i)) {
+                                break;
+                            } else {
                                 dirtySlots.set(i);
                             }
-                        }
+                        } while (i < index);
                     }
 
                     if (OPTION_ENABLE_CONSISTENCY_CHECKS) {
