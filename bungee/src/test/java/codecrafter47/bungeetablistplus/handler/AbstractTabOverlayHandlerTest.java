@@ -847,6 +847,7 @@ public class AbstractTabOverlayHandlerTest {
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
         item.setUuid(uuids[48]);
+        item.setUsername(usernames[48]);
         tabOverlayHandler.onPlayerListPacket(packet);
 
         assertEquals(2, clientTabList.getSize());
