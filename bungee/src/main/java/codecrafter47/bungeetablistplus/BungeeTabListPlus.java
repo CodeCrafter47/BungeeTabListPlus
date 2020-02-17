@@ -51,6 +51,7 @@ import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.taboverlay.config.ComponentSpec;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
+import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
@@ -60,6 +61,7 @@ import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.MultithreadEventExecutorGroup;
 import lombok.Getter;
+import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;
@@ -75,6 +77,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -302,7 +305,7 @@ public class BungeeTabListPlus {
                 mainThreadExecutor,
                 iconManager);
 
-        configTabOverlayManager.setTimeZone(config.getTimeZone());
+        updateTimeZoneAndGlobalCustomPlaceholders();
 
         Path tabLists = getPlugin().getDataFolder().toPath().resolve("tabLists");
         if (!Files.exists(tabLists)) {
@@ -329,6 +332,17 @@ public class BungeeTabListPlus {
         } catch (NoSuchFieldException | IllegalAccessException ex) {
             getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
         }
+    }
+
+    private void updateTimeZoneAndGlobalCustomPlaceholders() {
+        configTabOverlayManager.setTimeZone(config.getTimeZone());
+        val customPlaceholders = new HashMap<String, CustomPlaceholderConfiguration>();
+        for (val entry : config.customPlaceholders.entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                customPlaceholders.put(entry.getKey(), entry.getValue());
+            }
+        }
+        configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
     }
 
     private void updateExcludedAndHiddenServerLists() {
@@ -421,6 +435,7 @@ public class BungeeTabListPlus {
             return false;
         } else {
             updateExcludedAndHiddenServerLists();
+            updateTimeZoneAndGlobalCustomPlaceholders();
 
             Path tabLists = getPlugin().getDataFolder().toPath().resolve("tabLists");
             configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
