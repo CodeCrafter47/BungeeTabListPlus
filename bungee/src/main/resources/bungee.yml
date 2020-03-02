@@ -2,4 +2,12 @@ name: BungeeTabListPlus
 main : codecrafter47.bungeetablistplus.BungeePlugin
 version: ${project.version}
 author: CodeCrafter47
-softDepends: ['RedisBungee', 'ProtocolSupportBungee', 'BungeeOnlineTime']
+softDepends:
+  - RedisBungee
+  - ProtocolSupportBungee
+  - BungeeOnlineTime
+  - BungeePerms
+  - LuckPerms
+  - Clans
+  - ProxySuite
+  - PremiumVanish
