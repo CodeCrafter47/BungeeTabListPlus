@@ -22,7 +22,7 @@ import lombok.Value;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Set;
 
 @Value
 @Builder
@@ -63,7 +63,7 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
 
     ExpressionTemplate partitionFunction;
 
-    List<String> hiddenServers;
+    Set<String> hiddenServers;
     PlayersByServerComponentConfiguration.ServerOptions showServers;
     @Nullable
     ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator;

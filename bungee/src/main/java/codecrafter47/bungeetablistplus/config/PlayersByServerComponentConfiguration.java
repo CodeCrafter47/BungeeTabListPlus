@@ -6,6 +6,7 @@ import codecrafter47.bungeetablistplus.placeholder.ComponentServerPlaceholderRes
 import codecrafter47.bungeetablistplus.template.PlayersByServerComponentTemplate;
 import codecrafter47.bungeetablistplus.util.ContextAwareOrdering;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.dsl.ComponentConfiguration;
@@ -198,7 +199,7 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
                 .defaultText(tcc.getDefaultText())
                 .defaultPing(tcc.getDefaultPing())
                 .partitionFunction(tcc.getExpressionEngine().compile(childContextP, "${player server}", null))
-                .hiddenServers(hiddenServers)
+                .hiddenServers(ImmutableSet.copyOf(hiddenServers))
                 .showServers(showServers)
                 .serverComparator(serverComparator)
                 .build();

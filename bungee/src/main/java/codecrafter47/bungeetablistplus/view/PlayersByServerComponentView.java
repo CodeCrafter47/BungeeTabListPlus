@@ -26,7 +26,7 @@ import java.util.*;
 
 public class PlayersByServerComponentView extends PartitionedPlayersView {
 
-    private final List<String> hiddenServers;
+    private final Set<String> hiddenServers;
     private final PlayersByServerComponentConfiguration.ServerOptions showServers;
     private final ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator;
 
@@ -36,7 +36,7 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
     private final Runnable onlineStateUpdateListener = this::updateOnlineServers;
     private List<String> servers;
 
-    public PlayersByServerComponentView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory, List<String> hiddenServers, PlayersByServerComponentConfiguration.ServerOptions showServers, ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator) {
+    public PlayersByServerComponentView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory, Set<String> hiddenServers, PlayersByServerComponentConfiguration.ServerOptions showServers, ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator) {
         super(columns, playerSetTemplate, playerComponentTemplate, playerComponentSize, morePlayerComponentTemplate, morePlayerComponentSize, playerOrderTemplate, defaultTextTemplate, defaultPingTemplate, defaultIconTemplate, partitionFunction, sectionHeader, sectionFooter, sectionSeparator, minSizePerSection, maxSizePerSection, sectionContextFactory);
         this.hiddenServers = hiddenServers;
         this.showServers = showServers;
@@ -50,11 +50,17 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
         if (showServers == PlayersByServerComponentConfiguration.ServerOptions.ALL) {
             servers = new ArrayList<>(ProxyServer.getInstance().getServers().keySet());
             for (String serverName : servers) {
+                if (hiddenServers.contains(serverName)) {
+                    continue;
+                }
                 addPersistentSection(serverName, false);
             }
         } else if (showServers == PlayersByServerComponentConfiguration.ServerOptions.ONLINE) {
             servers = new ArrayList<>(ProxyServer.getInstance().getServers().keySet());
             for (String serverName : servers) {
+                if (hiddenServers.contains(serverName)) {
+                    continue;
+                }
                 DataHolder serverDataHolder = BungeeTabListPlus.getInstance().getDataManager().getServerDataHolder(serverName);
                 serverDataHolder.addDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE, onlineStateUpdateListener);
                 if (serverDataHolder.get(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE)) {
@@ -69,6 +75,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
         super.onDeactivation();
         if (showServers == PlayersByServerComponentConfiguration.ServerOptions.ONLINE) {
             for (String serverName : servers) {
+                if (hiddenServers.contains(serverName)) {
+                    continue;
+                }
                 DataHolder serverDataHolder = BungeeTabListPlus.getInstance().getDataManager().getServerDataHolder(serverName);
                 serverDataHolder.removeDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE, onlineStateUpdateListener);
             }
@@ -77,6 +86,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
 
     private void updateOnlineServers() {
         for (String serverName : servers) {
+            if (hiddenServers.contains(serverName)) {
+                continue;
+            }
             DataHolder serverDataHolder = BungeeTabListPlus.getInstance().getDataManager().getServerDataHolder(serverName);
             serverDataHolder.addDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE, onlineStateUpdateListener);
             Boolean online = serverDataHolder.get(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE);
