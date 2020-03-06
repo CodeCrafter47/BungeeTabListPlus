@@ -1485,6 +1485,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
                         freePlayers.addAll(serverPlayerList.keySet());
                     }
+                    sendQueuedItems();
                 }
             }
 
@@ -1950,7 +1951,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
         }
 
-        void setIconInternal(int index, @Nonnull Icon icon) {
+        void setIconInternal(int index, @Nonnull @NonNull Icon icon) {
             if (!icon.equals(this.icon[index])) {
                 this.icon[index] = icon;
                 dirtyFlagsIcon.set(index);
@@ -1958,7 +1959,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
         }
 
-        void setTextInternal(int index, @Nonnull String text) {
+        void setTextInternal(int index, @Nonnull @NonNull String text) {
             String jsonText = FastChat.legacyTextToJson(text);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
@@ -1967,7 +1968,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
         }
 
-        void setTextInternal(int index, @Nonnull String text, char alternateColorChar) {
+        void setTextInternal(int index, @Nonnull @NonNull String text, char alternateColorChar) {
             String jsonText = FastChat.legacyTextToJson(text, alternateColorChar);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
