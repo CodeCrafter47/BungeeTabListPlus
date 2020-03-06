@@ -1185,8 +1185,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 freePlayers.clear();
                 playerUuidToSlotMap.clear();
                 playerUsernameToSlotMap.clear();
-                viewerIsSpectator = false;
             }
+            viewerIsSpectator = false;
         }
 
         @Override
@@ -1250,11 +1250,13 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 }
             }
 
-            this.freePlayers.addAll(serverPlayerList.keySet());
+            if (!using80Slots) {
+                this.freePlayers.addAll(serverPlayerList.keySet());
 
-            if (!this.freePlayers.isEmpty()) {
+                if (!this.freePlayers.isEmpty()) {
 
-                getTabOverlay().dirtyFlagSize = true;
+                    getTabOverlay().dirtyFlagSize = true;
+                }
             }
         }
 
@@ -1438,6 +1440,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         // save some memory
                         freePlayers.clear();
                         playerUuidToSlotMap.clear();
+                        playerUsernameToSlotMap.clear();
                     } else {
                         // we switched to less than 80 slots
                         if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
