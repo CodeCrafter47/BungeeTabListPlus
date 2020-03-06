@@ -669,6 +669,35 @@ public class AbstractTabOverlayHandlerTest {
     }
 
     @Test
+    public void testTeamPropertyPassthrough2() {
+
+        SimpleTabOverlay tabOverlay = tabOverlayHandler.enterContentOperationMode(ContentOperationMode.SIMPLE);
+        tabOverlay.setSize(80);
+
+        PlayerListItem packet = new PlayerListItem();
+        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
+        PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUsername(usernames[0]);
+        item.setUuid(uuids[0]);
+        item.setPing(15);
+        item.setProperties(new String[0][]);
+        item.setGamemode(0);
+        PlayerListItem.Item[] items = new PlayerListItem.Item[]{item};
+        packet.setItems(items);
+        tabOverlayHandler.onPlayerListPacket(packet);
+
+        net.md_5.bungee.protocol.packet.Team team = new net.md_5.bungee.protocol.packet.Team("Team " + 0);
+        team.setPlayers(new String[]{usernames[0]});
+        team.setMode((byte) 0);
+        team.setPrefix("prefix " + 0);
+        team.setCollisionRule("always");
+        team.setNameTagVisibility("never");
+        tabOverlayHandler.onTeamPacket(team);
+
+        assertEquals("never", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[0])).getNameTagVisibility());
+    }
+
+    @Test
     public void testTeamPropertyPassthroughServerSwitch() {
         PlayerListItem packet = new PlayerListItem();
         packet.setAction(PlayerListItem.Action.ADD_PLAYER);
