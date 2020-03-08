@@ -1483,7 +1483,14 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
                         for (UUID player : freePlayers) {
                             String username = serverPlayerList.get(player).username;
-                            sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{username}));
+                            String playerTeamName = playerToTeamMap.get(username);
+                            if (playerTeamName != null) {
+                                // add player to correct team
+                                sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{username}));
+                            } else {
+                                // add player to overflow team
+                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{username}));
+                            }
                         }
 
                         //  create spacer slots
