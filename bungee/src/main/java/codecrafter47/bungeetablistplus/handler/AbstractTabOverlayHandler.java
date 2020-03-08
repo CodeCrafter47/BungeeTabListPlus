@@ -75,6 +75,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final String[] CUSTOM_SLOT_TEAMNAME;
     private static final Set<String> CUSTOM_SLOT_TEAMNAMES;
 
+    private static final DefinedPacket[] PACKETS_ADD_CUSTOM_SLOT_USERS_TO_TEAMS;
+    private static final DefinedPacket[] PACKETS_REMOVE_CUSTOM_SLOT_USERS_FROM_TEAMS;
+
     static {
         // check whether this BungeeCord version supports team's collision rule property
         boolean methodPresent = false;
@@ -144,8 +147,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         // generate usernames for custom slots
         int unique = ThreadLocalRandom.current().nextInt();
-        CUSTOM_SLOT_USERNAME = new String[80];
-        for (int i = 0; i < 80; i++) {
+        CUSTOM_SLOT_USERNAME = new String[81];
+        for (int i = 0; i < 81; i++) {
             CUSTOM_SLOT_USERNAME[i] = String.format("~BTLP%08x %02d", unique, i);
         }
         if (OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK) {
@@ -155,11 +158,22 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         // generate teams for custom slots
-        CUSTOM_SLOT_TEAMNAME = new String[80];
-        for (int i = 0; i < 80; i++) {
+        CUSTOM_SLOT_TEAMNAME = new String[81];
+        for (int i = 0; i < 81; i++) {
             CUSTOM_SLOT_TEAMNAME[i] = String.format(" BTLP%08x %02d", unique, i);
         }
         CUSTOM_SLOT_TEAMNAMES = ImmutableSet.copyOf(CUSTOM_SLOT_TEAMNAME);
+
+        // create packets
+        PACKETS_ADD_CUSTOM_SLOT_USERS_TO_TEAMS = new DefinedPacket[80];
+        for (int index = 0; index < 80; index++) {
+            PACKETS_ADD_CUSTOM_SLOT_USERS_TO_TEAMS[index] = createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{CUSTOM_SLOT_USERNAME[index]});
+        }
+
+        PACKETS_REMOVE_CUSTOM_SLOT_USERS_FROM_TEAMS = new DefinedPacket[80];
+        for (int index = 0; index < 80; index++) {
+            PACKETS_REMOVE_CUSTOM_SLOT_USERS_FROM_TEAMS[index] = createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{CUSTOM_SLOT_USERNAME[index]});
+        }
     }
 
     private final Logger logger;
@@ -898,6 +912,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         if (usedSlotsCount < serverPlayerList.size()) {
                             tabOverlay.dirtyFlagSize = true;
                         }
+                    } else {
+                        for (PlayerListItem.Item item : packet.getItems()) {
+                            if (!playerToTeamMap.containsKey(item.getUsername())) {
+                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{item.getUsername()}));
+                            }
+                        }
                     }
                     if (needUpdate) {
                         sendPacket(packet);
@@ -1031,6 +1051,18 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         }
                     }
                 }
+            } else {
+                if (packet.getMode() == 1) {
+                    TeamEntry teamEntry = serverTeams.get(packet.getName());
+                    if (teamEntry != null) {
+                        for (String playerName : teamEntry.getPlayers()) {
+                            if (serverTabListPlayers.contains(playerName)) {
+                                // reset slot team
+                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -1118,6 +1150,30 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 }
                 if (modified) {
                     return PacketListenerResult.MODIFIED;
+                }
+            } else {
+
+                switch (packet.getMode()) {
+                    case 0:
+                    case 3:
+                        String[] players = packet.getPlayers();
+                        for (int i = 0; i < players.length; i++) {
+                            String playerName = players[i];
+                            if (serverTabListPlayers.contains(playerName)) {
+                                // remove player from overflow team
+                                sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
+                            }
+                        }
+                    case 4:
+                        players = packet.getPlayers();
+                        for (int i = 0; i < players.length; i++) {
+                            String playerName = players[i];
+                            if (serverTabListPlayers.contains(playerName)) {
+                                // add player to overflow team
+                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
+                            }
+                        }
+                        break;
                 }
             }
             return PacketListenerResult.PASS;
@@ -1223,18 +1279,15 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 if (!hasCreatedCustomTeams) {
                     hasCreatedCustomTeams = true;
 
-                    if (is13OrLater) {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[0]}));
-                    } else {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], "", "", "", "always", "always", 0, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[0]}));
-                    }
-                    for (int i = 1; i < 80; i++) {
+                    for (int i = 0; i < 81; i++) {
                         if (is13OrLater) {
-                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3, new String[]{getCustomSlotUsername(i)}));
                         } else {
-                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 3, new String[]{getCustomSlotUsername(i)}));
                         }
                     }
+
+                    areCustomSlotUsersPartOfTeams = true;
                 }
             }
 
@@ -1243,6 +1296,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
                 if (!this.freePlayers.isEmpty()) {
 
+                    for (PlayerListEntry entry : serverPlayerList.values()) {
+                        if (!playerToTeamMap.containsKey(entry.username)) {
+                            sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{entry.username}));
+                        }
+                    }
                     getTabOverlay().dirtyFlagSize = true;
                 }
             }
@@ -1276,7 +1334,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
 
             if (using80Slots) {
-
+                for (String player : serverTabListPlayers) {
+                    if (playerToTeamMap.get(player) == null) {
+                        // remove player from overflow team
+                        sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{player}));
+                    }
+                }
                 // account for spacer players
                 customSlots += 17;
             }
@@ -1346,6 +1409,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     } else {
                                         sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 3));
                                     }
+                                } else {
+                                    // 2. add player to overflow team
+                                    sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{slotUsername[index]}));
                                 }
 
                                 // 4. create new custom slot
@@ -1408,6 +1474,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
                         packet.setItems(items.toArray(new PlayerListItem.Item[items.size()]));
                         sendPacket(packet);
+
+                        for (UUID player : freePlayers) {
+                            String username = serverPlayerList.get(player).username;
+                            sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{username}));
+                        }
 
                         // create spacer slots
                         for (int i = 0; i < 17; i++) {
