@@ -135,7 +135,7 @@ public class AbstractTabListLogicTestBase {
         private final ClientTabList clientTabList;
 
         public MockTabOverlayHandler(ClientTabList clientTabList) {
-            super(Logger.getGlobal(), Runnable::run, clientUUID, false);
+            super(Logger.getGlobal(), Runnable::run, clientUUID, false, false);
             this.clientTabList = clientTabList;
         }
 

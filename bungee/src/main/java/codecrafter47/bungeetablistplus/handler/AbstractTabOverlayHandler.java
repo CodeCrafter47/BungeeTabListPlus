@@ -186,13 +186,15 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private final AtomicBoolean updateScheduledFlag = new AtomicBoolean(false);
     private final Runnable updateTask = this::update;
 
+    private final boolean is18;
     private final boolean is13OrLater;
     protected boolean active;
 
-    public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is13OrLater) {
+    public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is18, boolean is13OrLater) {
         this.logger = logger;
         this.eventLoopExecutor = eventLoopExecutor;
         this.viewerUuid = viewerUuid;
+        this.is18 = is18;
         this.is13OrLater = is13OrLater;
         this.activeContentHandler = new PassThroughContentHandler();
         this.activeHeaderFooterHandler = new PassThroughHeaderFooterHandler();
@@ -979,6 +981,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 packet1.setAction(PlayerListItem.Action.ADD_PLAYER);
                                 packet1.setItems(new PlayerListItem.Item[]{item1});
                                 sendPacket(packet1);
+                                if (is18) {
+                                    packet1 = new PlayerListItem();
+                                    packet1.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+                                    packet1.setItems(new PlayerListItem.Item[]{item1});
+                                    sendPacket(packet1);
+                                }
                             }
                         }
                     }
@@ -1180,6 +1188,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         packet1.setAction(PlayerListItem.Action.ADD_PLAYER);
                         packet1.setItems(new PlayerListItem.Item[]{item1});
                         sendPacket(packet1);
+                        if (is18) {
+                            packet1 = new PlayerListItem();
+                            packet1.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+                            packet1.setItems(new PlayerListItem.Item[]{item1});
+                            sendPacket(packet1);
+                        }
                     }
                 }
                 freePlayers.clear();
@@ -1866,6 +1880,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 packet.setAction(PlayerListItem.Action.ADD_PLAYER);
                 packet.setItems(itemQueueAddPlayer.toArray(new PlayerListItem.Item[itemQueueAddPlayer.size()]));
                 sendPacket(packet);
+                if (is18) {
+                    packet = new PlayerListItem();
+                    packet.setAction(PlayerListItem.Action.UPDATE_DISPLAY_NAME);
+                    packet.setItems(itemQueueAddPlayer.toArray(new PlayerListItem.Item[itemQueueAddPlayer.size()]));
+                    sendPacket(packet);
+                }
                 itemQueueAddPlayer.clear();
             }
             if (!itemQueueUpdateDisplayName.isEmpty()) {

@@ -33,4 +33,9 @@ public class BungeeProtocolVersionProvider implements ProtocolVersionProvider {
         return player.getPendingConnection().getVersion() >= 393;
     }
 
+    @Override
+    public boolean is18(ProxiedPlayer player) {
+        return player.getPendingConnection().getVersion() == 47;
+    }
+
 }

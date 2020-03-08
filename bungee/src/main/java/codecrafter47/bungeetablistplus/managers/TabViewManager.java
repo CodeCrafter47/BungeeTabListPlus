@@ -129,7 +129,7 @@ public class TabViewManager implements Listener {
             EventLoop eventLoop = ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop();
 
             if (protocolVersionProvider.has18OrLater(player)) {
-                LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.has113OrLater(player));
+                LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player));
                 tabOverlayHandler = tabOverlayHandlerImpl;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, ((UserConnection) player)));
             } else {

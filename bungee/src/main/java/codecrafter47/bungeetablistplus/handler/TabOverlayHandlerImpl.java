@@ -30,8 +30,8 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
 
     private final ProxiedPlayer player;
 
-    public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is13OrLater) {
-        super(logger, eventLoopExecutor, viewerUuid, is13OrLater);
+    public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is18, boolean is13OrLater) {
+        super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater);
         this.player = player;
     }
 
