@@ -1039,8 +1039,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (CUSTOM_SLOT_TEAMNAMES.contains(packet.getName())) {
                 throw new AssertionError("Team name collision: " + packet);
             }
-            boolean modified = false;
             if (!using80Slots) {
+                boolean modified = false;
                 switch (packet.getMode()) {
                     case 0:
                     case 3:
@@ -1116,31 +1116,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         break;
 
                 }
-            }
-            if (packet.getMode() == 0 || packet.getMode() == 3 || packet.getMode() == 4) {
-                String[] players = packet.getPlayers();
-                int count = 0;
-                for (int i = 0; i < players.length; i++) {
-                    String playerName = players[i];
-                    if (!"".equals(playerName)) {
-                        count++;
-                    }
+                if (modified) {
+                    return PacketListenerResult.MODIFIED;
                 }
-                if (count < players.length) {
-                    modified = true;
-                    String[] filteredPlayers = new String[count];
-                    int j = 0;
-                    for (int i = 0; i < players.length; i++) {
-                        String playerName = players[i];
-                        if (!"".equals(playerName)) {
-                            filteredPlayers[j++] = playerName;
-                        }
-                    }
-                    packet.setPlayers(filteredPlayers);
-                }
-            }
-            if (modified) {
-                return PacketListenerResult.MODIFIED;
             }
             return PacketListenerResult.PASS;
         }
@@ -1258,10 +1236,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         }
                     }
                 }
-
-                if (playerToTeamMap.containsKey("")) {
-                    sendPacket(createPacketTeamRemovePlayers(playerToTeamMap.get(""), new String[]{""}));
-                }
             }
 
             if (!using80Slots) {
@@ -1329,10 +1303,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
                 packet.setItems(items);
                 sendPacket(packet);
-            }
-
-            if (playerToTeamMap.containsKey("")) {
-                sendPacket(createPacketTeamAddPlayers(playerToTeamMap.get(""), new String[]{""}));
             }
         }
 

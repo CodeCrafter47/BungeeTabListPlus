@@ -1001,32 +1001,6 @@ public class AbstractTabOverlayHandlerTest {
         assertTrue(clientTabList.playerToTeamMap.containsKey(usernames[48]));
     }
 
-    @Test
-    public void testTeamContainingEmptyString() {
-        PlayerListItem packet = new PlayerListItem();
-        packet.setAction(PlayerListItem.Action.ADD_PLAYER);
-        PlayerListItem.Item item = new PlayerListItem.Item();
-        item.setUsername(usernames[47]);
-        item.setUuid(clientUUID);
-        item.setPing(47);
-        item.setProperties(new String[0][]);
-        item.setGamemode(0);
-        packet.setItems(new PlayerListItem.Item[]{item});
-        tabOverlayHandler.onPlayerListPacket(packet);
-
-        SimpleTabOverlay tabOverlay = tabOverlayHandler.enterContentOperationMode(ContentOperationMode.SIMPLE);
-
-        tabOverlay.setSize(80);
-
-        tabOverlay.setSlot(3, clientUUID, new Icon(new ProfileProperty("texture", "abc", "")), "Hi", 1);
-        assertEquals("abc", clientTabList.getVisibleEntries().get(3).getProperties()[0][1]);
-
-        net.md_5.bungee.protocol.packet.Team packet2 = new net.md_5.bungee.protocol.packet.Team("test", (byte) 0, "", "", "", "", "", 0, (byte) 0, new String[]{""});
-        tabOverlayHandler.onTeamPacket(packet2);
-
-        assertEquals("abc", clientTabList.getVisibleEntries().get(3).getProperties()[0][1]);
-    }
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
