@@ -993,13 +993,11 @@ public class AbstractTabOverlayHandlerTest {
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
 
-        assertEquals(82, clientTabList.playerToTeamMap.size());
         assertTrue(clientTabList.playerToTeamMap.containsKey(usernames[47]));
 
         item.setUsername(usernames[48]);
         tabOverlayHandler.onPlayerListPacket(packet);
 
-        assertEquals(82, clientTabList.playerToTeamMap.size());
         assertTrue(clientTabList.playerToTeamMap.containsKey(usernames[48]));
     }
 

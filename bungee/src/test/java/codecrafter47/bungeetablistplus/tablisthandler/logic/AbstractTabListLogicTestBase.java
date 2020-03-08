@@ -281,7 +281,7 @@ public class AbstractTabListLogicTestBase {
                 }
             } else if (size == 80) {
                 Assert.assertEquals("server client tab size mismatch", 80, clientTabList.getSize());
-                Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 80, clientTabList.entries.size());
+                Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 97, clientTabList.entries.size());
                 // fake players
                 for (int i = 0; i < size; i++) {
                     Assert.assertEquals("text", clientText[i], clientTabList.getText(i));
