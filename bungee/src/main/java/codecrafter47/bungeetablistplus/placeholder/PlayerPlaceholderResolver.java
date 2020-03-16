@@ -27,6 +27,7 @@ import de.codecrafter47.data.api.TypeToken;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
+import de.codecrafter47.data.sponge.api.SpongeData;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
 import de.codecrafter47.taboverlay.config.expression.ToStringExpression;
@@ -143,6 +144,8 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("paf_clans_clan_online_member_count", create(BungeeData.PAFClans_OnlineMemberCount));
         addPlaceholder("paf_clans_is_leader", create(BungeeData.PAFClans_IsLeader));
         addPlaceholder("permission", this::resolvePermissionPlaceholder);
+        addPlaceholder("nucleus_afk", create(SpongeData.Nucleus_IsAFK));
+        addPlaceholder("nucleus_nick", create(SpongeData.Nucleus_Nick));
 
         // Alias
         aliasMap.put("luckperms_prefix", "luckpermsbungee_prefix");
