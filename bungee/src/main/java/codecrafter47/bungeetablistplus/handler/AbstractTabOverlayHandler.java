@@ -970,9 +970,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                         sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                                         // 3. reset custom slot team
                                         if (is13OrLater) {
-                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
                                         } else {
-                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 3));
+                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
                                         }
                                     }
                                 }
@@ -1043,9 +1043,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             if (slot != -1) {
                                 // reset slot team
                                 if (is13OrLater) {
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
                                 } else {
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 3));
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 1));
                                 }
                             }
                         }
@@ -1125,9 +1125,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 } else {
                                     // reset slot team
                                     if (is13OrLater) {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
                                     } else {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 3));
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 1));
                                     }
                                 }
                             }
@@ -1193,9 +1193,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
                         // reset slot team
                         if (is13OrLater) {
-                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
                         } else {
-                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 3));
+                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
                         }
 
                         // 2. create new custom slot
@@ -1280,16 +1280,16 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     hasCreatedCustomTeams = true;
 
                     if (is13OrLater) {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[0], ""}));
+                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], ""}));
                     } else {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], "", "", "", "always", "always", 0, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[0], ""}));
+                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], ""}));
                     }
 
                     for (int i = 1; i < 81; i++) {
                         if (is13OrLater) {
-                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
                         } else {
-                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 3, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
                         }
                     }
 
@@ -1328,9 +1328,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                             // 3. reset custom slot team
                             if (is13OrLater) {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
                             } else {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 3));
+                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
                             }
                         }
                     } else {
@@ -1411,9 +1411,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                                     // 3. reset custom slot team
                                     if (is13OrLater) {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 3));
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
                                     } else {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 3));
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
                                     }
                                 } else {
                                     // 2. add player to overflow team
