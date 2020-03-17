@@ -57,13 +57,6 @@ public class TabListListener implements Listener {
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
             btlp.getListener().onTabViewRemoved(tabView);
             btlp.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
-
-            // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
-            Server server = e.getPlayer().getServer();
-            if (server != null) {
-                server.disconnect("Quitting");
-            }
-            ((UserConnection) e.getPlayer()).setServer(null);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }
