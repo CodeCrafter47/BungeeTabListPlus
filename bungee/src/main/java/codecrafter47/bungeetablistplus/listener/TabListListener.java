@@ -51,7 +51,7 @@ public class TabListListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDisconnect(PlayerDisconnectEvent e) {
         try {
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
