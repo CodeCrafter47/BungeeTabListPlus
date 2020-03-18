@@ -238,7 +238,8 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
                         } else if (second.equals(server)) {
                             return 1;
                         } else {
-                            return 0;
+                            if(customServerOrder == null) return 0;
+                            return customServerOrder.getOrDefault(first, Integer.MAX_VALUE) - customServerOrder.getOrDefault(second, Integer.MAX_VALUE);
                         }
                     }
                 };
