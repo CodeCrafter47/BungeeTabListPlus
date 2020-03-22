@@ -199,7 +199,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
                 } else {
                     for (String prefix : placeholderAPIPluginPrefixes) {
                         if (id.length() >= prefix.length() && id.substring(0, prefix.length()).equalsIgnoreCase(prefix)) {
-                            args.remove(0);
+                            id = args.remove(0).getText();
                             val resolver = create(BTLPDataKeys.createPlaceholderAPIDataKey("%" + id + "%"));
                             addPlaceholder(id, resolver);
                             return resolver.resolve(builder, args, tcc);
