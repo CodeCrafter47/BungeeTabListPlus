@@ -407,7 +407,6 @@ public class BungeeTabListPlus {
                     plugin.getLogger().log(Level.WARNING, errorHandler.formatErrors(file.getName()));
                 }
                 if (config.needWrite) {
-                    // todo this never happens
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
                     config.writeWithComments(writer, yaml);
                 }

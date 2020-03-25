@@ -18,8 +18,13 @@
  */
 package codecrafter47.bungeetablistplus.config;
 
+import com.google.common.collect.ImmutableList;
 import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.yaml.UpdateableConfig;
+import de.codecrafter47.taboverlay.config.dsl.yaml.YamlUtil;
+import lombok.val;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.IOException;
@@ -28,7 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-public class MainConfig {
+public class MainConfig implements UpdateableConfig {
 
     @Comment({
             "if enabled the plugin checks for new versions automatically.",
@@ -90,6 +95,34 @@ public class MainConfig {
     }
 
     public transient boolean needWrite = false;
+
+    @Override
+    public void update(MappingNode node) {
+        val outdatedConfigOptions = ImmutableList.<String>of("tablistUpdateIntervall",
+                "tablistUpdateInterval",
+                "updateOnPlayerJoinLeave",
+                "updateOnServerChange",
+                "offline",
+                "offline-text",
+                "online",
+                "online-text",
+                "permissionSource",
+                "useScoreboardToBypass16CharLimit",
+                "autoExcludeServers",
+                "showPlayersInGamemode3",
+                "serverAlias",
+                "worldAlias",
+                "serverPrefixes",
+                "prefixes",
+                "charLimit",
+                "automaticallySendBugReports");
+
+        for (String option : outdatedConfigOptions) {
+            needWrite |= YamlUtil.contains(node, option);
+            YamlUtil.remove(node, option);
+        }
+
+    }
 
     public void writeWithComments(Writer writer, Yaml yaml) throws IOException {
         writeCommentLine(writer, "This is the configuration file of BungeeTabListPlus");
