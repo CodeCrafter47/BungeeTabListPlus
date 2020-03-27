@@ -43,7 +43,7 @@ public class ExcludedServersTabOverlayProvider extends AbstractTabOverlayProvide
             String server = player.get(BungeeData.BungeeCord_Server);
             shouldBeActive = server == null || btlp.getExcludedServers().contains(server);
             attachedProviders.add(this);
-        }).get();
+        }).sync();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ExcludedServersTabOverlayProvider extends AbstractTabOverlayProvide
         btlp.getMainThreadExecutor().submit(() -> {
             attachedProviders.remove(this);
             player.removeDataChangeListener(BungeeData.BungeeCord_Server, this);
-        }).get();
+        }).sync();
     }
 
     @Override

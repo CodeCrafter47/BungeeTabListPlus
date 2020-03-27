@@ -57,6 +57,16 @@ public class HiddenPlayersManager {
         }
     }
 
+    public List<String> getActiveVanishProviders(BungeePlayer player) {
+        List<String> activeVanishProviders = new ArrayList<>();
+        for (VanishProvider vanishProvider : vanishProviders) {
+            if (Boolean.TRUE.equals(player.get(vanishProvider.dataIsHidden))) {
+                activeVanishProviders.add(vanishProvider.name);
+            }
+        }
+        return activeVanishProviders;
+    }
+
     private class PlayerDataListener implements Runnable {
         private final BungeePlayer player;
 

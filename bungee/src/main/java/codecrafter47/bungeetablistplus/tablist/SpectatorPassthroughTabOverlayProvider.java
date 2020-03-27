@@ -37,7 +37,7 @@ public class SpectatorPassthroughTabOverlayProvider extends AbstractTabOverlayPr
             player.addDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE, this);
             Integer gamemode = player.get(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE);
             shouldBeActive = gamemode != null && gamemode == 3;
-        }).get();
+        }).sync();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SpectatorPassthroughTabOverlayProvider extends AbstractTabOverlayPr
     protected void detach(TabView tabView) {
         btlp.getMainThreadExecutor().submit(() -> {
             player.removeDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE, this);
-        }).get();
+        }).sync();
     }
 
     @Override

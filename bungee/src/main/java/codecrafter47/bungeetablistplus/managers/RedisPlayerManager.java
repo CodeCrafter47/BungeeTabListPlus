@@ -222,7 +222,7 @@ public class RedisPlayerManager implements Listener, PlayerProvider {
                         listeners.forEach(listener -> listener.onPlayerAdded(redisPlayer));
                     }
                 }
-            }).await();
+            }).sync();
         } catch (InterruptedException ignored) {
         }
     }

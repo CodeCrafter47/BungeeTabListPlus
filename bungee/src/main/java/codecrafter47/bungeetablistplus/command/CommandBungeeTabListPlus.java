@@ -49,6 +49,7 @@ public class CommandBungeeTabListPlus extends CommandExecutor {
         addSubCommand(new CommandFakePlayers());
         addSubCommand(new CommandBase("help", null, this::commandHelp, "?"));
         addSubCommand(new CommandBase("status", null, this::commandStatus));
+        addSubCommand(new CommandDebug());
         setDefaultAction(this::commandHelp);
     }
 

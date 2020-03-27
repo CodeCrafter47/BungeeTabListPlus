@@ -73,7 +73,7 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
     @SneakyThrows
     public void setPing(int ping) {
         if (!mainThread.inEventLoop()) {
-            mainThread.submit(() -> setPing(ping)).await();
+            mainThread.submit(() -> setPing(ping)).sync();
             return;
         }
         data.updateValue(BungeeData.BungeeCord_Ping, ping);
@@ -93,7 +93,7 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
     @SneakyThrows
     public void changeServer(ServerInfo newServer) {
         if (!mainThread.inEventLoop()) {
-            mainThread.submit(() -> changeServer(newServer)).await();
+            mainThread.submit(() -> changeServer(newServer)).sync();
             return;
         }
         data.updateValue(BungeeData.BungeeCord_Server, newServer.getName());
@@ -103,7 +103,7 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
     @SneakyThrows
     public void setIcon(Icon icon) {
         if (!mainThread.inEventLoop()) {
-            mainThread.submit(() -> setIcon(icon)).await();
+            mainThread.submit(() -> setIcon(icon)).sync();
             return;
         }
         data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, IconUtil.convert(icon));

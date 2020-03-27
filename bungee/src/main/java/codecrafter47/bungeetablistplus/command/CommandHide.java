@@ -44,7 +44,7 @@ public class CommandHide extends CommandExecutor {
     }
 
     private void commandToggle(ProxiedPlayer player) {
-        BungeeTabListPlus.getInstance().getMainThreadExecutor().submit(() -> {
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().execute(() -> {
             if (isHidden(player)) {
                 unhidePlayer(player);
                 player.sendMessage(ChatUtil.parseBBCode("&aYour name is no longer hidden from the tab list."));
@@ -56,7 +56,7 @@ public class CommandHide extends CommandExecutor {
     }
 
     private void commandHide(ProxiedPlayer player) {
-        BungeeTabListPlus.getInstance().getMainThreadExecutor().submit(() -> {
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().execute(() -> {
             if (isHidden(player)) {
                 player.sendMessage(ChatUtil.parseBBCode("&cYou're already hidden."));
             } else {
@@ -67,7 +67,7 @@ public class CommandHide extends CommandExecutor {
     }
 
     private void commandUnhide(ProxiedPlayer player) {
-        BungeeTabListPlus.getInstance().getMainThreadExecutor().submit(() -> {
+        BungeeTabListPlus.getInstance().getMainThreadExecutor().execute(() -> {
             if (isHidden(player)) {
                 unhidePlayer(player);
                 player.sendMessage(ChatUtil.parseBBCode("&aYour name is no longer hidden from the tab list."));
@@ -79,7 +79,7 @@ public class CommandHide extends CommandExecutor {
 
     private boolean isHidden(ProxiedPlayer player) {
         BungeePlayer bungeePlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
-        return bungeePlayer.get(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND);
+        return Boolean.TRUE.equals(bungeePlayer.get(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND));
     }
 
     private void hidePlayer(ProxiedPlayer player) {

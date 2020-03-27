@@ -61,7 +61,6 @@ import de.codecrafter47.taboverlay.config.platform.Platform;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorGroup;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.MultithreadEventExecutorGroup;
 import lombok.Getter;
 import lombok.val;
@@ -119,6 +118,8 @@ public class BungeeTabListPlus {
     private ServerPlaceholderResolver serverPlaceholderResolver;
 
     private Yaml yaml;
+    @Getter
+    private HiddenPlayersManager hiddenPlayersManager;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -172,7 +173,7 @@ public class BungeeTabListPlus {
     @Getter
     private EventListener listener;
 
-    private Future<?> softReloadTask;
+    private transient boolean scheduledSoftReload;
 
     /**
      * Called when the plugin is enabled
@@ -228,7 +229,7 @@ public class BungeeTabListPlus {
 
         bungeePlayerProvider = new BungeePlayerProvider(mainThreadExecutor);
 
-        HiddenPlayersManager hiddenPlayersManager = new HiddenPlayersManager();
+        hiddenPlayersManager = new HiddenPlayersManager();
         hiddenPlayersManager.addVanishProvider("/btlp hide", BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND);
         hiddenPlayersManager.addVanishProvider("config.yml (hiddenPlayers)", BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_CONFIG);
         hiddenPlayersManager.addVanishProvider("config.yml (hiddenServers)", BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN_SERVER_CONFIG);
@@ -474,13 +475,14 @@ public class BungeeTabListPlus {
     }
 
     public void scheduleSoftReload() {
-        if (softReloadTask == null) {
-            softReloadTask = asyncExecutor.submit(this::softReload);
+        if (!scheduledSoftReload) {
+            scheduledSoftReload = true;
+            asyncExecutor.execute(this::softReload);
         }
     }
 
     private void softReload() {
-        softReloadTask = null;
+        scheduledSoftReload = false;
         configTabOverlayManager.refreshConfigs();
 
         // this is a good time to save the cache

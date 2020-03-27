@@ -190,7 +190,7 @@ public class FakePlayerManagerImpl implements FakePlayerManager, PlayerProvider 
     @SneakyThrows
     public void removeFakePlayer(codecrafter47.bungeetablistplus.api.bungee.tablist.FakePlayer fakePlayer) {
         if (!mainThread.inEventLoop()) {
-            mainThread.submit(() -> removeFakePlayer(fakePlayer)).get();
+            mainThread.submit(() -> removeFakePlayer(fakePlayer)).sync();
             return;
         }
         FakePlayer player = (FakePlayer) fakePlayer;
