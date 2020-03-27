@@ -21,6 +21,7 @@ package codecrafter47.bungeetablistplus.listener;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
+import codecrafter47.bungeetablistplus.tablist.SpectatorPassthroughTabOverlayProvider;
 import de.codecrafter47.taboverlay.TabView;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.Server;
@@ -45,6 +46,9 @@ public class TabListListener implements Listener {
             BungeePlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
             TabView tabView = btlp.getTabViewManager().onPlayerJoin(e.getPlayer());
             tabView.getTabOverlayProviders().addProvider(new ExcludedServersTabOverlayProvider(player, btlp));
+            if (btlp.getConfig().disableCustomTabListForSpectators) {
+                tabView.getTabOverlayProviders().addProvider(new SpectatorPassthroughTabOverlayProvider(player, btlp));
+            }
             btlp.getListener().onTabViewAdded(tabView, player);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);

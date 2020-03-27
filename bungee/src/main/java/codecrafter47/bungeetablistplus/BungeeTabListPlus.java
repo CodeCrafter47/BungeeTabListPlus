@@ -33,9 +33,11 @@ import codecrafter47.bungeetablistplus.placeholder.GlobalServerPlaceholderResolv
 import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerCountPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
+import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.JoinedPlayerProvider;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
+import codecrafter47.bungeetablistplus.tablist.SpectatorPassthroughTabOverlayProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.ExceptionHandlingEventExecutor;
@@ -48,6 +50,7 @@ import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
+import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.ComponentSpec;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
@@ -65,6 +68,7 @@ import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
 import org.yaml.snakeyaml.Yaml;
@@ -429,6 +433,7 @@ public class BungeeTabListPlus {
     public boolean reload() {
         fakePlayerManagerImpl.removeConfigFakePlayers();
 
+        Boolean disableCustomTabListForSpectatorsOld = config.disableCustomTabListForSpectators;
         if (readMainConfig()) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config");
             return false;
@@ -442,6 +447,28 @@ public class BungeeTabListPlus {
             fakePlayerManagerImpl.reload();
 
             serverStateManager.updateConfig(config);
+
+            if (disableCustomTabListForSpectatorsOld != config.disableCustomTabListForSpectators) {
+                if (config.disableCustomTabListForSpectators) {
+                    for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
+                        TabView tabView = tabViewManager.getTabView(player);
+                        BungeePlayer bungeePlayer = bungeePlayerProvider.getPlayerIfPresent(player);
+                        if (tabView != null && bungeePlayer != null) {
+                            try {
+                                tabView.getTabOverlayProviders().addProvider(new SpectatorPassthroughTabOverlayProvider(bungeePlayer, this));
+                            } catch (IllegalArgumentException ignored) {
+                            }
+                        }
+                    }
+                } else {
+                    for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
+                        TabView tabView = tabViewManager.getTabView(player);
+                        if (tabView != null) {
+                            tabView.getTabOverlayProviders().removeProviders(SpectatorPassthroughTabOverlayProvider.class);
+                        }
+                    }
+                }
+            }
             return true;
         }
     }

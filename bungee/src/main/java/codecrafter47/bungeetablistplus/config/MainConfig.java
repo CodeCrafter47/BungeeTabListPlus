@@ -94,6 +94,14 @@ public class MainConfig implements UpdateableConfig {
         return TimeZone.getTimeZone(time_zone);
     }
 
+    @Comment({
+            "Disables the custom tab list for players in spectators mode.",
+            "As a result those players will see the vanilla tab list of the server.",
+            "If you do not use this option players in spectator mode will see the ",
+            "fake players created by BungeeTabListPlus in the teleport menu."
+    })
+    public boolean disableCustomTabListForSpectators = true;
+
     public transient boolean needWrite = false;
 
     @Override
@@ -122,6 +130,9 @@ public class MainConfig implements UpdateableConfig {
             YamlUtil.remove(node, option);
         }
 
+        if (!YamlUtil.contains(node, "disableCustomTabListForSpectators")) {
+            needWrite = true;
+        }
     }
 
     public void writeWithComments(Writer writer, Yaml yaml) throws IOException {
