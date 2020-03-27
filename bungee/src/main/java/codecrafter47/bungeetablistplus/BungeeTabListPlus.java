@@ -239,6 +239,7 @@ public class BungeeTabListPlus {
         hiddenPlayersManager.addVanishProvider("CMI", BukkitData.CMI_IsVanished);
         hiddenPlayersManager.addVanishProvider("Essentials", BukkitData.Essentials_IsVanished);
         hiddenPlayersManager.addVanishProvider("ProxySuite", BungeeData.ProxyCore_IsHidden);
+        hiddenPlayersManager.addVanishProvider("ProtocolVanish", BukkitData.ProtocolVanish_IsVanished);
         hiddenPlayersManager.enable();
 
         fakePlayerManagerImpl = new FakePlayerManagerImpl(plugin, iconManager, mainThreadExecutor);
