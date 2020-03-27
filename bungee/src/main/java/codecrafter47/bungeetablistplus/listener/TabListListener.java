@@ -59,6 +59,7 @@ public class TabListListener implements Listener {
     public void onPlayerDisconnect(PlayerDisconnectEvent e) {
         try {
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
+            tabView.deactivate();
             btlp.getListener().onTabViewRemoved(tabView);
             btlp.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
 
