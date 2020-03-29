@@ -47,12 +47,12 @@ public class LowMemoryTabOverlayHandlerImpl extends TabOverlayHandlerImpl {
     }
 
     @Override
-    public void onServerSwitch() {
+    public void onServerSwitch(boolean is13OrLater) {
         if (!WaterfallCompat.isDisableEntityMetadataRewrite()) {
             for (String team : serverTeams.keySet()) {
                 sendPacket(new Team(team));
             }
         }
-        super.onServerSwitch();
+        super.onServerSwitch(is13OrLater);
     }
 }

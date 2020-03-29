@@ -55,7 +55,7 @@ public class AbstractTabListLogicTestBase {
         clientTabList = new ClientTabList();
         tabListHandler = new MockTabListLogic(clientTabList);
         tabListHandler.onConnected();
-        tabListHandler.onServerSwitch();
+        tabListHandler.onServerSwitch(true);
     }
 
     @After
@@ -401,9 +401,9 @@ public class AbstractTabListLogicTestBase {
         }
 
         @Override
-        public void onServerSwitch() {
+        public void onServerSwitch(boolean is13OrLater) {
             validateConstraints();
-            tabOverlayHandler.onServerSwitch();
+            tabOverlayHandler.onServerSwitch(is13OrLater);
             serverTabList.clear();
             validateConstraints();
         }

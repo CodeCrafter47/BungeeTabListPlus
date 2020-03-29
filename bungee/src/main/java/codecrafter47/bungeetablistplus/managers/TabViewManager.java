@@ -107,7 +107,7 @@ public class TabViewManager implements Listener {
 
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "btlp-packet-listener", packetListener);
 
-            packetHandler.onServerSwitch();
+            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
 
         } catch (Exception ex) {
             btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);

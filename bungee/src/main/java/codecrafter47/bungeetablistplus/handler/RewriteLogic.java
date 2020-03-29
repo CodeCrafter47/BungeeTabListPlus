@@ -96,9 +96,9 @@ public class RewriteLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public void onServerSwitch() {
+    public void onServerSwitch(boolean is13OrLater) {
         rewriteMap.clear();
 
-        super.onServerSwitch();
+        super.onServerSwitch(is13OrLater);
     }
 }

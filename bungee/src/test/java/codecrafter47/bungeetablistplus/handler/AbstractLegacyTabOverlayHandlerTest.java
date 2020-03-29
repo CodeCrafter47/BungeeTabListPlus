@@ -145,7 +145,7 @@ public class AbstractLegacyTabOverlayHandlerTest {
         assertEquals("PlayerB", clientTabList.players.get(1));
         assertEquals((Object) 15, clientTabList.ping.get("PlayerB"));
 
-        tabListHandler.onServerSwitch();
+        tabListHandler.onServerSwitch(true);
 
         assertEquals(0, clientTabList.players.size());
 
@@ -179,7 +179,7 @@ public class AbstractLegacyTabOverlayHandlerTest {
 
         assertEquals(0, clientTabList.players.size());
 
-        tabListHandler.onServerSwitch();
+        tabListHandler.onServerSwitch(true);
 
         assertEquals(0, clientTabList.players.size());
 
@@ -318,8 +318,8 @@ public class AbstractLegacyTabOverlayHandlerTest {
         }
 
         @Override
-        public void onServerSwitch() {
-            super.onServerSwitch();
+        public void onServerSwitch(boolean is13OrLater) {
+            super.onServerSwitch(is13OrLater);
         }
     }
 

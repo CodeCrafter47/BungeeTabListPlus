@@ -59,9 +59,9 @@ public class TabListHandler implements PacketHandler {
     }
 
     @Override
-    public void onServerSwitch() {
+    public void onServerSwitch(boolean is13OrLater) {
         if (parent != null) {
-            parent.onServerSwitch();
+            parent.onServerSwitch(is13OrLater);
         }
     }
 

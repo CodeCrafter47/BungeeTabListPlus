@@ -33,10 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
@@ -174,7 +171,7 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
                             tabListHandler.onTeamPacket(gson.fromJson(tokens[1], net.md_5.bungee.protocol.packet.Team.class));
                             break;
                         case "serverSwitch":
-                            tabListHandler.onServerSwitch();
+                            tabListHandler.onServerSwitch(true);
                             break;
                         case "passThrough":
                             assertTrue(connected);

@@ -884,7 +884,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
             assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
         }
 
-        tabListHandler.onServerSwitch();
+        tabListHandler.onServerSwitch(true);
 
         tabListHandler.onPlayerListPacket(packet);
         tabListHandler.setSize(60);

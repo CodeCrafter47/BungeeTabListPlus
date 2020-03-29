@@ -31,5 +31,5 @@ public interface PacketHandler {
 
     PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet);
 
-    void onServerSwitch();
+    void onServerSwitch(boolean is13OrLater);
 }

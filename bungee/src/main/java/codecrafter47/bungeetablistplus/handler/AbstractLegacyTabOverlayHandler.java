@@ -150,7 +150,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     @Override
-    public void onServerSwitch() {
+    public void onServerSwitch(boolean is13OrLater) {
         this.activeHandler.onServerSwitch();
         serverPlayerList.clear();
     }

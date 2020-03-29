@@ -53,7 +53,7 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     }
 
     @Override
-    public void onServerSwitch() {
-        parent.onServerSwitch();
+    public void onServerSwitch(boolean is13OrLater) {
+        parent.onServerSwitch(is13OrLater);
     }
 }

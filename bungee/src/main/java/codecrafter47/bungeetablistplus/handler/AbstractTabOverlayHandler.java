@@ -199,7 +199,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private final Runnable updateTask = this::update;
 
     private final boolean is18;
-    private final boolean is13OrLater;
+    private boolean is13OrLater;
     protected boolean active;
 
     public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is18, boolean is13OrLater) {
@@ -372,7 +372,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     }
 
     @Override
-    public void onServerSwitch() {
+    public void onServerSwitch(boolean is13OrLater) {
+        this.is13OrLater = is13OrLater;
         if (!active) {
             active = true;
             update();
