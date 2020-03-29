@@ -102,9 +102,8 @@ public class TabViewManager implements Listener {
 
             ChannelWrapper wrapper = server.getCh();
 
-            int version = player.getPendingConnection().getVersion();
             PacketHandler packetHandler = tabView.packetHandler;
-            PacketListener packetListener = new PacketListener(server, packetHandler, version);
+            PacketListener packetListener = new PacketListener(server, packetHandler, player);
 
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "btlp-packet-listener", packetListener);
 

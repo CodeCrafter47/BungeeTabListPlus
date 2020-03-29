@@ -23,9 +23,8 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.ServerConnection;
-import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
@@ -35,39 +34,40 @@ import java.util.List;
 public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
     private final ServerConnection connection;
     private final PacketHandler handler;
-    private final int protocolVersion;
+    private final ProxiedPlayer player;
 
-    public PacketListener(ServerConnection connection, PacketHandler handler, int protocolVersion) {
+    public PacketListener(ServerConnection connection, PacketHandler handler, ProxiedPlayer player) {
         this.connection = connection;
         this.handler = handler;
-        this.protocolVersion = protocolVersion;
+        this.player = player;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, PacketWrapper packetWrapper, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, PacketWrapper packetWrapper, List<Object> out) {
         boolean shouldRelease = true;
         try {
             if (!connection.isObsolete()) {
                 if (packetWrapper.packet != null) {
 
                     PacketListenerResult result = PacketListenerResult.PASS;
+                    boolean handled = false;
 
                     if (packetWrapper.packet instanceof Team) {
                         result = handler.onTeamPacket((Team) packetWrapper.packet);
+                        handled = true;
                     } else if (packetWrapper.packet instanceof PlayerListItem) {
                         result = handler.onPlayerListPacket((PlayerListItem) packetWrapper.packet);
+                        handled = true;
                     } else if (packetWrapper.packet instanceof PlayerListHeaderFooter) {
                         result = handler.onPlayerListHeaderFooterPacket((PlayerListHeaderFooter) packetWrapper.packet);
+                        handled = true;
                     }
 
-                    if (result == PacketListenerResult.CANCEL) {
+                    if (handled) {
+                        if (result != PacketListenerResult.CANCEL) {
+                            player.unsafe().sendPacket(packetWrapper.packet);
+                        }
                         return;
-                    } else if (result == PacketListenerResult.MODIFIED) {
-                        int readerIndex = packetWrapper.buf.readerIndex();
-                        DefinedPacket.readVarInt(packetWrapper.buf);
-                        packetWrapper.buf.writerIndex(packetWrapper.buf.readerIndex());
-                        packetWrapper.packet.write(packetWrapper.buf, ProtocolConstants.Direction.TO_CLIENT, protocolVersion);
-                        packetWrapper.buf.readerIndex(readerIndex);
                     }
                 }
             }
