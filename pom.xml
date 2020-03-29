@@ -10,6 +10,7 @@
     <modules>
         <module>bungee</module>
         <module>bungee_compat</module>
+        <module>waterfall_compat</module>
         <module>bukkit</module>
         <module>common</module>
         <module>bootstrap-bungee</module>

@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.bungeetablistplus.bungee.compat.PacketUtil;
+import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.handler.*;
@@ -375,50 +376,57 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         if (!active) {
             active = true;
             update();
-        }
-        try {
-            this.activeContentHandler.onServerSwitch();
-        } catch (Throwable th) {
-            logger.log(Level.SEVERE, "Unexpected error", th);
-            // try recover
-            enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
-        }
-        try {
-            this.activeHeaderFooterHandler.onServerSwitch();
-        } catch (Throwable th) {
-            logger.log(Level.SEVERE, "Unexpected error", th);
-            // try recover
-            enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
-        }
+        } else {
 
-        if (!serverPlayerList.isEmpty()) {
-            PlayerListItem packet = new PlayerListItem();
-            packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
+            serverTeams.clear();
+            playerToTeamMap.clear();
 
-            PlayerListItem.Item[] items = new PlayerListItem.Item[serverPlayerList.size()];
-            Iterator<UUID> iterator = serverPlayerList.keySet().iterator();
-            for (int i = 0; i < items.length; i++) {
-                PlayerListItem.Item item = new PlayerListItem.Item();
-                item.setUuid(iterator.next());
-                items[i] = item;
+            if (WaterfallCompat.isDisableEntityMetadataRewrite()) {
+                hasCreatedCustomTeams = false;
+                areCustomSlotUsersPartOfTeams = false;
             }
 
-            packet.setItems(items);
-            sendPacket(packet);
-        }
+            try {
+                this.activeContentHandler.onServerSwitch();
+            } catch (Throwable th) {
+                logger.log(Level.SEVERE, "Unexpected error", th);
+                // try recover
+                enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
+            }
+            try {
+                this.activeHeaderFooterHandler.onServerSwitch();
+            } catch (Throwable th) {
+                logger.log(Level.SEVERE, "Unexpected error", th);
+                // try recover
+                enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
+            }
 
-        serverTeams.clear();
-        playerToTeamMap.clear();
+            if (!serverPlayerList.isEmpty()) {
+                PlayerListItem packet = new PlayerListItem();
+                packet.setAction(PlayerListItem.Action.REMOVE_PLAYER);
 
-        serverPlayerList.clear();
-        if (serverHeader != null) {
-            serverHeader = EMPTY_JSON_TEXT;
-        }
-        if (serverFooter != null) {
-            serverFooter = EMPTY_JSON_TEXT;
-        }
+                PlayerListItem.Item[] items = new PlayerListItem.Item[serverPlayerList.size()];
+                Iterator<UUID> iterator = serverPlayerList.keySet().iterator();
+                for (int i = 0; i < items.length; i++) {
+                    PlayerListItem.Item item = new PlayerListItem.Item();
+                    item.setUuid(iterator.next());
+                    items[i] = item;
+                }
 
-        serverTabListPlayers.clear();
+                packet.setItems(items);
+                sendPacket(packet);
+            }
+
+            serverPlayerList.clear();
+            if (serverHeader != null) {
+                serverHeader = EMPTY_JSON_TEXT;
+            }
+            if (serverFooter != null) {
+                serverFooter = EMPTY_JSON_TEXT;
+            }
+
+            serverTabListPlayers.clear();
+        }
     }
 
     @Override
@@ -1174,6 +1182,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         void onServerSwitch() {
+            boolean disableEntityMetadataRewrite = WaterfallCompat.isDisableEntityMetadataRewrite();
+
+            if (disableEntityMetadataRewrite) {
+                createTeamsIfNecessary();
+            }
+
             if (!using80Slots) {
                 T tabOverlay = getTabOverlay();
 
@@ -1182,13 +1196,15 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     if (slotState[index] == SlotState.PLAYER) {
                         // Switch slot 'index' from player to custom mode
 
-                        // 1. remove player from team
-                        sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
-                        // reset slot team
-                        if (is13OrLater) {
-                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                        } else {
-                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
+                        if (!disableEntityMetadataRewrite) {
+                            // 1. remove player from team
+                            sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
+                            // reset slot team
+                            if (is13OrLater) {
+                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
+                            } else {
+                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
+                            }
                         }
 
                         // 2. create new custom slot
@@ -1267,21 +1283,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         sendPacket(packet);
                     }
                 }
+                createTeamsIfNecessary();
 
-                // create teams if not already created
-                if (!hasCreatedCustomTeams) {
-                    hasCreatedCustomTeams = true;
-
-                    for (int i = 0; i < 81; i++) {
-                        if (is13OrLater) {
-                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
-                        } else {
-                            sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
-                        }
-                    }
-
-                    areCustomSlotUsersPartOfTeams = true;
-                }
             }
 
             if (!using80Slots) {
@@ -1296,6 +1299,23 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     }
                     getTabOverlay().dirtyFlagSize = true;
                 }
+            }
+        }
+
+        private void createTeamsIfNecessary() {
+            // create teams if not already created
+            if (!hasCreatedCustomTeams) {
+                hasCreatedCustomTeams = true;
+
+                for (int i = 0; i < 81; i++) {
+                    if (is13OrLater) {
+                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                    } else {
+                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                    }
+                }
+
+                areCustomSlotUsersPartOfTeams = true;
             }
         }
 

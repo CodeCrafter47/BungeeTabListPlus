@@ -156,4 +156,11 @@ public class BitSet {
             this.array[i] |= (a.array[i] ^ b.array[i]);
         }
     }
+
+    public void or(BitSet a) {
+        Preconditions.checkArgument(a.size == this.size);
+        for (int i = 0; i < this.array.length; i++) {
+            this.array[i] |= a.array[i];
+        }
+    }
 }
