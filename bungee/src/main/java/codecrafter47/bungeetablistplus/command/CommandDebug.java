@@ -5,23 +5,33 @@ import codecrafter47.bungeetablistplus.command.util.CommandBase;
 import codecrafter47.bungeetablistplus.command.util.CommandExecutor;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
+import io.netty.channel.ChannelHandler;
+import lombok.SneakyThrows;
 import lombok.val;
+import net.md_5.bungee.ServerConnection;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import static codecrafter47.bungeetablistplus.command.util.CommandBase.playerCommand;
 
 public class CommandDebug extends CommandExecutor {
 
     public CommandDebug() {
         super("debug", "bungeetablistplus.admin");
         addSubCommand(new CommandBase("hidden", null, this::commandHidden));
+        addSubCommand(new CommandBase("pipeline", null, playerCommand(this::commandPipeline)));
     }
 
     private void commandHidden(CommandSender sender, String[] args) {
@@ -73,5 +83,23 @@ public class CommandDebug extends CommandExecutor {
                     }, 1, TimeUnit.SECONDS);
                 });
 
+    }
+
+    @SneakyThrows
+    private void commandPipeline(ProxiedPlayer player) {
+        UserConnection userConnection = (UserConnection) player;
+        List<String> userPipeline = new ArrayList<>();
+        for (Map.Entry<String, ChannelHandler> entry : ReflectionUtil.getChannelWrapper(userConnection).getHandle().pipeline()) {
+            userPipeline.add(entry.getKey());
+        }
+
+        ServerConnection serverConnection = userConnection.getServer();
+        List<String> serverPipeline = new ArrayList<>();
+        for (Map.Entry<String, ChannelHandler> entry : serverConnection.getCh().getHandle().pipeline()) {
+            serverPipeline.add(entry.getKey());
+        }
+
+        player.sendMessage(ChatUtil.parseBBCode("&bUser: &f" + Joiner.on(", ").join(userPipeline) + "\n" +
+                "&bServer: &f" + Joiner.on(", ").join(serverPipeline)));
     }
 }
