@@ -1158,6 +1158,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 switch (packet.getMode()) {
                     case 0:
                     case 3:
+                        /*
+                        // Don't need this. Adding the player to another team will remove him from the current one.
                         String[] players = packet.getPlayers();
                         for (int i = 0; i < players.length; i++) {
                             String playerName = players[i];
@@ -1165,10 +1167,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 // remove player from overflow team
                                 sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
                             }
-                        }
+                        }*/
                         break;
                     case 4:
-                        players = packet.getPlayers();
+                        String[] players = packet.getPlayers();
                         for (int i = 0; i < players.length; i++) {
                             String playerName = players[i];
                             if (serverTabListPlayers.contains(playerName)) {
