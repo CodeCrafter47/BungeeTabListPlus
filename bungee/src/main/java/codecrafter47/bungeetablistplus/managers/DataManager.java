@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DataManager implements Listener {
@@ -59,6 +60,7 @@ public class DataManager implements Listener {
     private final HiddenPlayersManager hiddenPlayersManager;
     private final ServerStateManager serverStateManager;
     private final BukkitBridge bukkitBridge;
+    private final Logger logger;
 
     private final DataAccess<ProxiedPlayer> playerDataAccess;
     private final DataAccess<String> serverDataAccess;
@@ -86,8 +88,9 @@ public class DataManager implements Listener {
                 new LocalPlayerDataAccess(plugin, logger));
         this.serverDataAccess = new LocalServerDataAccess(plugin, logger);
         this.proxyDataAccess = new ProxyDataAccess(plugin, logger);
+        this.logger = logger;
 
-        ProxyServer.getInstance().getScheduler().schedule(plugin, this::updateData, 1, 1, TimeUnit.SECONDS);
+        mainThreadExecutor.schedule(this::updateData, 1, TimeUnit.SECONDS);
     }
 
     public LocalDataCache createDataCacheForPlayer(BungeePlayer player) {
@@ -109,32 +112,35 @@ public class DataManager implements Listener {
     }
 
     private void updateData() {
-        for (BungeePlayer player : bungeePlayerProvider.getPlayers()) {
-            for (DataKey<?> dataKey : player.getLocalDataCache().getActiveKeys()) {
-                if (playerDataAccess.provides(dataKey)) {
-                    DataKey<Object> key = Unchecked.cast(dataKey);
-                    updateIfNecessary(player.getLocalDataCache(), key, playerDataAccess.get(key, player.getPlayer()));
+        try {
+            for (BungeePlayer player : bungeePlayerProvider.getPlayers()) {
+                for (DataKey<?> dataKey : player.getLocalDataCache().getActiveKeys()) {
+                    if (playerDataAccess.provides(dataKey)) {
+                        DataKey<Object> key = Unchecked.cast(dataKey);
+                        updateIfNecessary(player.getLocalDataCache(), key, playerDataAccess.get(key, player.getPlayer()));
+                    }
                 }
             }
-        }
-        for (Map.Entry<String, TrackingDataCache> entry : serverData.entrySet()) {
-            String serverName = entry.getKey();
-            TrackingDataCache dataCache = entry.getValue();
-            for (DataKey<?> dataKey : dataCache.getActiveKeys()) {
-                DataKey<Object> key = Unchecked.cast(dataKey);
-                updateIfNecessary(dataCache, key, serverDataAccess.get(key, serverName));
+            for (Map.Entry<String, TrackingDataCache> entry : serverData.entrySet()) {
+                String serverName = entry.getKey();
+                TrackingDataCache dataCache = entry.getValue();
+                for (DataKey<?> dataKey : dataCache.getActiveKeys()) {
+                    DataKey<Object> key = Unchecked.cast(dataKey);
+                    updateIfNecessary(dataCache, key, serverDataAccess.get(key, serverName));
+                }
             }
+            for (DataKey<?> dataKey : proxyData.getActiveKeys()) {
+                DataKey<Object> key = Unchecked.cast(dataKey);
+                updateIfNecessary(proxyData, key, proxyDataAccess.get(key, BungeeCord.getInstance()));
+            }
+        } catch (Throwable th) {
+            logger.log(Level.SEVERE, "Unexpected exception:" + th.getMessage(), th);
         }
-        for (DataKey<?> dataKey : proxyData.getActiveKeys()) {
-            DataKey<Object> key = Unchecked.cast(dataKey);
-            updateIfNecessary(proxyData, key, proxyDataAccess.get(key, BungeeCord.getInstance()));
-        }
-
     }
 
     private <T> void updateIfNecessary(DataCache data, DataKey<T> key, T value) {
         if (!Objects.equals(data.get(key), value)) {
-            mainThreadExecutor.execute(() -> data.updateValue(key, value));
+            data.updateValue(key, value);
         }
     }
 
