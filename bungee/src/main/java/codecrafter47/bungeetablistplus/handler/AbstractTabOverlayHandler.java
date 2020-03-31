@@ -1166,6 +1166,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{playerName}));
                             }
                         }
+                        break;
                     case 4:
                         players = packet.getPlayers();
                         for (int i = 0; i < players.length; i++) {
