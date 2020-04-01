@@ -22,19 +22,19 @@ package codecrafter47.bungeetablistplus.managers;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
 import io.netty.util.concurrent.EventExecutor;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BungeePlayerProvider implements PlayerProvider {
 
     private final EventExecutor mainThread;
 
-    private Map<ProxiedPlayer, BungeePlayer> players = new Reference2ReferenceOpenHashMap<>();
+    private Map<ProxiedPlayer, BungeePlayer> players = new ConcurrentHashMap<>();
     private Set<Listener> listeners = new ReferenceOpenHashSet<>();
 
     public BungeePlayerProvider(EventExecutor mainThread) {
