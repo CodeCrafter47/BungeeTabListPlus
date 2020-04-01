@@ -55,7 +55,7 @@ public class AbstractTabListLogicTestBase {
         clientTabList = new ClientTabList();
         tabListHandler = new MockTabListLogic(clientTabList);
         tabListHandler.onConnected();
-        tabListHandler.onServerSwitch(true);
+        tabListHandler.onServerSwitch(false);
     }
 
     @After

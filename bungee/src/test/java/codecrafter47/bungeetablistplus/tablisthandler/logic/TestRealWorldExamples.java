@@ -171,7 +171,7 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
                             tabListHandler.onTeamPacket(gson.fromJson(tokens[1], net.md_5.bungee.protocol.packet.Team.class));
                             break;
                         case "serverSwitch":
-                            tabListHandler.onServerSwitch(true);
+                            tabListHandler.onServerSwitch(false);
                             break;
                         case "passThrough":
                             assertTrue(connected);

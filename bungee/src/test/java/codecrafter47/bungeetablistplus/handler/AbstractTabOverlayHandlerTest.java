@@ -734,7 +734,7 @@ public class AbstractTabOverlayHandlerTest {
             assertEquals("", clientTabList.teams.get(clientTabList.playerToTeamMap.get(usernames[i])).getPrefix());
         }
 
-        tabOverlayHandler.onServerSwitch(true);
+        tabOverlayHandler.onServerSwitch(false);
 
         tabOverlayHandler.onPlayerListPacket(packet);
 
@@ -948,7 +948,7 @@ public class AbstractTabOverlayHandlerTest {
         assertEquals(uuids[48], clientTabList.getVisibleEntries().get(0).getUuid());
         assertEquals(uuids[47], clientTabList.getVisibleEntries().get(1).getUuid());
 
-        tabOverlayHandler.onServerSwitch(true);
+        tabOverlayHandler.onServerSwitch(false);
 
         assertEquals(2, clientTabList.getSize());
         assertEquals("A", clientTabList.getText(0));
