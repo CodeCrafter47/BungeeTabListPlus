@@ -1616,6 +1616,13 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 if (slotUuid[index].version() != 2) { // dirty hack for Citizens compatibility
                                     sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
                                     playerUsernameToSlotMap.removeInt(slotUsername[index]);
+
+                                    // reset slot team
+                                    if (is13OrLater) {
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
+                                    } else {
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
+                                    }
                                 }
 
                                 // 2. update slot state
@@ -1634,6 +1641,13 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     if (slotUuid[index].version() != 2) { // dirty hack for Citizens compatibility
                                         sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
                                         playerUsernameToSlotMap.removeInt(slotUsername[index]);
+
+                                        // reset slot team
+                                        if (is13OrLater) {
+                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
+                                        } else {
+                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
+                                        }
                                     }
 
                                     freePlayers.add(slotUuid[index]);
