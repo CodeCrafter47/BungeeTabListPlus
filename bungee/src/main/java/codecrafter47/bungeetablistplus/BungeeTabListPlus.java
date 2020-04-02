@@ -342,6 +342,7 @@ public class BungeeTabListPlus {
 
     private void updateTimeZoneAndGlobalCustomPlaceholders() {
         configTabOverlayManager.setTimeZone(config.getTimeZone());
+
         if (config.customPlaceholders != null) {
             val customPlaceholders = new HashMap<String, CustomPlaceholderConfiguration>();
             for (val entry : config.customPlaceholders.entrySet()) {
@@ -349,8 +350,8 @@ public class BungeeTabListPlus {
                     customPlaceholders.put(entry.getKey(), entry.getValue());
                 }
             }
+            configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
         }
-        configTabOverlayManager.setGlobalCustomPlaceholders(customPlaceholders);
     }
 
     private void updateExcludedAndHiddenServerLists() {
