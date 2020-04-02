@@ -6,6 +6,7 @@ import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.util.ContextAwareOrdering;
 import codecrafter47.bungeetablistplus.util.EmptyPlayerSet;
 import de.codecrafter47.data.api.DataHolder;
+import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
 import de.codecrafter47.taboverlay.config.player.PlayerSet;
@@ -36,11 +37,14 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
     private final Runnable onlineStateUpdateListener = this::updateOnlineServers;
     private List<String> servers;
 
-    public PlayersByServerComponentView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory, Set<String> hiddenServers, PlayersByServerComponentConfiguration.ServerOptions showServers, ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator) {
+    private final boolean prioritizeViewerServer;
+
+    public PlayersByServerComponentView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory, Set<String> hiddenServers, PlayersByServerComponentConfiguration.ServerOptions showServers, ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator, boolean prioritizeViewerServer) {
         super(columns, playerSetTemplate, playerComponentTemplate, playerComponentSize, morePlayerComponentTemplate, morePlayerComponentSize, playerOrderTemplate, defaultTextTemplate, defaultPingTemplate, defaultIconTemplate, partitionFunction, sectionHeader, sectionFooter, sectionSeparator, minSizePerSection, maxSizePerSection, sectionContextFactory);
         this.hiddenServers = hiddenServers;
         this.showServers = showServers;
         this.serverComparator = serverComparator;
+        this.prioritizeViewerServer = prioritizeViewerServer;
     }
 
     @Override
@@ -214,5 +218,19 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
             }
         }
         super.updateLayoutRequirements(notify);
+    }
+
+    @Override
+    protected int getInitialSizeEstimate(ComponentView componentView) {
+        int initialSize = super.getInitialSizeEstimate(componentView);
+        if (prioritizeViewerServer) {
+            String server = getContext().getViewer().get(BungeeData.BungeeCord_Server);
+            if (server != null && componentView == sectionMap.get(server)) {
+                int preferredSize = componentView.getPreferredSize();
+                preferredSize = Integer.min(preferredSize, getArea().getSize() - minSize + initialSize);
+                initialSize = Integer.max(initialSize, preferredSize);
+            }
+        }
+        return initialSize;
     }
 }

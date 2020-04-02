@@ -61,6 +61,7 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
 
     private MarkedStringProperty serverOrder = null;
     private Map<String, Integer> customServerOrder = null;
+    private boolean prioritizeViewerServer = true;
 
     public List<String> getCustomServerOrder() {
         // dummy method for snakeyaml to detect property type
@@ -202,6 +203,7 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
                 .hiddenServers(ImmutableSet.copyOf(hiddenServers))
                 .showServers(showServers)
                 .serverComparator(serverComparator)
+                .prioritizeViewerServer(prioritizeViewerServer)
                 .build();
     }
 

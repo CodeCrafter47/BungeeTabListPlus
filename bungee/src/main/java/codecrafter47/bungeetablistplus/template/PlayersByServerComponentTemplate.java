@@ -27,35 +27,35 @@ import java.util.Set;
 @Value
 @Builder
 public class PlayersByServerComponentTemplate implements ComponentTemplate {
-    private PlayerSetTemplate playerSet;
+    PlayerSetTemplate playerSet;
 
-    private PlayerSetFactory playerSetFactory;
+    PlayerSetFactory playerSetFactory;
 
-    private PlayerOrderTemplate playerOrder;
+    PlayerOrderTemplate playerOrder;
 
-    private ComponentTemplate playerComponent;
+    ComponentTemplate playerComponent;
 
     @NonNull
     @Nonnull
-    private ComponentTemplate morePlayersComponent;
+    ComponentTemplate morePlayersComponent;
 
     @Nullable
-    private ComponentTemplate serverHeader;
+    ComponentTemplate serverHeader;
 
     @Nullable
-    private ComponentTemplate serverFooter;
+    ComponentTemplate serverFooter;
 
     @Nullable
-    private ComponentTemplate serverSeparator;
+    ComponentTemplate serverSeparator;
 
-    private boolean fillSlotsVertical;
+    boolean fillSlotsVertical;
     int minSize;
     /* A value of -1 indicates no limit. */
     int maxSize;
     int minSizePerServer;
     /* A value of -1 indicates no limit. */
     int maxSizePerServer;
-    private int columns;
+    int columns;
 
     TextTemplate defaultText;
     PingTemplate defaultPing;
@@ -67,6 +67,8 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
     PlayersByServerComponentConfiguration.ServerOptions showServers;
     @Nullable
     ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator;
+
+    boolean prioritizeViewerServer;
 
     @Override
     public LayoutInfo getLayoutInfo() {
@@ -84,7 +86,7 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
             child.setCustomObject(BTLPContextKeys.SERVER_ID, sectionId);
             child.setCustomObject(BTLPContextKeys.SERVER_PLAYER_SET, playerSet1);
             return child;
-        }, hiddenServers, showServers, serverComparator),
+        }, hiddenServers, showServers, serverComparator, prioritizeViewerServer),
                 fillSlotsVertical, minSize, maxSize, columns, false);
     }
 }
