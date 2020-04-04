@@ -22,6 +22,7 @@ package de.codecrafter47.bungeetablistplus.demo;
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
+import codecrafter47.bungeetablistplus.api.bungee.Variable;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -44,6 +45,18 @@ public class DemoPlugin extends Plugin {
 
     private CustomTablist customTablist;
     private Icon icon = Icon.DEFAULT;
+
+    @Override
+    public void onLoad() {
+
+        // variables should be registered in onLoad to avoid warnings when BTLP loads your config files
+        BungeeTabListPlusAPI.registerVariable(this, new Variable("uppercase_name") {
+            @Override
+            public String getReplacement(ProxiedPlayer player) {
+                return player.getName().toUpperCase();
+            }
+        });
+    }
 
     @Override
     public void onEnable() {

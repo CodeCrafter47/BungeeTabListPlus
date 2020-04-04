@@ -26,7 +26,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 public class BungeePlugin extends Plugin {
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         if (Float.parseFloat(System.getProperty("java.class.version")) < 52.0) {
             getLogger().severe("§cBungeeTabListPlus requires Java 8 or above. Please download and install it!");
             getLogger().severe("Disabling plugin!");
@@ -37,12 +37,17 @@ public class BungeePlugin extends Plugin {
                 proxiedPlayer.disconnect("Cannot reload BungeeTabListPlus while players are online.");
             }
         }
-        BungeeTabListPlus.getInstance(this).onEnable();
+        BungeeTabListPlus.getInstance(this).onLoad();
         if (!getProxy().getPlayers().isEmpty()) {
             for (ProxiedPlayer proxiedPlayer : getProxy().getPlayers()) {
                 proxiedPlayer.disconnect("Cannot reload BungeeTabListPlus while players are online.");
             }
         }
+    }
+
+    @Override
+    public void onEnable() {
+        BungeeTabListPlus.getInstance().onEnable();
     }
 
     @Override

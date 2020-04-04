@@ -6,6 +6,7 @@ import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
 import codecrafter47.bungeetablistplus.util.IconUtil;
 import com.google.common.base.Preconditions;
@@ -31,21 +32,17 @@ public class API extends BungeeTabListPlusAPI {
     private final PlayerPlaceholderResolver playerPlaceholderResolver;
     private final ServerPlaceholderResolver serverPlaceholderResolver;
     private final Logger logger;
-    private final FakePlayerManager fakePlayerManager;
-    private final BungeePlayerProvider bungeePlayerProvider;
     private final BungeeTabListPlus btlp;
 
     private final Map<String, Variable> variablesByName = new HashMap<>();
     private final Map<String, ServerVariable> serverVariablesByName = new HashMap<>();
 
-    public API(TabViewManager tabViewManager, IconManager iconManager, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, Logger logger, FakePlayerManager fakePlayerManager, BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus btlp) {
+    public API(TabViewManager tabViewManager, IconManager iconManager, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, Logger logger, BungeeTabListPlus btlp) {
         this.tabViewManager = tabViewManager;
         this.iconManager = iconManager;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
         this.serverPlaceholderResolver = serverPlaceholderResolver;
         this.logger = logger;
-        this.fakePlayerManager = fakePlayerManager;
-        this.bungeePlayerProvider = bungeePlayerProvider;
         this.btlp = btlp;
     }
 
@@ -56,6 +53,7 @@ public class API extends BungeeTabListPlusAPI {
             throw new IllegalStateException("unknown player");
         }
         if (customTablist instanceof DefaultCustomTablist) {
+            tabView.getTabOverlayProviders().removeProviders(DefaultCustomTablist.TabOverlayProviderImpl.class);
             ((DefaultCustomTablist) customTablist).addToPlayer(tabView);
         } else {
             throw new IllegalArgumentException("customTablist not created by createCustomTablist()");
@@ -138,6 +136,10 @@ public class API extends BungeeTabListPlusAPI {
 
     @Override
     protected FakePlayerManager getFakePlayerManager0() {
+        FakePlayerManagerImpl fakePlayerManager = btlp.getFakePlayerManagerImpl();
+        if (fakePlayerManager == null) {
+            throw new IllegalStateException("Cannot call getFakePlayerManager() before onEnable()");
+        }
         return fakePlayerManager;
     }
 

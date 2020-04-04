@@ -120,6 +120,8 @@ public class BungeeTabListPlus {
     private Yaml yaml;
     @Getter
     private HiddenPlayersManager hiddenPlayersManager;
+    private PlayerPlaceholderResolver playerPlaceholderResolver;
+    private API api;
 
     public BungeeTabListPlus(Plugin plugin) {
         this.plugin = plugin;
@@ -175,10 +177,7 @@ public class BungeeTabListPlus {
 
     private transient boolean scheduledSoftReload;
 
-    /**
-     * Called when the plugin is enabled
-     */
-    public void onEnable() {
+    public void onLoad() {
         if (!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdirs();
         }
@@ -197,6 +196,47 @@ public class BungeeTabListPlus {
 
         INSTANCE = this;
 
+        Executor executor = (task) -> ProxyServer.getInstance().getScheduler().runAsync(getPlugin(), task);
+
+        asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
+            @Override
+            protected EventExecutor newChild(Executor executor, Object... args) {
+                return new ExceptionHandlingEventExecutor(this, executor, getLogger());
+            }
+        };
+        mainThreadExecutor = new ExceptionHandlingEventExecutor(null, executor, getLogger());
+
+        if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
+            protocolVersionProvider = new ProtocolSupportVersionProvider();
+        } else {
+            protocolVersionProvider = new BungeeProtocolVersionProvider();
+        }
+
+        this.tabViewManager = new TabViewManager(this, protocolVersionProvider);
+
+        File headsFolder = new File(plugin.getDataFolder(), "heads");
+        extractDefaultIcons(headsFolder);
+
+        iconManager = new DefaultIconManager(asyncExecutor, mainThreadExecutor, headsFolder.toPath(), getLogger());
+
+        cache = Cache.load(new File(plugin.getDataFolder(), "cache.dat"));
+
+        serverPlaceholderResolver = new ServerPlaceholderResolver(cache);
+        playerPlaceholderResolver = new PlayerPlaceholderResolver(serverPlaceholderResolver, cache);
+
+        api = new API(tabViewManager, iconManager, playerPlaceholderResolver, serverPlaceholderResolver, getLogger(), this);
+
+        try {
+            Field field = BungeeTabListPlusAPI.class.getDeclaredField("instance");
+            field.setAccessible(true);
+            field.set(null, api);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
+        }
+    }
+
+    public void onEnable() {
+
         ConfigTabOverlayManager.Options options = ConfigTabOverlayManager.Options.createBuilderWithDefaults()
                 .playerIconDataKey(BTLPBungeeDataKeys.DATA_KEY_ICON)
                 .playerPingDataKey(BungeeData.BungeeCord_Ping)
@@ -209,23 +249,6 @@ public class BungeeTabListPlus {
 
         if (readMainConfig())
             return;
-
-        cache = Cache.load(new File(plugin.getDataFolder(), "cache.dat"));
-
-        Executor executor = (task) -> ProxyServer.getInstance().getScheduler().runAsync(getPlugin(), task);
-
-        asyncExecutor = new MultithreadEventExecutorGroup(4, executor) {
-            @Override
-            protected EventExecutor newChild(Executor executor, Object... args) {
-                return new ExceptionHandlingEventExecutor(this, executor, getLogger());
-            }
-        };
-        mainThreadExecutor = new ExceptionHandlingEventExecutor(null, executor, getLogger());
-
-        File headsFolder = new File(plugin.getDataFolder(), "heads");
-        extractDefaultIcons(headsFolder);
-
-        iconManager = new DefaultIconManager(asyncExecutor, mainThreadExecutor, headsFolder.toPath(), getLogger());
 
         bungeePlayerProvider = new BungeePlayerProvider(mainThreadExecutor);
 
@@ -254,22 +277,12 @@ public class BungeeTabListPlus {
         playerProviders.add(fakePlayerManagerImpl);
         this.playerProvider = new JoinedPlayerProvider(playerProviders);
 
-        serverPlaceholderResolver = new ServerPlaceholderResolver(cache);
-        PlayerPlaceholderResolver playerPlaceholderResolver = new PlayerPlaceholderResolver(serverPlaceholderResolver, cache);
-
         plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
         bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), getLogger(), bungeePlayerProvider, this, cache);
-        API api = new API(tabViewManager, iconManager, playerPlaceholderResolver, serverPlaceholderResolver, getLogger(), fakePlayerManagerImpl, bungeePlayerProvider, this);
         serverStateManager = new ServerStateManager(config, plugin);
         dataManager = new DataManager(api, this.getPlugin(), this.getLogger(), bungeePlayerProvider, mainThreadExecutor, hiddenPlayersManager, serverStateManager, bukkitBridge);
 
         updateExcludedAndHiddenServerLists();
-
-        if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
-            protocolVersionProvider = new ProtocolSupportVersionProvider();
-        } else {
-            protocolVersionProvider = new BungeeProtocolVersionProvider();
-        }
 
         // register commands and update Notifier
         ProxyServer.getInstance().getPluginManager().registerCommand(
@@ -288,8 +301,6 @@ public class BungeeTabListPlus {
             plugin.getProxy().getScheduler().schedule(plugin, updateChecker, 0,
                     UpdateChecker.interval, TimeUnit.MINUTES).getId();
         }
-
-        this.tabViewManager = new TabViewManager(this, protocolVersionProvider);
 
         int[] serversHash = {getProxy().getServers().hashCode()};
         getProxy().getScheduler().schedule(plugin, () -> {
@@ -330,14 +341,6 @@ public class BungeeTabListPlus {
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
 
         ProxyServer.getInstance().getPluginManager().registerListener(plugin, new TabListListener(this));
-
-        try {
-            Field field = BungeeTabListPlusAPI.class.getDeclaredField("instance");
-            field.setAccessible(true);
-            field.set(null, api);
-        } catch (NoSuchFieldException | IllegalAccessException ex) {
-            getLogger().log(Level.SEVERE, "Failed to initialize API", ex);
-        }
     }
 
     private void updateTimeZoneAndGlobalCustomPlaceholders() {
