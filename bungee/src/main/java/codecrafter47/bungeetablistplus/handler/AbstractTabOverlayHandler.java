@@ -1390,88 +1390,120 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
             if (tabOverlay.dirtyFlagSize) {
                 tabOverlay.dirtyFlagSize = false;
-                if (using80Slots) {
-                    // when previously using 80 slots
-                    for (int index = 0; index < 80; index++) {
-                        if (tabOverlay.uuid[index] != null) {
-                            dirtySlots.set(index);
-                        }
-                    }
-                    freePlayers.addAll(serverPlayerList.keySet());
-                } else if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
-                    dirtySlots.set(highestUsedSlotIndex);
-                }
                 updateSize();
-                highestUsedSlotIndex = usedSlots.previousSetBit(79);
-                this.usedSlotsCount = usedSlots.cardinality();
-                using80Slots = this.usedSlotsCount == 80;
-                if (using80Slots) {
-                    // we switched to 80 slots
-                    for (int index = 0; index < 80; index++) {
-                        if (slotState[index] == SlotState.PLAYER) {
+                if (usedSlotsCount != (usedSlotsCount = usedSlots.cardinality())) {
 
-                            // 1. remove player from team
-                            sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
-                            playerUsernameToSlotMap.removeInt(slotUsername[index]);
-                            String playerTeamName;
-                            if ((playerTeamName = playerToTeamMap.get(slotUsername[index])) != null) {
-                                // 2. add player to correct team
-                                sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
-                                // 3. reset custom slot team
-                                if (is13OrLater) {
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                } else {
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
+                    if (using80Slots) {
+                        // when previously using 80 slots
+                        for (int index = 0; index < 80; index++) {
+                            if (tabOverlay.uuid[index] != null) {
+                                dirtySlots.set(index);
+                            }
+                        }
+                        freePlayers.addAll(serverPlayerList.keySet());
+
+                        // switch all players except for viewer in survival mode if they are in spectator mode
+                        PlayerListEntry viewerEntry = serverPlayerList.get(viewerUuid);
+                        int count = 0;
+                        for (PlayerListEntry entry : serverPlayerList.values()) {
+                            if (entry != viewerEntry && entry.getGamemode() == 3) {
+                                count++;
+                            }
+                        }
+
+                        if (count > 0) {
+                            PlayerListItem.Item[] items = new PlayerListItem.Item[count];
+                            int index = 0;
+
+                            for (Map.Entry<UUID, PlayerListEntry> mEntry : serverPlayerList.entrySet()) {
+                                PlayerListEntry entry = mEntry.getValue();
+                                if (entry != viewerEntry && entry.getGamemode() == 3) {
+                                    PlayerListItem.Item item = new PlayerListItem.Item();
+                                    item.setUuid(mEntry.getKey());
+                                    item.setGamemode(0);
+                                    items[index++] = item;
                                 }
-                            } else {
-                                // 2. add player to overflow team
-                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{slotUsername[index]}));
                             }
 
-                            // 4. create new custom slot
-                            tabOverlay.dirtyFlagsIcon.clear(index);
-                            tabOverlay.dirtyFlagsText.clear(index);
-                            tabOverlay.dirtyFlagsPing.clear(index);
-                            Icon icon = tabOverlay.icon[index];
-                            UUID customSlotUuid;
-                            if (icon.isAlex()) {
-                                customSlotUuid = CUSTOM_SLOT_UUID_ALEX[index];
-                            } else {
-                                customSlotUuid = CUSTOM_SLOT_UUID_STEVE[index];
+                            PlayerListItem packet = new PlayerListItem();
+                            packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
+                            packet.setItems(items);
+                            sendPacket(packet);
+                        }
+                    } else if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
+                        dirtySlots.set(highestUsedSlotIndex);
+                    }
+
+                    highestUsedSlotIndex = usedSlots.previousSetBit(79);
+                    using80Slots = this.usedSlotsCount == 80;
+                    if (using80Slots) {
+                        // we switched to 80 slots
+                        for (int index = 0; index < 80; index++) {
+                            if (slotState[index] == SlotState.PLAYER) {
+
+                                // 1. remove player from team
+                                sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
+                                playerUsernameToSlotMap.removeInt(slotUsername[index]);
+                                String playerTeamName;
+                                if ((playerTeamName = playerToTeamMap.get(slotUsername[index])) != null) {
+                                    // 2. add player to correct team
+                                    sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
+                                    // 3. reset custom slot team
+                                    if (is13OrLater) {
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
+                                    } else {
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
+                                    }
+                                } else {
+                                    // 2. add player to overflow team
+                                    sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{slotUsername[index]}));
+                                }
+
+                                // 4. create new custom slot
+                                tabOverlay.dirtyFlagsIcon.clear(index);
+                                tabOverlay.dirtyFlagsText.clear(index);
+                                tabOverlay.dirtyFlagsPing.clear(index);
+                                Icon icon = tabOverlay.icon[index];
+                                UUID customSlotUuid;
+                                if (icon.isAlex()) {
+                                    customSlotUuid = CUSTOM_SLOT_UUID_ALEX[index];
+                                } else {
+                                    customSlotUuid = CUSTOM_SLOT_UUID_STEVE[index];
+                                }
+                                slotState[index] = SlotState.CUSTOM;
+                                slotUuid[index] = customSlotUuid;
+                                PlayerListItem.Item item1 = new PlayerListItem.Item();
+                                item1.setUuid(customSlotUuid);
+                                item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                                item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                                item1.setDisplayName(tabOverlay.text[index]);
+                                item1.setPing(tabOverlay.ping[index]);
+                                item1.setGamemode(0);
+                                itemQueueAddPlayer.add(item1);
+                            } else if (slotState[index] == SlotState.UNUSED) {
+                                // enable slot
+                                // create new custom slot
+                                tabOverlay.dirtyFlagsIcon.clear(index);
+                                tabOverlay.dirtyFlagsText.clear(index);
+                                tabOverlay.dirtyFlagsPing.clear(index);
+                                Icon icon = tabOverlay.icon[index];
+                                UUID customSlotUuid;
+                                if (icon.isAlex()) {
+                                    customSlotUuid = CUSTOM_SLOT_UUID_ALEX[index];
+                                } else {
+                                    customSlotUuid = CUSTOM_SLOT_UUID_STEVE[index];
+                                }
+                                slotState[index] = SlotState.CUSTOM;
+                                slotUuid[index] = customSlotUuid;
+                                PlayerListItem.Item item1 = new PlayerListItem.Item();
+                                item1.setUuid(customSlotUuid);
+                                item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                                item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                                item1.setDisplayName(tabOverlay.text[index]);
+                                item1.setPing(tabOverlay.ping[index]);
+                                item1.setGamemode(0);
+                                itemQueueAddPlayer.add(item1);
                             }
-                            slotState[index] = SlotState.CUSTOM;
-                            slotUuid[index] = customSlotUuid;
-                            PlayerListItem.Item item1 = new PlayerListItem.Item();
-                            item1.setUuid(customSlotUuid);
-                            item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
-                            item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
-                            item1.setDisplayName(tabOverlay.text[index]);
-                            item1.setPing(tabOverlay.ping[index]);
-                            item1.setGamemode(0);
-                            itemQueueAddPlayer.add(item1);
-                        } else if (slotState[index] == SlotState.UNUSED) {
-                            // enable slot
-                            // create new custom slot
-                            tabOverlay.dirtyFlagsIcon.clear(index);
-                            tabOverlay.dirtyFlagsText.clear(index);
-                            tabOverlay.dirtyFlagsPing.clear(index);
-                            Icon icon = tabOverlay.icon[index];
-                            UUID customSlotUuid;
-                            if (icon.isAlex()) {
-                                customSlotUuid = CUSTOM_SLOT_UUID_ALEX[index];
-                            } else {
-                                customSlotUuid = CUSTOM_SLOT_UUID_STEVE[index];
-                            }
-                            slotState[index] = SlotState.CUSTOM;
-                            slotUuid[index] = customSlotUuid;
-                            PlayerListItem.Item item1 = new PlayerListItem.Item();
-                            item1.setUuid(customSlotUuid);
-                            item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
-                            item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
-                            item1.setDisplayName(tabOverlay.text[index]);
-                            item1.setPing(tabOverlay.ping[index]);
-                            item1.setGamemode(0);
-                            itemQueueAddPlayer.add(item1);
                         }
 
                         // restore player gamemode
@@ -1488,57 +1520,30 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
                         packet.setItems(items.toArray(new PlayerListItem.Item[items.size()]));
                         sendPacket(packet);
-                    }
-                    for (UUID player : freePlayers) {
-                        String username = serverPlayerList.get(player).username;
-                        String playerTeamName = playerToTeamMap.get(username);
-                        if (playerTeamName != null) {
-                            // add player to correct team
-                            sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{username}));
-                        } else {
-                            // add player to overflow team
-                            sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{username}));
-                        }
-                    }
 
-                    //  save some memory
-                    freePlayers.clear();
-                    playerUuidToSlotMap.clear();
-                    playerUsernameToSlotMap.clear();
-                } else {
-
-                    if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
-                        dirtySlots.set(highestUsedSlotIndex);
-                    }
-
-                    // switch all players except for viewer in survival mode if they are in spectator mode
-                    PlayerListEntry viewerEntry = serverPlayerList.get(viewerUuid);
-                    int count = 0;
-                    for (PlayerListEntry entry : serverPlayerList.values()) {
-                        if (entry != viewerEntry && entry.getGamemode() == 3) {
-                            count++;
-                        }
-                    }
-
-                    if (count > 0) {
-                        PlayerListItem.Item[] items = new PlayerListItem.Item[count];
-                        int index = 0;
-
-                        for (Map.Entry<UUID, PlayerListEntry> mEntry : serverPlayerList.entrySet()) {
-                            PlayerListEntry entry = mEntry.getValue();
-                            if (entry != viewerEntry && entry.getGamemode() == 3) {
-                                PlayerListItem.Item item = new PlayerListItem.Item();
-                                item.setUuid(mEntry.getKey());
-                                item.setGamemode(0);
-                                items[index++] = item;
+                        for (UUID player : freePlayers) {
+                            String username = serverPlayerList.get(player).username;
+                            String playerTeamName = playerToTeamMap.get(username);
+                            if (playerTeamName != null) {
+                                // add player to correct team
+                                sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{username}));
+                            } else {
+                                // add player to overflow team
+                                sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{username}));
                             }
                         }
 
-                        PlayerListItem packet = new PlayerListItem();
-                        packet.setAction(PlayerListItem.Action.UPDATE_GAMEMODE);
-                        packet.setItems(items);
-                        sendPacket(packet);
+                        //  save some memory
+                        freePlayers.clear();
+                        playerUuidToSlotMap.clear();
+                        playerUsernameToSlotMap.clear();
+                    } else {
+
+                        if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
+                            dirtySlots.set(highestUsedSlotIndex);
+                        }
                     }
+
                     sendQueuedItems();
                 }
             }
