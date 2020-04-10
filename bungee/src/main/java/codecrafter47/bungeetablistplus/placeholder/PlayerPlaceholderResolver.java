@@ -132,7 +132,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("bungeeonlinetime_seconds", create(BungeeData.BungeeOnlineTime_OnlineTime, duration -> duration == null ? null : (int) (duration.getSeconds() % 60), TypeToken.INTEGER));
         addPlaceholder("bungeeonlinetime_minutes", create(BungeeData.BungeeOnlineTime_OnlineTime, duration -> duration == null ? null : (int) ((duration.getSeconds() % 3600) / 60), TypeToken.INTEGER));
         addPlaceholder("bungeeonlinetime_hours", create(BungeeData.BungeeOnlineTime_OnlineTime, duration -> duration == null ? null : (int) (duration.getSeconds() / 3600), TypeToken.INTEGER));
-        addPlaceholder("bungeeonlinetime_hours_of_24", create(BungeeData.BungeeOnlineTime_OnlineTime, duration -> duration == null ? null : (int) ((duration.getSeconds() / 3600) / 60), TypeToken.INTEGER));
+        addPlaceholder("bungeeonlinetime_hours_of_24", create(BungeeData.BungeeOnlineTime_OnlineTime, duration -> duration == null ? null : (int) ((duration.getSeconds() / 3600) % 24), TypeToken.INTEGER));
         addPlaceholder("bungeeonlinetime_days", create(BungeeData.BungeeOnlineTime_OnlineTime, duration -> duration == null ? null : (int) (duration.getSeconds() / 86400), TypeToken.INTEGER));
         addPlaceholder("redisbungee_server_id", create(BTLPBungeeDataKeys.DATA_KEY_RedisBungee_ServerId));
         addPlaceholder("askyblock_island_level", create(BukkitData.ASkyBlock_IslandLevel));
