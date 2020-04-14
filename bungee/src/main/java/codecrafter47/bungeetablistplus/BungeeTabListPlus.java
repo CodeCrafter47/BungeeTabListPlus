@@ -490,10 +490,13 @@ public class BungeeTabListPlus {
 
     private void softReload() {
         scheduledSoftReload = false;
-        configTabOverlayManager.refreshConfigs();
 
-        // this is a good time to save the cache
-        asyncExecutor.execute(cache::save);
+        if (configTabOverlayManager != null) {
+            configTabOverlayManager.refreshConfigs();
+
+            // this is a good time to save the cache
+            asyncExecutor.execute(cache::save);
+        }
     }
 
     @Deprecated
