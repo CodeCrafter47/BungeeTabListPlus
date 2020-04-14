@@ -70,7 +70,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("luckpermsbungee_prefix", create(BungeeData.LuckPerms_Prefix));
         addPlaceholder("luckpermsbungee_suffix", create(BungeeData.LuckPerms_Suffix));
         addPlaceholder("luckpermsbungee_primary_group", create(BungeeData.LuckPerms_PrimaryGroup));
-        addPlaceholder("luckpermsbungee_meta_weight", create(BungeeData.LuckPerms_Weight));
+        addPlaceholder("luckpermsbungee_primary_group_weight", create(BungeeData.LuckPerms_Weight));
         addPlaceholder("client_version", create(BungeeData.ClientVersion));
         addPlaceholder("world", create(MinecraftData.World));
         addPlaceholder("team", create(MinecraftData.Team));
@@ -148,7 +148,9 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("nucleus_nick", create(SpongeData.Nucleus_Nick));
 
         // Alias
-        aliasMap.put("luckpermsbungee_primary_group_weight", "luckpermsbungee_meta_weight");
+        aliasMap.put("luckperms_prefix", "luckpermsbungee_prefix");
+        aliasMap.put("luckperms_suffix", "luckpermsbungee_suffix");
+        aliasMap.put("luckperms_primary_group", "luckpermsbungee_primary_group");
 
         // Server
         addPlaceholder("server", this::resolveServerPlaceholder);
