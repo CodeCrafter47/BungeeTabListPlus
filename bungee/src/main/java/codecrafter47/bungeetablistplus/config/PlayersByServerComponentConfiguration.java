@@ -110,6 +110,9 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
 
 
         TemplateCreationContext childContextS = tcc.clone();
+        if (fillSlotsVertical) {
+            childContextS.setColumns(1);
+        }
         BungeeTabListPlus btlp = BungeeTabListPlus.getInstance();
         childContextS.addPlaceholderResolver(new ComponentServerPlaceholderResolver(btlp.getServerPlaceholderResolver(), btlp.getDataManager()));
 
@@ -119,6 +122,9 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
         childContextP.setPlayerAvailable(true);
 
         TemplateCreationContext childContextM = tcc.clone();
+        if (fillSlotsVertical) {
+            childContextM.setColumns(1);
+        }
         childContextM.addPlaceholderResolver(new OtherCountPlaceholderResolver());
 
         ComponentTemplate playerComponentTemplate = tcc.emptyComponent(); // dummy

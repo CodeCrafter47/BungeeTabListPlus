@@ -81,7 +81,7 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new ContainerComponentView(new PlayersByServerComponentView(columns, playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), playerOrder, defaultText, defaultPing, defaultIcon, partitionFunction, serverHeader, serverFooter, serverSeparator, minSizePerServer, maxSizePerServer, (parent, sectionId, playerSet1) -> {
+        return new ContainerComponentView(new PlayersByServerComponentView(fillSlotsVertical ? 1 : columns, playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), playerOrder, defaultText, defaultPing, defaultIcon, partitionFunction, serverHeader, serverFooter, serverSeparator, minSizePerServer, maxSizePerServer, (parent, sectionId, playerSet1) -> {
             Context child = parent.clone();
             child.setCustomObject(BTLPContextKeys.SERVER_ID, sectionId);
             child.setCustomObject(BTLPContextKeys.SERVER_PLAYER_SET, playerSet1);
