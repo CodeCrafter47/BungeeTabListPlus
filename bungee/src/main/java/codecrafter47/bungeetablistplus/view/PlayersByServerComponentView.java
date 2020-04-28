@@ -67,7 +67,11 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
                 }
                 DataHolder serverDataHolder = BungeeTabListPlus.getInstance().getDataManager().getServerDataHolder(serverName);
                 serverDataHolder.addDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE, onlineStateUpdateListener);
-                if (serverDataHolder.get(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE)) {
+                Boolean online = serverDataHolder.get(BTLPBungeeDataKeys.DATA_KEY_SERVER_ONLINE);
+                if (online == null) {
+                    online = true;
+                }
+                if (online) {
                     addPersistentSection(serverName, false);
                 }
             }
