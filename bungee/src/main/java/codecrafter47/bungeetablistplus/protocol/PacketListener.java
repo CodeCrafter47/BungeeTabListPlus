@@ -54,7 +54,12 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
 
                     if (packetWrapper.packet instanceof Team) {
                         result = handler.onTeamPacket((Team) packetWrapper.packet);
-                        handled = true;
+                        if (result == PacketListenerResult.MODIFIED) {
+                            player.unsafe().sendPacket(packetWrapper.packet);
+                        }
+                        if (result != PacketListenerResult.PASS) {
+                            return;
+                        }
                     } else if (packetWrapper.packet instanceof PlayerListItem) {
                         result = handler.onPlayerListPacket((PlayerListItem) packetWrapper.packet);
                         handled = true;
