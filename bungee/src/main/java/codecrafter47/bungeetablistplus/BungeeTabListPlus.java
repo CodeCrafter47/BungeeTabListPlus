@@ -33,11 +33,9 @@ import codecrafter47.bungeetablistplus.placeholder.GlobalServerPlaceholderResolv
 import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerCountPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
-import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.player.JoinedPlayerProvider;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
-import codecrafter47.bungeetablistplus.tablist.SpectatorPassthroughTabOverlayProvider;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.ExceptionHandlingEventExecutor;
@@ -50,7 +48,6 @@ import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
-import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.ComponentSpec;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
@@ -59,6 +56,7 @@ import de.codecrafter47.taboverlay.config.icon.DefaultIconManager;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
+import de.codecrafter47.taboverlay.spectator.SpectatorPassthroughTabOverlayManager;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.MultithreadEventExecutorGroup;
@@ -67,7 +65,6 @@ import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bstats.bungeecord.Metrics;
 import org.yaml.snakeyaml.Yaml;
@@ -171,9 +168,10 @@ public class BungeeTabListPlus {
     private TabViewManager tabViewManager;
 
     private ConfigTabOverlayManager configTabOverlayManager;
+    private SpectatorPassthroughTabOverlayManager spectatorPassthroughTabOverlayManager;
 
     @Getter
-    private EventListener listener;
+    private List<EventListener> listeners = new ArrayList<>();
 
     private transient boolean scheduledSoftReload;
 
@@ -311,7 +309,8 @@ public class BungeeTabListPlus {
             }
         }, 1, 1, TimeUnit.MINUTES);
 
-        configTabOverlayManager = new ConfigTabOverlayManager(new MyPlatform(),
+        MyPlatform platform = new MyPlatform();
+        configTabOverlayManager = new ConfigTabOverlayManager(platform,
                 playerProvider,
                 playerPlaceholderResolver,
                 ImmutableList.of(new ServerCountPlaceholderResolver(dataManager),
@@ -321,6 +320,12 @@ public class BungeeTabListPlus {
                 getLogger(),
                 mainThreadExecutor,
                 iconManager);
+        spectatorPassthroughTabOverlayManager = new SpectatorPassthroughTabOverlayManager(platform, mainThreadExecutor, BTLPBungeeDataKeys.DATA_KEY_GAMEMODE);
+        if (config.disableCustomTabListForSpectators) {
+            spectatorPassthroughTabOverlayManager.enable();
+        } else {
+            spectatorPassthroughTabOverlayManager.disable();
+        }
 
         updateTimeZoneAndGlobalCustomPlaceholders();
 
@@ -441,7 +446,6 @@ public class BungeeTabListPlus {
     public boolean reload() {
         fakePlayerManagerImpl.removeConfigFakePlayers();
 
-        Boolean disableCustomTabListForSpectatorsOld = config.disableCustomTabListForSpectators;
         if (readMainConfig()) {
             plugin.getLogger().log(Level.WARNING, "Unable to reload Config");
             return false;
@@ -456,26 +460,10 @@ public class BungeeTabListPlus {
 
             serverStateManager.updateConfig(config);
 
-            if (disableCustomTabListForSpectatorsOld != config.disableCustomTabListForSpectators) {
-                if (config.disableCustomTabListForSpectators) {
-                    for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
-                        TabView tabView = tabViewManager.getTabView(player);
-                        BungeePlayer bungeePlayer = bungeePlayerProvider.getPlayerIfPresent(player);
-                        if (tabView != null && bungeePlayer != null) {
-                            try {
-                                tabView.getTabOverlayProviders().addProvider(new SpectatorPassthroughTabOverlayProvider(bungeePlayer, this));
-                            } catch (IllegalArgumentException ignored) {
-                            }
-                        }
-                    }
-                } else {
-                    for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
-                        TabView tabView = tabViewManager.getTabView(player);
-                        if (tabView != null) {
-                            tabView.getTabOverlayProviders().removeProviders(SpectatorPassthroughTabOverlayProvider.class);
-                        }
-                    }
-                }
+            if (config.disableCustomTabListForSpectators) {
+                spectatorPassthroughTabOverlayManager.enable();
+            } else {
+                spectatorPassthroughTabOverlayManager.disable();
             }
             return true;
         }
@@ -550,7 +538,7 @@ public class BungeeTabListPlus {
 
         @Override
         public void addEventListener(EventListener listener) {
-            BungeeTabListPlus.this.listener = listener;
+            BungeeTabListPlus.this.listeners.add(listener);
         }
     }
 }

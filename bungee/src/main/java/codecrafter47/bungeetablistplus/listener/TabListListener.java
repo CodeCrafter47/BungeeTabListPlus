@@ -21,8 +21,8 @@ package codecrafter47.bungeetablistplus.listener;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
-import codecrafter47.bungeetablistplus.tablist.SpectatorPassthroughTabOverlayProvider;
 import de.codecrafter47.taboverlay.TabView;
+import de.codecrafter47.taboverlay.config.platform.EventListener;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -46,10 +46,9 @@ public class TabListListener implements Listener {
             BungeePlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
             TabView tabView = btlp.getTabViewManager().onPlayerJoin(e.getPlayer());
             tabView.getTabOverlayProviders().addProvider(new ExcludedServersTabOverlayProvider(player, btlp));
-            if (btlp.getConfig().disableCustomTabListForSpectators) {
-                tabView.getTabOverlayProviders().addProvider(new SpectatorPassthroughTabOverlayProvider(player, btlp));
+            for (EventListener listener : btlp.getListeners()) {
+                listener.onTabViewAdded(tabView, player);
             }
-            btlp.getListener().onTabViewAdded(tabView, player);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
         }
@@ -60,7 +59,9 @@ public class TabListListener implements Listener {
         try {
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
             tabView.deactivate();
-            btlp.getListener().onTabViewRemoved(tabView);
+            for (EventListener listener : btlp.getListeners()) {
+                listener.onTabViewRemoved(tabView);
+            }
             btlp.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
 
             // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
