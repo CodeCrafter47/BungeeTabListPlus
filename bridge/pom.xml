@@ -3,7 +3,7 @@
     <parent>
         <artifactId>BungeeTabListPlus-parent</artifactId>
         <groupId>codecrafter47.bungeetablistplus</groupId>
-        <version>3.2.2</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>codecrafter47.bungeetablistplus</groupId>
             <artifactId>bungeetablistplus-common</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
