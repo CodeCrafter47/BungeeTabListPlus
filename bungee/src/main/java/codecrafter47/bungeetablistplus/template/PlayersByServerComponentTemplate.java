@@ -23,6 +23,7 @@ import lombok.Value;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.Function;
 
 @Value
 @Builder
@@ -62,6 +63,7 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
     IconTemplate defaultIcon;
 
     ExpressionTemplate partitionFunction;
+    Function<String, String> mergeSections;
 
     Set<String> hiddenServers;
     PlayersByServerComponentConfiguration.ServerOptions showServers;
@@ -81,7 +83,7 @@ public class PlayersByServerComponentTemplate implements ComponentTemplate {
 
     @Override
     public ComponentView instantiate() {
-        return new ContainerComponentView(new PlayersByServerComponentView(fillSlotsVertical ? 1 : columns, playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), playerOrder, defaultText, defaultPing, defaultIcon, partitionFunction, serverHeader, serverFooter, serverSeparator, minSizePerServer, maxSizePerServer, (parent, sectionId, playerSet1) -> {
+        return new ContainerComponentView(new PlayersByServerComponentView(fillSlotsVertical ? 1 : columns, playerSet, playerComponent, playerComponent.getLayoutInfo().getMinSize(), morePlayersComponent, morePlayersComponent.getLayoutInfo().getMinSize(), playerOrder, defaultText, defaultPing, defaultIcon, partitionFunction, mergeSections, serverHeader, serverFooter, serverSeparator, minSizePerServer, maxSizePerServer, (parent, sectionId, playerSet1) -> {
             Context child = parent.clone();
             child.setCustomObject(BTLPContextKeys.SERVER_ID, sectionId);
             child.setCustomObject(BTLPContextKeys.SERVER_PLAYER_SET, playerSet1);

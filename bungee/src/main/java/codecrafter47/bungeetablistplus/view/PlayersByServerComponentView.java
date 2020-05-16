@@ -9,6 +9,7 @@ import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplates;
 import de.codecrafter47.taboverlay.config.player.PlayerSet;
 import de.codecrafter47.taboverlay.config.player.PlayerSetPartition;
 import de.codecrafter47.taboverlay.config.template.PlayerOrderTemplate;
@@ -24,9 +25,11 @@ import de.codecrafter47.taboverlay.config.view.components.PartitionedPlayersView
 import net.md_5.bungee.api.ProxyServer;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class PlayersByServerComponentView extends PartitionedPlayersView {
 
+    private final Function<String, String> mergeSections;
     private final Set<String> hiddenServers;
     private final PlayersByServerComponentConfiguration.ServerOptions showServers;
     private final ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator;
@@ -39,8 +42,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
 
     private final boolean prioritizeViewerServer;
 
-    public PlayersByServerComponentView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory, Set<String> hiddenServers, PlayersByServerComponentConfiguration.ServerOptions showServers, ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator, boolean prioritizeViewerServer) {
-        super(columns, playerSetTemplate, playerComponentTemplate, playerComponentSize, morePlayerComponentTemplate, morePlayerComponentSize, playerOrderTemplate, defaultTextTemplate, defaultPingTemplate, defaultIconTemplate, partitionFunction, sectionHeader, sectionFooter, sectionSeparator, minSizePerSection, maxSizePerSection, sectionContextFactory);
+    public PlayersByServerComponentView(int columns, PlayerSetTemplate playerSetTemplate, ComponentTemplate playerComponentTemplate, int playerComponentSize, ComponentTemplate morePlayerComponentTemplate, int morePlayerComponentSize, PlayerOrderTemplate playerOrderTemplate, TextTemplate defaultTextTemplate, PingTemplate defaultPingTemplate, IconTemplate defaultIconTemplate, ExpressionTemplate partitionFunction, Function<String, String> mergeSections, ComponentTemplate sectionHeader, ComponentTemplate sectionFooter, ComponentTemplate sectionSeparator, int minSizePerSection, int maxSizePerSection, SectionContextFactory sectionContextFactory, Set<String> hiddenServers, PlayersByServerComponentConfiguration.ServerOptions showServers, ContextAwareOrdering<Context, PlayerSetPartition, String> serverComparator, boolean prioritizeViewerServer) {
+        super(columns, playerSetTemplate, playerComponentTemplate, playerComponentSize, morePlayerComponentTemplate, morePlayerComponentSize, playerOrderTemplate, defaultTextTemplate, defaultPingTemplate, defaultIconTemplate, ExpressionTemplates.applyStringToStringFunction(partitionFunction, mergeSections), sectionHeader, sectionFooter, sectionSeparator, minSizePerSection, maxSizePerSection, sectionContextFactory);
+        this.mergeSections = mergeSections;
         this.hiddenServers = hiddenServers;
         this.showServers = showServers;
         this.serverComparator = serverComparator;
@@ -57,11 +61,12 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
                 if (hiddenServers.contains(serverName)) {
                     continue;
                 }
-                addPersistentSection(serverName, false);
+                addPersistentSection(mergeSections.apply(serverName), false);
             }
         } else if (showServers == PlayersByServerComponentConfiguration.ServerOptions.ONLINE) {
             servers = new ArrayList<>(ProxyServer.getInstance().getServers().keySet());
             for (String serverName : servers) {
+                serverName = mergeSections.apply(serverName);
                 if (hiddenServers.contains(serverName)) {
                     continue;
                 }
@@ -94,6 +99,7 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
 
     private void updateOnlineServers() {
         for (String serverName : servers) {
+            serverName = mergeSections.apply(serverName);
             if (hiddenServers.contains(serverName)) {
                 continue;
             }

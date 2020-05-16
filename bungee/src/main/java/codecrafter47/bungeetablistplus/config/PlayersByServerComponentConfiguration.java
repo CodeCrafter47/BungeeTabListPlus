@@ -5,6 +5,7 @@ import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.placeholder.ComponentServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.template.PlayersByServerComponentTemplate;
 import codecrafter47.bungeetablistplus.util.ContextAwareOrdering;
+import codecrafter47.bungeetablistplus.util.MapFunction;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bungee.api.BungeeData;
@@ -62,6 +63,8 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
     private MarkedStringProperty serverOrder = null;
     private Map<String, Integer> customServerOrder = null;
     private boolean prioritizeViewerServer = true;
+
+    private Map<String, List<String>> mergeServers = null;
 
     public List<String> getCustomServerOrder() {
         // dummy method for snakeyaml to detect property type
@@ -188,6 +191,19 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
             morePlayersComponentTemplate = childContextM.emptyComponent();
         }
 
+        Map<String, String> serverMap = new HashMap<>();
+        if (mergeServers != null) {
+            for (Map.Entry<String, List<String>> entry : mergeServers.entrySet()) {
+                String groupName = entry.getKey();
+                List<String> serverNames = entry.getValue();
+                if (serverNames != null) {
+                    for (String serverName : serverNames) {
+                        serverMap.put(serverName, groupName);
+                    }
+                }
+            }
+        }
+
         return PlayersByServerComponentTemplate.builder()
                 .playerOrder(playerOrderTemplate)
                 .playerSet(tcc.getPlayerSets().get(playerSet.getValue()))
@@ -206,6 +222,7 @@ public class PlayersByServerComponentConfiguration extends MarkedPropertyBase im
                 .defaultText(tcc.getDefaultText())
                 .defaultPing(tcc.getDefaultPing())
                 .partitionFunction(tcc.getExpressionEngine().compile(childContextP, "${player server}", null))
+                .mergeSections(new MapFunction(serverMap))
                 .hiddenServers(ImmutableSet.copyOf(hiddenServers))
                 .showServers(showServers)
                 .serverComparator(serverComparator)
