@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.handler.AbstractTabOverlayHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
@@ -245,6 +246,16 @@ public class AbstractTabListLogicTestBase {
             }
             return packetListenerResult;
         }
+
+        @Override
+        protected boolean isExperimentalTabCompleteSmileys() {
+            return false;
+        }
+
+        @Override
+        protected boolean isExperimentalTabCompleteFixForTabSize80() {
+            return true;
+        }
     }
 
     class MockTabListLogic extends TabListHandler {
@@ -281,7 +292,7 @@ public class AbstractTabListLogicTestBase {
                 }
             } else if (size == 80) {
                 Assert.assertEquals("server client tab size mismatch", 80, clientTabList.getSize());
-                Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 80, clientTabList.entries.size());
+                Assert.assertEquals("server client tab size mismatch", serverTabList.size() + 97, clientTabList.entries.size());
                 // fake players
                 for (int i = 0; i < size; i++) {
                     Assert.assertEquals("text", clientText[i], clientTabList.getText(i));

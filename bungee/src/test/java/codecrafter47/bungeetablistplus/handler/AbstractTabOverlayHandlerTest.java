@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
@@ -993,13 +994,11 @@ public class AbstractTabOverlayHandlerTest {
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
 
-        assertEquals(82, clientTabList.playerToTeamMap.size());
         assertTrue(clientTabList.playerToTeamMap.containsKey(usernames[47]));
 
         item.setUsername(usernames[48]);
         tabOverlayHandler.onPlayerListPacket(packet);
 
-        assertEquals(82, clientTabList.playerToTeamMap.size());
         assertTrue(clientTabList.playerToTeamMap.containsKey(usernames[48]));
     }
 
@@ -1180,6 +1179,16 @@ public class AbstractTabOverlayHandlerTest {
                 sendPacket(packet);
             }
             return packetListenerResult;
+        }
+
+        @Override
+        protected boolean isExperimentalTabCompleteSmileys() {
+            return false;
+        }
+
+        @Override
+        protected boolean isExperimentalTabCompleteFixForTabSize80() {
+            return true;
         }
     }
 

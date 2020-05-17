@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.BitSet;
@@ -69,8 +70,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
     private static final UUID[] CUSTOM_SLOT_UUID_STEVE;
     private static final UUID[] CUSTOM_SLOT_UUID_ALEX;
+    private static final UUID[] CUSTOM_SLOT_UUID_SPACER;
     private static final Set<UUID> CUSTOM_SLOT_UUIDS;
     private static final String[] CUSTOM_SLOT_USERNAME;
+    private static final String[] CUSTOM_SLOT_USERNAME_SMILEYS;
     private static final Set<String> CUSTOM_SLOT_USERNAMES;
     private static final String[] CUSTOM_SLOT_TEAMNAME;
     private static final Set<String> CUSTOM_SLOT_TEAMNAMES;
@@ -124,21 +127,23 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         // generate random uuids for our custom slots
         CUSTOM_SLOT_UUID_ALEX = new UUID[80];
         CUSTOM_SLOT_UUID_STEVE = new UUID[80];
-        int steve = 0, alex = 0;
-        while (steve != 80 || alex != 80) {
-            UUID uuid = UUID.randomUUID();
-            if ((uuid.hashCode() & 1) == 1) {
-                if (alex < 80) {
-                    CUSTOM_SLOT_UUID_ALEX[alex++] = uuid;
-                }
-            } else {
-                if (steve < 80) {
-                    CUSTOM_SLOT_UUID_STEVE[steve++] = uuid;
-                }
-            }
+        CUSTOM_SLOT_UUID_SPACER = new UUID[17];
+        UUID base = UUID.randomUUID();
+        long msb = base.getMostSignificantBits();
+        long lsb = base.getLeastSignificantBits();
+        lsb ^= base.hashCode();
+        for (int i = 0; i < 80; i++) {
+            CUSTOM_SLOT_UUID_STEVE[i] = new UUID(msb, lsb ^ (2 * i));
+            CUSTOM_SLOT_UUID_ALEX[i] = new UUID(msb, lsb ^ (2 * i + 1));
+        }
+        for (int i = 0; i < 17; i++) {
+            CUSTOM_SLOT_UUID_SPACER[i] = new UUID(msb, lsb ^ (160 + i));
         }
         if (OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK) {
-            CUSTOM_SLOT_UUIDS = ImmutableSet.<UUID>builder().add(CUSTOM_SLOT_UUID_ALEX).add(CUSTOM_SLOT_UUID_STEVE).build();
+            CUSTOM_SLOT_UUIDS = ImmutableSet.<UUID>builder()
+                    .add(CUSTOM_SLOT_UUID_ALEX)
+                    .add(CUSTOM_SLOT_UUID_STEVE)
+                    .add(CUSTOM_SLOT_UUID_SPACER).build();
         } else {
             CUSTOM_SLOT_UUIDS = null;
         }
@@ -153,6 +158,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             CUSTOM_SLOT_USERNAMES = ImmutableSet.copyOf(CUSTOM_SLOT_USERNAME);
         } else {
             CUSTOM_SLOT_USERNAMES = null;
+        }
+        CUSTOM_SLOT_USERNAME_SMILEYS = new String[80];
+        String emojis = "\u263a\u2639\u2620\u2763\u2764\u270c\u261d\u270d\u2618\u2615\u2668\u2693\u2708\u231b\u231a\u2600\u2b50\u2601\u2602\u2614\u26a1\u2744\u2603\u2604\u2660\u2665\u2666\u2663\u265f\u260e\u2328\u2709\u270f\u2712\u2702\u2692\u2694\u2699\u2696\u2697\u26b0\u26b1\u267f\u26a0\u2622\u2623\u2640\u2642\u267e\u267b\u269c\u303d\u2733\u2734\u2747\u203c\u2b1c\u2b1b\u25fc\u25fb\u25aa\u25ab\u2049\u26ab\u26aa\u3030\u00a9\u00ae\u2122\u2139\u24c2\u3297\u2716\u2714\u2611\u2695\u2b06\u2197\u27a1\u2198\u2b07\u2199\u3299\u2b05\u2196\u2195\u2194\u21a9\u21aa\u2934\u2935\u269b\u2721\u2638\u262f\u271d\u2626\u262a\u262e\u2648\u2649\u264a\u264b\u264c\u264d\u264e\u264f\u2650\u2651\u2652\u2653\u25b6\u25c0\u23cf";
+        for (int i = 0; i < 80; i++) {
+            CUSTOM_SLOT_USERNAME_SMILEYS[i] = String.format("" + emojis.charAt(i), unique, i);
         }
 
         // generate teams for custom slots
@@ -804,6 +814,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         private final List<PlayerListItem.Item> itemQueueUpdateDisplayName;
         private final List<PlayerListItem.Item> itemQueueUpdatePing;
 
+        private final boolean experimentalTabCompleteFixForTabSize80 = isExperimentalTabCompleteFixForTabSize80();
+        private final boolean experimentalTabCompleteSmileys = isExperimentalTabCompleteSmileys();
+
         private CustomContentTabOverlayHandler() {
             this.dirtySlots = new BitSet(80);
             this.usedSlots = SIZE_TO_USED_SLOTS[0];
@@ -998,7 +1011,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 slotUuid[index] = customSlotUuid;
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
-                                item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                                item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                                 item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
@@ -1032,6 +1045,17 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 update();
             }
             return result;
+        }
+
+        private String getCustomSlotUsername(int index) {
+            if (experimentalTabCompleteFixForTabSize80 && using80Slots) {
+                return "";
+            }
+            if (experimentalTabCompleteSmileys) {
+                return CUSTOM_SLOT_USERNAME_SMILEYS[index];
+            } else {
+                return CUSTOM_SLOT_USERNAME[index];
+            }
         }
 
         @Override
@@ -1226,7 +1250,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         slotUuid[index] = customSlotUuid;
                         PlayerListItem.Item item1 = new PlayerListItem.Item();
                         item1.setUuid(customSlotUuid);
-                        item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                        item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                         item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
                         item1.setDisplayName(tabOverlay.text[index]);
                         item1.setPing(tabOverlay.ping[index]);
@@ -1311,12 +1335,23 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (!hasCreatedCustomTeams) {
                 hasCreatedCustomTeams = true;
 
-                for (int i = 0; i < 81; i++) {
+                if (is13OrLater) {
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
+                } else {
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
+                }
+
+                for (int i = 1; i < 80; i++) {
                     if (is13OrLater) {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                     } else {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i]}));
+                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                     }
+                }
+                if (is13OrLater) {
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
+                } else {
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
                 }
 
                 areCustomSlotUsersPartOfTeams = true;
@@ -1357,6 +1392,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{player}));
                     }
                 }
+                // account for spacer players
+                if (experimentalTabCompleteFixForTabSize80) {
+                    customSlots += 17;
+                }
             }
 
             int i = 0;
@@ -1367,6 +1406,13 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     if (slotState[index] == SlotState.CUSTOM) {
                         PlayerListItem.Item item = new PlayerListItem.Item();
                         item.setUuid(slotUuid[index]);
+                        items[i++] = item;
+                    }
+                }
+                if (experimentalTabCompleteFixForTabSize80 && using80Slots) {
+                    for (int j = 0; j < 17; j++) {
+                        PlayerListItem.Item item = new PlayerListItem.Item();
+                        item.setUuid(CUSTOM_SLOT_UUID_SPACER[j]);
                         items[i++] = item;
                     }
                 }
@@ -1387,6 +1433,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     tabOverlay.dirtyFlagSize = true;
                 }
             }
+
+            boolean updateAllCustomSlots = false;
 
             if (tabOverlay.dirtyFlagSize) {
                 tabOverlay.dirtyFlagSize = false;
@@ -1430,6 +1478,18 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             packet.setItems(items);
                             sendPacket(packet);
                         }
+
+                        // remove spacer slots
+                        if (experimentalTabCompleteFixForTabSize80) {
+                            for (int i = 0; i < 17; i++) {
+                                PlayerListItem.Item item1 = new PlayerListItem.Item();
+                                item1.setUuid(CUSTOM_SLOT_UUID_SPACER[i]);
+                                itemQueueRemovePlayer.add(item1);
+                            }
+                        }
+
+                        dirtySlots.set(0, 80);
+                        updateAllCustomSlots = true;
                     } else if (viewerIsSpectator && highestUsedSlotIndex >= 0) {
                         dirtySlots.set(highestUsedSlotIndex);
                     }
@@ -1474,15 +1534,14 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 slotUuid[index] = customSlotUuid;
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
-                                item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                                item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                                 item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
                                 item1.setGamemode(0);
                                 itemQueueAddPlayer.add(item1);
-                            } else if (slotState[index] == SlotState.UNUSED) {
-                                // enable slot
-                                // create new custom slot
+                            } else {
+                                // custom or unused
                                 tabOverlay.dirtyFlagsIcon.clear(index);
                                 tabOverlay.dirtyFlagsText.clear(index);
                                 tabOverlay.dirtyFlagsPing.clear(index);
@@ -1497,7 +1556,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 slotUuid[index] = customSlotUuid;
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
-                                item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                                item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                                 item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
@@ -1530,6 +1589,20 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             } else {
                                 // add player to overflow team
                                 sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{username}));
+                            }
+                        }
+
+                        //  create spacer slots
+                        if (experimentalTabCompleteFixForTabSize80) {
+                            for (int i = 0; i < 17; i++) {
+                                PlayerListItem.Item item1 = new PlayerListItem.Item();
+                                item1.setUuid(CUSTOM_SLOT_UUID_SPACER[i]);
+                                item1.setUsername("");
+                                item1.setProperties(EMPTY_PROPERTIES_ARRAY);
+                                item1.setDisplayName(null);
+                                item1.setPing(0);
+                                item1.setGamemode(0);
+                                itemQueueAddPlayer.add(item1);
                             }
                         }
 
@@ -1831,8 +1904,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     // pass 4: switch some slots from unused to custom
                     for (index = dirtySlots.nextSetBit(0); index >= 0; index = dirtySlots.nextSetBit(index + 1)) {
                         if (usedSlots.get(index)) {
-                            if (slotState[index] == SlotState.UNUSED) {
-                                // switch slot to custom mode
+                            if (slotState[index] == SlotState.UNUSED || (updateAllCustomSlots && slotState[index] == SlotState.CUSTOM)) {
                                 tabOverlay.dirtyFlagsIcon.clear(index);
                                 tabOverlay.dirtyFlagsText.clear(index);
                                 tabOverlay.dirtyFlagsPing.clear(index);
@@ -1847,7 +1919,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 slotUuid[index] = customSlotUuid;
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
-                                item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                                item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                                 item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
@@ -1887,7 +1959,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     slotUuid[index] = customSlotUuid;
                     PlayerListItem.Item item1 = new PlayerListItem.Item();
                     item1.setUuid(customSlotUuid);
-                    item1.setUsername(slotUsername[index] = CUSTOM_SLOT_USERNAME[index]);
+                    item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                     item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
                     item1.setDisplayName(tabOverlay.text[index]);
                     item1.setPing(tabOverlay.ping[index]);
@@ -1967,6 +2039,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
          */
         abstract void updateSize();
     }
+
+    protected abstract boolean isExperimentalTabCompleteSmileys();
+
+    protected abstract boolean isExperimentalTabCompleteFixForTabSize80();
 
     private abstract class CustomContentTabOverlay extends AbstractContentTabOverlay implements TabOverlayHandle.BatchModifiable {
         final UUID[] uuid;

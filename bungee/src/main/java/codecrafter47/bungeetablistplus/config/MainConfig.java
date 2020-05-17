@@ -102,6 +102,17 @@ public class MainConfig implements UpdateableConfig {
     })
     public boolean disableCustomTabListForSpectators = true;
 
+    @Comment({
+            "Removes the `~BTLP Slot ##` entries from tab completion if the.",
+            "size of the tab list is 80 slots."
+    })
+    public boolean experimentalTabCompleteFixForTabSize80 = false;
+
+    @Comment({
+            "Replaces the `~BTLP Slot ##` entries in tab completion with smileys"
+    })
+    public boolean experimentalTabCompleteSmileys = false;
+
     public transient boolean needWrite = false;
 
     @Override
@@ -130,8 +141,14 @@ public class MainConfig implements UpdateableConfig {
             YamlUtil.remove(node, option);
         }
 
-        if (!YamlUtil.contains(node, "disableCustomTabListForSpectators")) {
-            needWrite = true;
+        val newConfigOptions = ImmutableList.<String>of(
+                "disableCustomTabListForSpectators",
+                "experimentalTabCompleteFixForTabSize80",
+                "experimentalTabCompleteSmileys"
+        );
+
+        for (String option : newConfigOptions) {
+            needWrite |= !YamlUtil.contains(node, option);
         }
     }
 
