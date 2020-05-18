@@ -81,6 +81,8 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
                 }
             }
         }
+
+        updateLayoutRequirements(false);
     }
 
     @Override
@@ -118,6 +120,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
     }
 
     private void addPersistentSection(String id, boolean notify) {
+        if (persistentSections.contains(id)) {
+            return;
+        }
         persistentSections.add(id);
         if (!sectionMap.containsKey(id)) {
             addEmptySection(id, notify);
@@ -125,6 +130,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
     }
 
     private void removePersistentSection(String id, boolean notify) {
+        if (!persistentSections.contains(id)) {
+            return;
+        }
         persistentSections.remove(id);
         if (persistentSections.contains(id)) {
             removeEmptySection(id, notify);
@@ -142,7 +150,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
             super.components.add(separator);
         }
         super.components.add(componentView);
-        updateLayoutRequirements(notify);
+        if (notify) {
+            requestLayoutUpdate(this);
+        }
     }
 
     private void removeEmptySection(String id, boolean notify) {
@@ -162,7 +172,9 @@ public class PlayersByServerComponentView extends PartitionedPlayersView {
             super.components.remove(index);
         }
         componentView.deactivate();
-        updateLayoutRequirements(notify);
+        if (notify) {
+            requestLayoutUpdate(this);
+        }
     }
 
     private ComponentView createEmptySectionView() {
