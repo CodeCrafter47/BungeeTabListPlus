@@ -1,0 +1,28 @@
+
+dependencies {
+    implementation "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.sponge:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:minecraft:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.bungee:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:bungee:${rootProject.ext.dataApiVersion}"
+    implementation project(':bungeetablistplus-common')
+    implementation project(':bungeetablistplus-api-bungee')
+    implementation project(':bungee-compat')
+    implementation project(':waterfall-compat')
+    implementation "it.unimi.dsi:fastutil:7.0.12"
+    implementation "codecrafter47.util:chat-utils:1.1-SNAPSHOT"
+    implementation "de.codecrafter47.taboverlay:TabOverlayCommon:1.0-SNAPSHOT"
+    implementation "org.bstats:bstats-bungeecord:1.4"
+    implementation "org.yaml:snakeyaml:1.25"
+    testImplementation "junit:junit:4.12"
+    compileOnly "net.md-5:bungeecord-proxy:${rootProject.ext.bungeeVersion}"
+    compileOnly "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
+    compileOnly "net.md-5:bungeecord-event:${rootProject.ext.bungeeVersion}"
+    compileOnly "net.md-5:bungeecord-protocol:${rootProject.ext.bungeeVersion}"
+    testImplementation "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
+    compileOnly "com.imaginarycode.minecraft:RedisBungee:0.3.5-SNAPSHOT"
+    compileOnly "protocolsupport:ProtocolSupportBungee:1.3.dev"
+    compileOnly "com.google.guava:guava:17.0"
+    testImplementation "com.google.guava:guava:17.0"
+}

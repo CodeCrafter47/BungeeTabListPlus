@@ -38,7 +38,6 @@ import de.codecrafter47.data.bukkit.AbstractBukkitDataAccess;
 import de.codecrafter47.data.bukkit.PlayerDataAccess;
 import de.codecrafter47.data.bukkit.ServerDataAccess;
 import de.codecrafter47.data.bukkit.api.BukkitData;
-import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -69,7 +68,6 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     private static final DataKeyRegistry keyRegistry = DataKeyRegistry.of(
             MinecraftData.class,
             BukkitData.class,
-            BungeeData.class,
             BTLPDataKeys.class);
 
     private static final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);

@@ -1,0 +1,5 @@
+
+dependencies {
+    api "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
+    implementation project(':bungeetablistplus-common')
+}

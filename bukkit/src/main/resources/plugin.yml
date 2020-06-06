@@ -1,6 +1,6 @@
 name: BungeeTabListPlus
 main: codecrafter47.bungeetablistplus.BukkitPlugin
-version: ${project.version}
+version: ${version}
 api-version: 1.13
 authors:
   - CodeCrafter47

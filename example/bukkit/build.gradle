@@ -1,0 +1,5 @@
+
+dependencies {
+    compileOnly project(':bungeetablistplus-api-bukkit')
+    compileOnly "org.bukkit:bukkit:${rootProject.ext.spigotVersion}"
+}

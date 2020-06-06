@@ -1,0 +1,17 @@
+
+dependencies {
+    compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}

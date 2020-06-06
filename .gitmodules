@@ -1,0 +1,6 @@
+[submodule "TabOverlayCommon"]
+	path = TabOverlayCommon
+	url = git@github.com:CodeCrafter47/TabOverlayCommon.git
+[submodule "minecraft-data-api"]
+	path = minecraft-data-api
+	url = git@github.com:/CodeCrafter47/minecraft-data-api.git

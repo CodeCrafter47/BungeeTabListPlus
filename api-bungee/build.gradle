@@ -1,0 +1,17 @@
+
+dependencies {
+    compileOnly "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}

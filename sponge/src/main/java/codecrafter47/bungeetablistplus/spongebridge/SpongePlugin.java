@@ -36,7 +36,6 @@ import de.codecrafter47.bungeetablistplus.bridge.AbstractBridge;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.DataKeyRegistry;
 import de.codecrafter47.data.api.JoinedDataAccess;
-import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
 import de.codecrafter47.data.sponge.AbstractSpongeDataAccess;
 import de.codecrafter47.data.sponge.PlayerDataAccess;
@@ -56,6 +55,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 
 import javax.annotation.Nonnull;
@@ -65,18 +65,19 @@ import java.io.DataInputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
 
-@Plugin(id = "bungeetablistplus", name = "BungeeTabListPlus-SpongeBridge", version = PomData.VERSION)
+@Plugin(id = "bungeetablistplus", name = "BungeeTabListPlus-SpongeBridge")
 public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
 
     private static final TypeAdapterRegistry typeRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
 
     private static final DataKeyRegistry keyRegistry = DataKeyRegistry.of(
             MinecraftData.class,
-            BungeeData.class,
             BTLPDataKeys.class,
             SpongeData.class);
 
@@ -357,7 +358,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
     private class Bridge extends AbstractBridge<Player, Server> {
 
         Bridge() {
-            super(SpongePlugin.keyRegistry, SpongePlugin.typeRegistry, PomData.VERSION, Sponge.getServer());
+            super(SpongePlugin.keyRegistry, SpongePlugin.typeRegistry, Sponge.getPluginManager().getPlugin("bungeetablistplus").flatMap(PluginContainer::getVersion).orElse("unknown"), Sponge.getServer());
         }
 
         @Override

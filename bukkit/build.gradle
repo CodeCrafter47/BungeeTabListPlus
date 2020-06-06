@@ -1,0 +1,12 @@
+
+dependencies {
+    implementation "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:bukkit:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:minecraft:${rootProject.ext.dataApiVersion}"
+    implementation project(":bungeetablistplus-common")
+    implementation project(":bungeetablistplus-bridge")
+    api project(":bungeetablistplus-api-bukkit")
+    compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"
+    compileOnly "me.clip.placeholderapi:PlaceholderAPI:1.8.5"
+}

@@ -1,0 +1,83 @@
+
+ext {
+    spigotVersion = '1.11-R0.1-SNAPSHOT'
+    bungeeVersion = '1.15-SNAPSHOT'
+    spongeVersion = '5.0.0'
+    dataApiVersion = '1.0.2-SNAPSHOT'
+}
+
+allprojects {
+    group = 'codecrafter47.bungeetablistplus'
+    version = '3.2.3-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url = 'https://nexus.codecrafter47.dyndns.eu/content/repositories/public/'
+        }
+
+        maven {
+            url = 'https://repo.codemc.org/repository/maven-public'
+        }
+
+        maven {
+            url = 'https://repo.md-5.net/content/repositories/snapshots/'
+        }
+
+        maven {
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        }
+
+        maven {
+            url = 'https://papermc.io/repo/repository/maven-snapshots/'
+        }
+
+        maven {
+            url = 'https://repo.spongepowered.org/maven'
+        }
+
+        maven {
+            url = 'https://jitpack.io'
+        }
+
+        maven {
+            url = 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
+    }
+
+    dependencies {
+
+        compileOnly 'org.projectlombok:lombok:1.18.12'
+        annotationProcessor 'org.projectlombok:lombok:1.18.12'
+        testCompileOnly 'org.projectlombok:lombok:1.18.12'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+        compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
+    }
+
+    sourceCompatibility = '1.8'
+
+    publishing {
+        repositories {
+            maven {
+                if (project.version.endsWith("-SNAPSHOT")) {
+                    url "https://nexus.codecrafter47.de/content/repositories/snapshots/"
+                } else {
+                    url "https://nexus.codecrafter47.de/content/repositories/releases/"
+                }
+                credentials {
+                    username "$mavenUser"
+                    password "$mavenPassword"
+                }
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}

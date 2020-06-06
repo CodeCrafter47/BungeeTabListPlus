@@ -1,0 +1,5 @@
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+    compileOnly 'io.github.waterfallmc:waterfall-api:1.15-SNAPSHOT'
+}
