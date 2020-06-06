@@ -3,15 +3,6 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.2.0"
 }
 
-processResources {
-    filesMatching("plugin.yml") {
-        expand(project.properties)
-    }
-    filesMatching("bungee.yml") {
-        expand(project.properties)
-    }
-}
-
 dependencies {
     implementation project(':bukkit-plugin')
     compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"

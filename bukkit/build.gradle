@@ -10,3 +10,12 @@ dependencies {
     compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"
     compileOnly "me.clip.placeholderapi:PlaceholderAPI:1.8.5"
 }
+
+processResources {
+    filesMatching("plugin.yml") {
+        expand(project.properties)
+    }
+    filesMatching("bungee.yml") {
+        expand(project.properties)
+    }
+}

@@ -9,19 +9,11 @@ dependencies {
     compileOnly "net.md-5:bungeecord-proxy:${rootProject.ext.bungeeVersion}"
 }
 
-processResources {
-    filesMatching("plugin.yml") {
-        expand(project.properties)
-    }
-    filesMatching("bungee.yml") {
-        expand(project.properties)
-    }
-}
-
 shadowJar {
     relocate 'codecrafter47.util', 'codecrafter47.bungeetablistplus.util'
     relocate 'org.bstats', 'codecrafter47.bungeetablistplus.libs.bstats'
     relocate 'it.unimi.dsi.fastutil', 'codecrafter47.bungeetablistplus.libs.fastutil'
     relocate 'org.yaml.snakeyaml', 'codecrafter47.bungeetablistplus.libs.snakeyaml'
     classifier = null
+    minimize()
 }

@@ -26,3 +26,15 @@ dependencies {
     compileOnly "com.google.guava:guava:17.0"
     testImplementation "com.google.guava:guava:17.0"
 }
+
+processResources {
+    filesMatching("plugin.yml") {
+        expand(project.properties)
+    }
+    filesMatching("bungee.yml") {
+        expand(project.properties)
+    }
+    filesMatching("version.properties") {
+        expand(project.properties)
+    }
+}
