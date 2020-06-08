@@ -19,12 +19,10 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.BitSet;
 import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
-import codecrafter47.bungeetablistplus.util.FastChat;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -32,6 +30,7 @@ import de.codecrafter47.bungeetablistplus.bungee.compat.PacketUtil;
 import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
@@ -2116,7 +2115,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         void setTextInternal(int index, @Nonnull @NonNull String text) {
-            String jsonText = FastChat.legacyTextToJson(text);
+            String jsonText = ChatFormat.formattedTextToJson(text);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
                 dirtyFlagsText.set(index);
@@ -2125,7 +2124,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         void setTextInternal(int index, @Nonnull @NonNull String text, char alternateColorChar) {
-            String jsonText = FastChat.legacyTextToJson(text, alternateColorChar);
+            String jsonText = ChatFormat.formattedTextToJson(text);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
                 dirtyFlagsText.set(index);
@@ -2575,44 +2574,44 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         public void setHeaderFooter(@Nullable String header, @Nullable String footer) {
-            this.header = FastChat.legacyTextToJson(header);
-            this.footer = FastChat.legacyTextToJson(footer);
+            this.header = ChatFormat.formattedTextToJson(header);
+            this.footer = ChatFormat.formattedTextToJson(footer);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
-            this.header = FastChat.legacyTextToJson(header, alternateColorChar);
-            this.footer = FastChat.legacyTextToJson(footer, alternateColorChar);
+            this.header = ChatFormat.formattedTextToJson(header);
+            this.footer = ChatFormat.formattedTextToJson(footer);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setHeader(@Nullable String header) {
-            this.header = FastChat.legacyTextToJson(header);
+            this.header = ChatFormat.formattedTextToJson(header);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setHeader(@Nullable String header, char alternateColorChar) {
-            this.header = FastChat.legacyTextToJson(header, alternateColorChar);
+            this.header = ChatFormat.formattedTextToJson(header);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setFooter(@Nullable String footer) {
-            this.footer = FastChat.legacyTextToJson(footer);
+            this.footer = ChatFormat.formattedTextToJson(footer);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setFooter(@Nullable String footer, char alternateColorChar) {
-            this.footer = FastChat.legacyTextToJson(footer, alternateColorChar);
+            this.footer = ChatFormat.formattedTextToJson(footer);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
