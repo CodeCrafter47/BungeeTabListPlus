@@ -7,3 +7,7 @@ dependencies {
     implementation project(':bukkit-plugin')
     compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"
 }
+
+shadowJar {
+    archiveClassifier.set(null)
+}

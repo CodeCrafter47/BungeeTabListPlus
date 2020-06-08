@@ -27,3 +27,7 @@ dependencies {
         exclude group: 'org.spongepowered'
     }
 }
+
+shadowJar {
+    archiveClassifier.set(null)
+}

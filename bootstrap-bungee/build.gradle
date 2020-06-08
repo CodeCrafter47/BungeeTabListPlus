@@ -14,6 +14,6 @@ shadowJar {
     relocate 'org.bstats', 'codecrafter47.bungeetablistplus.libs.bstats'
     relocate 'it.unimi.dsi.fastutil', 'codecrafter47.bungeetablistplus.libs.fastutil'
     relocate 'org.yaml.snakeyaml', 'codecrafter47.bungeetablistplus.libs.snakeyaml'
-    classifier = null
+    archiveClassifier.set(null)
     minimize()
 }
