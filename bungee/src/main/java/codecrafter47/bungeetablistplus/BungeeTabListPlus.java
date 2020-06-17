@@ -48,6 +48,7 @@ import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.bungee.api.BungeeData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
+import de.codecrafter47.data.sponge.api.SpongeData;
 import de.codecrafter47.taboverlay.config.ComponentSpec;
 import de.codecrafter47.taboverlay.config.ConfigTabOverlayManager;
 import de.codecrafter47.taboverlay.config.ErrorHandler;
@@ -262,6 +263,7 @@ public class BungeeTabListPlus {
         hiddenPlayersManager.addVanishProvider("ProxySuite", BungeeData.ProxyCore_IsHidden);
         hiddenPlayersManager.addVanishProvider("ProtocolVanish", BukkitData.ProtocolVanish_IsVanished);
         hiddenPlayersManager.addVanishProvider("Bukkit Player Metadata `vanished`", BukkitData.BukkitPlayerMetadataVanished);
+        hiddenPlayersManager.addVanishProvider("Sponge VANISH", SpongeData.Sponge_IsVanished);
         hiddenPlayersManager.enable();
 
         fakePlayerManagerImpl = new FakePlayerManagerImpl(plugin, iconManager, mainThreadExecutor);
