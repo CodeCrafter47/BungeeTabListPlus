@@ -19,6 +19,7 @@
 
 package codecrafter47.bungeetablistplus.managers;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.ServerDataHolder;

@@ -71,7 +71,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("luckpermsbungee_suffix", create(BungeeData.LuckPerms_Suffix));
         addPlaceholder("luckpermsbungee_primary_group", create(BungeeData.LuckPerms_PrimaryGroup));
         addPlaceholder("luckpermsbungee_primary_group_weight", create(BungeeData.LuckPerms_Weight));
-        addPlaceholder("client_version", create(BungeeData.ClientVersion));
+        addPlaceholder("client_version", create(BTLPBungeeDataKeys.DATA_KEY_CLIENT_VERSION));
         addPlaceholder("world", create(MinecraftData.World));
         addPlaceholder("team", create(MinecraftData.Team));
         addPlaceholder("vault_balance", create(MinecraftData.Economy_Balance));

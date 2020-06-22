@@ -19,6 +19,8 @@
 
 package codecrafter47.bungeetablistplus.managers;
 
+import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
 import io.netty.util.concurrent.EventExecutor;
@@ -58,7 +60,9 @@ public class BungeePlayerProvider implements PlayerProvider {
 
     public BungeePlayer onPlayerConnected(ProxiedPlayer player) {
         BungeePlayer bungeePlayer = new BungeePlayer(player);
+        String version = BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersion(player);
         mainThread.execute(() -> {
+            bungeePlayer.getLocalDataCache().updateValue(BTLPBungeeDataKeys.DATA_KEY_CLIENT_VERSION, version);
             players.put(player, bungeePlayer);
             listeners.forEach(listener -> listener.onPlayerAdded(bungeePlayer));
         });

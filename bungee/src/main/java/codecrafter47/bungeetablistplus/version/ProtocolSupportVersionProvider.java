@@ -59,4 +59,9 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
         return protocolVersion == ProtocolVersion.MINECRAFT_1_8;
     }
 
+    @Override
+    public String getVersion(ProxiedPlayer player) {
+        return ProtocolSupportAPI.getProtocolVersion(player).getName();
+    }
+
 }

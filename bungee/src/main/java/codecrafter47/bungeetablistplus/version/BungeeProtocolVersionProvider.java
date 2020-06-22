@@ -19,9 +19,12 @@
 
 package codecrafter47.bungeetablistplus.version;
 
+import de.codecrafter47.data.bungee.BungeeClientVersionProvider;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeProtocolVersionProvider implements ProtocolVersionProvider {
+
+    private final BungeeClientVersionProvider clientVersionProvider = new BungeeClientVersionProvider();
 
     @Override
     public boolean has18OrLater(ProxiedPlayer player) {
@@ -36,6 +39,11 @@ public class BungeeProtocolVersionProvider implements ProtocolVersionProvider {
     @Override
     public boolean is18(ProxiedPlayer player) {
         return player.getPendingConnection().getVersion() == 47;
+    }
+
+    @Override
+    public String getVersion(ProxiedPlayer player) {
+        return clientVersionProvider.apply(player);
     }
 
 }

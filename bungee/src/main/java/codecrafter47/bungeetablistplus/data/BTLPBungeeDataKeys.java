@@ -43,6 +43,7 @@ public class BTLPBungeeDataKeys implements DataKeyCatalogue {
     public static final DataKey<Boolean> DATA_KEY_SERVER_ONLINE = new DataKey<>("btlp:server_online", BungeeData.SCOPE_BUNGEE_SERVER, TypeToken.BOOLEAN);
 
     public static final DataKey<Boolean> DATA_KEY_IS_HIDDEN = new DataKey<>("btlp:is_hidden", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.BOOLEAN);
+    public static final DataKey<String> DATA_KEY_CLIENT_VERSION = new DataKey<>("btlp:client_version", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.STRING);
 
     public static final DataKey<Boolean> DATA_KEY_IS_HIDDEN_PLAYER_CONFIG = new DataKey<>("btlp:is_hidden_player_config", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.BOOLEAN);
     public static final DataKey<Boolean> DATA_KEY_IS_HIDDEN_PLAYER_COMMAND = new DataKey<>("btlp:is_hidden_player_command", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.BOOLEAN);
