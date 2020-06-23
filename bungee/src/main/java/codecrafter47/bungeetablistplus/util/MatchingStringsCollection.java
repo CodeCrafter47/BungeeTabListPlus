@@ -49,7 +49,7 @@ public class MatchingStringsCollection {
 
     public boolean contains(String s) {
         if (cache.containsKey(s)) {
-            return cache.get(s);
+            return cache.getBoolean(s);
         } else {
             boolean r = compute(s);
             cache.put(s, r);

@@ -43,6 +43,7 @@ import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
 import codecrafter47.bungeetablistplus.version.BungeeProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolSupportVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
+import codecrafter47.bungeetablistplus.version.ViaVersionProtocolVersionProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.data.bukkit.api.BukkitData;
@@ -207,6 +208,8 @@ public class BungeeTabListPlus {
 
         if (plugin.getProxy().getPluginManager().getPlugin("ProtocolSupportBungee") != null) {
             protocolVersionProvider = new ProtocolSupportVersionProvider();
+        } else if (plugin.getProxy().getPluginManager().getPlugin("ViaVersion") != null) {
+            protocolVersionProvider = new ViaVersionProtocolVersionProvider();
         } else {
             protocolVersionProvider = new BungeeProtocolVersionProvider();
         }
