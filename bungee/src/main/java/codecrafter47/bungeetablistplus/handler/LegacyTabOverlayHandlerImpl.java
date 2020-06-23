@@ -29,8 +29,8 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
 
     private final ProxiedPlayer player;
 
-    public LegacyTabOverlayHandlerImpl(Logger logger, int playerListSize, Executor eventLoopExecutor, ProxiedPlayer player) {
-        super(logger, playerListSize, eventLoopExecutor);
+    public LegacyTabOverlayHandlerImpl(Logger logger, int playerListSize, Executor eventLoopExecutor, ProxiedPlayer player, boolean is13OrLater) {
+        super(logger, playerListSize, eventLoopExecutor, is13OrLater);
         this.player = player;
     }
 

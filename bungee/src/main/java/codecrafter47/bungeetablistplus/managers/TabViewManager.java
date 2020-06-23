@@ -132,7 +132,7 @@ public class TabViewManager implements Listener {
                 tabOverlayHandler = tabOverlayHandlerImpl;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, ((UserConnection) player)));
             } else {
-                LegacyTabOverlayHandlerImpl legacyTabOverlayHandler = new LegacyTabOverlayHandlerImpl(logger, player.getPendingConnection().getListener().getTabListSize(), eventLoop, player);
+                LegacyTabOverlayHandlerImpl legacyTabOverlayHandler = new LegacyTabOverlayHandlerImpl(logger, player.getPendingConnection().getListener().getTabListSize(), eventLoop, player, protocolVersionProvider.has113OrLater(player));
                 tabOverlayHandler = legacyTabOverlayHandler;
                 packetHandler = legacyTabOverlayHandler;
             }

@@ -32,6 +32,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.AllArgsConstructor;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.protocol.DefinedPacket;
@@ -59,6 +62,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
 
     private static final String[] slotID;
+    private static final UUID[] slotUUID;
     private static final Set<String> slotIDSet = new HashSet<>();
 
     private static final Int2ObjectMap<Collection<RectangularTabOverlay.Dimension>> playerListSizeToSupportedSizesMap = new Int2ObjectOpenHashMap<>();
@@ -68,13 +72,18 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         int random = ThreadLocalRandom.current().nextInt(0x1e00, 0x2c00);
 
         slotID = new String[256];
+        slotUUID = new UUID[256];
 
         for (int i = 0; i < 256; i++) {
             String hex = String.format("%02x", i);
             slotID[i] = String.format("§B§T§L§P§%c§%c§%c§r", random, hex.charAt(0), hex.charAt(1));
             slotIDSet.add(slotID[i]);
+            slotUUID[i] = UUID.randomUUID();
         }
     }
+
+    private static String[][] EMPTY_PROPERTIES = new String[0][];
+    private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
 
     private static Collection<RectangularTabOverlay.Dimension> getSupportedSizesByPlayerListSize(int playerListSize) {
         Preconditions.checkArgument(playerListSize >= 0, "playerListSize is negative");
@@ -103,6 +112,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     private final Executor eventLoopExecutor;
 
     private final Object2IntMap<String> serverPlayerList = new Object2IntLinkedOpenHashMap<>();
+    private final Object2ObjectMap<UUID, ModernPlayerListEntry> modernServerPlayerList = new Object2ObjectOpenHashMap<>();
+
+    private boolean is13OrLater;
 
     private final Queue<AbstractContentOperationModeHandler<?>> nextActiveHandlerQueue = new ConcurrentLinkedQueue<>();
     private AbstractContentOperationModeHandler<?> activeHandler;
@@ -110,9 +122,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     private final AtomicBoolean updateScheduledFlag = new AtomicBoolean(false);
     private final Runnable updateTask = this::update;
 
-    AbstractLegacyTabOverlayHandler(Logger logger, int playerListSize, Executor eventLoopExecutor) {
+    AbstractLegacyTabOverlayHandler(Logger logger, int playerListSize, Executor eventLoopExecutor, boolean is13OrLater) {
         this.logger = logger;
         this.eventLoopExecutor = eventLoopExecutor;
+        this.is13OrLater = is13OrLater;
         Preconditions.checkElementIndex(playerListSize, 256, "playerListSize");
         this.playerListSize = playerListSize;
         this.activeHandler = new PassThroughHandlerContent();
@@ -124,11 +137,19 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     public PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
         if (packet.getAction() == PlayerListItem.Action.ADD_PLAYER) {
             for (PlayerListItem.Item item : packet.getItems()) {
-                serverPlayerList.put(getName(item), item.getPing());
+                if (item.getUuid() != null) {
+                    modernServerPlayerList.put(item.getUuid(), new ModernPlayerListEntry(item.getUsername(), item.getPing(), item.getGamemode()));
+                } else {
+                    serverPlayerList.put(getName(item), item.getPing());
+                }
             }
         } else {
             for (PlayerListItem.Item item : packet.getItems()) {
-                serverPlayerList.remove(getName(item));
+                if (item.getUuid() != null) {
+                    modernServerPlayerList.remove(item.getUuid());
+                } else {
+                    serverPlayerList.removeInt(getName(item));
+                }
             }
         }
         return activeHandler.onPlayerListPacket(packet);
@@ -151,8 +172,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
     @Override
     public void onServerSwitch(boolean is13OrLater) {
+        this.is13OrLater = is13OrLater;
         this.activeHandler.onServerSwitch();
         serverPlayerList.clear();
+        modernServerPlayerList.clear();
     }
 
     @Override
@@ -197,9 +220,11 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         this.activeHandler.update();
     }
 
-    private void removeEntry(String player) {
+    private void removeEntry(UUID uuid, String player) {
         PlayerListItem pli = new PlayerListItem();
         PlayerListItem.Item item = new PlayerListItem.Item();
+        item.setUuid(uuid);
+        item.setUsername(player);
         item.setDisplayName(player);
         item.setPing(9999);
         pli.setItems(new PlayerListItem.Item[]{item});
@@ -256,6 +281,18 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 pli.setAction(PlayerListItem.Action.ADD_PLAYER);
                 sendPacket(pli);
             }
+            for (val entry : modernServerPlayerList.entrySet()) {
+                PlayerListItem pli = new PlayerListItem();
+                PlayerListItem.Item item = new PlayerListItem.Item();
+                item.setUuid(entry.getKey());
+                item.setUsername(entry.getValue().name);
+                item.setGamemode(entry.getValue().gamemode);
+                item.setPing(entry.getValue().latency);
+                item.setProperties(EMPTY_PROPERTIES);
+                pli.setItems(new PlayerListItem.Item[]{item});
+                pli.setAction(PlayerListItem.Action.ADD_PLAYER);
+                sendPacket(pli);
+            }
         }
 
         @Override
@@ -265,7 +302,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
         private void removeAllEntries() {
             for (String player : serverPlayerList.keySet()) {
-                removeEntry(player);
+                removeEntry(null, player);
+            }
+            for (UUID player : modernServerPlayerList.keySet()) {
+                removeEntry(player, null);
             }
         }
 
@@ -324,7 +364,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         @Override
         void onDeactivated() {
             for (int index = this.size - 1; index >= 0; index--) {
-                removeEntry(slotID[index]);
+                removeEntry(slotUUID[index], slotID[index]);
                 Team t = new Team();
                 t.setName(slotID[index]);
                 t.setMode((byte) 1);
@@ -349,11 +389,18 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         t.setDisplayName("");
                         t.setSuffix(tabOverlay.text1[index]);
                         t.setPlayers(new String[]{slotID[index]});
+                        t.setNameTagVisibility("always");
+                        t.setCollisionRule("always");
+                        if (is13OrLater) {
+                            t.setDisplayName(EMPTY_JSON_TEXT);
+                            t.setPrefix("{\"text\":\"" + tabOverlay.text0[index] + "\"}");
+                            t.setSuffix("{\"text\":\"" + tabOverlay.text1[index] + "\"}");
+                        }
                         sendPacket(t);
                     }
                 } else {
                     for (int index = this.size - 1; index >= size; index--) {
-                        removeEntry(slotID[index]);
+                        removeEntry(slotUUID[index], slotID[index]);
                         Team t = new Team();
                         t.setName(slotID[index]);
                         t.setMode((byte) 1);
@@ -367,6 +414,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         private void updateSlot(CustomTabOverlay tabOverlay, int index) {
             PlayerListItem pli = new PlayerListItem();
             PlayerListItem.Item item = new PlayerListItem.Item();
+            item.setUuid(slotUUID[index]);
+            item.setUsername(slotID[index]);
+            item.setProperties(EMPTY_PROPERTIES);
             item.setDisplayName(slotID[index]);
             item.setPing(tabOverlay.ping[index]);
             pli.setItems(new PlayerListItem.Item[]{item});
@@ -382,6 +432,13 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 packet.setPrefix(tabOverlay.text0[index]);
                 packet.setDisplayName("");
                 packet.setSuffix(tabOverlay.text1[index]);
+                packet.setNameTagVisibility("always");
+                packet.setCollisionRule("always");
+                if (is13OrLater) {
+                    packet.setDisplayName(EMPTY_JSON_TEXT);
+                    packet.setPrefix("{\"text\":\"" + tabOverlay.text0[index] + "\"}");
+                    packet.setSuffix("{\"text\":\"" + tabOverlay.text1[index] + "\"}");
+                }
                 sendPacket(packet);
             }
         }
@@ -811,5 +868,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         } else {
             throw new AssertionError("DisplayName and Username are null");
         }
+    }
+
+    @AllArgsConstructor
+    private static class ModernPlayerListEntry {
+        String name;
+        int latency;
+        int gamemode;
     }
 }
