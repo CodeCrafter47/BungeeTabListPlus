@@ -61,8 +61,10 @@ public class BungeePlayerProvider implements PlayerProvider {
     public BungeePlayer onPlayerConnected(ProxiedPlayer player) {
         BungeePlayer bungeePlayer = new BungeePlayer(player);
         String version = BungeeTabListPlus.getInstance().getProtocolVersionProvider().getVersion(player);
+        boolean version_below_1_8 = !BungeeTabListPlus.getInstance().getProtocolVersionProvider().has18OrLater(player);
         mainThread.execute(() -> {
             bungeePlayer.getLocalDataCache().updateValue(BTLPBungeeDataKeys.DATA_KEY_CLIENT_VERSION, version);
+            bungeePlayer.getLocalDataCache().updateValue(BTLPBungeeDataKeys.DATA_KEY_CLIENT_VERSION_BELOW_1_8, version_below_1_8);
             players.put(player, bungeePlayer);
             listeners.forEach(listener -> listener.onPlayerAdded(bungeePlayer));
         });
