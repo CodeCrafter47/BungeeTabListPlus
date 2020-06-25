@@ -27,7 +27,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.bungeetablistplus.bungee.compat.PacketUtil;
-import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
@@ -391,7 +390,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             serverTeams.clear();
             playerToTeamMap.clear();
 
-            if (WaterfallCompat.isDisableEntityMetadataRewrite()) {
+            if (isUsingAltRespawn()) {
                 hasCreatedCustomTeams = false;
                 areCustomSlotUsersPartOfTeams = false;
             }
@@ -437,6 +436,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
             serverTabListPlayers.clear();
         }
+    }
+
+    protected boolean isUsingAltRespawn() {
+        return false;
     }
 
     @Override
@@ -1209,9 +1212,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         void onServerSwitch() {
-            boolean disableEntityMetadataRewrite = WaterfallCompat.isDisableEntityMetadataRewrite();
+            boolean altRespawn = isUsingAltRespawn();
 
-            if (disableEntityMetadataRewrite) {
+            if (altRespawn) {
                 createTeamsIfNecessary();
             }
 
@@ -1223,7 +1226,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     if (slotState[index] == SlotState.PLAYER) {
                         // Switch slot 'index' from player to custom mode
 
-                        if (!disableEntityMetadataRewrite) {
+                        if (!altRespawn) {
                             // 1. remove player from team
                             sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
                             // reset slot team

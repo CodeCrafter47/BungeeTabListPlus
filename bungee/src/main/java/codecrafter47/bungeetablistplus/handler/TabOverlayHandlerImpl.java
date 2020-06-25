@@ -20,8 +20,10 @@
 package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -49,5 +51,12 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
     @Override
     protected boolean isExperimentalTabCompleteFixForTabSize80() {
         return BungeeTabListPlus.getInstance().getConfig().experimentalTabCompleteFixForTabSize80;
+    }
+
+    @Override
+    protected boolean isUsingAltRespawn() {
+        return WaterfallCompat.isDisableEntityMetadataRewrite()
+                || (player.getPendingConnection().getVersion() >= 735
+                && ProtocolConstants.SUPPORTED_VERSION_IDS.contains(736));
     }
 }
