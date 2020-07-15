@@ -22,7 +22,9 @@ package codecrafter47.bungeetablistplus.tablisthandler.logic;
 import codecrafter47.bungeetablistplus.eventlog.EventLogger;
 import codecrafter47.bungeetablistplus.eventlog.Transformer;
 import com.google.gson.Gson;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import lombok.SneakyThrows;
+import net.md_5.bungee.api.ChatColor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -187,7 +189,7 @@ public class TestRealWorldExamples extends AbstractTabListLogicTestBase {
                             if (fakeClientID.equals(data.skin.owner)) {
                                 data.skin.owner = clientUUID.toString();
                             }
-                            tabListHandler.setSlot(data.index, data.skin.unwrap(), data.text, data.ping);
+                            tabListHandler.setSlot(data.index, data.skin.unwrap(), ChatColor.stripColor(data.text), data.ping);
                             break;
                         default:
                             fail("Unknown token " + tokens[0]);

@@ -121,7 +121,7 @@ public class AbstractTabListLogicTestBase {
         String getText(int index) {
             String displayName = getVisibleEntries().get(index).getDisplayName();
             String text = displayName == null ? null : BaseComponent.toLegacyText(ComponentSerializer.parse(displayName));
-            if (text != null && text.startsWith("§f")) {
+            while (text != null && text.startsWith("\u00A7f")) {
                 text = text.substring(2);
             }
             return text;
