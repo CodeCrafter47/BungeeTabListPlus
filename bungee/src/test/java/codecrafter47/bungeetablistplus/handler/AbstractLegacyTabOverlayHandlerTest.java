@@ -218,7 +218,7 @@ public class AbstractLegacyTabOverlayHandlerTest {
         private final ClientTabList clientTabList;
 
         public MockLegacyTabList(int maxSize, ClientTabList clientTabList) {
-            super(Logger.getLogger("test"), maxSize, Runnable::run, is13OrLater);
+            super(Logger.getLogger("test"), maxSize, Runnable::run, false);
             this.clientTabList = clientTabList;
         }
 
