@@ -149,11 +149,6 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("nucleus_afk", create(SpongeData.Nucleus_IsAFK));
         addPlaceholder("nucleus_nick", create(SpongeData.Nucleus_Nick));
 
-        // Alias
-        aliasMap.put("luckperms_prefix", "luckpermsbungee_prefix");
-        aliasMap.put("luckperms_suffix", "luckpermsbungee_suffix");
-        aliasMap.put("luckperms_primary_group", "luckpermsbungee_primary_group");
-
         // Server
         addPlaceholder("server", this::resolveServerPlaceholder);
     }
