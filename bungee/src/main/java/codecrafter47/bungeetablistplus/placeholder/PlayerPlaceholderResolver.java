@@ -168,9 +168,14 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         if (args.isEmpty()) {
             throw new PlaceholderException("Use of permission placeholder lacks specification of specific permission");
         }
-        ExpressionTemplate permission = args.remove(0).getExpression();
-        Function<Context, Player> playerFunction = builder.getContextTransformation();
-        return PlaceholderBuilder.create().acquireData(() -> new PermissionDataProvider(permission.instantiateWithStringResult(), playerFunction), TypeToken.BOOLEAN, builder.isRequiresViewerContext() || permission.requiresViewerContext());
+        if (args.get(0) instanceof PlaceholderArg.Text) {
+            String permission = args.remove(0).getText();
+            return builder.acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.BOOLEAN, MinecraftData.permission(permission), (p, d) -> d), TypeToken.BOOLEAN);
+        } else {
+            ExpressionTemplate permission = args.remove(0).getExpression();
+            Function<Context, Player> playerFunction = builder.getContextTransformation();
+            return PlaceholderBuilder.create().acquireData(() -> new PermissionDataProvider(permission.instantiateWithStringResult(), playerFunction), TypeToken.BOOLEAN, builder.isRequiresViewerContext() || permission.requiresViewerContext());
+        }
     }
 
     @Nonnull
