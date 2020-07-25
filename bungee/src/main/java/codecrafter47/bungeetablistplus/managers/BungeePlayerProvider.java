@@ -31,16 +31,32 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class BungeePlayerProvider implements PlayerProvider {
 
     private final EventExecutor mainThread;
 
-    private Map<ProxiedPlayer, BungeePlayer> players = new ConcurrentHashMap<>();
-    private Set<Listener> listeners = new ReferenceOpenHashSet<>();
+    private final Map<ProxiedPlayer, BungeePlayer> players = new ConcurrentHashMap<>();
+    private final Set<Listener> listeners = new ReferenceOpenHashSet<>();
 
     public BungeePlayerProvider(EventExecutor mainThread) {
         this.mainThread = mainThread;
+        mainThread.scheduleWithFixedDelay(this::checkForStalePlayers, 5, 5, TimeUnit.MINUTES);
+    }
+
+    private void checkForStalePlayers() {
+        for (Map.Entry<ProxiedPlayer, BungeePlayer> entry : players.entrySet()) {
+            if (!entry.getKey().isConnected()) {
+                if (!entry.getValue().isStale()) {
+                    entry.getValue().setStale(true);
+                } else {
+                    BungeeTabListPlus.getInstance().getLogger().severe("Player " + entry.getKey().getName() + " is no longer connected to the network, but PlayerDisconnectEvent has not been called.");
+                    onPlayerDisconnected(entry.getKey());
+                }
+            }
+        }
+
     }
 
     @Override

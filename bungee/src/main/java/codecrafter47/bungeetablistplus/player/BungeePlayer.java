@@ -50,6 +50,13 @@ public class BungeePlayer extends AbstractPlayer {
     @Setter
     private CustomTablist customTablist = null;
 
+    /**
+     * The player is no longer connected to the proxy, but a DisconnectEvent has not been called.
+     */
+    @Getter
+    @Setter
+    private boolean stale;
+
     public BungeePlayer(@Nonnull ProxiedPlayer player) {
         super(player.getUniqueId(), player.getName());
         this.player = player;
