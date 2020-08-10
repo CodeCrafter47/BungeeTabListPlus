@@ -79,6 +79,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final DefinedPacket[] PACKETS_ADD_CUSTOM_SLOT_USERS_TO_TEAMS;
     private static final DefinedPacket[] PACKETS_REMOVE_CUSTOM_SLOT_USERS_FROM_TEAMS;
 
+    private static final Set<String> blockedTeams = new HashSet<>();
+
     static {
         // check whether this BungeeCord version supports team's collision rule property
         boolean methodPresent = false;
@@ -290,6 +292,22 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
     @Override
     public PacketListenerResult onTeamPacket(Team packet) {
+
+        if (packet.getPlayers() != null) {
+            boolean block = false;
+            for (String player : packet.getPlayers()) {
+                if (player.equals("")) {
+                    block = true;
+                }
+            }
+            if (block) {
+                if (!blockedTeams.contains(packet.getName())) {
+                    logger.warning("Blocking Team Packet for Team " + packet.getName() + ", as it is incompatible with BungeeTabListPlus.");
+                    blockedTeams.add(packet.getName());
+                }
+                return PacketListenerResult.CANCEL;
+            }
+        }
 
         try {
             this.activeContentHandler.onTeamPacketPreprocess(packet);
