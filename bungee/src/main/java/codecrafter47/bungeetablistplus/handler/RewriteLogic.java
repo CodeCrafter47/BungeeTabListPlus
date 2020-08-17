@@ -71,16 +71,19 @@ public class RewriteLogic extends AbstractPacketHandler {
                         if (player != null) {
                             LoginResult loginResult = player.getPendingConnection().getLoginProfile();
                             if (loginResult != null) {
-                                String[][] props = new String[loginResult.getProperties().length][];
-                                for (int i = 0; i < props.length; i++) {
-                                    props[i] = new String[]
-                                            {
-                                                    loginResult.getProperties()[i].getName(),
-                                                    loginResult.getProperties()[i].getValue(),
-                                                    loginResult.getProperties()[i].getSignature()
-                                            };
+                                LoginResult.Property[] properties = loginResult.getProperties();
+                                if (properties != null) {
+                                    String[][] props = new String[properties.length][];
+                                    for (int i = 0; i < props.length; i++) {
+                                        props[i] = new String[]
+                                                {
+                                                        properties[i].getName(),
+                                                        properties[i].getValue(),
+                                                        properties[i].getSignature()
+                                                };
+                                    }
+                                    item.setProperties(props);
                                 }
-                                item.setProperties(props);
                             } else {
                                 item.setProperties(new String[0][0]);
                             }
