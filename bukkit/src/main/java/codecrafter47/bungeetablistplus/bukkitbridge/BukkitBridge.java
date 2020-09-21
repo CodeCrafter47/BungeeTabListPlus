@@ -114,8 +114,12 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
         // initialize bridge for players already on the server
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            bridge.onPlayerConnect(player);
+        try {
+            for (Player player : plugin.getServer().getOnlinePlayers()) {
+                bridge.onPlayerConnect(player);
+            }
+        } catch (NoSuchMethodError ignored) {
+            // super old spigot version - reload won't work properly
         }
 
         // start update task
