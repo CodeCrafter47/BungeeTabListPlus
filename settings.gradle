@@ -1,3 +1,13 @@
+pluginManagement {
+    repositories {
+        jcenter()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        gradlePluginPortal()
+    }
+}
 
 rootProject.name = 'BungeeTabListPlus-parent'
 include(':bungee-plugin')
@@ -15,6 +25,7 @@ include(':example:example-bungee-api')
 include(':example:example-bukkit-api')
 include(':example')
 include(':bungeetablistplus-bridge')
+include(':fabric-bridge-1.16.3')
 project(':bungee-plugin').projectDir = file('bungee')
 project(':bungee-compat').projectDir = file('bungee_compat')
 project(':waterfall-compat').projectDir = file('waterfall_compat')

@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "de.codecrafter47.bungeetablistplus.fabric.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinNetHandlerPlayServer",
+    "MixinPlayerManager"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
