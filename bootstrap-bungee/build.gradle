@@ -9,6 +9,11 @@ dependencies {
     compileOnly "net.md-5:bungeecord-proxy:${rootProject.ext.bungeeVersion}"
 }
 
+compileJava {
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+}
+
 shadowJar {
     relocate 'codecrafter47.util', 'codecrafter47.bungeetablistplus.util'
     relocate 'org.bstats', 'codecrafter47.bungeetablistplus.libs.bstats'

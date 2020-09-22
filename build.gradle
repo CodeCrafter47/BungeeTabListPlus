@@ -59,7 +59,10 @@ subprojects {
         compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
     }
 
-    sourceCompatibility = '1.8'
+    compileJava {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 
     publishing {
         repositories {

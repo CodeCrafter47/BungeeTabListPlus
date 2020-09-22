@@ -8,6 +8,11 @@ dependencies {
     compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"
 }
 
+compileJava {
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+}
+
 shadowJar {
     archiveClassifier.set(null)
 }
