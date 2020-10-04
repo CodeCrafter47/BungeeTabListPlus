@@ -82,8 +82,6 @@ public class RewriteLogic extends AbstractPacketHandler {
                                     }
                                     item.setProperties(props);
                                 }
-                            } else {
-                                item.setProperties(new String[0][0]);
                             }
                         }
                     }
