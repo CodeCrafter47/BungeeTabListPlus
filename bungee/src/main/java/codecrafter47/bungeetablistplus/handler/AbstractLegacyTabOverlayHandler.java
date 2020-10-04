@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.handler.*;
 import de.codecrafter47.taboverlay.util.Unchecked;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -497,7 +498,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         void setTextInternal(int index, String text, char alternateColorChar) {
-            setTextInternal(index, ChatColor.translateAlternateColorCodes(alternateColorChar, text));
+            setTextInternal(index, ChatFormat.formattedTextToLegacy(text));
         }
 
         void setTextInternal(int index, String text) {
