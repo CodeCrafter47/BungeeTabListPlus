@@ -101,10 +101,21 @@ public class API extends BungeeTabListPlusAPI {
         return IconUtil.convert(IconUtil.getIconFromPlayer(player));
     }
 
+    @Nonnull
+    @Override
+    protected de.codecrafter47.taboverlay.Icon getPlayerIcon0(ProxiedPlayer player) {
+        return IconUtil.getIconFromPlayer(player);
+    }
+
     @Override
     protected void createIcon0(BufferedImage image, Consumer<Icon> callback) {
         CompletableFuture<de.codecrafter47.taboverlay.Icon> future = iconManager.createIcon(image);
         future.thenAccept(icon -> callback.accept(IconUtil.convert(icon)));
+    }
+
+    @Override
+    protected CompletableFuture<de.codecrafter47.taboverlay.Icon> getIconFromImage0(BufferedImage image) {
+        return iconManager.createIcon(image);
     }
 
     @Override

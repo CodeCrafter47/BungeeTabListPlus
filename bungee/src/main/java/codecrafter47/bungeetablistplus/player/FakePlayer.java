@@ -99,12 +99,19 @@ public class FakePlayer extends AbstractPlayer implements codecrafter47.bungeeta
 
     @Override
     @SneakyThrows
+    @SuppressWarnings("deprecation")
     public void setIcon(Icon icon) {
+        setIcon(IconUtil.convert(icon));
+    }
+
+    @Override
+    @SneakyThrows
+    public void setIcon(de.codecrafter47.taboverlay.Icon icon) {
         if (!mainThread.inEventLoop()) {
             mainThread.submit(() -> setIcon(icon)).sync();
             return;
         }
-        data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, IconUtil.convert(icon));
+        data.updateValue(BTLPBungeeDataKeys.DATA_KEY_ICON, icon);
     }
 
     @Override

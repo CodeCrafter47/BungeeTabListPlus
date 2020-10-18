@@ -73,8 +73,16 @@ public interface FakePlayer {
      * Set the icon displayed on the tab list.
      *
      * @param icon the icon
+     * @deprecated use {@link #setIcon(de.codecrafter47.taboverlay.Icon)}
      */
     void setIcon(Icon icon);
+
+    /**
+     * Set the icon displayed on the tab list.
+     *
+     * @param icon the icon
+     */
+    void setIcon(de.codecrafter47.taboverlay.Icon icon);
 
     /**
      * Set the ping of the fake player.

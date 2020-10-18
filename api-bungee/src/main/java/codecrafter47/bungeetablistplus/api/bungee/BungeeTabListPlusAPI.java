@@ -24,6 +24,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public abstract class BungeeTabListPlusAPI {
@@ -82,7 +83,6 @@ public abstract class BungeeTabListPlusAPI {
      *
      * @param player        the player
      * @param customTablist the CustomTablist to use
-     *
      * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
      */
     @Deprecated
@@ -98,7 +98,9 @@ public abstract class BungeeTabListPlusAPI {
      *
      * @param player the player
      * @return the icon
+     * @deprecated Use {@link #getPlayerIcon(ProxiedPlayer)}
      */
+    @Deprecated
     @Nonnull
     public static Icon getIconFromPlayer(ProxiedPlayer player) {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
@@ -109,13 +111,27 @@ public abstract class BungeeTabListPlusAPI {
     protected abstract Icon getIconFromPlayer0(ProxiedPlayer player);
 
     /**
+     * Get the face part of the players skin as an icon for use in the tab list.
+     *
+     * @param player the player
+     * @return the icon
+     */
+    @Nonnull
+    public static de.codecrafter47.taboverlay.Icon getPlayerIcon(ProxiedPlayer player) {
+        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
+        return instance.getPlayerIcon0(player);
+    }
+
+    @Nonnull
+    protected abstract de.codecrafter47.taboverlay.Icon getPlayerIcon0(ProxiedPlayer player);
+
+    /**
      * Creates an icon from an 8x8 px image. The creation of the icon can take several
      * minutes. When the icon has been created the callback is invoked.
      *
      * @param image    the image
      * @param callback called when the icon is ready
-     *
-     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
+     * @deprecated use {@link #getIconFromImage(BufferedImage)}
      */
     @Deprecated
     public static void createIcon(BufferedImage image, Consumer<Icon> callback) {
@@ -126,11 +142,24 @@ public abstract class BungeeTabListPlusAPI {
     protected abstract void createIcon0(BufferedImage image, Consumer<Icon> callback);
 
     /**
+     * Creates an icon from an 8x8 px image. The creation of the icon can take several
+     * minutes. When the icon has been created the callback is invoked.
+     *
+     * @param image the image
+     * @return a completable future providing the icon is ready
+     */
+    public static CompletableFuture<de.codecrafter47.taboverlay.Icon> getIconFromImage(BufferedImage image) {
+        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
+        return instance.getIconFromImage0(image);
+    }
+
+    protected abstract CompletableFuture<de.codecrafter47.taboverlay.Icon> getIconFromImage0(BufferedImage image);
+
+    /**
      * Removes a custom tab list from a player.
      * If the player hasn't got a custom tab list associated with it this will do nothing.
      *
      * @param player the player
-     *
      * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
      */
     @Deprecated
@@ -174,7 +203,7 @@ public abstract class BungeeTabListPlusAPI {
 
     /**
      * Check if a player is hidden from the tab list.
-     *
+     * <p>
      * A player is regarded as hidden if one of the following conditions is true:
      * - The player is hidden using a vanish plugin(e.g. SuperVanish, Essentials, ...)
      * - The player has been hidden using the /btlp hide command
