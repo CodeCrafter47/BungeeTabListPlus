@@ -86,6 +86,15 @@ public class API extends BungeeTabListPlusAPI {
         tabView.getTabOverlayProviders().removeProviders(DefaultCustomTablist.TabOverlayProviderImpl.class);
     }
 
+    @Override
+    protected TabView getTabViewForPlayer0(ProxiedPlayer player) {
+        TabView tabView = tabViewManager.getTabView(player);
+        if (tabView == null) {
+            throw new IllegalStateException("unknown player");
+        }
+        return tabView;
+    }
+
     @Nonnull
     @Override
     protected Icon getIconFromPlayer0(ProxiedPlayer player) {

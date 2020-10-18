@@ -18,10 +18,15 @@
 package codecrafter47.bungeetablistplus.api.bungee;
 
 import lombok.NonNull;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * @deprecated The custom tab list api has been changed. See {@link BungeeTabListPlusAPI#getTabViewForPlayer(ProxiedPlayer)}
+ */
+@Deprecated
 public interface CustomTablist {
     /**
      * Set the size of the tab list.

@@ -18,6 +18,7 @@
 package codecrafter47.bungeetablistplus.api.bungee;
 
 import com.google.common.base.Preconditions;
+import de.codecrafter47.taboverlay.TabView;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -66,7 +67,9 @@ public abstract class BungeeTabListPlusAPI {
      * Create a new {@link CustomTablist}
      *
      * @return thte created {@link CustomTablist}
+     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
      */
+    @Deprecated
     public static CustomTablist createCustomTablist() {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
         return instance.createCustomTablist0();
@@ -79,7 +82,10 @@ public abstract class BungeeTabListPlusAPI {
      *
      * @param player        the player
      * @param customTablist the CustomTablist to use
+     *
+     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
      */
+    @Deprecated
     public static void setCustomTabList(ProxiedPlayer player, CustomTablist customTablist) {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
         instance.setCustomTabList0(player, customTablist);
@@ -108,7 +114,10 @@ public abstract class BungeeTabListPlusAPI {
      *
      * @param image    the image
      * @param callback called when the icon is ready
+     *
+     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
      */
+    @Deprecated
     public static void createIcon(BufferedImage image, Consumer<Icon> callback) {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
         instance.createIcon0(image, callback);
@@ -121,13 +130,35 @@ public abstract class BungeeTabListPlusAPI {
      * If the player hasn't got a custom tab list associated with it this will do nothing.
      *
      * @param player the player
+     *
+     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(ProxiedPlayer)}
      */
+    @Deprecated
     public static void removeCustomTabList(ProxiedPlayer player) {
         Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
         instance.removeCustomTabList0(player);
     }
 
     protected abstract void removeCustomTabList0(ProxiedPlayer player);
+
+    /**
+     * Get the tab view of a player. The tab view object allows registering and unregistering custom tab overlay
+     * handlers.
+     *
+     * @param player the player
+     * @return tab view of that player
+     * @throws IllegalStateException is the player is not found
+     * @see TabView
+     * @see de.codecrafter47.taboverlay.TabOverlayProviderSet
+     * @see de.codecrafter47.taboverlay.TabOverlayProvider
+     * @see de.codecrafter47.taboverlay.AbstractPlayerTabOverlayProvider
+     */
+    public static TabView getTabViewForPlayer(ProxiedPlayer player) {
+        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
+        return instance.getTabViewForPlayer0(player);
+    }
+
+    protected abstract TabView getTabViewForPlayer0(ProxiedPlayer player);
 
     /**
      * Get the FakePlayerManager instance
