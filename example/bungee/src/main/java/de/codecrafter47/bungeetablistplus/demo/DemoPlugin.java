@@ -18,20 +18,26 @@
 package de.codecrafter47.bungeetablistplus.demo;
 
 import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
-import codecrafter47.bungeetablistplus.api.bungee.Icon;
 import codecrafter47.bungeetablistplus.api.bungee.Variable;
+import de.codecrafter47.taboverlay.AbstractPlayerTabOverlayProvider;
+import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.TabView;
+import de.codecrafter47.taboverlay.handler.*;
+import lombok.NonNull;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
+import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -41,8 +47,7 @@ import static java.lang.Math.*;
 
 public class DemoPlugin extends Plugin {
 
-    private CustomTablist customTablist;
-    private Icon icon = Icon.DEFAULT;
+    private CompletableFuture<Icon> customIcon;
 
     @Override
     public void onLoad() {
@@ -54,42 +59,145 @@ public class DemoPlugin extends Plugin {
                 return player.getName().toUpperCase();
             }
         });
-    }
 
-    @Override
-    public void onEnable() {
-        // create a custom tab list
-        customTablist = BungeeTabListPlusAPI.createCustomTablist();
-        // with 19 rows and 1 column
-        customTablist.setSize(19);
-
-        // if the player types /tabdemo he will see the custom tab list
-        getProxy().getPluginManager().registerCommand(this, new Command("tabdemo") {
-            @Override
-            public void execute(CommandSender sender, String[] args) {
-                if (sender instanceof ProxiedPlayer) {
-                    BungeeTabListPlusAPI.setCustomTabList(((ProxiedPlayer) sender), customTablist);
-                }
-            }
-        });
-
-        // every second call updateCustomTablist to update the content of our custom tab list
-        getProxy().getScheduler().schedule(this, this::updateCustomTablist, 1, 1, TimeUnit.SECONDS);
-
-        // Create our icon. Use the default icon until the custom one is created.
+        // Create our icon.
         try {
+            // read the image file
             BufferedImage image = ImageIO.read(getResourceAsStream("icon.png"));
-            BungeeTabListPlusAPI.createIcon(image, icon -> this.icon = icon);
+            // call getIconFromImage, this gives use a future that will hold the icon once completed
+            customIcon = BungeeTabListPlusAPI.getIconFromImage(image);
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, "Failed to load icon.", ex);
         }
     }
 
+    @Override
+    public void onEnable() {
+
+        // register the /tabdemo command.
+        // It will display the custom tab list to players
+        getProxy().getPluginManager().registerCommand(this, new Command("tabdemo") {
+            @Override
+            public void execute(CommandSender sender, String[] args) {
+                if (sender instanceof ProxiedPlayer) {
+                    // get the tab view for the player
+                    TabView tabView = BungeeTabListPlusAPI.getTabViewForPlayer((ProxiedPlayer) sender);
+                    // create a new instance of our CustomTabOverlayProvider and add it to the tab view
+                    tabView.getTabOverlayProviders().addProvider(new CustomTabOverlayProvider(tabView));
+                }
+            }
+        });
+    }
+
     /**
-     * This method renders an analogue clock to the tab list.
+     * Our custom tab overlay provider.
      */
-    private void updateCustomTablist() {
-        // create an image
+    private class CustomTabOverlayProvider extends AbstractPlayerTabOverlayProvider {
+
+        // In this field we will store the handle to access the header and footer
+        private HeaderAndFooterHandle headerFooterHandle;
+        // In the contentHandle field we store the handle to modify the content of the tab list
+        private RectangularTabOverlay contentHandle;
+        // The updateTask field stores the task hande for the update task
+        private ScheduledTask updateTask;
+
+        public CustomTabOverlayProvider(@Nonnull @NonNull TabView tabView) {
+            // set the name to "custom-taboverlay-example", you can use any name, but it needs to be unique
+            // set the priority to 1000. The plugin will display the tab overlay with the highest priority. So using a
+            // high number here is good. It ensures our custom tab overlay is displayed and not a tab list provided by
+            // a config file. The priority should be between 0 and 10000.
+            super(tabView, "custom-taboverlay-example", 1000);
+        }
+
+        @Override
+        protected void onAttach() {
+            // This informs us that the tab overlay provider has been added to a tab view.
+            // We can access the tab view using super.getTabView(). After this has been called BungeeTabListPlus
+            // expects shouldActivate() to return correct values.
+
+            // In this example we don't need to do anything here. However if you create a more complex tab overlay
+            // provider, that isn't always active, but should activate depending on some condition, you might want to
+            // do some stuff here.
+        }
+
+        @Override
+        protected void onActivate(TabOverlayHandler handler) {
+            // Our tab overlay provider has been activated
+
+            // Configure that tab overlay of the player and store the handles so we can modify it later
+            // IMPORTANT: Do not store a copy of handler anywhere!!!
+
+            // for the header and footer we can choose either custom or pass through
+            // we choose custom
+            headerFooterHandle = handler.enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.CUSTOM);
+
+            // for the content we can choose between rectangular, simple and pass through.
+            // we choose rectangular
+            contentHandle = handler.enterContentOperationMode(ContentOperationMode.RECTANGULAR);
+
+            // We set the header text
+            headerFooterHandle.setHeader("&6Super &eAwesome &cClock");
+
+            // now we set the size of the content to 1 column, 19 rows
+            contentHandle.setSize(new RectangularTabOverlay.Dimension(1, 19));
+
+            // we schedule a task to update the content every second
+            // we store the task handle in a field so we can cancel it later
+            updateTask = getProxy().getScheduler().schedule(DemoPlugin.this, this::updateContent, 0, 1, TimeUnit.SECONDS);
+        }
+
+        @Override
+        protected void onDeactivate() {
+            // Our tab overlay provider has been deactivated
+            // We should now stop modifying the tab list
+
+            // We cancel the update task
+            updateTask.cancel();
+        }
+
+        @Override
+        protected void onDetach() {
+            // Our tab overlay provider has been detached from the tab view.
+            // This means it is no longer used at all.
+
+            // You can use this method to free any resources you might have acquired.
+
+            // In this example we don't have to do anything here.
+        }
+
+        @Override
+        protected boolean shouldActivate() {
+            // This method is used by the plugin to check whether this tab overlay provider should be active.
+
+            // In our example we want our custom tab overlay provider to always be used so we always return true.
+            return true;
+        }
+
+        // This method renders an analogue clock to the tab list.
+        private void updateContent() {
+            // First we draw to a buffered image
+            BufferedImage image = renderClock();
+
+            // now we convert the image to text lines and set the appropriate slot of the tab list
+            for (int row = 0; row < 19; row++) {
+                String text = "";
+                for (int x = 0; x < 19; x++) {
+                    ChatColor chatColor = getSimilarChatColor(new Color(image.getRGB(x, row)));
+                    text += chatColor == null ? ' ' : chatColor.toString() + '█';
+                }
+
+                // get our custom icon. If it's not ready yet use the default alex icon
+                Icon icon = customIcon.getNow(Icon.DEFAULT_ALEX);
+
+                // set the icon, text and ping of the slot
+                contentHandle.setSlot(0, row, icon, text, 0);
+            }
+        }
+    }
+
+    // This method renders an analogue clock to a buffered image.
+    @Nonnull
+    private BufferedImage renderClock() {
         BufferedImage image = new BufferedImage(19, 19, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         // background
@@ -111,14 +219,6 @@ public class DemoPlugin extends Plugin {
         int second = Calendar.getInstance().get(Calendar.SECOND);
         g.setColor(getAWTColor(ChatColor.GOLD));
         g.drawLine(9, 9, (int) round(9 + 9 * sin(second / 30.0 * PI)), (int) round(9 - 9 * cos(second / 30.0 * PI)));
-        // convert the image to chat lines
-        for (int line = 0; line < 19; line++) {
-            String text = "";
-            for (int x = 0; x < 19; x++) {
-                ChatColor chatColor = getSimilarChatColor(new Color(image.getRGB(x, line)));
-                text += chatColor == null ? ' ' : chatColor.toString() + '█';
-            }
-            customTablist.setSlot(line, 0, icon, text, 0);
-        }
+        return image;
     }
 }
