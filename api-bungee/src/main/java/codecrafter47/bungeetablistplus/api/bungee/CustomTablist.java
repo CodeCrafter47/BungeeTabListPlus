@@ -27,12 +27,15 @@ public interface CustomTablist {
      * Set the size of the tab list.
      * <p>
      * Recommended values:
-     * <table>
-     * <th>
-     * <td>Size</td>
-     * <td>Columns</td>
-     * <td>Rows</td>
-     * </th>
+     * <table summary="">
+     * <thead>
+     * <tr>
+     * <th>Size</th>
+     * <th>Columns</th>
+     * <th>Rows</th>
+     * </tr>
+     * </thead>
+     * <tbody>
      * <tr>
      * <td>0</td>
      * <td>0</td>
@@ -68,6 +71,7 @@ public interface CustomTablist {
      * <td>4</td>
      * <td>20</td>
      * </tr>
+     * </tbody>
      * </table>
      *
      * @param size new size of the tab list
