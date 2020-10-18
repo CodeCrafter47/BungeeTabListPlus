@@ -18,7 +18,6 @@
 package codecrafter47.bungeetablistplus.player;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.api.bungee.CustomTablist;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.data.NullDataHolder;
 import codecrafter47.bungeetablistplus.managers.DataManager;
@@ -43,10 +42,6 @@ public class BungeePlayer extends AbstractPlayer {
 
     @Getter
     private final DataManager.LocalDataCache localDataCache;
-
-    @Getter
-    @Setter
-    private CustomTablist customTablist = null;
 
     /**
      * The player is no longer connected to the proxy, but a DisconnectEvent has not been called.

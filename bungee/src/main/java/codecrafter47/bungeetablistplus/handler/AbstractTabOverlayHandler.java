@@ -28,6 +28,7 @@ import de.codecrafter47.bungeetablistplus.bungee.compat.PacketUtil;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
+import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
@@ -472,7 +473,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
         nextActiveContentHandlerQueue.add(handler);
         scheduleUpdate();
-        return (R) handler.getTabOverlay();
+        return Unchecked.cast(handler.getTabOverlay());
     }
 
     @Override
@@ -487,7 +488,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
         nextActiveHeaderFooterHandlerQueue.add(handler);
         scheduleUpdate();
-        return (R) handler.getTabOverlay();
+        return Unchecked.cast(handler.getTabOverlay());
     }
 
     private void scheduleUpdate() {

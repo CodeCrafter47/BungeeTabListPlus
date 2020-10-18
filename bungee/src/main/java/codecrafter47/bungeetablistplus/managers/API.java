@@ -64,6 +64,7 @@ public class API extends BungeeTabListPlusAPI {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist) {
         TabView tabView = tabViewManager.getTabView(player);
         if (tabView == null) {
@@ -167,6 +168,7 @@ public class API extends BungeeTabListPlusAPI {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected CustomTablist createCustomTablist0() {
         return new DefaultCustomTablist();
     }

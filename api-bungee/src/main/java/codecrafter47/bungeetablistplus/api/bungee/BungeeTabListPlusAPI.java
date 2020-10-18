@@ -76,6 +76,7 @@ public abstract class BungeeTabListPlusAPI {
         return instance.createCustomTablist0();
     }
 
+    @SuppressWarnings("deprecation")
     protected abstract CustomTablist createCustomTablist0();
 
     /**
@@ -91,6 +92,7 @@ public abstract class BungeeTabListPlusAPI {
         instance.setCustomTabList0(player, customTablist);
     }
 
+    @SuppressWarnings("deprecation")
     protected abstract void setCustomTabList0(ProxiedPlayer player, CustomTablist customTablist);
 
     /**

@@ -32,6 +32,7 @@ import static java.lang.Integer.min;
 /**
  * Represents a custom tab list.
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractCustomTablist implements CustomTablist {
     private static Icon[] EMPTY_ICON_ARRAY = new Icon[0];
     private static String[] EMPTY_STRING_ARRAY = new String[0];

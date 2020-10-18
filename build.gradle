@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'ru.vyarus:gradle-quality-plugin:4.4.0'
+    }
+}
 
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
@@ -14,6 +23,7 @@ allprojects {
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'ru.vyarus.quality'
 
     repositories {
         mavenCentral()
