@@ -17,7 +17,6 @@
 
 package codecrafter47.bungeetablistplus.managers;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.ServerDataHolder;
@@ -29,8 +28,8 @@ import com.imaginarycode.minecraft.redisbungee.RedisBungee;
 import de.codecrafter47.data.api.*;
 import de.codecrafter47.data.bungee.AbstractBungeeDataAccess;
 import de.codecrafter47.data.bungee.PlayerDataAccess;
+import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.config.player.Player;
-import de.codecrafter47.taboverlay.util.Unchecked;
 import io.netty.util.concurrent.EventExecutor;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,7 @@
 
 dependencies {
     compileOnly "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
+    api "de.codecrafter47.taboverlay:taboverlaycommon-api:1.0-SNAPSHOT"
 }
 
 java {

@@ -56,7 +56,7 @@ import de.codecrafter47.taboverlay.config.platform.EventListener;
 import de.codecrafter47.taboverlay.config.platform.Platform;
 import de.codecrafter47.taboverlay.config.player.JoinedPlayerProvider;
 import de.codecrafter47.taboverlay.config.player.PlayerProvider;
-import de.codecrafter47.taboverlay.spectator.SpectatorPassthroughTabOverlayManager;
+import de.codecrafter47.taboverlay.config.spectator.SpectatorPassthroughTabOverlayManager;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.MultithreadEventExecutorGroup;
