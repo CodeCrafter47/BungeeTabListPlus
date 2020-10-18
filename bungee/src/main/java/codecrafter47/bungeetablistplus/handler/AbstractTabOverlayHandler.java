@@ -2142,15 +2142,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
         }
 
-        void setTextInternal(int index, @Nonnull @NonNull String text, char alternateColorChar) {
-            String jsonText = ChatFormat.formattedTextToJson(text);
-            if (!jsonText.equals(this.text[index])) {
-                this.text[index] = jsonText;
-                dirtyFlagsText.set(index);
-                scheduleUpdateIfNotInBatch();
-            }
-        }
-
         void setPingInternal(int index, int ping) {
             if (ping != this.ping[index]) {
                 this.ping[index] = ping;
@@ -2284,42 +2275,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         @Override
-        public void setSlot(int column, int row, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, size.getColumns(), "column");
-                Preconditions.checkElementIndex(row, size.getRows(), "row");
-                beginBatchModification();
-                try {
-                    int index = index(column, row);
-                    setUuidInternal(index, null);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
-        public void setSlot(int column, int row, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, size.getColumns(), "column");
-                Preconditions.checkElementIndex(row, size.getRows(), "row");
-                beginBatchModification();
-                try {
-                    int index = index(column, row);
-                    setUuidInternal(index, uuid);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
         public void setUuid(int column, int row, @Nullable UUID uuid) {
             if (isValid()) {
                 Preconditions.checkElementIndex(column, size.getColumns(), "column");
@@ -2343,15 +2298,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 Preconditions.checkElementIndex(column, size.getColumns(), "column");
                 Preconditions.checkElementIndex(row, size.getRows(), "row");
                 setTextInternal(index(column, row), text);
-            }
-        }
-
-        @Override
-        public void setText(int column, int row, @Nonnull String text, char alternateColorChar) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, size.getColumns(), "column");
-                Preconditions.checkElementIndex(row, size.getRows(), "row");
-                setTextInternal(index(column, row), text, alternateColorChar);
             }
         }
 
@@ -2446,38 +2392,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         @Override
-        public void setSlot(int index, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size, "index");
-                beginBatchModification();
-                try {
-                    setUuidInternal(index, uuid);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
-        public void setSlot(int index, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size, "index");
-                beginBatchModification();
-                try {
-                    setUuidInternal(index, null);
-                    setIconInternal(index, icon);
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
         public void setUuid(int index, UUID uuid) {
             if (isValid()) {
                 Preconditions.checkElementIndex(index, size, "index");
@@ -2498,14 +2412,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (isValid()) {
                 Preconditions.checkElementIndex(index, size, "index");
                 setTextInternal(index, text);
-            }
-        }
-
-        @Override
-        public void setText(int index, @Nonnull String text, char alternateColorChar) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size, "index");
-                setTextInternal(index, text, alternateColorChar);
             }
         }
 
@@ -2600,14 +2506,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         @Override
-        public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
-            this.header = ChatFormat.formattedTextToJson(header);
-            this.footer = ChatFormat.formattedTextToJson(footer);
-            headerOrFooterDirty = true;
-            scheduleUpdateIfNotInBatch();
-        }
-
-        @Override
         public void setHeader(@Nullable String header) {
             this.header = ChatFormat.formattedTextToJson(header);
             headerOrFooterDirty = true;
@@ -2615,21 +2513,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
 
         @Override
-        public void setHeader(@Nullable String header, char alternateColorChar) {
-            this.header = ChatFormat.formattedTextToJson(header);
-            headerOrFooterDirty = true;
-            scheduleUpdateIfNotInBatch();
-        }
-
-        @Override
         public void setFooter(@Nullable String footer) {
-            this.footer = ChatFormat.formattedTextToJson(footer);
-            headerOrFooterDirty = true;
-            scheduleUpdateIfNotInBatch();
-        }
-
-        @Override
-        public void setFooter(@Nullable String footer, char alternateColorChar) {
             this.footer = ChatFormat.formattedTextToJson(footer);
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();

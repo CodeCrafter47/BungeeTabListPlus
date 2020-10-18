@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.taboverlay.Icon;
-import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -497,10 +496,6 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             }
         }
 
-        void setTextInternal(int index, String text, char alternateColorChar) {
-            setTextInternal(index, ChatFormat.formattedTextToLegacy(text));
-        }
-
         void setTextInternal(int index, String text) {
             String text0, text1;
             if (text.length() <= 16) {
@@ -618,24 +613,6 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         @Override
-        public void setSlot(int column, int row, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, sizeAsDimension.getColumns(), "column");
-                Preconditions.checkElementIndex(row, sizeAsDimension.getRows(), "row");
-                int index = row * sizeAsDimension.getColumns() + column;
-
-                beginBatchModification();
-                try {
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-
-        }
-
-        @Override
         public void setUuid(int column, int row, UUID uuid) {
             // nothing to do - not supported in 1.7
         }
@@ -652,16 +629,6 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 Preconditions.checkElementIndex(row, sizeAsDimension.getRows(), "row");
                 int index = row * sizeAsDimension.getColumns() + column;
                 setTextInternal(index, text);
-            }
-        }
-
-        @Override
-        public void setText(int column, int row, @Nonnull String text, char alternateColorChar) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(column, sizeAsDimension.getColumns(), "column");
-                Preconditions.checkElementIndex(row, sizeAsDimension.getRows(), "row");
-                int index = row * sizeAsDimension.getColumns() + column;
-                setTextInternal(index, text, alternateColorChar);
             }
         }
 
@@ -738,36 +705,6 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         @Override
-        public void setSlot(int index, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size);
-
-                beginBatchModification();
-                try {
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
-        public void setSlot(int index, @Nullable UUID uuid, @Nonnull Icon icon, @Nonnull String text, char alternateColorChar, int ping) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size);
-
-                beginBatchModification();
-                try {
-                    setTextInternal(index, text, alternateColorChar);
-                    setPingInternal(index, ping);
-                } finally {
-                    completeBatchModification();
-                }
-            }
-        }
-
-        @Override
         public void setUuid(int index, UUID uuid) {
             // nothing to do - not supported in 1.7
         }
@@ -782,14 +719,6 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             if (isValid()) {
                 Preconditions.checkElementIndex(index, size);
                 setTextInternal(index, text);
-            }
-        }
-
-        @Override
-        public void setText(int index, @Nonnull String text, char alternateColorChar) {
-            if (isValid()) {
-                Preconditions.checkElementIndex(index, size);
-                setTextInternal(index, text, alternateColorChar);
             }
         }
 
@@ -812,27 +741,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         @Override
-        public void setHeaderFooter(@Nullable String header, @Nullable String footer, char alternateColorChar) {
-            // dummy
-        }
-
-        @Override
         public void setHeader(@Nullable String header) {
             // dummy
         }
 
         @Override
-        public void setHeader(@Nullable String header, char alternateColorChar) {
-            // dummy
-        }
-
-        @Override
         public void setFooter(@Nullable String footer) {
-            // dummy
-        }
-
-        @Override
-        public void setFooter(@Nullable String footer, char alternateColorChar) {
             // dummy
         }
 
