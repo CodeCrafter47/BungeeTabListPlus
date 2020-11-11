@@ -17,7 +17,7 @@
 package codecrafter47.bungeetablistplus.config;
 
 import com.google.common.collect.ImmutableList;
-import de.codecrafter47.taboverlay.config.dsl.CustomPlaceholderConfiguration;
+import de.codecrafter47.taboverlay.config.dsl.customplaceholder.CustomPlaceholderConfiguration;
 import de.codecrafter47.taboverlay.config.dsl.yaml.UpdateableConfig;
 import de.codecrafter47.taboverlay.config.dsl.yaml.YamlUtil;
 import lombok.val;
