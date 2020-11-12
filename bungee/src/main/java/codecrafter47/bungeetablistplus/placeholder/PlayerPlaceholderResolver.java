@@ -113,7 +113,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
             return (p==null?null:p.replaceAll(".*?&(.)","&$1"));
         }, TypeToken.STRING));
         addPlaceholder("vault_player_prefix", create(MinecraftData.Permissions_PlayerPrefix));
-        addPlaceholder("vault_player_prefix", create(MinecraftData.Permissions_PlayerPrefix, p -> {
+        addPlaceholder("vault_player_prefix_color", create(MinecraftData.Permissions_PlayerPrefix, p -> {
             return (p==null?null:p.replaceAll(".*?&(.)","&$1"));
         }, TypeToken.STRING));
         addPlaceholder("vault_primary_group_weight", create(MinecraftData.Permissions_PermissionGroupWeight));
