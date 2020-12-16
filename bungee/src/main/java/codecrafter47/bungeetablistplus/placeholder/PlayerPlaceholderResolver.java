@@ -168,7 +168,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         }
         if (args.get(0) instanceof PlaceholderArg.Text) {
             String permission = args.remove(0).getText();
-            return builder.acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.BOOLEAN, MinecraftData.permission(permission), (p, d) -> d), TypeToken.BOOLEAN);
+            return builder.acquireData(new PlayerPlaceholderDataProviderSupplier<>(TypeToken.BOOLEAN, BTLPBungeeDataKeys.permission(permission), (p, d) -> d), TypeToken.BOOLEAN);
         } else {
             ExpressionTemplate permission = args.remove(0).getExpression();
             Function<Context, Player> playerFunction = builder.getContextTransformation();
@@ -252,7 +252,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         @Override
         protected void onActivation() {
             permission.activate(getContext(), this);
-            permissionDataKey = MinecraftData.permission(permission.evaluate());
+            permissionDataKey = BTLPBungeeDataKeys.permission(permission.evaluate());
             if (hasListener()) {
                 playerFunction.apply(getContext()).addDataChangeListener(permissionDataKey, getListener());
             }
@@ -276,7 +276,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
             if (hasListener()) {
                 playerFunction.apply(getContext()).removeDataChangeListener(permissionDataKey, getListener());
             }
-            permissionDataKey = MinecraftData.permission(permission.evaluate());
+            permissionDataKey = BTLPBungeeDataKeys.permission(permission.evaluate());
             if (hasListener()) {
                 playerFunction.apply(getContext()).addDataChangeListener(permissionDataKey, getListener());
                 getListener().run();

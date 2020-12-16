@@ -80,16 +80,16 @@ public class CommandDebug extends CommandExecutor {
         Runnable dummyListener = () -> {
         };
         CompletableFuture.runAsync(() -> {
-            player.addDataChangeListener(MinecraftData.permission("bungeetablistplus.seevanished"), dummyListener);
+            player.addDataChangeListener(BTLPBungeeDataKeys.permission("bungeetablistplus.seevanished"), dummyListener);
             player.addDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN, dummyListener);
         }, btlp.getMainThreadExecutor())
                 .thenRun(() -> {
                     btlp.getMainThreadExecutor().schedule(() -> {
-                        Boolean canSeeHiddenPlayers = player.get(MinecraftData.permission("bungeetablistplus.seevanished"));
+                        Boolean canSeeHiddenPlayers = player.get(BTLPBungeeDataKeys.permission("bungeetablistplus.seevanished"));
                         Boolean isHidden = player.get(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN);
                         List<String> activeVanishProviders = btlp.getHiddenPlayersManager().getActiveVanishProviders(player);
 
-                        player.removeDataChangeListener(MinecraftData.permission("bungeetablistplus.seevanished"), dummyListener);
+                        player.removeDataChangeListener(BTLPBungeeDataKeys.permission("bungeetablistplus.seevanished"), dummyListener);
                         player.removeDataChangeListener(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN, dummyListener);
 
                         sender.sendMessage(ChatUtil.parseBBCode("&bPlayer: &f" + player.getName() + "\n" +

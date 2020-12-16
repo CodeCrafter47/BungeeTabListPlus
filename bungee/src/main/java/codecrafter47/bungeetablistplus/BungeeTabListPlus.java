@@ -25,6 +25,7 @@ import codecrafter47.bungeetablistplus.compat.SortingRuleAliasProcessor;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.config.PlayersByServerComponentConfiguration;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
+import codecrafter47.bungeetablistplus.data.PermissionDataProvider;
 import codecrafter47.bungeetablistplus.listener.TabListListener;
 import codecrafter47.bungeetablistplus.managers.*;
 import codecrafter47.bungeetablistplus.placeholder.GlobalServerPlaceholderResolver;
@@ -241,7 +242,7 @@ public class BungeeTabListPlus {
                 .playerIconDataKey(BTLPBungeeDataKeys.DATA_KEY_ICON)
                 .playerPingDataKey(BungeeData.BungeeCord_Ping)
                 .playerInvisibleDataKey(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN)
-                .playerCanSeeInvisibleDataKey(MinecraftData.permission("bungeetablistplus.seevanished"))
+                .playerCanSeeInvisibleDataKey(BTLPBungeeDataKeys.permission("bungeetablistplus.seevanished"))
                 .component(new ComponentSpec("!players_by_server", PlayersByServerComponentConfiguration.class))
                 .sortingRulePreprocessor(new SortingRuleAliasProcessor())
                 .build();
@@ -284,6 +285,7 @@ public class BungeeTabListPlus {
         serverStateManager = new ServerStateManager(config, plugin);
         dataManager = new DataManager(api, this.getPlugin(), this.getLogger(), bungeePlayerProvider, mainThreadExecutor, serverStateManager, bukkitBridge);
         dataManager.addCompositeDataProvider(hiddenPlayersManager);
+        dataManager.addCompositeDataProvider(new PermissionDataProvider());
 
         updateExcludedAndHiddenServerLists();
 

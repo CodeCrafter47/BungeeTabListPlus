@@ -47,6 +47,7 @@ public class BTLPBungeeDataKeys implements DataKeyCatalogue {
     public static final DataKey<Boolean> DATA_KEY_IS_HIDDEN_PLAYER_CONFIG = new DataKey<>("btlp:is_hidden_player_config", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.BOOLEAN);
     public static final DataKey<Boolean> DATA_KEY_IS_HIDDEN_PLAYER_COMMAND = new DataKey<>("btlp:is_hidden_player_command", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.BOOLEAN);
     public static final DataKey<Boolean> DATA_KEY_IS_HIDDEN_SERVER_CONFIG = new DataKey<>("btlp:is_hidden_server_config", BungeeData.SCOPE_BUNGEE_SERVER, TypeToken.BOOLEAN);
+    public static final DataKey<Boolean> Permission = new DataKey<>("btlp:permission", BungeeData.SCOPE_BUNGEE_PLAYER, TypeToken.BOOLEAN);
 
     public static DataKey<String> createBungeeThirdPartyVariableDataKey(String name) {
         return ThirdPartyPlaceholderBungee.withParameter(name);
@@ -54,5 +55,9 @@ public class BTLPBungeeDataKeys implements DataKeyCatalogue {
 
     public static DataKey<String> createBungeeThirdPartyServerVariableDataKey(String name) {
         return ThirdPartyServerPlaceholderBungee.withParameter(name);
+    }
+
+    public static DataKey<Boolean> permission(String permission) {
+        return Permission.withParameter(permission);
     }
 }
