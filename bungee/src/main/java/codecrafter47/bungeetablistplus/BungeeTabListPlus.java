@@ -282,7 +282,8 @@ public class BungeeTabListPlus {
         plugin.getProxy().registerChannel(BridgeProtocolConstants.CHANNEL);
         bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), getLogger(), bungeePlayerProvider, this, cache);
         serverStateManager = new ServerStateManager(config, plugin);
-        dataManager = new DataManager(api, this.getPlugin(), this.getLogger(), bungeePlayerProvider, mainThreadExecutor, hiddenPlayersManager, serverStateManager, bukkitBridge);
+        dataManager = new DataManager(api, this.getPlugin(), this.getLogger(), bungeePlayerProvider, mainThreadExecutor, serverStateManager, bukkitBridge);
+        dataManager.addCompositeDataProvider(hiddenPlayersManager);
 
         updateExcludedAndHiddenServerLists();
 

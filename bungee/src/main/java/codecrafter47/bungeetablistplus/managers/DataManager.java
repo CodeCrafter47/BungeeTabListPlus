@@ -18,6 +18,7 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
+import codecrafter47.bungeetablistplus.data.AbstractCompositeDataProvider;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.data.ServerDataHolder;
 import codecrafter47.bungeetablistplus.data.TrackingDataCache;
@@ -41,10 +42,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -54,13 +52,13 @@ public class DataManager implements Listener {
     private final API api;
     private final EventExecutor mainThreadExecutor;
     private final BungeePlayerProvider bungeePlayerProvider;
-    private final HiddenPlayersManager hiddenPlayersManager;
     private final ServerStateManager serverStateManager;
     private final BukkitBridge bukkitBridge;
 
     private final DataAccess<ProxiedPlayer> playerDataAccess;
     private final DataAccess<String> serverDataAccess;
     private final DataAccess<ProxyServer> proxyDataAccess;
+    private final Map<String, AbstractCompositeDataProvider<?>> compositeDataProviders = new HashMap<>();
 
     private final Map<String, TrackingDataCache> serverData = new ConcurrentHashMap<>();
     private final Map<String, DataHolder> combinedServerData = new ConcurrentHashMap<>();
@@ -73,11 +71,10 @@ public class DataManager implements Listener {
     @Setter
     List<String> permanentlyHiddenPlayers = Collections.emptyList();
 
-    public DataManager(API api, Plugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, EventExecutor mainThreadExecutor, HiddenPlayersManager hiddenPlayersManager, ServerStateManager serverStateManager, BukkitBridge bukkitBridge) {
+    public DataManager(API api, Plugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, EventExecutor mainThreadExecutor, ServerStateManager serverStateManager, BukkitBridge bukkitBridge) {
         this.api = api;
         this.bungeePlayerProvider = bungeePlayerProvider;
         this.mainThreadExecutor = mainThreadExecutor;
-        this.hiddenPlayersManager = hiddenPlayersManager;
         this.serverStateManager = serverStateManager;
         this.bukkitBridge = bukkitBridge;
         this.playerDataAccess = JoinedDataAccess.of(new PlayerDataAccess(plugin, logger),
@@ -97,6 +94,10 @@ public class DataManager implements Listener {
             combinedServerData.put(serverName, new ServerDataHolder(getLocalServerDataHolder(serverName), bukkitBridge.getServerDataHolder(serverName)));
         }
         return combinedServerData.get(serverName);
+    }
+
+    public <T> void addCompositeDataProvider(@Nonnull AbstractCompositeDataProvider<T> provider) {
+        compositeDataProviders.put(provider.getCompositeDataKey().getId(), provider);
     }
 
     private DataHolder getLocalServerDataHolder(@Nonnull String serverName) {
@@ -182,8 +183,9 @@ public class DataManager implements Listener {
 
         @Override
         protected <T> void addActiveKey(DataKey<T> key) {
-            if (key == BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN) {
-                hiddenPlayersManager.onPlayerAdded(player);
+            AbstractCompositeDataProvider<?> compositeDataProvider = compositeDataProviders.get(key.getId());
+            if (compositeDataProvider != null) {
+                compositeDataProvider.onPlayerAdded(player);
             } else {
                 super.addActiveKey(key);
             }
@@ -191,8 +193,9 @@ public class DataManager implements Listener {
 
         @Override
         protected <T> void removeActiveKey(DataKey<T> key) {
-            if (key == BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN) {
-                hiddenPlayersManager.onPlayerRemoved(player);
+            AbstractCompositeDataProvider<?> compositeDataProvider = compositeDataProviders.get(key.getId());
+            if (compositeDataProvider != null) {
+                compositeDataProvider.onPlayerRemoved(player);
             } else {
                 super.removeActiveKey(key);
             }

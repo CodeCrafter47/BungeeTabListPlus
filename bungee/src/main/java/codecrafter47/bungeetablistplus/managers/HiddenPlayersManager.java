@@ -17,6 +17,7 @@
 
 package codecrafter47.bungeetablistplus.managers;
 
+import codecrafter47.bungeetablistplus.data.AbstractCompositeDataProvider;
 import codecrafter47.bungeetablistplus.data.BTLPBungeeDataKeys;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import de.codecrafter47.data.api.DataKey;
@@ -24,15 +25,16 @@ import de.codecrafter47.taboverlay.config.player.Player;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class HiddenPlayersManager {
+public class HiddenPlayersManager extends AbstractCompositeDataProvider<Boolean> {
 
     private final List<VanishProvider> vanishProviders = new ArrayList<>();
-    private final Map<BungeePlayer, PlayerDataListener> playerDataListenerMap = new HashMap<>();
     private boolean active = false;
+
+    public HiddenPlayersManager() {
+        super(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN);
+    }
 
     public void enable() {
         active = true;
@@ -52,26 +54,27 @@ public class HiddenPlayersManager {
         this.vanishProviders.add(new VanishProvider(name, dataIsHidden));
     }
 
-    void onPlayerAdded(Player player) {
-        if (player instanceof BungeePlayer) {
-            PlayerDataListener playerDataListener = new PlayerDataListener((BungeePlayer) player);
-            playerDataListenerMap.put((BungeePlayer) player, playerDataListener);
-            for (VanishProvider vanishProvider : vanishProviders) {
-                player.addDataChangeListener(vanishProvider.dataIsHidden, playerDataListener);
-            }
-            playerDataListener.run();
+    @Override
+    protected void registerListener(Player player, PlayerDataListener playerDataListener) {
+        for (VanishProvider vanishProvider : vanishProviders) {
+            player.addDataChangeListener(vanishProvider.dataIsHidden, playerDataListener);
         }
     }
 
-    void onPlayerRemoved(Player player) {
-        if (player instanceof BungeePlayer) {
-            PlayerDataListener playerDataListener = playerDataListenerMap.remove(player);
-            if (playerDataListener != null) {
-                for (VanishProvider vanishProvider : vanishProviders) {
-                    player.removeDataChangeListener(vanishProvider.dataIsHidden, playerDataListener);
-                }
-            }
+    @Override
+    protected void unregisterListener(Player player, PlayerDataListener playerDataListener) {
+        for (VanishProvider vanishProvider : vanishProviders) {
+            player.removeDataChangeListener(vanishProvider.dataIsHidden, playerDataListener);
         }
+    }
+
+    @Override
+    protected Boolean computeCompositeData(BungeePlayer player) {
+        boolean hidden = false;
+        for (VanishProvider vanishProvider : vanishProviders) {
+            hidden = hidden || Boolean.TRUE.equals(player.get(vanishProvider.dataIsHidden));
+        }
+        return hidden;
     }
 
     public List<String> getActiveVanishProviders(BungeePlayer player) {
@@ -82,23 +85,6 @@ public class HiddenPlayersManager {
             }
         }
         return activeVanishProviders;
-    }
-
-    private class PlayerDataListener implements Runnable {
-        private final BungeePlayer player;
-
-        private PlayerDataListener(BungeePlayer player) {
-            this.player = player;
-        }
-
-        @Override
-        public void run() {
-            boolean hidden = false;
-            for (VanishProvider vanishProvider : vanishProviders) {
-                hidden = hidden || Boolean.TRUE.equals(player.get(vanishProvider.dataIsHidden));
-            }
-            player.getLocalDataCache().updateValue(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN, hidden);
-        }
     }
 
     @Data
