@@ -55,21 +55,21 @@ public class HiddenPlayersManager extends AbstractCompositeDataProvider<Boolean>
     }
 
     @Override
-    protected void registerListener(Player player, PlayerDataListener playerDataListener) {
+    protected void registerListener(Player player, DataKey<Boolean> key, Runnable listener) {
         for (VanishProvider vanishProvider : vanishProviders) {
-            player.addDataChangeListener(vanishProvider.dataIsHidden, playerDataListener);
+            player.addDataChangeListener(vanishProvider.dataIsHidden, listener);
         }
     }
 
     @Override
-    protected void unregisterListener(Player player, PlayerDataListener playerDataListener) {
+    protected void unregisterListener(Player player, DataKey<Boolean> key, Runnable listener) {
         for (VanishProvider vanishProvider : vanishProviders) {
-            player.removeDataChangeListener(vanishProvider.dataIsHidden, playerDataListener);
+            player.removeDataChangeListener(vanishProvider.dataIsHidden, listener);
         }
     }
 
     @Override
-    protected Boolean computeCompositeData(BungeePlayer player) {
+    protected Boolean computeCompositeData(BungeePlayer player, DataKey<Boolean> key) {
         boolean hidden = false;
         for (VanishProvider vanishProvider : vanishProviders) {
             hidden = hidden || Boolean.TRUE.equals(player.get(vanishProvider.dataIsHidden));

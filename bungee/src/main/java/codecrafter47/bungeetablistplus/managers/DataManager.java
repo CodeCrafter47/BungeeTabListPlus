@@ -185,7 +185,7 @@ public class DataManager implements Listener {
         protected <T> void addActiveKey(DataKey<T> key) {
             AbstractCompositeDataProvider<?> compositeDataProvider = compositeDataProviders.get(key.getId());
             if (compositeDataProvider != null) {
-                compositeDataProvider.onPlayerAdded(player);
+                compositeDataProvider.onPlayerAdded(player, Unchecked.cast(key));
             } else {
                 super.addActiveKey(key);
             }
@@ -195,7 +195,7 @@ public class DataManager implements Listener {
         protected <T> void removeActiveKey(DataKey<T> key) {
             AbstractCompositeDataProvider<?> compositeDataProvider = compositeDataProviders.get(key.getId());
             if (compositeDataProvider != null) {
-                compositeDataProvider.onPlayerRemoved(player);
+                compositeDataProvider.onPlayerRemoved(player, Unchecked.cast(key));
             } else {
                 super.removeActiveKey(key);
             }
