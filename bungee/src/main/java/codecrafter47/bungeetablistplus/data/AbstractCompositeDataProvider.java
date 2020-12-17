@@ -1,10 +1,8 @@
 package codecrafter47.bungeetablistplus.data;
 
-import codecrafter47.bungeetablistplus.managers.HiddenPlayersManager;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.taboverlay.config.player.Player;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Value;
 
@@ -23,7 +21,7 @@ public abstract class AbstractCompositeDataProvider<T> {
 
     public final void onPlayerAdded(Player player, DataKey<T> key) {
         if (player instanceof BungeePlayer) {
-            PlayerDataListener playerDataListener = new PlayerDataListener((BungeePlayer) player);
+            PlayerDataListener playerDataListener = new PlayerDataListener((BungeePlayer) player, key);
             playerDataListenerMap.put(new CompositeKey((BungeePlayer) player, key), playerDataListener);
             registerListener(player, key, playerDataListener);
             playerDataListener.run();
@@ -47,15 +45,16 @@ public abstract class AbstractCompositeDataProvider<T> {
 
     protected class PlayerDataListener implements Runnable {
         private final BungeePlayer player;
-        DataKey<T> dataKey;
+        private final DataKey<T> dataKey;
 
-        private PlayerDataListener(BungeePlayer player) {
+        private PlayerDataListener(BungeePlayer player, DataKey<T> dataKey) {
             this.player = player;
+            this.dataKey = dataKey;
         }
 
         @Override
         public void run() {
-            player.getLocalDataCache().updateValue(getCompositeDataKey(), computeCompositeData(player, dataKey));
+            player.getLocalDataCache().updateValue(dataKey, computeCompositeData(player, dataKey));
         }
     }
 
