@@ -83,8 +83,8 @@ subprojects {
                     url "https://nexus.codecrafter47.de/content/repositories/releases/"
                 }
                 credentials {
-                    username "$mavenUser"
-                    password "$mavenPassword"
+                    username "${project.properties.mavenUser}"
+                    password "${project.properties.mavenPassword}"
                 }
             }
         }
