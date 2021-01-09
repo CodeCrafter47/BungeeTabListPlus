@@ -460,6 +460,9 @@ public class BungeeTabListPlus {
             updateExcludedAndHiddenServerLists();
             updateTimeZoneAndGlobalCustomPlaceholders();
 
+            // clear cache to force image files to be read from disk again
+            iconManager.clearCache();
+
             Path tabLists = getPlugin().getDataFolder().toPath().resolve("tabLists");
             configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
 
