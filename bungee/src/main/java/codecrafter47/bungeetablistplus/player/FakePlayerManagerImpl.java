@@ -69,13 +69,10 @@ public class FakePlayerManagerImpl implements FakePlayerManager, PlayerProvider 
                     player.changeServer(getRandomServer());
                 }
             } else if (randomJoinLeaveEventsEnabled) {
-                if (Math.random() < 0.7 && offline.size() > 0) {
+                if (Math.random() < 0.8 && offline.size() > 0) {
                     // add player
-                    String name = offline.get((int) (Math.random() * offline.size()));
-                    FakePlayer player = createFakePlayer(name, getRandomServer(), true, true);
-                    offline.remove(name);
-                    online.add(player);
-                    listeners.forEach(listener -> listener.onPlayerAdded(player));
+                    String name = offline.remove((int) (Math.random() * offline.size()));
+                    createFakePlayer(name, getRandomServer(), true, true);
                 } else if (online.size() > 0) {
                     // remove player
                     FakePlayer fakePlayer = online.get((int) (online.size() * Math.random()));
@@ -98,7 +95,11 @@ public class FakePlayerManagerImpl implements FakePlayerManager, PlayerProvider 
         Set<String> configFakePlayers = new HashSet<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
         mainThread.execute(() -> {
             offline.clear();
-            online.removeIf(fakePlayer -> configFakePlayers.contains(fakePlayer.getName()));
+            for (FakePlayer fakePlayer : ImmutableList.copyOf(online)) {
+                if (configFakePlayers.contains(fakePlayer.getName())) {
+                    removeFakePlayer(fakePlayer);
+                }
+            }
         });
     }
 
@@ -106,7 +107,7 @@ public class FakePlayerManagerImpl implements FakePlayerManager, PlayerProvider 
         mainThread.execute(() -> {
             offline = new ArrayList<>(BungeeTabListPlus.getInstance().getConfig().fakePlayers);
             sanitizeFakePlayerNames();
-            for (int i = offline.size(); i > 0; i--) {
+            for (int i = offline.size() * 4; i > 0; i--) {
                 triggerRandomEvent();
             }
         });
