@@ -116,6 +116,10 @@ public class FabricBridge implements ModInitializer {
         }, 1000, 1000, TimeUnit.MILLISECONDS);
     }
 
+    private void onStop(MinecraftServer server) {
+        asyncScheduler.shutdownNow();
+    }
+
     private void onTick(MinecraftServer server) {
         int ticks = server.getTicks();
         if (ticks % monitorInterval == 0) {
@@ -136,6 +140,7 @@ public class FabricBridge implements ModInitializer {
     @Override
     public void onInitialize() {
         ServerLifecycleEvents.SERVER_STARTED.register(this::onStart);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onStop);
     }
 
     private class ServerDataAccess extends AbstractDataAccess<MinecraftServer> {
