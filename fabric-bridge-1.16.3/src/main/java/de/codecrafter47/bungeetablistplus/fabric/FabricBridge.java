@@ -24,6 +24,7 @@ import de.codecrafter47.bungeetablistplus.bridge.AbstractBridge;
 import de.codecrafter47.bungeetablistplus.fabric.event.PlayerDisconnectCallback;
 import de.codecrafter47.bungeetablistplus.fabric.event.PlayerJoinCallback;
 import de.codecrafter47.data.api.AbstractDataAccess;
+import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.DataKeyRegistry;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.minecraft.api.MinecraftData;
@@ -41,8 +42,11 @@ import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -62,6 +66,8 @@ public class FabricBridge implements ModInitializer {
             MinecraftData.class,
             BukkitData.class,
             BTLPDataKeys.class);
+
+    private static final Logger logger = LogManager.getLogger("BTLPFabricBridge");
 
     MyBridge bridge;
 
@@ -154,6 +160,17 @@ public class FabricBridge implements ModInitializer {
             addProvider(BTLPDataKeys.REGISTERED_THIRD_PARTY_SERVER_VARIABLES, v -> Collections.emptyList());
             addProvider(BTLPDataKeys.PLACEHOLDERAPI_PRESENT, v -> false);
         }
+
+        @Nullable
+        @Override
+        public <V> V get(DataKey<V> key, MinecraftServer context) {
+            try {
+                return super.get(key, context);
+            } catch (Throwable th) {
+                logger.warn("Failed to acquire data " + key + " from " + context, th);
+            }
+            return null;
+        }
     }
 
     private static class PlayerDataAccess extends AbstractDataAccess<ServerPlayerEntity> {
@@ -173,6 +190,17 @@ public class FabricBridge implements ModInitializer {
                 return team != null ? team.getName() : null;
             });
             addProvider(MinecraftData.DisplayName, player -> player.getDisplayName().getString());
+        }
+
+        @Nullable
+        @Override
+        public <V> V get(DataKey<V> key, ServerPlayerEntity context) {
+            try {
+                return super.get(key, context);
+            } catch (Throwable th) {
+                logger.warn("Failed to acquire data " + key + " from " + context, th);
+            }
+            return null;
         }
     }
 
