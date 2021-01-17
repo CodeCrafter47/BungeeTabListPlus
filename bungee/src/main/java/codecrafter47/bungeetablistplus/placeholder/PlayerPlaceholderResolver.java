@@ -74,6 +74,10 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("client_version_atleast_1_8", create(BTLPBungeeDataKeys.DATA_KEY_CLIENT_VERSION_BELOW_1_8, b -> !b, TypeToken.BOOLEAN));
         addPlaceholder("world", create(MinecraftData.World));
         addPlaceholder("team", create(MinecraftData.Team));
+        addPlaceholder("team_color", create(MinecraftData.TeamColor));
+        addPlaceholder("team_display_name", create(MinecraftData.TeamDisplayName));
+        addPlaceholder("team_prefix", create(MinecraftData.TeamPrefix));
+        addPlaceholder("team_suffix", create(MinecraftData.TeamSuffix));
         addPlaceholder("vault_balance", create(MinecraftData.Economy_Balance));
         addPlaceholder("vault_balance2", create(MinecraftData.Economy_Balance, b -> {
             if (b == null) {

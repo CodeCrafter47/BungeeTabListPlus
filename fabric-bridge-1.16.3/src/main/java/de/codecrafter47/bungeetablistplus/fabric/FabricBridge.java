@@ -39,6 +39,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -188,6 +189,23 @@ public class FabricBridge implements ModInitializer {
             addProvider(MinecraftData.Team, player -> {
                 AbstractTeam team = player.getScoreboardTeam();
                 return team != null ? team.getName() : null;
+            });
+            // todo this ain't working
+            //addProvider(MinecraftData.TeamColor, player -> {
+            //    AbstractTeam team = player.getScoreboardTeam();
+            //    return team instanceof Team ? ((Team) team).getColor().toString() : null;
+            //});
+            addProvider(MinecraftData.TeamDisplayName, player -> {
+                AbstractTeam team = player.getScoreboardTeam();
+                return team instanceof Team ? ((Team) team).getDisplayName().getString() : null;
+            });
+            addProvider(MinecraftData.TeamPrefix, player -> {
+                AbstractTeam team = player.getScoreboardTeam();
+                return team instanceof Team ? ((Team) team).getPrefix().getString() : null;
+            });
+            addProvider(MinecraftData.TeamSuffix, player -> {
+                AbstractTeam team = player.getScoreboardTeam();
+                return team instanceof Team ? ((Team) team).getSuffix().getString() : null;
             });
             addProvider(MinecraftData.DisplayName, player -> player.getDisplayName().getString());
         }
