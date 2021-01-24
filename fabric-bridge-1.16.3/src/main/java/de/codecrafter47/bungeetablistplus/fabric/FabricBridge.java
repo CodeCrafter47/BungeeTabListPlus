@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import de.codecrafter47.bungeetablistplus.bridge.AbstractBridge;
 import de.codecrafter47.bungeetablistplus.fabric.event.PlayerDisconnectCallback;
 import de.codecrafter47.bungeetablistplus.fabric.event.PlayerJoinCallback;
+import de.codecrafter47.bungeetablistplus.fabric.mixin.TeamAccessor;
 import de.codecrafter47.data.api.AbstractDataAccess;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.DataKeyRegistry;
@@ -190,11 +191,10 @@ public class FabricBridge implements ModInitializer {
                 AbstractTeam team = player.getScoreboardTeam();
                 return team != null ? team.getName() : null;
             });
-            // todo this ain't working
-            //addProvider(MinecraftData.TeamColor, player -> {
-            //    AbstractTeam team = player.getScoreboardTeam();
-            //    return team instanceof Team ? ((Team) team).getColor().toString() : null;
-            //});
+            addProvider(MinecraftData.TeamColor, player -> {
+                AbstractTeam team = player.getScoreboardTeam();
+                return team instanceof Team ? ((TeamAccessor) team).getColor().toString() : null;
+            });
             addProvider(MinecraftData.TeamDisplayName, player -> {
                 AbstractTeam team = player.getScoreboardTeam();
                 return team instanceof Team ? ((Team) team).getDisplayName().getString() : null;
