@@ -27,6 +27,37 @@ Download the [latest release][spigot] ([Dev Builds]) and install it on your Bung
 
 After that, head over to the [Wiki] to learn about how to configure the plugin to your needs.
 
+# Maven
+```xml
+<repository>
+    <id>codecrafter47-repo</id>
+    <url>https://nexus.codecrafter47.de/content/repositories/public/</url>
+</repository>
+```
+
+```xml
+<!-- Bungee API -->
+<dependency>
+    <groupId>codecrafter47.bungeetablistplus</groupId>
+    <artifactId>bungeetablistplus-api-bungee</artifactId>
+    <version>3.4.4-SNAPSHOT</version>
+</dependency>
+
+<!-- Bukkit API -->
+<dependency>
+    <groupId>codecrafter47.bungeetablistplus</groupId>
+    <artifactId>bungeetablistplus-api-bukkit</artifactId>
+    <version>3.4.4-SNAPSHOT</version>
+</dependency>
+
+<!-- Sponge API -->
+<dependency>
+    <groupId>codecrafter47.bungeetablistplus</groupId>
+    <artifactId>bungeetablistplus-api-sponge</artifactId>
+    <version>3.4.4-SNAPSHOT</version>
+</dependency>
+```
+
 # Support
 If you have issues configuring the plugin, do not hesitate to [Join the Discord][Discord] for support.  
 If you found a bug, head over to the [issues] tab and open a new issue.
