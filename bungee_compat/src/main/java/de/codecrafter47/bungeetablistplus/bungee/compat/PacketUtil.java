@@ -19,13 +19,23 @@ package de.codecrafter47.bungeetablistplus.bungee.compat;
 
 import net.md_5.bungee.protocol.packet.Team;
 
-public class PacketUtil {
+/**
+ * Utility class for accessing methods in old BungeeCord builds, where team color is represented as a byte.
+ */
+public final class PacketUtil {
 
-    public static void setTeamColorByte(Team team, byte c) {
+    /*
+     * Utility class cannot be instantiated.
+     */
+    private PacketUtil() {
+        throw new AssertionError();
+    }
+
+    public static void setTeamColorByte(final Team team, final byte c) {
         team.setColor(c);
     }
 
-    public static byte getTeamColorByte(Team team) {
+    public static byte getTeamColorByte(final Team team) {
         return team.getColor();
     }
 }
