@@ -31,7 +31,7 @@ dependencies {
     compileOnly "protocolsupport:ProtocolSupportBungee:1.3.dev"
     compileOnly "com.google.guava:guava:17.0"
     testImplementation "com.google.guava:guava:17.0"
-    compileOnly 'us.myles:viaversion:3.0.0'
+    compileOnly "com.viaversion:viaversion-api:4.0.0"
 }
 
 processResources {

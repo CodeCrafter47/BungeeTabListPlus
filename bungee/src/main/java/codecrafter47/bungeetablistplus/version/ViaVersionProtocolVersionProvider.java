@@ -17,9 +17,9 @@
 
 package codecrafter47.bungeetablistplus.version;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.protocol.ProtocolVersion;
 
 public class ViaVersionProtocolVersionProvider implements ProtocolVersionProvider {
 
