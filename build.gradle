@@ -11,7 +11,7 @@ buildscript {
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
     bungeeVersion = '1.15-SNAPSHOT'
-    spongeVersion = '5.0.0'
+    spongeVersion = '7.0.0'
     dataApiVersion = '1.0.2-SNAPSHOT'
 }
 
@@ -62,10 +62,10 @@ subprojects {
 
     dependencies {
 
-        compileOnly 'org.projectlombok:lombok:1.18.12'
-        annotationProcessor 'org.projectlombok:lombok:1.18.12'
-        testCompileOnly 'org.projectlombok:lombok:1.18.12'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+        compileOnly 'org.projectlombok:lombok:1.18.20'
+        annotationProcessor 'org.projectlombok:lombok:1.18.20'
+        testCompileOnly 'org.projectlombok:lombok:1.18.20'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
         compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
     }
 
@@ -96,5 +96,9 @@ subprojects {
 
     quality {
         strict = false
+    }
+
+    tasks.withType(Javadoc) {
+        failOnError false
     }
 }
