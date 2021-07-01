@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.4-SNAPSHOT'
+    id 'fabric-loom' version '0.8-SNAPSHOT'
     id 'maven-publish'
     id "com.github.johnrengelman.shadow" version "5.2.0"
 }
@@ -26,13 +26,12 @@ dependencies {
     //Fabric api
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.21.0+build.407-1.16"
 
-
-    compile "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
-    compile "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
-    compile "de.codecrafter47.data:bukkit:${rootProject.ext.dataApiVersion}"
-    compile "de.codecrafter47.data:minecraft:${rootProject.ext.dataApiVersion}"
-    compile project(":bungeetablistplus-common")
-    compile project(":bungeetablistplus-bridge")
+    implementation "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:bukkit:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:minecraft:${rootProject.ext.dataApiVersion}"
+    implementation project(":bungeetablistplus-common")
+    implementation project(":bungeetablistplus-bridge")
 
     shadow "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
     shadow "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
@@ -41,10 +40,10 @@ dependencies {
     shadow project(":bungeetablistplus-common")
     shadow project(":bungeetablistplus-bridge")
 
-    compileOnly 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    testCompileOnly 'org.projectlombok:lombok:1.18.12'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
     compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
 }
 
@@ -64,12 +63,7 @@ remapJar {
 processResources {
     inputs.property "version", project.version
 
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
+    filesMatching("fabric.mod.json") {
         expand "version": project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
     }
 }
