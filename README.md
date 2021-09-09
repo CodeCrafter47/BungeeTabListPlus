@@ -40,21 +40,21 @@ After that, head over to the [Wiki] to learn about how to configure the plugin t
 <dependency>
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>bungeetablistplus-api-bungee</artifactId>
-    <version>3.4.4-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
 </dependency>
 
 <!-- Bukkit API -->
 <dependency>
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>bungeetablistplus-api-bukkit</artifactId>
-    <version>3.4.4-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
 </dependency>
 
 <!-- Sponge API -->
 <dependency>
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>bungeetablistplus-api-sponge</artifactId>
-    <version>3.4.4-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
 </dependency>
 ```
 
