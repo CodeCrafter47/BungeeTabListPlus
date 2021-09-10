@@ -10,7 +10,7 @@
 [Dev Builds]: https://ci.codecrafter47.de/job/BungeeTabListPlus/
 [Discord]: https://discord.gg/qYX5AyJ
 
-# BungeeTabListPlus
+# BungeeTabListPlus ![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/codecrafter47.bungeetablistplus/bungeetablistplus-api-bungee?label=BungeeTablistPlus&nexusVersion=3&server=http%3A%2F%2Fnexus.codecrafter47.de)
 BungeeTabListPlus is a tab list plugin for BungeeCord, which provides highly customisable features including but not limited to:
 
 - Custom slots with configurable text, icon and ping.
@@ -27,7 +27,8 @@ Download the [latest release][spigot] ([Dev Builds]) and install it on your Bung
 
 After that, head over to the [Wiki] to learn about how to configure the plugin to your needs.
 
-# Maven
+# Maven 
+> Latest stable version can be found on top of this page. 
 ```xml
 <repository>
     <id>codecrafter47-repo</id>
@@ -40,21 +41,21 @@ After that, head over to the [Wiki] to learn about how to configure the plugin t
 <dependency>
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>bungeetablistplus-api-bungee</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>VERSION</version>
 </dependency>
 
 <!-- Bukkit API -->
 <dependency>
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>bungeetablistplus-api-bukkit</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>VERSION</version>
 </dependency>
 
 <!-- Sponge API -->
 <dependency>
     <groupId>codecrafter47.bungeetablistplus</groupId>
     <artifactId>bungeetablistplus-api-sponge</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>VERSION</version>
 </dependency>
 ```
 
