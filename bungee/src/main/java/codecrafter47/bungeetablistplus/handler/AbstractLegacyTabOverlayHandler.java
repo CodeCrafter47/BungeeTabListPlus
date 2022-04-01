@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.taboverlay.Icon;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -497,6 +498,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         void setTextInternal(int index, String text) {
+            // convert to legacy format
+            text = ChatFormat.formattedTextToLegacy(text);
+
+            // split string into two parts of at most 16 characters each to be displayed as prefix and suffix
             String text0, text1;
             if (text.length() <= 16) {
                 text0 = text;
