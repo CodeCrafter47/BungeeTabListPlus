@@ -32,7 +32,8 @@ public interface CustomTablist {
      * Set the size of the tab list.
      * <p>
      * Recommended values:
-     * <table summary="">
+     * <table>
+     * <caption></caption>
      * <thead>
      * <tr>
      * <th>Size</th>
