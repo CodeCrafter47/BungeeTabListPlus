@@ -17,6 +17,7 @@
 
 package codecrafter47.bungeetablistplus.util;
 
+import de.codecrafter47.bungeetablistplus.bungee.compat.PropertyUtil;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import lombok.experimental.UtilityClass;
@@ -50,9 +51,9 @@ public class IconUtil {
     public Icon getIconFromPlayer(ProxiedPlayer player) {
         LoginResult loginResult = ((UserConnection) player).getPendingConnection().getLoginProfile();
         if (loginResult != null) {
-            LoginResult.Property[] properties = loginResult.getProperties();
+            PropertyUtil.VersionSafeProperty[] properties = PropertyUtil.convertLoginProperties(loginResult);
             if (properties != null) {
-                for (LoginResult.Property s : properties) {
+                for (PropertyUtil.VersionSafeProperty s : properties) {
                     if (s.getName().equals("textures")) {
                         return new Icon(new ProfileProperty(s.getName(), s.getValue(), s.getSignature()));
                     }
