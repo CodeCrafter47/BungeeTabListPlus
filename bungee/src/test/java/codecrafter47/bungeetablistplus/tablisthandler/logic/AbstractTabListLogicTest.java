@@ -18,6 +18,7 @@
 package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
+import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -136,7 +137,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
                     item.setUsername(usernames[p]);
                     item.setUuid(uuids[p]);
                     item.setPing(p + 13);
-                    item.setProperties(new String[0][]);
+                    Property119Handler.setProperties(item, new String[0][]);
                     item.setGamemode(p % 4);
                     packet.setItems(new PlayerListItem.Item[]{item});
                     tabListHandler.onPlayerListPacket(packet);
@@ -188,7 +189,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -250,7 +251,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -278,7 +279,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -306,7 +307,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -339,7 +340,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[4]);
         item.setUuid(uuids[4]);
         item.setPing(4);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -367,7 +368,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[4]);
         item.setUuid(uuids[4]);
         item.setPing(4);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -395,7 +396,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[4]);
         item.setUuid(uuids[4]);
         item.setPing(4);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -421,7 +422,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -443,7 +444,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -463,7 +464,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -490,7 +491,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -523,7 +524,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -563,7 +564,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -603,7 +604,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -645,7 +646,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
             item.setUsername(usernames[i]);
             item.setUuid(uuids[i]);
             item.setPing(15);
-            item.setProperties(new String[0][]);
+            Property119Handler.setProperties(item, new String[0][]);
             item.setGamemode(0);
             items[i] = item;
 
@@ -797,7 +798,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
             item.setUsername(usernames[i]);
             item.setUuid(uuids[i]);
             item.setPing(15);
-            item.setProperties(new String[0][]);
+            Property119Handler.setProperties(item, new String[0][]);
             item.setGamemode(0);
             items[i] = item;
 
@@ -856,7 +857,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
             item.setUsername(usernames[i]);
             item.setUuid(uuids[i]);
             item.setPing(15);
-            item.setProperties(new String[0][]);
+            Property119Handler.setProperties(item, new String[0][]);
             item.setGamemode(0);
             items[i] = item;
 
@@ -906,7 +907,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);
@@ -930,7 +931,7 @@ public class AbstractTabListLogicTest extends AbstractTabListLogicTestBase {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabListHandler.onPlayerListPacket(packet);

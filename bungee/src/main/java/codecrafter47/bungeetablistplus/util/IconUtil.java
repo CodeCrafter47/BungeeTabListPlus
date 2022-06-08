@@ -26,7 +26,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.connection.LoginResult;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 
 @UtilityClass
 public class IconUtil {
@@ -66,9 +65,9 @@ public class IconUtil {
         if (loginResult != null) {
             String[][] properties;
             if(USE_PROTOCOL_PROPERTY_TYPE) {
-                properties = PropertyUtil.getProperties(loginResult);
+                properties = Property119Handler.getProperties(loginResult);
             } else {
-                properties = Arrays.stream(loginResult.getProperties()).map(prop -> new String[]{prop.getName(), prop.getValue(), prop.getSignature()}).toArray(String[][]::new);
+                properties = PropertyUtil.getProperties(loginResult);
             }
             if (properties.length != 0) {
                 for (String[] s : properties) {
