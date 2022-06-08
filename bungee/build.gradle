@@ -23,6 +23,7 @@ dependencies {
     implementation "org.yaml:snakeyaml:1.25"
     testImplementation "junit:junit:4.12"
     compileOnly "net.md-5:bungeecord-proxy:${rootProject.ext.bungeeVersion}"
+    testImplementation "net.md-5:bungeecord-proxy:${rootProject.ext.bungeeVersion}"
     compileOnly "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
     compileOnly "net.md-5:bungeecord-event:${rootProject.ext.bungeeVersion}"
     compileOnly "net.md-5:bungeecord-protocol:${rootProject.ext.bungeeVersion}"

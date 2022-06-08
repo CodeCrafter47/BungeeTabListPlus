@@ -18,6 +18,7 @@
 package codecrafter47.bungeetablistplus.eventlog;
 
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
+import codecrafter47.bungeetablistplus.util.Property119Handler;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
@@ -44,7 +45,7 @@ public class Transformer {
     }
 
     public TabListItemWrapper wrapTabListItem(PlayerListItem.Item item) {
-        return new TabListItemWrapper(item.getUuid().toString(), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode(), wrapProperties(item.getProperties()));
+        return new TabListItemWrapper(item.getUuid().toString(), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode(), wrapProperties(Property119Handler.getProperties(item)));
     }
 
     public PlayerListPacketWrapper wrapPlayerListPacket(PlayerListItem packet) {
@@ -102,7 +103,7 @@ public class Transformer {
             item.setDisplayName(displayName);
             item.setPing(ping);
             item.setGamemode(gamemode);
-            item.setProperties(new String[][]{{properties}});
+            Property119Handler.setProperties(item, new String[][]{{"textures", properties, null}});
             return item;
         }
     }
