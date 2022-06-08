@@ -1,5 +1,6 @@
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    compileOnly 'net.md-5:bungeecord-protocol:1.12-SNAPSHOT'
+    compileOnly 'net.md-5:bungeecord-protocol:1.19-R0.1-SNAPSHOT'
+    compileOnly 'net.md-5:bungeecord-proxy:1.19-R0.1-SNAPSHOT'
 }
