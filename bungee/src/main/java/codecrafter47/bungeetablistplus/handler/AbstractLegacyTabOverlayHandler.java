@@ -301,7 +301,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 item.setGamemode(entry.getValue().gamemode);
                 item.setPing(entry.getValue().latency);
                 if(USE_PROTOCOL_PROPERTY_TYPE) {
-
+                    Property119Handler.setProperties(item, EMPTY_PROPERTIES);
+                } else {
+                    PropertyUtil.setProperties(item, EMPTY_PROPERTIES);
                 }
                 pli.setItems(new PlayerListItem.Item[]{item});
                 pli.setAction(PlayerListItem.Action.ADD_PLAYER);
