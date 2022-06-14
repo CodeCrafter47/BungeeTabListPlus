@@ -20,7 +20,9 @@ package codecrafter47.bungeetablistplus.handler;
 import codecrafter47.bungeetablistplus.protocol.AbstractPacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
+import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.MoreObjects;
+import de.codecrafter47.bungeetablistplus.bungee.compat.PropertyUtil;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.connection.LoginResult;
@@ -31,6 +33,18 @@ import java.util.Map;
 import java.util.UUID;
 
 public class RewriteLogic extends AbstractPacketHandler {
+
+    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
+
+    static {
+        boolean classPresent = false;
+        try {
+            Class.forName("net.md_5.bungee.protocol.Property");
+            classPresent = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        USE_PROTOCOL_PROPERTY_TYPE = classPresent;
+    }
 
     private final Map<UUID, UUID> rewriteMap = new HashMap<>();
 
@@ -69,18 +83,12 @@ public class RewriteLogic extends AbstractPacketHandler {
                         if (player != null) {
                             LoginResult loginResult = player.getPendingConnection().getLoginProfile();
                             if (loginResult != null) {
-                                LoginResult.Property[] properties = loginResult.getProperties();
-                                if (properties != null) {
-                                    String[][] props = new String[properties.length][];
-                                    for (int i = 0; i < props.length; i++) {
-                                        props[i] = new String[]
-                                                {
-                                                        properties[i].getName(),
-                                                        properties[i].getValue(),
-                                                        properties[i].getSignature()
-                                                };
-                                    }
-                                    item.setProperties(props);
+                                if(USE_PROTOCOL_PROPERTY_TYPE) {
+                                    String[][] properties = Property119Handler.getProperties(loginResult);
+                                    Property119Handler.setProperties(item, properties);
+                                } else {
+                                    String[][] properties = PropertyUtil.getProperties(loginResult);
+                                    PropertyUtil.setProperties(item, properties);
                                 }
                             }
                         }

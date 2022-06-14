@@ -21,10 +21,12 @@ import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.BitSet;
 import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
+import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import de.codecrafter47.bungeetablistplus.bungee.compat.PacketUtil;
+import de.codecrafter47.bungeetablistplus.bungee.compat.PropertyUtil;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
@@ -61,6 +63,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
     private static final boolean TEAM_COLLISION_RULE_SUPPORTED;
     private static final boolean TEAM_COLOR_IS_BYTE;
+    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
 
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
     private static final BitSet[] SIZE_TO_USED_SLOTS;
@@ -97,6 +100,14 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         } catch (NoSuchMethodException ignored) {
         }
         TEAM_COLOR_IS_BYTE = methodPresent;
+
+        methodPresent = false;
+        try {
+            Class.forName("net.md_5.bungee.protocol.Property");
+            methodPresent = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        USE_PROTOCOL_PROPERTY_TYPE = methodPresent;
 
         // build the dimension to used slots map (for the rectangular tab overlay)
         val builder = ImmutableMap.<RectangularTabOverlay.Dimension, BitSet>builder();
@@ -1031,7 +1042,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
                                 item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
-                                item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                                if(USE_PROTOCOL_PROPERTY_TYPE) {
+                                    Property119Handler.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                } else {
+                                    PropertyUtil.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                }
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
                                 item1.setGamemode(0);
@@ -1270,7 +1285,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         PlayerListItem.Item item1 = new PlayerListItem.Item();
                         item1.setUuid(customSlotUuid);
                         item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
-                        item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                        if(USE_PROTOCOL_PROPERTY_TYPE) {
+                            Property119Handler.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                        } else {
+                            PropertyUtil.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                        }
                         item1.setDisplayName(tabOverlay.text[index]);
                         item1.setPing(tabOverlay.ping[index]);
                         item1.setGamemode(0);
@@ -1554,7 +1573,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
                                 item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
-                                item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                                if(USE_PROTOCOL_PROPERTY_TYPE) {
+                                    Property119Handler.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                } else {
+                                    PropertyUtil.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                }
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
                                 item1.setGamemode(0);
@@ -1576,7 +1599,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
                                 item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
-                                item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                                if(USE_PROTOCOL_PROPERTY_TYPE) {
+                                    Property119Handler.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                } else {
+                                    PropertyUtil.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                }
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
                                 item1.setGamemode(0);
@@ -1617,7 +1644,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(CUSTOM_SLOT_UUID_SPACER[i]);
                                 item1.setUsername("");
-                                item1.setProperties(EMPTY_PROPERTIES_ARRAY);
+                                if(USE_PROTOCOL_PROPERTY_TYPE) {
+                                    Property119Handler.setProperties(item1, EMPTY_PROPERTIES_ARRAY);
+                                } else {
+                                    PropertyUtil.setProperties(item1, EMPTY_PROPERTIES_ARRAY);
+                                }
                                 item1.setDisplayName(null);
                                 item1.setPing(0);
                                 item1.setGamemode(0);
@@ -1939,7 +1970,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 PlayerListItem.Item item1 = new PlayerListItem.Item();
                                 item1.setUuid(customSlotUuid);
                                 item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
-                                item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                                if(USE_PROTOCOL_PROPERTY_TYPE) {
+                                    Property119Handler.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                } else {
+                                    PropertyUtil.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                                }
                                 item1.setDisplayName(tabOverlay.text[index]);
                                 item1.setPing(tabOverlay.ping[index]);
                                 item1.setGamemode(0);
@@ -1979,7 +2014,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     PlayerListItem.Item item1 = new PlayerListItem.Item();
                     item1.setUuid(customSlotUuid);
                     item1.setUsername(slotUsername[index] = getCustomSlotUsername(index));
-                    item1.setProperties(toPropertiesArray(icon.getTextureProperty()));
+                    if(USE_PROTOCOL_PROPERTY_TYPE) {
+                        Property119Handler.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                    } else {
+                        PropertyUtil.setProperties(item1, toPropertiesArray(icon.getTextureProperty()));
+                    }
                     item1.setDisplayName(tabOverlay.text[index]);
                     item1.setPing(tabOverlay.ping[index]);
                     item1.setGamemode(0);
@@ -2616,7 +2655,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         private int gamemode;
 
         private PlayerListEntry(PlayerListItem.Item item) {
-            this(item.getUuid(), item.getProperties(), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
+            this(item.getUuid(), null, item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
+            if(USE_PROTOCOL_PROPERTY_TYPE) {
+                properties = Property119Handler.getProperties(item);
+            } else {
+                properties = PropertyUtil.getProperties(item);
+            }
         }
     }
 

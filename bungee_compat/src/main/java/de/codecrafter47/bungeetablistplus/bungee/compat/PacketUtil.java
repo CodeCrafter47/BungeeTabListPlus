@@ -36,6 +36,6 @@ public final class PacketUtil {
     }
 
     public static byte getTeamColorByte(final Team team) {
-        return team.getColor();
+        return (byte) team.getColor();
     }
 }

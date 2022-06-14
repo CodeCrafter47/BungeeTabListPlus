@@ -19,6 +19,7 @@ package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
+import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
@@ -167,7 +168,7 @@ public class AbstractTabOverlayHandlerTest {
                 item.setUsername(usernames[p]);
                 item.setUuid(uuids[p]);
                 item.setPing(p + 13);
-                item.setProperties(new String[0][]);
+                Property119Handler.setProperties(item, new String[0][]);
                 item.setGamemode(p % 4);
                 packet.setItems(new PlayerListItem.Item[]{item});
                 tabOverlayHandler.onPlayerListPacket(packet);
@@ -212,7 +213,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -264,7 +265,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -285,7 +286,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -305,7 +306,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -335,7 +336,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -364,7 +365,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -396,7 +397,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -436,7 +437,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -475,7 +476,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(uuids[47]);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -516,7 +517,7 @@ public class AbstractTabOverlayHandlerTest {
             item.setUsername(usernames[i]);
             item.setUuid(uuids[i]);
             item.setPing(15);
-            item.setProperties(new String[0][]);
+            Property119Handler.setProperties(item, new String[0][]);
             item.setGamemode(0);
             items[i] = item;
 
@@ -624,7 +625,7 @@ public class AbstractTabOverlayHandlerTest {
             item.setUsername(usernames[i]);
             item.setUuid(uuids[i]);
             item.setPing(15);
-            item.setProperties(new String[0][]);
+            Property119Handler.setProperties(item, new String[0][]);
             item.setGamemode(0);
             items[i] = item;
 
@@ -679,7 +680,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[0]);
         item.setUuid(uuids[0]);
         item.setPing(15);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         PlayerListItem.Item[] items = new PlayerListItem.Item[]{item};
         packet.setItems(items);
@@ -706,7 +707,7 @@ public class AbstractTabOverlayHandlerTest {
             item.setUsername(usernames[i]);
             item.setUuid(uuids[i]);
             item.setPing(15);
-            item.setProperties(new String[0][]);
+            Property119Handler.setProperties(item, new String[0][]);
             item.setGamemode(0);
             items[i] = item;
 
@@ -755,7 +756,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(3);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -778,7 +779,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -805,7 +806,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -838,7 +839,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(2);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -870,7 +871,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -918,7 +919,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -987,7 +988,7 @@ public class AbstractTabOverlayHandlerTest {
         item.setUsername(usernames[47]);
         item.setUuid(clientUUID);
         item.setPing(47);
-        item.setProperties(new String[0][]);
+        Property119Handler.setProperties(item, new String[0][]);
         item.setGamemode(0);
         packet.setItems(new PlayerListItem.Item[]{item});
         tabOverlayHandler.onPlayerListPacket(packet);
@@ -1012,7 +1013,7 @@ public class AbstractTabOverlayHandlerTest {
         private int gamemode;
 
         private TabListEntry(PlayerListItem.Item item) {
-            this(item.getUuid(), item.getProperties(), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
+            this(item.getUuid(), Property119Handler.getProperties(item), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
         }
     }
 

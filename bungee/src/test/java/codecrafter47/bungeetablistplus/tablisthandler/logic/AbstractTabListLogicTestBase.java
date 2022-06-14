@@ -19,6 +19,7 @@ package codecrafter47.bungeetablistplus.tablisthandler.logic;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.bungee.Icon;
+import codecrafter47.bungeetablistplus.util.Property119Handler;
 import codecrafter47.bungeetablistplus.handler.AbstractTabOverlayHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import com.google.common.base.MoreObjects;
@@ -75,7 +76,7 @@ public class AbstractTabListLogicTestBase {
         private int gamemode;
 
         private TabListEntry(PlayerListItem.Item item) {
-            this(item.getUuid(), item.getProperties(), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
+            this(item.getUuid(), Property119Handler.getProperties(item), item.getUsername(), item.getDisplayName(), item.getPing(), item.getGamemode());
         }
     }
 
