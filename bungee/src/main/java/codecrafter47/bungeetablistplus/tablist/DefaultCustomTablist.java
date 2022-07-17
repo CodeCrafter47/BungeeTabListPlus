@@ -123,18 +123,24 @@ public class DefaultCustomTablist extends AbstractCustomTablist {
 
         void onSizeChanged() {
             synchronized (DefaultCustomTablist.this) {
-                int size = getSize();
-                tabOverlay.setSize(size);
-                updateAllSlots();
+                if (tabOverlay != null) {
+                    int size = getSize();
+                    tabOverlay.setSize(size);
+                    updateAllSlots();
+                }
             }
         }
 
         void onSlotChanged(int index, Icon icon, String text, int ping) {
-            tabOverlay.setSlot(index, icon, text, ping);
+            if (tabOverlay != null) {
+                tabOverlay.setSlot(index, icon, text, ping);
+            }
         }
 
         void setHeaderFooter(String header, String footer) {
-            headerAndFooterHandle.setHeaderFooter(header, footer);
+            if (headerAndFooterHandle != null) {
+                headerAndFooterHandle.setHeaderFooter(header, footer);
+            }
         }
     }
 }
