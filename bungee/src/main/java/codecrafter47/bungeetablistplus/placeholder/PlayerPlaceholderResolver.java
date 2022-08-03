@@ -118,7 +118,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
             return ChatFormat.lastFormatCode(p);
         }, TypeToken.STRING));
         addPlaceholder("vault_player_prefix", create(MinecraftData.Permissions_PlayerPrefix));
-        addPlaceholder("vault_player_prefix", create(MinecraftData.Permissions_PlayerPrefix, p -> {
+        addPlaceholder("vault_player_prefix_color", create(MinecraftData.Permissions_PlayerPrefix, p -> {
             return ChatFormat.lastFormatCode(p);
         }, TypeToken.STRING));
         addPlaceholder("vault_primary_group_weight", create(MinecraftData.Permissions_PermissionGroupWeight));
