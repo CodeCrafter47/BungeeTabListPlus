@@ -2006,7 +2006,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         itemRemove.setUuid(slotUuid[index]);
                         itemQueueRemovePlayer.add(itemRemove);
                     }
-                    tabOverlay.dirtyFlagsIcon.clear(index);
                     tabOverlay.dirtyFlagsText.clear(index);
                     tabOverlay.dirtyFlagsPing.clear(index);
                     slotState[index] = SlotState.CUSTOM;
