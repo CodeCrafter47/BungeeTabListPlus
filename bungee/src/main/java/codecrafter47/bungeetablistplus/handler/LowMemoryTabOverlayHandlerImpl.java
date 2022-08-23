@@ -32,8 +32,8 @@ import java.util.logging.Logger;
  */
 public class LowMemoryTabOverlayHandlerImpl extends TabOverlayHandlerImpl {
 
-    public LowMemoryTabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is18, boolean has113OrLater) {
-        super(logger, eventLoopExecutor, viewerUuid, player, is18, has113OrLater);
+    public LowMemoryTabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is18, boolean has113OrLater, boolean has119OrLater) {
+        super(logger, eventLoopExecutor, viewerUuid, player, is18, has113OrLater, has119OrLater);
     }
 
     @Override

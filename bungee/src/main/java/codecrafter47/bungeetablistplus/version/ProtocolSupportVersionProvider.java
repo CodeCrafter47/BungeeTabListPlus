@@ -52,6 +52,16 @@ public class ProtocolSupportVersionProvider implements ProtocolVersionProvider {
     }
 
     @Override
+    public boolean has119OrLater(ProxiedPlayer player) {
+        ProtocolVersion protocolVersion = ProtocolSupportAPI.getProtocolVersion(player);
+        if (psb12) {
+            return false;
+        } else {
+            return protocolVersion.getId() >= 759;
+        }
+    }
+
+    @Override
     public boolean is18(ProxiedPlayer player) {
         ProtocolVersion protocolVersion = ProtocolSupportAPI.getProtocolVersion(player);
         return protocolVersion == ProtocolVersion.MINECRAFT_1_8;
