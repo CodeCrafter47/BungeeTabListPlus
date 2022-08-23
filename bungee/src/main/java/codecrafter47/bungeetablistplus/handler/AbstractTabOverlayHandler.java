@@ -220,14 +220,16 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
     private final boolean is18;
     private boolean is13OrLater;
+    private boolean is119OrLater;
     protected boolean active;
 
-    public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is18, boolean is13OrLater) {
+    public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is18, boolean is13OrLater, boolean is119OrLater) {
         this.logger = logger;
         this.eventLoopExecutor = eventLoopExecutor;
         this.viewerUuid = viewerUuid;
         this.is18 = is18;
         this.is13OrLater = is13OrLater;
+        this.is119OrLater = is119OrLater;
         this.activeContentHandler = new PassThroughContentHandler();
         this.activeHeaderFooterHandler = new PassThroughHeaderFooterHandler();
     }
@@ -938,10 +940,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 dirtySlots.set(index);
                                 needUpdate = true;
                             } else {
-                                tabOverlay.dirtyFlagsText.clear(index);
-                                tabOverlay.dirtyFlagsPing.clear(index);
                                 item.setDisplayName(tabOverlay.text[index]);
                                 item.setPing(tabOverlay.ping[index]);
+                                tabOverlay.dirtyFlagsText.clear(index);
+                                tabOverlay.dirtyFlagsPing.clear(index);
                             }
                         }
 
@@ -1583,7 +1585,13 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 item1.setGamemode(0);
                                 itemQueueAddPlayer.add(item1);
                             } else {
-                                // custom or unused
+                                // custom
+                                if (slotState[index] == SlotState.CUSTOM) {
+                                    PlayerListItem.Item item1 = new PlayerListItem.Item();
+                                    item1.setUuid(slotUuid[index]);
+                                    itemQueueRemovePlayer.add(item1);
+                                }
+                                // unused
                                 tabOverlay.dirtyFlagsIcon.clear(index);
                                 tabOverlay.dirtyFlagsText.clear(index);
                                 tabOverlay.dirtyFlagsPing.clear(index);
@@ -1955,6 +1963,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     for (index = dirtySlots.nextSetBit(0); index >= 0; index = dirtySlots.nextSetBit(index + 1)) {
                         if (usedSlots.get(index)) {
                             if (slotState[index] == SlotState.UNUSED || (updateAllCustomSlots && slotState[index] == SlotState.CUSTOM)) {
+                                if (slotState[index] == SlotState.CUSTOM) {
+                                    PlayerListItem.Item item1 = new PlayerListItem.Item();
+                                    item1.setUuid(slotUuid[index]);
+                                    itemQueueRemovePlayer.add(item1);
+                                }
                                 tabOverlay.dirtyFlagsIcon.clear(index);
                                 tabOverlay.dirtyFlagsText.clear(index);
                                 tabOverlay.dirtyFlagsPing.clear(index);
@@ -2001,12 +2014,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     } else { // steve
                         customSlotUuid = CUSTOM_SLOT_UUID_STEVE[index];
                     }
-                    if (!customSlotUuid.equals(slotUuid[index])) {
+                    if (!customSlotUuid.equals(slotUuid[index]) || is119OrLater) {
                         PlayerListItem.Item itemRemove = new PlayerListItem.Item();
                         itemRemove.setUuid(slotUuid[index]);
                         itemQueueRemovePlayer.add(itemRemove);
                     }
-                    tabOverlay.dirtyFlagsIcon.clear(index);
                     tabOverlay.dirtyFlagsText.clear(index);
                     tabOverlay.dirtyFlagsPing.clear(index);
                     slotState[index] = SlotState.CUSTOM;
