@@ -366,7 +366,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     for (String s : packet.getPlayers()) {
                         if (packet.getMode() == 0 || packet.getMode() == 3) {
                             if (playerToTeamMap.containsKey(s)) {
-                                serverTeams.get(playerToTeamMap.get(s)).removePlayer(s);
+                                TeamEntry previousTeam = serverTeams.get(playerToTeamMap.get(s));
+                                // previousTeam shouldn't be null (that's inconsistent with playerToTeamMap, but apparently it happens)
+                                if (previousTeam != null) {
+                                    previousTeam.removePlayer(s);
+                                }
                             }
                             teamEntry.addPlayer(s);
                             playerToTeamMap.put(s, packet.getName());
