@@ -24,6 +24,7 @@ import codecrafter47.bungeetablistplus.handler.LowMemoryTabOverlayHandlerImpl;
 import codecrafter47.bungeetablistplus.handler.RewriteLogic;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListener;
+import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import de.codecrafter47.taboverlay.TabView;
@@ -87,6 +88,9 @@ public class TabViewManager implements Listener {
 
     @EventHandler
     public void onServerConnected(ServerSwitchEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
         try {
             ProxiedPlayer player = event.getPlayer();
 

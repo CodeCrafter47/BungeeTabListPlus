@@ -19,6 +19,7 @@ package codecrafter47.bungeetablistplus.listener;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
+import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import net.md_5.bungee.UserConnection;
@@ -40,6 +41,9 @@ public class TabListListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PostLoginEvent e) {
+        if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
+            return;
+        }
         try {
             BungeePlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
             TabView tabView = btlp.getTabViewManager().onPlayerJoin(e.getPlayer());
@@ -54,6 +58,9 @@ public class TabListListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDisconnect(PlayerDisconnectEvent e) {
+        if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
+            return;
+        }
         try {
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
             tabView.deactivate();

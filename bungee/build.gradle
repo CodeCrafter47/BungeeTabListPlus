@@ -3,6 +3,9 @@ repositories {
     maven {
         url = "https://repo.viaversion.com"
     }
+    maven {
+        url = "https://repo.opencollab.dev/maven-snapshots/"
+    }
 }
 
 dependencies {
@@ -33,6 +36,8 @@ dependencies {
     compileOnly "com.google.guava:guava:17.0"
     testImplementation "com.google.guava:guava:17.0"
     compileOnly "com.viaversion:viaversion-api:4.0.0"
+    compileOnly(group: "org.geysermc", name: "geyser-api", version: "2.0.0-SNAPSHOT")
+    compileOnly "org.geysermc.floodgate:api:2.0-SNAPSHOT"
 }
 
 processResources {

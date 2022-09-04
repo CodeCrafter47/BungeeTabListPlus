@@ -28,6 +28,7 @@ import codecrafter47.bungeetablistplus.managers.BungeePlayerProvider;
 import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.codecrafter47.data.api.DataCache;
@@ -94,11 +95,17 @@ public class BukkitBridge implements Listener {
 
     @EventHandler
     public void onPlayerConnect(PostLoginEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
         playerPlayerConnectionInfoMap.put(event.getPlayer(), new PlayerConnectionInfo());
     }
 
     @EventHandler
     public void onServerChange(ServerConnectedEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
         PlayerConnectionInfo previous = playerPlayerConnectionInfoMap.put(event.getPlayer(), new PlayerConnectionInfo());
         if (previous != null) {
             PlayerBridgeDataCache playerBridgeData = previous.playerBridgeData;
@@ -113,6 +120,9 @@ public class BukkitBridge implements Listener {
 
     @EventHandler
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
         playerPlayerConnectionInfoMap.remove(event.getPlayer());
     }
 
@@ -123,6 +133,10 @@ public class BukkitBridge implements Listener {
 
                 ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
                 Server server = (Server) event.getSender();
+                
+                if (GeyserCompat.isBedrockPlayer(player.getUniqueId())) {
+                    return;
+                }
 
                 event.setCancelled(true);
 
