@@ -158,8 +158,6 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("paf_clans_clan_online_member_count", create(BungeeData.PAFClans_OnlineMemberCount));
         addPlaceholder("paf_clans_is_leader", create(BungeeData.PAFClans_IsLeader));
         addPlaceholder("permission", this::resolvePermissionPlaceholder);
-        addPlaceholder("nucleus_afk", create(SpongeData.Nucleus_IsAFK));
-        addPlaceholder("nucleus_nick", create(SpongeData.Nucleus_Nick));
 
         // Server
         addPlaceholder("server", this::resolveServerPlaceholder);
