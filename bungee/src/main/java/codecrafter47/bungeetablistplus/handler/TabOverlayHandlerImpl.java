@@ -18,10 +18,13 @@
 package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
+import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -56,5 +59,15 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
         return WaterfallCompat.isDisableEntityMetadataRewrite()
                 || (player.getPendingConnection().getVersion() >= 735
                 && ProtocolConstants.SUPPORTED_VERSION_IDS.contains(736));
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+        return PacketListenerResult.PASS;
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+        return PacketListenerResult.PASS;
     }
 }

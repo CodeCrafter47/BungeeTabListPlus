@@ -23,9 +23,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.Team;
+import net.md_5.bungee.protocol.packet.*;
 
 import java.util.List;
 
@@ -63,6 +61,12 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
                         handled = true;
                     } else if (packetWrapper.packet instanceof PlayerListHeaderFooter) {
                         result = handler.onPlayerListHeaderFooterPacket((PlayerListHeaderFooter) packetWrapper.packet);
+                        handled = true;
+                    } else if (packetWrapper.packet instanceof PlayerListItemUpdate) {
+                        result = handler.onPlayerListUpdatePacket((PlayerListItemUpdate) packetWrapper.packet);
+                        handled = true;
+                    } else if (packetWrapper.packet instanceof PlayerListItemRemove) {
+                        result = handler.onPlayerListRemovePacket((PlayerListItemRemove) packetWrapper.packet);
                         handled = true;
                     }
 

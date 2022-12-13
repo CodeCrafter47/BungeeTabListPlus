@@ -27,6 +27,8 @@ import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.connection.LoginResult;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +101,56 @@ public class RewriteLogic extends AbstractPacketHandler {
         }
 
         PacketListenerResult result = super.onPlayerListPacket(packet);
+        return result == PacketListenerResult.PASS && modified ? PacketListenerResult.MODIFIED : result;
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+        if (packet.getActions().contains(PlayerListItemUpdate.Action.ADD_PLAYER)) {
+            for (PlayerListItem.Item item : packet.getItems()) {
+                UUID uuid = item.getUuid();
+                UserConnection player = BungeeCord.getInstance().getPlayerByOfflineUUID(uuid);
+                if (player != null) {
+                    rewriteMap.put(uuid, player.getUniqueId());
+                    LoginResult loginResult = player.getPendingConnection().getLoginProfile();
+                    if (loginResult != null) {
+                        if(USE_PROTOCOL_PROPERTY_TYPE) {
+                            String[][] properties = Property119Handler.getProperties(loginResult);
+                            Property119Handler.setProperties(item, properties);
+                        } else {
+                            String[][] properties = PropertyUtil.getProperties(loginResult);
+                            PropertyUtil.setProperties(item, properties);
+                        }
+                    }
+                }
+            }
+        }
+        boolean modified = false;
+        for (PlayerListItem.Item item : packet.getItems()) {
+            UUID uuid = rewriteMap.get(item.getUuid());
+            if (uuid != null) {
+                modified = true;
+                item.setUuid(uuid);
+            }
+        }
+        PacketListenerResult result = super.onPlayerListUpdatePacket(packet);
+        return result == PacketListenerResult.PASS && modified ? PacketListenerResult.MODIFIED : result;
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+        boolean modified = false;
+        
+        UUID[] uuids = packet.getUuids();
+        for (int i = 0; i < uuids.length; i++) {
+            UUID uuid = rewriteMap.remove(uuids[i]);
+            if (uuid != null) {
+                modified = true;
+                uuids[i] = uuid;
+            }
+        }
+
+        PacketListenerResult result = super.onPlayerListRemovePacket(packet);
         return result == PacketListenerResult.PASS && modified ? PacketListenerResult.MODIFIED : result;
     }
 

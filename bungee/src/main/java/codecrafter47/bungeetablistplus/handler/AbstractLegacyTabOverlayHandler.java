@@ -39,9 +39,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.Team;
+import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -168,6 +166,29 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     @Override
+    public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+        if (packet.getActions().contains(PlayerListItemUpdate.Action.ADD_PLAYER)) {
+            for (PlayerListItem.Item item : packet.getItems()) {
+                if (item.getUuid() != null) {
+                    modernServerPlayerList.put(item.getUuid(), new ModernPlayerListEntry(item.getUsername(), item.getPing(), item.getGamemode()));
+                } else {
+                    serverPlayerList.put(getName(item), item.getPing());
+                }
+            }
+        }
+        return activeHandler.onPlayerListUpdatePacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+        for (UUID uuid : packet.getUuids()) {
+            modernServerPlayerList.remove(uuid);
+        }
+        
+        return activeHandler.onPlayerListRemovePacket(packet);
+    }
+
+    @Override
     public PacketListenerResult onTeamPacket(Team packet) {
         if (slotIDSet.contains(packet.getName())) {
             logger.log(Level.WARNING, "Team name collision, using multi-bungee setup? Packet: {0}", packet);
@@ -260,6 +281,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         abstract void onDeactivated();
 
         abstract void onActivated();
+
+        public abstract PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet);
+
+        public abstract PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet);
     }
 
     private abstract static class AbstractTabOverlay implements TabOverlayHandle {
@@ -279,6 +304,16 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
         @Override
         PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
+            return PacketListenerResult.PASS;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+            return PacketListenerResult.PASS;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
             return PacketListenerResult.PASS;
         }
 
@@ -357,6 +392,16 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
         @Override
         PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
+            return PacketListenerResult.CANCEL;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+            return PacketListenerResult.CANCEL;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
             return PacketListenerResult.CANCEL;
         }
 

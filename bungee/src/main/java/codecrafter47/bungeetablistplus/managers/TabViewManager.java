@@ -18,10 +18,7 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.handler.GetGamemodeLogic;
-import codecrafter47.bungeetablistplus.handler.LegacyTabOverlayHandlerImpl;
-import codecrafter47.bungeetablistplus.handler.LowMemoryTabOverlayHandlerImpl;
-import codecrafter47.bungeetablistplus.handler.RewriteLogic;
+import codecrafter47.bungeetablistplus.handler.*;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListener;
 import codecrafter47.bungeetablistplus.util.GeyserCompat;
@@ -129,7 +126,11 @@ public class TabViewManager implements Listener {
             Logger logger = new ChildLogger(btlp.getLogger(), player.getName());
             EventLoop eventLoop = ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop();
 
-            if (protocolVersionProvider.has18OrLater(player)) {
+            if (protocolVersionProvider.has1193OrLater(player)) {
+                NewTabOverlayHandler handler = new NewTabOverlayHandler(logger, eventLoop, player);
+                tabOverlayHandler = handler;
+                packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, (UserConnection) player));
+            } else if (protocolVersionProvider.has18OrLater(player)) {
                 LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player), protocolVersionProvider.has119OrLater(player));
                 tabOverlayHandler = tabOverlayHandlerImpl;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, ((UserConnection) player)));

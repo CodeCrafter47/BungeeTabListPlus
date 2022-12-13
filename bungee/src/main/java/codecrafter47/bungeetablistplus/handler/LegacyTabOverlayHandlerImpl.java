@@ -17,8 +17,11 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
+import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
