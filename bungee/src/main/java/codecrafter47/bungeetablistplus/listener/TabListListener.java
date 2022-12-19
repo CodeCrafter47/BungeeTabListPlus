@@ -41,11 +41,13 @@ public class TabListListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PostLoginEvent e) {
-        if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
-            return;
-        }
         try {
             BungeePlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
+            
+            if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
+                return;
+            }
+            
             TabView tabView = btlp.getTabViewManager().onPlayerJoin(e.getPlayer());
             tabView.getTabOverlayProviders().addProvider(new ExcludedServersTabOverlayProvider(player, btlp));
             for (EventListener listener : btlp.getListeners()) {
@@ -58,16 +60,18 @@ public class TabListListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDisconnect(PlayerDisconnectEvent e) {
-        if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
-            return;
-        }
         try {
+            btlp.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
+
+            if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
+                return;
+            }
+            
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
             tabView.deactivate();
             for (EventListener listener : btlp.getListeners()) {
                 listener.onTabViewRemoved(tabView);
             }
-            btlp.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
 
             // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
             Server server = e.getPlayer().getServer();
