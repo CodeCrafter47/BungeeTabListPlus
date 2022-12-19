@@ -17,7 +17,6 @@
 
 package codecrafter47.bungeetablistplus.util;
 
-import de.codecrafter47.bungeetablistplus.bungee.compat.PropertyUtil;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import lombok.experimental.UtilityClass;
@@ -29,18 +28,6 @@ import javax.annotation.Nonnull;
 
 @UtilityClass
 public class IconUtil {
-
-    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
-
-    static {
-        boolean classPresent = false;
-        try {
-            Class.forName("net.md_5.bungee.protocol.Property");
-            classPresent = true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        USE_PROTOCOL_PROPERTY_TYPE = classPresent;
-    }
 
     public Icon convert(codecrafter47.bungeetablistplus.api.bungee.Icon icon) {
         String[][] properties = icon.getProperties();
@@ -63,17 +50,10 @@ public class IconUtil {
     public Icon getIconFromPlayer(ProxiedPlayer player) {
         LoginResult loginResult = ((UserConnection) player).getPendingConnection().getLoginProfile();
         if (loginResult != null) {
-            String[][] properties;
-            if(USE_PROTOCOL_PROPERTY_TYPE) {
-                properties = Property119Handler.getProperties(loginResult);
-            } else {
-                properties = PropertyUtil.getProperties(loginResult);
-            }
-            if (properties.length != 0) {
-                for (String[] s : properties) {
-                    if (s[0].equals("textures")) {
-                        return new Icon(new ProfileProperty(s[0], s[1], s[2]));
-                    }
+            String[][] properties = Property119Handler.getProperties(loginResult);
+            for (String[] s : properties) {
+                if (s[0].equals("textures")) {
+                    return new Icon(new ProfileProperty(s[0], s[1], s[2]));
                 }
             }
         }

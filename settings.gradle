@@ -11,7 +11,6 @@ pluginManagement {
 
 rootProject.name = 'BungeeTabListPlus-parent'
 include(':bungee-plugin')
-include(':bungee-compat')
 include(':waterfall-compat')
 include(':bukkit-plugin')
 include(':bungeetablistplus-common')
@@ -28,7 +27,6 @@ include(':bungeetablistplus-bridge')
 include(':fabric-bridge-1.16.3')
 include(':fabric-bridge-1.17')
 project(':bungee-plugin').projectDir = file('bungee')
-project(':bungee-compat').projectDir = file('bungee_compat')
 project(':waterfall-compat').projectDir = file('waterfall_compat')
 project(':bukkit-plugin').projectDir = file('bukkit')
 project(':bungeetablistplus-common').projectDir = file('common')

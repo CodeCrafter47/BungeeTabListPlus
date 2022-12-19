@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.MoreObjects;
-import de.codecrafter47.bungeetablistplus.bungee.compat.PropertyUtil;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.connection.LoginResult;
@@ -35,18 +34,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class RewriteLogic extends AbstractPacketHandler {
-
-    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
-
-    static {
-        boolean classPresent = false;
-        try {
-            Class.forName("net.md_5.bungee.protocol.Property");
-            classPresent = true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        USE_PROTOCOL_PROPERTY_TYPE = classPresent;
-    }
 
     private final Map<UUID, UUID> rewriteMap = new HashMap<>();
 
@@ -85,13 +72,8 @@ public class RewriteLogic extends AbstractPacketHandler {
                         if (player != null) {
                             LoginResult loginResult = player.getPendingConnection().getLoginProfile();
                             if (loginResult != null) {
-                                if(USE_PROTOCOL_PROPERTY_TYPE) {
-                                    String[][] properties = Property119Handler.getProperties(loginResult);
-                                    Property119Handler.setProperties(item, properties);
-                                } else {
-                                    String[][] properties = PropertyUtil.getProperties(loginResult);
-                                    PropertyUtil.setProperties(item, properties);
-                                }
+                                String[][] properties = Property119Handler.getProperties(loginResult);
+                                Property119Handler.setProperties(item, properties);
                             }
                         }
                     }
@@ -114,13 +96,8 @@ public class RewriteLogic extends AbstractPacketHandler {
                     rewriteMap.put(uuid, player.getUniqueId());
                     LoginResult loginResult = player.getPendingConnection().getLoginProfile();
                     if (loginResult != null) {
-                        if(USE_PROTOCOL_PROPERTY_TYPE) {
-                            String[][] properties = Property119Handler.getProperties(loginResult);
-                            Property119Handler.setProperties(item, properties);
-                        } else {
-                            String[][] properties = PropertyUtil.getProperties(loginResult);
-                            PropertyUtil.setProperties(item, properties);
-                        }
+                        String[][] properties = Property119Handler.getProperties(loginResult);
+                        Property119Handler.setProperties(item, properties);
                     }
                 }
             }
@@ -140,7 +117,7 @@ public class RewriteLogic extends AbstractPacketHandler {
     @Override
     public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
         boolean modified = false;
-        
+
         UUID[] uuids = packet.getUuids();
         for (int i = 0; i < uuids.length; i++) {
             UUID uuid = rewriteMap.remove(uuids[i]);

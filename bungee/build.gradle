@@ -17,7 +17,6 @@ dependencies {
     implementation "de.codecrafter47.data:bungee:${rootProject.ext.dataApiVersion}"
     implementation project(':bungeetablistplus-common')
     implementation project(':bungeetablistplus-api-bungee')
-    implementation project(':bungee-compat')
     implementation project(':waterfall-compat')
     implementation "it.unimi.dsi:fastutil:8.3.1"
     implementation "codecrafter47.util:chat-utils:1.1-SNAPSHOT"
