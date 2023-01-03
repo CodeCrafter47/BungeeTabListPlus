@@ -1,0 +1,39 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.0.1"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+dependencies {
+    implementation project(':velocity-plugin')
+    compileOnly "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    annotationProcessor "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    implementation "org.bstats:bstats-velocity:3.0.0"
+}
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+task processSource(type: Sync) {
+    from sourceSets.main.java
+    inputs.property 'version', version
+    filter(ReplaceTokens, tokens: [VERSION: version])
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
+shadowJar {
+    relocate 'codecrafter47.util', 'codecrafter47.bungeetablistplus.util'
+    relocate 'org.bstats', 'codecrafter47.bungeetablistplus.libs.bstats'
+    relocate 'it.unimi.dsi.fastutil', 'codecrafter47.bungeetablistplus.libs.fastutil'
+    relocate 'org.yaml.snakeyaml', 'codecrafter47.bungeetablistplus.libs.snakeyaml'
+    relocate 'org.mineskin', 'codecrafter47.bungeetablistplus.libs.mineskin'
+    archiveClassifier.set(null)
+    minimize()
+}

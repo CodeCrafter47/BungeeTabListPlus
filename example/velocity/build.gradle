@@ -1,0 +1,5 @@
+
+dependencies {
+    compileOnly project(':bungeetablistplus-api-bungee')
+    compileOnly "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
+}

@@ -11,6 +11,7 @@ buildscript {
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
     bungeeVersion = '1.19-R0.1-SNAPSHOT'
+    velocityVersion = '3.1.2-SNAPSHOT'
     spongeVersion = '7.0.0'
     dataApiVersion = '1.0.2-SNAPSHOT'
 }
@@ -45,6 +46,10 @@ subprojects {
 
         maven {
             url = 'https://papermc.io/repo/repository/maven-snapshots/'
+        }
+
+        maven {
+            url = 'https://repo.papermc.io/repository/maven-public/'
         }
 
         maven {

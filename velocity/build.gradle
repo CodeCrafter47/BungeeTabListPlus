@@ -1,0 +1,42 @@
+
+repositories {
+    maven {
+        url = "https://repo.viaversion.com"
+    }
+    maven {
+        url = "https://repo.opencollab.dev/main/"
+    }
+}
+
+dependencies {
+    implementation "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.sponge:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:minecraft:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data.velocity:api:${rootProject.ext.dataApiVersion}"
+    implementation "de.codecrafter47.data:velocity:${rootProject.ext.dataApiVersion}"
+    implementation project(':bungeetablistplus-common')
+    implementation project(':bungeetablistplus-api-velocity')
+    implementation project(':waterfall-compat')
+    implementation 'it.unimi.dsi:fastutil:8.5.11'
+    implementation "de.codecrafter47.taboverlay:taboverlaycommon-config:1.0-SNAPSHOT"
+    implementation 'org.yaml:snakeyaml:1.33'
+    testImplementation 'junit:junit:4.13.2'
+    compileOnly "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    testImplementation "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    annotationProcessor "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    compileOnly "com.github.proxiodev.redisbungee:RedisBungee-Velocity:0.10.1"
+    compileOnly 'com.google.guava:guava:23.0'
+    testImplementation 'com.google.guava:guava:23.0'
+    compileOnly "com.viaversion:viaversion-api:4.0.0"
+    compileOnly group: "org.geysermc.geyser", name: "api", version: "2.1.0-SNAPSHOT"
+    compileOnly "org.geysermc.floodgate:api:2.0-SNAPSHOT"
+    // This imports velocity proxy
+    compileOnly fileTree(dir: '../libs', include: '*.jar')
+}
+
+processResources {
+    filesMatching("version.properties") {
+        expand(project.properties)
+    }
+}
