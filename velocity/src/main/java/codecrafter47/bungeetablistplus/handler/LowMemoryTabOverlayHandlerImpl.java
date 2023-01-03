@@ -20,7 +20,6 @@ package codecrafter47.bungeetablistplus.handler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.packet.Team;
-import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -46,10 +45,8 @@ public class LowMemoryTabOverlayHandlerImpl extends TabOverlayHandlerImpl {
 
     @Override
     public void onServerSwitch(boolean is13OrLater) {
-        if (!WaterfallCompat.isDisableEntityMetadataRewrite()) {
-            for (String team : serverTeams.keySet()) {
-                sendPacket(new Team(team));
-            }
+        for (String team : serverTeams.keySet()) {
+            sendPacket(new Team(team));
         }
         super.onServerSwitch(is13OrLater);
     }

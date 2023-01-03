@@ -25,7 +25,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
 import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
-import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import lombok.SneakyThrows;
 
 import java.util.UUID;
@@ -60,8 +59,7 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
     @SneakyThrows
     @Override
     protected boolean isUsingAltRespawn() {
-        return WaterfallCompat.isDisableEntityMetadataRewrite()
-                || player.getProtocolVersion().getProtocol() >= 735
+        return player.getProtocolVersion().getProtocol() >= 735
                 && ProtocolVersion.isSupported(736);
     }
 

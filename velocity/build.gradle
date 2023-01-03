@@ -17,7 +17,6 @@ dependencies {
     implementation "de.codecrafter47.data:velocity:${rootProject.ext.dataApiVersion}"
     implementation project(':bungeetablistplus-common')
     implementation project(':bungeetablistplus-api-velocity')
-    implementation project(':waterfall-compat')
     implementation 'it.unimi.dsi:fastutil:8.5.11'
     implementation "de.codecrafter47.taboverlay:taboverlaycommon-config:1.0-SNAPSHOT"
     implementation 'org.yaml:snakeyaml:1.33'
