@@ -20,7 +20,7 @@ package codecrafter47.bungeetablistplus.command;
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.data.BTLPVelocityDataKeys;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
-import codecrafter47.bungeetablistplus.util.ChatUtil;
+import codecrafter47.bungeetablistplus.util.chat.ChatUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;

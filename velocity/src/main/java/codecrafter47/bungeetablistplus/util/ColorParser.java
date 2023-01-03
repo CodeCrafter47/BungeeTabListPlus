@@ -16,6 +16,7 @@
  */
 package codecrafter47.bungeetablistplus.util;
 
+import codecrafter47.bungeetablistplus.util.chat.ChatUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextFormat;

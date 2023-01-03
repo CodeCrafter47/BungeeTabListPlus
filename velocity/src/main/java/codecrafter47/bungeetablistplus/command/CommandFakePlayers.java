@@ -21,7 +21,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.velocity.tablist.FakePlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
 import codecrafter47.bungeetablistplus.util.ProxyServer;
-import codecrafter47.bungeetablistplus.util.ChatUtil;
+import codecrafter47.bungeetablistplus.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

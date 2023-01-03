@@ -22,7 +22,7 @@ import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.common.BTLPDataKeys;
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.util.VelocityPlugin;
-import codecrafter47.bungeetablistplus.util.ChatUtil;
+import codecrafter47.bungeetablistplus.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;

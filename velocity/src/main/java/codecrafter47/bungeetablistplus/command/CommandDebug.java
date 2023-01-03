@@ -22,7 +22,7 @@ import codecrafter47.bungeetablistplus.data.BTLPVelocityDataKeys;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
 import codecrafter47.bungeetablistplus.util.ProxyServer;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
-import codecrafter47.bungeetablistplus.util.ChatUtil;
+import codecrafter47.bungeetablistplus.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
