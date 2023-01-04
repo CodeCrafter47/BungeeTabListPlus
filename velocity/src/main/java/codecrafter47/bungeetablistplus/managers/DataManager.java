@@ -144,7 +144,7 @@ public class DataManager {
             addProvider(BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_CONFIG, (player, dataKey) -> permanentlyHiddenPlayers.contains(player.getUsername()) || permanentlyHiddenPlayers.contains(player.getUniqueId().toString()));
 
             if (plugin.getProxy().getPluginManager().getPlugin("redisbungee").isPresent()) {
-                addProvider(BTLPVelocityDataKeys.DATA_KEY_RedisBungee_ServerId, player -> RedisBungeeAPI.getRedisBungeeApi().getServerNameFor(player.getUniqueId()));
+                addProvider(BTLPVelocityDataKeys.DATA_KEY_RedisBungee_ServerId, player -> RedisBungeeAPI.getRedisBungeeApi().getServerId());
             }
         }
     }
