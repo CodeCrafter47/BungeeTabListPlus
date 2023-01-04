@@ -28,13 +28,13 @@ public class VelocityPlugin {
         this.version = version;
     }
 
-    public static boolean isProxyRunning(ProxyServer proxyServer){
+    public boolean isProxyRunning(){
         try {
             Class<?> velocityServer = Class.forName("com.velocitypowered.proxy.VelocityServer");
             Field shutdownInProgress = velocityServer.getDeclaredField("shutdownInProgress");
             shutdownInProgress.setAccessible(true);
 
-            return !((AtomicBoolean) shutdownInProgress.get(proxyServer)).get();
+            return !((AtomicBoolean) shutdownInProgress.get(proxy)).get();
         } catch (NoSuchFieldException | ClassNotFoundException | IllegalAccessException ignored) { }
         // Return not running if it can't grab the shutdownInProgress value;
         return false;

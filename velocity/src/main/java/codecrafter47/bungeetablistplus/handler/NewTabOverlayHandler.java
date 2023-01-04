@@ -41,9 +41,7 @@ import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -729,7 +727,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                     UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(customSlotUuid);
                     GameProfile profile = new GameProfile(customSlotUuid, slotUsername[index] = getCustomSlotUsername(index), toPropertiesList(icon.getTextureProperty()));
                     item.setProfile(profile);
-                    item.setDisplayName(tabOverlay.text[index]);
+                    item.setDisplayName(GsonComponentSerializer.gson().deserialize(tabOverlay.text[index]));
                     item.setLatency(tabOverlay.ping[index]);
                     item.setGameMode(0);
                     item.setListed(true);
@@ -742,7 +740,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             for (int index = dirtySlots.nextSetBit(0); index >= 0; index = dirtySlots.nextSetBit(index + 1)) {
                 if (slotState[index] != SlotState.UNUSED) {
                     UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(slotUuid[index]);
-                    item.setDisplayName(tabOverlay.text[index]);
+                    item.setDisplayName(GsonComponentSerializer.gson().deserialize(tabOverlay.text[index]));
                     itemQueueUpdateDisplayName.add(item);
                 }
             }
@@ -806,7 +804,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     private abstract class CustomContentTabOverlay extends AbstractContentTabOverlay implements TabOverlayHandle.BatchModifiable {
         final Icon[] icon;
-        final Component[] text;
+        final String[] text;
         final int[] ping;
 
         final AtomicInteger batchUpdateRecursionLevel;
@@ -818,8 +816,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         private CustomContentTabOverlay() {
             this.icon = new Icon[80];
             Arrays.fill(this.icon, Icon.DEFAULT_STEVE);
-            this.text = new Component[80];
-            Arrays.fill(this.text, Component.empty());
+            this.text = new String[80];
+            Arrays.fill(this.text, EMPTY_JSON_TEXT);
             this.ping = new int[80];
             this.batchUpdateRecursionLevel = new AtomicInteger(0);
             this.dirtyFlagSize = true;
@@ -864,7 +862,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
 
         void setTextInternal(int index, @Nonnull @NonNull String text) {
-            Component jsonText = LegacyComponentSerializer.legacyAmpersand().deserialize(text.replace(LegacyComponentSerializer.SECTION_CHAR, LegacyComponentSerializer.AMPERSAND_CHAR));
+            String jsonText = ChatFormat.formattedTextToJson(text);
             if (!jsonText.equals(this.text[index])) {
                 this.text[index] = jsonText;
                 dirtyFlagsText.set(index);
@@ -933,7 +931,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 for (int index = newUsedSlots.nextSetBit(0); index >= 0; index = newUsedSlots.nextSetBit(index + 1)) {
                     if (!oldUsedSlots.get(index)) {
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = Component.empty();
+                        text[index] = EMPTY_JSON_TEXT;
                         ping[index] = 0;
                     }
                 }
@@ -943,7 +941,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 for (int index = oldUsedSlots.nextSetBit(0); index >= 0; index = oldUsedSlots.nextSetBit(index + 1)) {
                     if (!newUsedSlots.get(index)) {
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = Component.empty();
+                        text[index] = EMPTY_JSON_TEXT;
                         ping[index] = 0;
                     }
                 }

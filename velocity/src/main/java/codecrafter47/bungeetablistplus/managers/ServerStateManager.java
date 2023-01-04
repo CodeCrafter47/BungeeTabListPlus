@@ -78,7 +78,7 @@ public class ServerStateManager {
             if (delay <= 0 || delay > 10) {
                 delay = 10;
             }
-            task = new PingTask(plugin.getProxy(), server);
+            task = new PingTask(plugin, server);
             serverState.put(serverName, task);
             task.task = plugin.getProxy().getScheduler().buildTask(plugin, task).delay(delay, TimeUnit.SECONDS).repeat(delay, TimeUnit.SECONDS).schedule();
         }
@@ -87,15 +87,15 @@ public class ServerStateManager {
 
     public static class PingTask implements Runnable {
 
-        private final ProxyServer proxyServer;
+        private final VelocityPlugin plugin;
         private final RegisteredServer server;
         private boolean online = true;
         private int maxPlayers = Integer.MAX_VALUE;
         private int onlinePlayers = 0;
         private ScheduledTask task;
 
-        public PingTask(ProxyServer proxyServer, RegisteredServer server) {
-            this.proxyServer = proxyServer;
+        public PingTask(VelocityPlugin plugin, RegisteredServer server) {
+            this.plugin = plugin;
             this.server = server;
         }
 
@@ -113,7 +113,7 @@ public class ServerStateManager {
 
         @Override
         public void run() {
-            if (!VelocityPlugin.isProxyRunning(proxyServer)) return;
+            if (!plugin.isProxyRunning()) return;
             server.ping().whenComplete((serverPing, throwable) -> {
                 if (throwable != null) {
                     online = false;

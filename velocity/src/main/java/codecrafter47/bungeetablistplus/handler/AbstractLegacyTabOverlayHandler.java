@@ -42,9 +42,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,9 +64,9 @@ import java.util.logging.Logger;
 public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
 
-    private static final Component[] slotID;
+    private static final String[] slotID;
     private static final UUID[] slotUUID;
-    private static final Set<Component> slotIDSet = new HashSet<>();
+    private static final Set<String> slotIDSet = new HashSet<>();
 
     private static final Int2ObjectMap<Collection<RectangularTabOverlay.Dimension>> playerListSizeToSupportedSizesMap = new Int2ObjectOpenHashMap<>();
 
@@ -77,12 +76,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         // add a random character to the player and team names to prevent issues in multi-velocity setup (stupid!).
         int random = ThreadLocalRandom.current().nextInt(0x1e00, 0x2c00);
 
-        slotID = new Component[256];
+        slotID = new String[256];
         slotUUID = new UUID[256];
 
         for (int i = 0; i < 256; i++) {
             String hex = String.format("%02x", i);
-            slotID[i] = LegacyComponentSerializer.legacySection().deserialize(String.format("§B§T§L§P§%c§%c§%c§r", random, hex.charAt(0), hex.charAt(1)));
+            slotID[i] = String.format("§B§T§L§P§%c§%c§%c§r", random, hex.charAt(0), hex.charAt(1));
             slotIDSet.add(slotID[i]);
             slotUUID[i] = UUID.randomUUID();
         }
@@ -117,7 +116,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     private final int playerListSize;
     private final Executor eventLoopExecutor;
 
-    private final Object2IntMap<Component> serverPlayerList = new Object2IntLinkedOpenHashMap<>();
+    private final Object2IntMap<String> serverPlayerList = new Object2IntLinkedOpenHashMap<>();
     private final Object2ObjectMap<UUID, ModernPlayerListEntry> modernServerPlayerList = new Object2ObjectOpenHashMap<>();
 
     private boolean is13OrLater;
@@ -249,10 +248,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         this.activeHandler.update();
     }
 
-    private void removeEntry(UUID uuid, Component player) {
+    private void removeEntry(UUID uuid, String player) {
         LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item();
-        item.setName(PlainTextComponentSerializer.plainText().serialize(player));
-        item.setDisplayName(player);
+        item.setName(player);
+        item.setDisplayName(GsonComponentSerializer.gson().deserialize(player));
         item.setLatency(9999);
         LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.REMOVE_PLAYER, Collections.singletonList(item));
         sendPacket(pli);
@@ -314,7 +313,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         void onActivated() {
             for (val entry : serverPlayerList.object2IntEntrySet()) {
                 LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item();
-                item.setDisplayName(entry.getKey()); // TODO: Check Formatting
+                item.setDisplayName(GsonComponentSerializer.gson().deserialize(entry.getKey())); // TODO: Check Formatting
                 item.setLatency(entry.getIntValue());
                 LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, Collections.singletonList(item));
                 sendPacket(pli);
@@ -336,7 +335,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         private void removeAllEntries() {
-            for (Component player : serverPlayerList.keySet()) {
+            for (String player : serverPlayerList.keySet()) {
                 removeEntry(null, player);
             }
             for (UUID player : modernServerPlayerList.keySet()) {
@@ -411,7 +410,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             for (int index = this.size - 1; index >= 0; index--) {
                 removeEntry(slotUUID[index], slotID[index]);
                 Team t = new Team();
-                t.setName(PlainTextComponentSerializer.plainText().serialize(slotID[index]));
+                t.setName(slotID[index]);
                 t.setMode((byte) 1);
                 sendPacket(t);
             }
@@ -428,12 +427,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         // create new slot
                         updateSlot(tabOverlay, index);
                         Team t = new Team();
-                        t.setName(PlainTextComponentSerializer.plainText().serialize(slotID[index]));
+                        t.setName(slotID[index]);
                         t.setMode((byte) 0);
                         t.setPrefix(tabOverlay.text0[index]);
                         t.setDisplayName("");
                         t.setSuffix(tabOverlay.text1[index]);
-                        t.setPlayers(new String[]{PlainTextComponentSerializer.plainText().serialize(slotID[index])});
+                        t.setPlayers(new String[]{slotID[index]});
                         t.setNameTagVisibility("always");
                         t.setCollisionRule("always");
                         if (is13OrLater) {
@@ -447,7 +446,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                     for (int index = this.size - 1; index >= size; index--) {
                         removeEntry(slotUUID[index], slotID[index]);
                         Team t = new Team();
-                        t.setName(PlainTextComponentSerializer.plainText().serialize(slotID[index]));
+                        t.setName(slotID[index]);
                         t.setMode((byte) 1);
                         sendPacket(t);
                     }
@@ -458,9 +457,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
         private void updateSlot(CustomTabOverlay tabOverlay, int index) {
             LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item(slotUUID[index]);
-            item.setName(PlainTextComponentSerializer.plainText().serialize(slotID[index]));
+            item.setName(slotID[index]);
             Property119Handler.setProperties(item, EMPTY_PROPERTIES);
-            item.setDisplayName(slotID[index]); // TODO: Check Formatting
+            item.setDisplayName(GsonComponentSerializer.gson().deserialize(slotID[index])); // TODO: Check Formatting
             item.setLatency(tabOverlay.ping[index]);
             LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, Collections.singletonList(item));
             sendPacket(pli);
@@ -469,7 +468,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         private void updateText(CustomTabOverlay tabOverlay, int index) {
             if (index < size) {
                 Team packet = new Team();
-                packet.setName(PlainTextComponentSerializer.plainText().serialize(slotID[index]));
+                packet.setName(slotID[index]);
                 packet.setMode((byte) 2);
                 packet.setPrefix(tabOverlay.text0[index]);
                 packet.setDisplayName("");
@@ -821,21 +820,21 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
      * @param item the item
      * @return the name
      */
-    private static Component getName(LegacyPlayerListItem.Item item) {
+    private static String getName(LegacyPlayerListItem.Item item) {
         if (item.getDisplayName() != null) {
-            return item.getDisplayName();
+            return GsonComponentSerializer.gson().serialize(item.getDisplayName());
         } else if (item.getName() != null) {
-            return Component.text(item.getName());
+            return item.getName();
         } else {
             throw new AssertionError("DisplayName and Username are null");
         }
     }
 
-    private static Component getName(UpsertPlayerInfo.Entry entry) {
+    private static String getName(UpsertPlayerInfo.Entry entry) {
         if (entry.getDisplayName() != null) {
-            return entry.getDisplayName();
+            return GsonComponentSerializer.gson().serialize(entry.getDisplayName());
         } else if (entry.getProfile().getName() != null) {
-            return Component.text(entry.getProfile().getName());
+            return entry.getProfile().getName();
         } else {
             throw new AssertionError("DisplayName and Username are null");
         }

@@ -56,10 +56,10 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         this.serverPlaceholderResolver = serverPlaceholderResolver;
         this.cache = cache;
         addPlaceholder("ping", create(VelocityData.Velocity_Ping));
-        addPlaceholder("luckpermsbungee_prefix", create(VelocityData.LuckPerms_Prefix));
-        addPlaceholder("luckpermsbungee_suffix", create(VelocityData.LuckPerms_Suffix));
-        addPlaceholder("luckpermsbungee_primary_group", create(VelocityData.LuckPerms_PrimaryGroup));
-        addPlaceholder("luckpermsbungee_primary_group_weight", create(VelocityData.LuckPerms_Weight));
+        addPlaceholder("luckpermsvelocity_prefix", create(VelocityData.LuckPerms_Prefix));
+        addPlaceholder("luckpermsvelocity_suffix", create(VelocityData.LuckPerms_Suffix));
+        addPlaceholder("luckpermsvelocity_primary_group", create(VelocityData.LuckPerms_PrimaryGroup));
+        addPlaceholder("luckpermsvelocity_primary_group_weight", create(VelocityData.LuckPerms_Weight));
         addPlaceholder("client_version", create(BTLPVelocityDataKeys.DATA_KEY_CLIENT_VERSION));
         addPlaceholder("client_version_below_1_8", create(BTLPVelocityDataKeys.DATA_KEY_CLIENT_VERSION_BELOW_1_8));
         addPlaceholder("client_version_atleast_1_8", create(BTLPVelocityDataKeys.DATA_KEY_CLIENT_VERSION_BELOW_1_8, b -> !b, TypeToken.BOOLEAN));

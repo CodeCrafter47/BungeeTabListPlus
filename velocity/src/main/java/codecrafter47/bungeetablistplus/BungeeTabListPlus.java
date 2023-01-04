@@ -202,7 +202,7 @@ public class BungeeTabListPlus {
         };
         mainThreadExecutor = new ExceptionHandlingEventExecutor(null, executor, logger);
 
-        if (getProxy().getPluginManager().getPlugin("ViaVersion").isPresent()) {
+        if (getProxy().getPluginManager().getPlugin("viaversion").isPresent()) {
             protocolVersionProvider = new ViaVersionProtocolVersionProvider();
         } else {
             protocolVersionProvider = new VelocityProtocolVersionProvider();
@@ -264,7 +264,7 @@ public class BungeeTabListPlus {
         fakePlayerManagerImpl = new FakePlayerManagerImpl(plugin, iconManager, mainThreadExecutor);
 
         List<PlayerProvider> playerProviders = new ArrayList<>();
-        if (getProxy().getPluginManager().getPlugin("RedisBungee").isPresent()) {
+        if (getProxy().getPluginManager().getPlugin("redisbungee").isPresent()) {
             redisPlayerManager = new RedisPlayerManager(bungeePlayerProvider, this, logger);
             playerProviders.add(redisPlayerManager);
             plugin.getLogger().info("Hooked RedisBungee");

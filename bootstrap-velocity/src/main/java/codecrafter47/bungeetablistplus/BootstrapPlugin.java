@@ -38,11 +38,13 @@ import java.nio.file.Path;
   name = "BungeeTabListPlus",
   version = "@VERSION@",
   dependencies = {
-    @Dependency(id = "RedisBungee", optional = true),
-    @Dependency(id = "LuckPerms", optional = true),
-    @Dependency(id = "Geyser", optional = true),
-    @Dependency(id = "Floodgate", optional = true)
-  }
+    @Dependency(id = "redisbungee", optional = true),
+    @Dependency(id = "luckperms", optional = true),
+    @Dependency(id = "geyser", optional = true),
+    @Dependency(id = "floodgate", optional = true),
+    @Dependency(id = "viaversion", optional = true)
+  },
+  authors = "CodeCrafter47 & proferabg"
 )
 public class BootstrapPlugin extends VelocityPlugin {
 
@@ -76,6 +78,13 @@ public class BootstrapPlugin extends VelocityPlugin {
     @Subscribe
     public void onProxyShutdown(final ProxyShutdownEvent event) {
         BungeeTabListPlus.getInstance().onDisable();
-
+        if (isProxyRunning()) {
+            getLogger().error("You cannot use ServerUtils to reload BungeeTabListPlus. Use /btlp reload instead.");
+            if (!getProxy().getAllPlayers().isEmpty()) {
+                for (Player proxiedPlayer : getProxy().getAllPlayers()) {
+                    proxiedPlayer.disconnect(Component.text("Cannot reload BungeeTabListPlus while players are online."));
+                }
+            }
+        }
     }
 }
