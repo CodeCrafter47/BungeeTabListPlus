@@ -19,9 +19,7 @@ package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.api.velocity.BungeeTabListPlusAPI;
-import codecrafter47.bungeetablistplus.api.velocity.CustomTablist;
 import codecrafter47.bungeetablistplus.api.velocity.FakePlayerManager;
-import codecrafter47.bungeetablistplus.api.velocity.Icon;
 import codecrafter47.bungeetablistplus.api.velocity.ServerVariable;
 import codecrafter47.bungeetablistplus.api.velocity.Variable;
 import codecrafter47.bungeetablistplus.data.BTLPVelocityDataKeys;
@@ -42,7 +40,6 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,30 +65,6 @@ public class API extends BungeeTabListPlusAPI {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    protected void setCustomTabList0(Player player, CustomTablist customTablist) {
-        TabView tabView = tabViewManager.getTabView(player);
-        if (tabView == null) {
-            throw new IllegalStateException("unknown player");
-        }
-        if (customTablist instanceof DefaultCustomTablist) {
-            tabView.getTabOverlayProviders().removeProviders(DefaultCustomTablist.TabOverlayProviderImpl.class);
-            ((DefaultCustomTablist) customTablist).addToPlayer(tabView);
-        } else {
-            throw new IllegalArgumentException("customTablist not created by createCustomTablist()");
-        }
-    }
-
-    @Override
-    protected void removeCustomTabList0(Player player) {
-        TabView tabView = tabViewManager.getTabView(player);
-        if (tabView == null) {
-            throw new IllegalStateException("unknown player");
-        }
-        tabView.getTabOverlayProviders().removeProviders(DefaultCustomTablist.TabOverlayProviderImpl.class);
-    }
-
-    @Override
     protected TabView getTabViewForPlayer0(Player player) {
         TabView tabView = tabViewManager.getTabView(player);
         if (tabView == null) {
@@ -102,20 +75,8 @@ public class API extends BungeeTabListPlusAPI {
 
     @Nonnull
     @Override
-    protected Icon getIconFromPlayer0(Player player) {
-        return IconUtil.convert(IconUtil.getIconFromPlayer(player));
-    }
-
-    @Nonnull
-    @Override
     protected de.codecrafter47.taboverlay.Icon getPlayerIcon0(Player player) {
         return IconUtil.getIconFromPlayer(player);
-    }
-
-    @Override
-    protected void createIcon0(BufferedImage image, Consumer<Icon> callback) {
-        CompletableFuture<de.codecrafter47.taboverlay.Icon> future = iconManager.createIcon(image);
-        future.thenAccept(icon -> callback.accept(IconUtil.convert(icon)));
     }
 
     @Override
@@ -169,12 +130,6 @@ public class API extends BungeeTabListPlusAPI {
             }
         }
         return "";
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    protected CustomTablist createCustomTablist0() {
-        return new DefaultCustomTablist();
     }
 
     @Override

@@ -17,7 +17,6 @@
 
 package codecrafter47.bungeetablistplus.tablist;
 
-import codecrafter47.bungeetablistplus.api.velocity.CustomTablist;
 import codecrafter47.bungeetablistplus.util.IconUtil;
 import de.codecrafter47.taboverlay.Icon;
 import lombok.NonNull;

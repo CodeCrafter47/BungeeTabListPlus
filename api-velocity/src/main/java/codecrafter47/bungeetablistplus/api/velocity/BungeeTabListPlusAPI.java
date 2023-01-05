@@ -24,7 +24,6 @@ import de.codecrafter47.taboverlay.TabView;
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 public abstract class BungeeTabListPlusAPI {
     private static BungeeTabListPlusAPI instance = null;
@@ -64,54 +63,6 @@ public abstract class BungeeTabListPlusAPI {
     protected abstract void registerVariable0(Object plugin, ServerVariable variable);
 
     /**
-     * Create a new {@link CustomTablist}
-     *
-     * @return thte created {@link CustomTablist}
-     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(Player)}
-     */
-    @Deprecated
-    public static CustomTablist createCustomTablist() {
-        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
-        return instance.createCustomTablist0();
-    }
-
-    @SuppressWarnings("deprecation")
-    protected abstract CustomTablist createCustomTablist0();
-
-    /**
-     * Set a custom tab list for a player
-     *
-     * @param player        the player
-     * @param customTablist the CustomTablist to use
-     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(Player)}
-     */
-    @Deprecated
-    public static void setCustomTabList(Player player, CustomTablist customTablist) {
-        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
-        instance.setCustomTabList0(player, customTablist);
-    }
-
-    @SuppressWarnings("deprecation")
-    protected abstract void setCustomTabList0(Player player, CustomTablist customTablist);
-
-    /**
-     * Get the face part of the players skin as an icon for use in the tab list.
-     *
-     * @param player the player
-     * @return the icon
-     * @deprecated Use {@link #getPlayerIcon(Player)}
-     */
-    @Deprecated
-    @Nonnull
-    public static Icon getIconFromPlayer(Player player) {
-        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
-        return instance.getIconFromPlayer0(player);
-    }
-
-    @Nonnull
-    protected abstract Icon getIconFromPlayer0(Player player);
-
-    /**
      * Get the face part of the players skin as an icon for use in the tab list.
      *
      * @param player the player
@@ -126,21 +77,6 @@ public abstract class BungeeTabListPlusAPI {
     @Nonnull
     protected abstract de.codecrafter47.taboverlay.Icon getPlayerIcon0(Player player);
 
-    /**
-     * Creates an icon from an 8x8 px image. The creation of the icon can take several
-     * minutes. When the icon has been created the callback is invoked.
-     *
-     * @param image    the image
-     * @param callback called when the icon is ready
-     * @deprecated use {@link #getIconFromImage(BufferedImage)}
-     */
-    @Deprecated
-    public static void createIcon(BufferedImage image, Consumer<Icon> callback) {
-        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
-        instance.createIcon0(image, callback);
-    }
-
-    protected abstract void createIcon0(BufferedImage image, Consumer<Icon> callback);
 
     /**
      * Creates an icon from an 8x8 px image. The creation of the icon can take several
@@ -155,21 +91,6 @@ public abstract class BungeeTabListPlusAPI {
     }
 
     protected abstract CompletableFuture<de.codecrafter47.taboverlay.Icon> getIconFromImage0(BufferedImage image);
-
-    /**
-     * Removes a custom tab list from a player.
-     * If the player hasn't got a custom tab list associated with it this will do nothing.
-     *
-     * @param player the player
-     * @deprecated The custom tab list api has been changed. See {@link #getTabViewForPlayer(Player)}
-     */
-    @Deprecated
-    public static void removeCustomTabList(Player player) {
-        Preconditions.checkState(instance != null, "BungeeTabListPlus not initialized");
-        instance.removeCustomTabList0(player);
-    }
-
-    protected abstract void removeCustomTabList0(Player player);
 
     /**
      * Get the tab view of a player. The tab view object allows registering and unregistering custom tab overlay
