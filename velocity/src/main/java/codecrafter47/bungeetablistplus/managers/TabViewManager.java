@@ -101,7 +101,6 @@ public class TabViewManager {
 
             PacketHandler packetHandler = tabView.packetHandler;
             PacketListener packetListener = new PacketListener(server, packetHandler, player);
-
             wrapper.getChannel().pipeline().addBefore(Connections.HANDLER, "btlp-packet-listener", packetListener);
 
             packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));

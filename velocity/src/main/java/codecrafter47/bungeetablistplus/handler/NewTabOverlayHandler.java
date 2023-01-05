@@ -1212,9 +1212,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         if (textureProperty == null) {
             return new ArrayList<>();
         } else if (textureProperty.isSigned()) {
-            return Collections.singletonList(new GameProfile.Property(textureProperty.getName(), textureProperty.getValue(), textureProperty.getSignature()));
+            return List.of(new GameProfile.Property(textureProperty.getName(), textureProperty.getValue(), textureProperty.getSignature()));
         } else {
-            return Collections.singletonList(new GameProfile.Property(textureProperty.getName(), textureProperty.getValue(), ""));
+            return List.of(new GameProfile.Property(textureProperty.getName(), textureProperty.getValue(), ""));
         }
     }
 

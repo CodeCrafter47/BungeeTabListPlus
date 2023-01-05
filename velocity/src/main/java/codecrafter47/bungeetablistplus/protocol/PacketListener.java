@@ -21,6 +21,7 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.connection.backend.VelocityServerConnection;
+import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
 import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
@@ -31,7 +32,7 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.util.List;
 
-public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
+public class PacketListener extends MessageToMessageDecoder<MinecraftPacket> {
     private final VelocityServerConnection connection;
     private final PacketHandler handler;
     private final Player player;
@@ -43,53 +44,47 @@ public class PacketListener extends MessageToMessageDecoder<PacketWrapper> {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, PacketWrapper packetWrapper, List<Object> out) {
-        boolean shouldRelease = true;
+    protected void decode(ChannelHandlerContext ctx, MinecraftPacket packet, List<Object> out) {
         try {
             if (connection.isActive()) {
-                if (packetWrapper.packet != null) {
+                if (packet != null) {
 
                     PacketListenerResult result = PacketListenerResult.PASS;
                     boolean handled = false;
 
-                    if (packetWrapper.packet instanceof Team) {
-                        result = handler.onTeamPacket((Team) packetWrapper.packet);
+                    if (packet instanceof Team) {
+                        result = handler.onTeamPacket((Team) packet);
                         if (result == PacketListenerResult.MODIFIED) {
-                            ReflectionUtil.getChannelWrapper(player).getChannel().write(packetWrapper.packet);
+                            ReflectionUtil.getChannelWrapper(player).getChannel().write(packet);
                         }
                         if (result != PacketListenerResult.PASS) {
                             return;
                         }
-                    } else if (packetWrapper.packet instanceof LegacyPlayerListItem) {
-                        result = handler.onPlayerListPacket((LegacyPlayerListItem) packetWrapper.packet);
+                    } else if (packet instanceof LegacyPlayerListItem) {
+                        result = handler.onPlayerListPacket((LegacyPlayerListItem) packet);
                         handled = true;
-                    } else if (packetWrapper.packet instanceof HeaderAndFooter) {
-                        result = handler.onPlayerListHeaderFooterPacket((HeaderAndFooter) packetWrapper.packet);
+                    } else if (packet instanceof HeaderAndFooter) {
+                        result = handler.onPlayerListHeaderFooterPacket((HeaderAndFooter) packet);
                         handled = true;
-                    } else if (packetWrapper.packet instanceof UpsertPlayerInfo) {
-                        result = handler.onPlayerListUpdatePacket((UpsertPlayerInfo) packetWrapper.packet);
+                    } else if (packet instanceof UpsertPlayerInfo) {
+                        result = handler.onPlayerListUpdatePacket((UpsertPlayerInfo) packet);
                         handled = true;
-                    } else if (packetWrapper.packet instanceof RemovePlayerInfo) {
-                        result = handler.onPlayerListRemovePacket((RemovePlayerInfo) packetWrapper.packet);
+                    } else if (packet instanceof RemovePlayerInfo) {
+                        result = handler.onPlayerListRemovePacket((RemovePlayerInfo) packet);
                         handled = true;
                     }
 
                     if (handled) {
                         if (result != PacketListenerResult.CANCEL) {
-                            ReflectionUtil.getChannelWrapper(player).getChannel().write(packetWrapper.packet);
+                            ReflectionUtil.getChannelWrapper(player).getChannel().write(packet);
                         }
                         return;
                     }
                 }
             }
-            out.add(packetWrapper);
-            shouldRelease = false;
+            out.add(packet);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
-        } finally {
-            if (shouldRelease) {
-                packetWrapper.trySingleRelease();
-            }
         }
     }
 }

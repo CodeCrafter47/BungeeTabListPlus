@@ -20,15 +20,19 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
 import codecrafter47.bungeetablistplus.util.GeyserCompat;
+import codecrafter47.bungeetablistplus.util.ProxyServer;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import net.kyori.adventure.text.Component;
+
+import java.util.concurrent.TimeUnit;
 
 public class TabListListener {
 
@@ -41,6 +45,13 @@ public class TabListListener {
     @Subscribe(order = PostOrder.LATE)
     public void onPlayerJoin(PostLoginEvent e) {
         try {
+            // Hacks -> Remove everyone from all tablists
+            btlp.getProxy().getScheduler().buildTask(btlp.getPlugin(), () -> {
+                for(Player tmpPlayer : btlp.getProxy().getAllPlayers()){
+                    tmpPlayer.getTabList().clearAll();
+                }
+            }).delay(2, TimeUnit.SECONDS).schedule();
+
             VelocityPlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
             
             if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {

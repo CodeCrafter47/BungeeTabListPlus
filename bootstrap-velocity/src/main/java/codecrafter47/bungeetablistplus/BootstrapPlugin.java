@@ -34,21 +34,23 @@ import org.slf4j.Logger;
 import java.nio.file.Path;
 
 @Plugin(
-  id = "bungeetablistplus",
-  name = "BungeeTabListPlus",
-  version = "@VERSION@",
-  dependencies = {
-    @Dependency(id = "redisbungee", optional = true),
-    @Dependency(id = "luckperms", optional = true),
-    @Dependency(id = "geyser", optional = true),
-    @Dependency(id = "floodgate", optional = true),
-    @Dependency(id = "viaversion", optional = true)
-  },
-  authors = "CodeCrafter47 & proferabg"
+    id = "bungeetablistplus",
+    name = "BungeeTabListPlus",
+    authors = "CodeCrafter47 & proferabg",
+    version = "@VERSION@",
+    dependencies = {
+        @Dependency(id = "redisbungee", optional = true),
+        @Dependency(id = "luckperms", optional = true),
+        @Dependency(id = "geyser", optional = true),
+        @Dependency(id = "floodgate", optional = true),
+        @Dependency(id = "viaversion", optional = true)
+    }
 )
 public class BootstrapPlugin extends VelocityPlugin {
 
     private final Metrics.Factory metricsFactory;
+
+    private static final String NO_RELOAD_PLAYERS = "Cannot reload BungeeTabListPlus while players are online.";
 
     @Inject
     public BootstrapPlugin(final ProxyServer server, final Logger logger, final @DataDirectory Path dataDirectory, final Metrics.Factory metricsFactory) {
@@ -58,14 +60,14 @@ public class BootstrapPlugin extends VelocityPlugin {
 
     @Subscribe
     public void onProxyInitialization(final ProxyInitializeEvent event) {
-         if (Float.parseFloat(System.getProperty("java.class.version")) < 52.0) {
-            getLogger().error("§cBungeeTabListPlus requires Java 8 or above. Please download and install it!");
+        if (Float.parseFloat(System.getProperty("java.class.version")) < 55.0) {
+            getLogger().error("§cBungeeTabListPlus requires Java 11 or above. Please download and install it!");
             getLogger().error("Disabling plugin!");
             return;
         }
         if (!getProxy().getAllPlayers().isEmpty()) {
             for (Player player : getProxy().getAllPlayers()) {
-                player.disconnect(Component.text("Cannot reload BungeeTabListPlus while players are online."));
+                player.disconnect(Component.text(NO_RELOAD_PLAYERS));
             }
         }
         getProxy().getPluginManager().getPlugin("BungeeTabListPlus");
@@ -82,7 +84,7 @@ public class BootstrapPlugin extends VelocityPlugin {
             getLogger().error("You cannot use ServerUtils to reload BungeeTabListPlus. Use /btlp reload instead.");
             if (!getProxy().getAllPlayers().isEmpty()) {
                 for (Player proxiedPlayer : getProxy().getAllPlayers()) {
-                    proxiedPlayer.disconnect(Component.text("Cannot reload BungeeTabListPlus while players are online."));
+                    proxiedPlayer.disconnect(Component.text(NO_RELOAD_PLAYERS));
                 }
             }
         }

@@ -36,6 +36,7 @@ import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import javax.annotation.Nonnull;
@@ -708,7 +709,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 items.clear();
                 for (PlayerListEntry entry : serverPlayerList.values()) {
                     LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item(entry.getUuid());
-                    item.setDisplayName(GsonComponentSerializer.gson().deserialize(entry.getDisplayName()));
+                    item.setDisplayName((entry.getDisplayName() != null && !entry.getDisplayName().equalsIgnoreCase("null")) ? GsonComponentSerializer.gson().deserialize(entry.getDisplayName()) : Component.empty());
                     items.add(item);
                 }
                 packet = new LegacyPlayerListItem(UPDATE_DISPLAY_NAME, items);
@@ -996,10 +997,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                 item1.setDisplayName(GsonComponentSerializer.gson().deserialize(tabOverlay.text[index])); // TODO: Check formatting
                                 item1.setLatency(tabOverlay.ping[index]);
                                 item1.setGameMode(0);
-                                LegacyPlayerListItem packet1 = new LegacyPlayerListItem(ADD_PLAYER, Collections.singletonList(item1));
+                                LegacyPlayerListItem packet1 = new LegacyPlayerListItem(ADD_PLAYER, List.of(item1));
                                 sendPacket(packet1);
                                 if (is18) {
-                                    packet1 = new LegacyPlayerListItem(UPDATE_DISPLAY_NAME, Collections.singletonList(item1));
+                                    packet1 = new LegacyPlayerListItem(UPDATE_DISPLAY_NAME, List.of(item1));
                                     sendPacket(packet1);
                                 }
                             }
@@ -1230,10 +1231,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         item1.setDisplayName(GsonComponentSerializer.gson().deserialize(tabOverlay.text[index])); // TODO: Check formatting
                         item1.setLatency(tabOverlay.ping[index]);
                         item1.setGameMode(0);
-                        LegacyPlayerListItem packet1 = new LegacyPlayerListItem(ADD_PLAYER, Collections.singletonList(item1));
+                        LegacyPlayerListItem packet1 = new LegacyPlayerListItem(ADD_PLAYER, List.of(item1));
                         sendPacket(packet1);
                         if (is18) {
-                            packet1 = new LegacyPlayerListItem(UPDATE_DISPLAY_NAME, Collections.singletonList(item1));
+                            packet1 = new LegacyPlayerListItem(UPDATE_DISPLAY_NAME, List.of(item1));
                             sendPacket(packet1);
                         }
                     }

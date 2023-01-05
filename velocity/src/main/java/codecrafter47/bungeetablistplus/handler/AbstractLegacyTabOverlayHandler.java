@@ -253,7 +253,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         item.setName(player);
         item.setDisplayName(GsonComponentSerializer.gson().deserialize(player));
         item.setLatency(9999);
-        LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.REMOVE_PLAYER, Collections.singletonList(item));
+        LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.REMOVE_PLAYER, List.of(item));
         sendPacket(pli);
     }
 
@@ -315,7 +315,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item();
                 item.setDisplayName(GsonComponentSerializer.gson().deserialize(entry.getKey())); // TODO: Check Formatting
                 item.setLatency(entry.getIntValue());
-                LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, Collections.singletonList(item));
+                LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, List.of(item));
                 sendPacket(pli);
             }
             for (val entry : modernServerPlayerList.entrySet()) {
@@ -324,7 +324,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 item.setGameMode(entry.getValue().gamemode);
                 item.setLatency(entry.getValue().latency);
                 Property119Handler.setProperties(item, EMPTY_PROPERTIES);
-                LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, Collections.singletonList(item));
+                LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, List.of(item));
                 sendPacket(pli);
             }
         }
@@ -461,7 +461,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             Property119Handler.setProperties(item, EMPTY_PROPERTIES);
             item.setDisplayName(GsonComponentSerializer.gson().deserialize(slotID[index])); // TODO: Check Formatting
             item.setLatency(tabOverlay.ping[index]);
-            LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, Collections.singletonList(item));
+            LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, List.of(item));
             sendPacket(pli);
         }
 
