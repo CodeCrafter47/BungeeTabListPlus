@@ -21,7 +21,6 @@ import codecrafter47.bungeetablistplus.bridge.BukkitBridge;
 import codecrafter47.bungeetablistplus.cache.Cache;
 import codecrafter47.bungeetablistplus.command.CommandBungeeTabListPlus;
 import codecrafter47.bungeetablistplus.common.network.BridgeProtocolConstants;
-import codecrafter47.bungeetablistplus.compat.SortingRuleAliasProcessor;
 import codecrafter47.bungeetablistplus.config.MainConfig;
 import codecrafter47.bungeetablistplus.config.PlayersByServerComponentConfiguration;
 import codecrafter47.bungeetablistplus.data.BTLPVelocityDataKeys;
@@ -38,6 +37,7 @@ import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.ExceptionHandlingEventExecutor;
 import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
+import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.util.VelocityPlugin;
 import codecrafter47.bungeetablistplus.version.VelocityProtocolVersionProvider;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
@@ -239,7 +239,6 @@ public class BungeeTabListPlus {
                 .playerInvisibleDataKey(BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN)
                 .playerCanSeeInvisibleDataKey(BTLPVelocityDataKeys.permission("bungeetablistplus.seevanished"))
                 .component(new ComponentSpec("!players_by_server", PlayersByServerComponentConfiguration.class))
-                .sortingRulePreprocessor(new SortingRuleAliasProcessor())
                 .build();
         yaml = ConfigTabOverlayManager.constructYamlInstance(options);
 
@@ -341,6 +340,9 @@ public class BungeeTabListPlus {
             }
         }
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
+
+        // Hacks to get around no Team packet in Velocity
+        ReflectionUtil.injectTeamPacketRegistry();
 
         getProxy().getEventManager().register(plugin, new TabListListener(this));
     }

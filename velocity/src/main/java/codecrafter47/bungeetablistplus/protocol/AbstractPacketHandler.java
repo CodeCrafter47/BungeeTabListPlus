@@ -20,7 +20,6 @@ package codecrafter47.bungeetablistplus.protocol;
 import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
 import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.Team;
 import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
 import lombok.NonNull;
 

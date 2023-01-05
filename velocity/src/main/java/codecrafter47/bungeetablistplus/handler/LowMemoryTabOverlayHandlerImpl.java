@@ -18,8 +18,8 @@
 package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
+import codecrafter47.bungeetablistplus.protocol.Team;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.proxy.protocol.packet.Team;
 
 import java.util.UUID;
 import java.util.concurrent.Executor;

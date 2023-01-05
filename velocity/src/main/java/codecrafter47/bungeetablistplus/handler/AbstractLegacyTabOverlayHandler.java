@@ -19,6 +19,7 @@ package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
+import codecrafter47.bungeetablistplus.protocol.Team;
 import codecrafter47.bungeetablistplus.util.ColorParser;
 import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import codecrafter47.bungeetablistplus.util.Property119Handler;
@@ -28,7 +29,6 @@ import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
 import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.Team;
 import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
