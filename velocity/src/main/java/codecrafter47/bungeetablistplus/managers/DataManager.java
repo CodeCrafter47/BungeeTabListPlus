@@ -48,7 +48,7 @@ public class DataManager {
 
     private final API api;
     private final EventExecutor mainThreadExecutor;
-    private final BungeePlayerProvider bungeePlayerProvider;
+    private final VelocityPlayerProvider velocityPlayerProvider;
     private final ServerStateManager serverStateManager;
     private final BukkitBridge bukkitBridge;
 
@@ -68,9 +68,9 @@ public class DataManager {
     @Setter
     List<String> permanentlyHiddenPlayers = Collections.emptyList();
 
-    public DataManager(API api, VelocityPlugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, EventExecutor mainThreadExecutor, ServerStateManager serverStateManager, BukkitBridge bukkitBridge) {
+    public DataManager(API api, VelocityPlugin plugin, Logger logger, VelocityPlayerProvider velocityPlayerProvider, EventExecutor mainThreadExecutor, ServerStateManager serverStateManager, BukkitBridge bukkitBridge) {
         this.api = api;
-        this.bungeePlayerProvider = bungeePlayerProvider;
+        this.velocityPlayerProvider = velocityPlayerProvider;
         this.mainThreadExecutor = mainThreadExecutor;
         this.serverStateManager = serverStateManager;
         this.bukkitBridge = bukkitBridge;
@@ -104,7 +104,7 @@ public class DataManager {
     }
 
     private void updateData(ProxyServer server) {
-        for (VelocityPlayer player : bungeePlayerProvider.getPlayers()) {
+        for (VelocityPlayer player : velocityPlayerProvider.getPlayers()) {
             for (DataKey<?> dataKey : player.getLocalDataCache().getActiveKeys()) {
                 if (playerDataAccess.provides(dataKey)) {
                     DataKey<Object> key = Unchecked.cast(dataKey);

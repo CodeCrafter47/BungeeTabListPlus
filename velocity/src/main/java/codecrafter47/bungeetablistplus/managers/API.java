@@ -27,7 +27,6 @@ import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
 import codecrafter47.bungeetablistplus.player.FakePlayerManagerImpl;
-import codecrafter47.bungeetablistplus.tablist.DefaultCustomTablist;
 import codecrafter47.bungeetablistplus.util.IconUtil;
 import com.google.common.base.Preconditions;
 import com.velocitypowered.api.proxy.Player;
@@ -143,7 +142,7 @@ public class API extends BungeeTabListPlusAPI {
 
     @Override
     protected boolean isHidden0(Player player) {
-        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayerIfPresent(player);
+        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getVelocityPlayerProvider().getPlayerIfPresent(player);
         return velocityPlayer != null && velocityPlayer.get(BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN);
     }
 }

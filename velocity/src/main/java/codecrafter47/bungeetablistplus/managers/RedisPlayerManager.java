@@ -74,7 +74,7 @@ public class RedisPlayerManager implements PlayerProvider {
     private static String CHANNEL_DATA_UPDATE = "btlp-data-upd";
 
     private final Map<UUID, RedisPlayer> byUUID = new ConcurrentHashMap<>();
-    private final BungeePlayerProvider bungeePlayerProvider;
+    private final VelocityPlayerProvider velocityPlayerProvider;
     private final BungeeTabListPlus plugin;
     private final EventExecutor mainThread;
     private final Logger logger;
@@ -96,8 +96,8 @@ public class RedisPlayerManager implements PlayerProvider {
 
     private boolean redisConnectionSuccessful = false;
 
-    public RedisPlayerManager(BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus plugin, Logger logger) {
-        this.bungeePlayerProvider = bungeePlayerProvider;
+    public RedisPlayerManager(VelocityPlayerProvider velocityPlayerProvider, BungeeTabListPlus plugin, Logger logger) {
+        this.velocityPlayerProvider = velocityPlayerProvider;
         this.plugin = plugin;
         this.logger = logger;
         this.mainThread = plugin.getMainThreadExecutor();
@@ -126,7 +126,7 @@ public class RedisPlayerManager implements PlayerProvider {
 
                 com.velocitypowered.api.proxy.Player Player = ProxyServer.getInstance().getPlayer(uuid).orElse(null);
                 if (Player != null) {
-                    VelocityPlayer player = bungeePlayerProvider.getPlayerIfPresent(Player);
+                    VelocityPlayer player = velocityPlayerProvider.getPlayerIfPresent(Player);
                     if (player != null) {
                         DataKey<?> key = DataStreamUtils.readDataKey(input, keyRegistry, missingDataKeyLogger);
 

@@ -32,14 +32,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-public class BungeePlayerProvider implements PlayerProvider {
+public class VelocityPlayerProvider implements PlayerProvider {
 
     private final EventExecutor mainThread;
 
     private final Map<Player, VelocityPlayer> players = new ConcurrentHashMap<>();
     private final Set<Listener> listeners = new ReferenceOpenHashSet<>();
 
-    public BungeePlayerProvider(EventExecutor mainThread) {
+    public VelocityPlayerProvider(EventExecutor mainThread) {
         this.mainThread = mainThread;
         mainThread.scheduleWithFixedDelay(this::checkForStalePlayers, 5, 5, TimeUnit.MINUTES);
     }

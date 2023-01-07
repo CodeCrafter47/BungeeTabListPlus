@@ -30,6 +30,7 @@ dependencies {
     compileOnly "com.viaversion:viaversion-api:4.0.0"
     compileOnly group: "org.geysermc.geyser", name: "api", version: "2.1.0-SNAPSHOT"
     compileOnly "org.geysermc.floodgate:api:2.0-SNAPSHOT"
+    compileOnly "io.netty:netty-all:4.1.86.Final"
     // This imports velocity proxy
     compileOnly fileTree(dir: '../libs', include: '*.jar')
 }

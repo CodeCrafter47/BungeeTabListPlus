@@ -81,17 +81,17 @@ public class CommandHide {
     }
 
     private static boolean isHidden(Player player) {
-        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
+        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getVelocityPlayerProvider().getPlayer(player);
         return Boolean.TRUE.equals(velocityPlayer.get(BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND));
     }
 
     private static void hidePlayer(Player player) {
-        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
+        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getVelocityPlayerProvider().getPlayer(player);
         velocityPlayer.getLocalDataCache().updateValue(BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND, true);
     }
 
     private static void unhidePlayer(Player player) {
-        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getBungeePlayerProvider().getPlayer(player);
+        VelocityPlayer velocityPlayer = BungeeTabListPlus.getInstance().getVelocityPlayerProvider().getPlayer(player);
         velocityPlayer.getLocalDataCache().updateValue(BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND, false);
     }
 }

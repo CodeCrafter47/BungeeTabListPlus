@@ -20,7 +20,6 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
 import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider;
 import codecrafter47.bungeetablistplus.util.GeyserCompat;
-import codecrafter47.bungeetablistplus.util.ProxyServer;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -52,7 +51,7 @@ public class TabListListener {
                 }
             }).delay(2, TimeUnit.SECONDS).schedule();
 
-            VelocityPlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
+            VelocityPlayer player = btlp.getVelocityPlayerProvider().onPlayerConnected(e.getPlayer());
             
             if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
                 return;
@@ -71,7 +70,7 @@ public class TabListListener {
     @Subscribe(order = PostOrder.FIRST)
     public void onPlayerDisconnect(DisconnectEvent e) {
         try {
-            btlp.getBungeePlayerProvider().onPlayerDisconnected(e.getPlayer());
+            btlp.getVelocityPlayerProvider().onPlayerDisconnected(e.getPlayer());
 
             if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
                 return;

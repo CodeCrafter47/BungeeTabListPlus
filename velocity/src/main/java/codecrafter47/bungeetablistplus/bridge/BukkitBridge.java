@@ -24,7 +24,7 @@ import codecrafter47.bungeetablistplus.common.network.DataStreamUtils;
 import codecrafter47.bungeetablistplus.common.network.TypeAdapterRegistry;
 import codecrafter47.bungeetablistplus.common.util.RateLimitedExecutor;
 import codecrafter47.bungeetablistplus.data.TrackingDataCache;
-import codecrafter47.bungeetablistplus.managers.BungeePlayerProvider;
+import codecrafter47.bungeetablistplus.managers.VelocityPlayerProvider;
 import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
@@ -39,7 +39,6 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
-import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.codecrafter47.data.api.DataCache;
 import de.codecrafter47.data.api.DataHolder;
@@ -72,18 +71,18 @@ public class BukkitBridge {
     private final ServerPlaceholderResolver serverPlaceholderResolver;
     private final VelocityPlugin plugin;
     private final Logger logger;
-    private final BungeePlayerProvider bungeePlayerProvider;
+    private final VelocityPlayerProvider velocityPlayerProvider;
     private final BungeeTabListPlus btlp;
     private final Cache cache;
 
-    public BukkitBridge(ScheduledExecutorService asyncExecutor, ScheduledExecutorService mainLoop, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, VelocityPlugin plugin, Logger logger, BungeePlayerProvider bungeePlayerProvider, BungeeTabListPlus btlp, Cache cache) {
+    public BukkitBridge(ScheduledExecutorService asyncExecutor, ScheduledExecutorService mainLoop, PlayerPlaceholderResolver playerPlaceholderResolver, ServerPlaceholderResolver serverPlaceholderResolver, VelocityPlugin plugin, Logger logger, VelocityPlayerProvider velocityPlayerProvider, BungeeTabListPlus btlp, Cache cache) {
         this.asyncExecutor = asyncExecutor;
         this.mainLoop = mainLoop;
         this.playerPlaceholderResolver = playerPlaceholderResolver;
         this.serverPlaceholderResolver = serverPlaceholderResolver;
         this.plugin = plugin;
         this.logger = logger;
-        this.bungeePlayerProvider = bungeePlayerProvider;
+        this.velocityPlayerProvider = velocityPlayerProvider;
         this.btlp = btlp;
         this.cache = cache;
         ProxyServer.getInstance().getEventManager().register(plugin, this);
@@ -235,7 +234,7 @@ public class BukkitBridge {
             connectionInfo.hasReceived = false;
             connectionInfo.protocolVersion = Integer.min(BridgeProtocolConstants.VERSION, protocolVersion);
 
-            VelocityPlayer velocityPlayer = bungeePlayerProvider.getPlayerIfPresent(player);
+            VelocityPlayer velocityPlayer = velocityPlayerProvider.getPlayerIfPresent(player);
             if (velocityPlayer == null) {
                 logger.severe("Internal error - Bridge functionality not available for " + player.getUsername());
             } else {

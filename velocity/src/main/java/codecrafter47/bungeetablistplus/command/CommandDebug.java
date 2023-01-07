@@ -64,7 +64,7 @@ public class CommandDebug {
         }
 
         val btlp = BungeeTabListPlus.getInstance();
-        VelocityPlayer player = btlp.getBungeePlayerProvider().getPlayerIfPresent(target);
+        VelocityPlayer player = btlp.getVelocityPlayerProvider().getPlayerIfPresent(target);
 
         if (player == null) {
             sender.sendMessage(ChatUtil.parseBBCode("&cUnknown player: " + name));

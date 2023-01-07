@@ -160,7 +160,7 @@ public class BungeeTabListPlus {
     private DefaultIconManager iconManager;
 
     @Getter
-    private BungeePlayerProvider bungeePlayerProvider;
+    private VelocityPlayerProvider velocityPlayerProvider;
 
     @Getter
     private ProtocolVersionProvider protocolVersionProvider;
@@ -191,6 +191,9 @@ public class BungeeTabListPlus {
         }
 
         INSTANCE = this;
+
+        // Hacks to get around no Team packet in Velocity
+        ReflectionUtil.injectTeamPacketRegistry();
 
         Executor executor = (task) -> getProxy().getScheduler().buildTask(getPlugin(), task).schedule();
 
@@ -245,7 +248,7 @@ public class BungeeTabListPlus {
         if (readMainConfig())
             return;
 
-        bungeePlayerProvider = new BungeePlayerProvider(mainThreadExecutor);
+        velocityPlayerProvider = new VelocityPlayerProvider(mainThreadExecutor);
 
         hiddenPlayersManager = new HiddenPlayersManager();
         hiddenPlayersManager.addVanishProvider("/btlp hide", BTLPVelocityDataKeys.DATA_KEY_IS_HIDDEN_PLAYER_COMMAND);
@@ -264,18 +267,18 @@ public class BungeeTabListPlus {
 
         List<PlayerProvider> playerProviders = new ArrayList<>();
         if (getProxy().getPluginManager().getPlugin("redisbungee").isPresent()) {
-            redisPlayerManager = new RedisPlayerManager(bungeePlayerProvider, this, logger);
+            redisPlayerManager = new RedisPlayerManager(velocityPlayerProvider, this, logger);
             playerProviders.add(redisPlayerManager);
             plugin.getLogger().info("Hooked RedisBungee");
         }
-        playerProviders.add(bungeePlayerProvider);
+        playerProviders.add(velocityPlayerProvider);
         playerProviders.add(fakePlayerManagerImpl);
         this.playerProvider = new JoinedPlayerProvider(playerProviders);
 
         getProxy().getChannelRegistrar().register(channelIdentifier);
-        bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), logger, bungeePlayerProvider, this, cache);
+        bukkitBridge = new BukkitBridge(asyncExecutor, mainThreadExecutor, playerPlaceholderResolver, serverPlaceholderResolver, getPlugin(), logger, velocityPlayerProvider, this, cache);
         serverStateManager = new ServerStateManager(config, plugin);
-        dataManager = new DataManager(api, plugin, logger, bungeePlayerProvider, mainThreadExecutor, serverStateManager, bukkitBridge);
+        dataManager = new DataManager(api, plugin, logger, velocityPlayerProvider, mainThreadExecutor, serverStateManager, bukkitBridge);
         dataManager.addCompositeDataProvider(hiddenPlayersManager);
         dataManager.addCompositeDataProvider(new PermissionDataProvider());
 
@@ -340,9 +343,6 @@ public class BungeeTabListPlus {
             }
         }
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
-
-        // Hacks to get around no Team packet in Velocity
-        ReflectionUtil.injectTeamPacketRegistry();
 
         getProxy().getEventManager().register(plugin, new TabListListener(this));
     }

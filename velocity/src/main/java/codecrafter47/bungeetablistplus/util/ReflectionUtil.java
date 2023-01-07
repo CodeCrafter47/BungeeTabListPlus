@@ -116,6 +116,7 @@ public class ReflectionUtil {
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x58, MINECRAFT_1_19_1, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x56, MINECRAFT_1_19_3, null, false)
                 });
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
             }
