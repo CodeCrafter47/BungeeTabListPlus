@@ -23,6 +23,7 @@ import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.platform.EventListener;
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -43,11 +44,11 @@ public class TabListListener implements Listener {
     public void onPlayerJoin(PostLoginEvent e) {
         try {
             BungeePlayer player = btlp.getBungeePlayerProvider().onPlayerConnected(e.getPlayer());
-            
+
             if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
                 return;
             }
-            
+
             TabView tabView = btlp.getTabViewManager().onPlayerJoin(e.getPlayer());
             tabView.getTabOverlayProviders().addProvider(new ExcludedServersTabOverlayProvider(player, btlp));
             for (EventListener listener : btlp.getListeners()) {
@@ -66,17 +67,19 @@ public class TabListListener implements Listener {
             if (GeyserCompat.isBedrockPlayer(e.getPlayer().getUniqueId())) {
                 return;
             }
-            
+
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
-            tabView.deactivate();
-            for (EventListener listener : btlp.getListeners()) {
-                listener.onTabViewRemoved(tabView);
+            if (tabView != null) {
+                tabView.deactivate();
+                for (EventListener listener : btlp.getListeners()) {
+                    listener.onTabViewRemoved(tabView);
+                }
             }
 
             // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
             Server server = e.getPlayer().getServer();
             if (server != null) {
-                server.disconnect("Quitting");
+                server.disconnect(new ComponentBuilder().append("Quitting").create());
             }
             ((UserConnection) e.getPlayer()).setServer(null);
         } catch (Throwable th) {
