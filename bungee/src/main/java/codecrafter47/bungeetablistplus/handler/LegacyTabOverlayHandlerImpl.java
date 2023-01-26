@@ -20,6 +20,7 @@ package codecrafter47.bungeetablistplus.handler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
 import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
@@ -30,6 +31,8 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
 
     private final ProxiedPlayer player;
 
+    private boolean logVersionMismatch = false;
+
     public LegacyTabOverlayHandlerImpl(Logger logger, int playerListSize, Executor eventLoopExecutor, ProxiedPlayer player, boolean is13OrLater) {
         super(logger, playerListSize, eventLoopExecutor, is13OrLater);
         this.player = player;
@@ -37,6 +40,14 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
 
     @Override
     protected void sendPacket(DefinedPacket packet) {
-        player.unsafe().sendPacket(packet);
+        if ((packet instanceof PlayerListItem) && (player.getPendingConnection().getVersion() >= 761)) {
+            // error
+            if (!logVersionMismatch) {
+                logVersionMismatch = true;
+                this.logger.warning("Cannot correctly update tablist for player " + player.getName() + "\nThe client and server versions do not match. Client <= 1.7.10, server >= 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
+            }
+        } else {
+            player.unsafe().sendPacket(packet);
+        }
     }
 }

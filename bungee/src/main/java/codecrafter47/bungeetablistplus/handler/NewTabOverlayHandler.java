@@ -161,6 +161,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private final Runnable updateTask = this::update;
 
     protected boolean active;
+    
+    private boolean logVersionMismatch = false;
 
     private final ProxiedPlayer player;
 
@@ -173,7 +175,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     }
 
     private void sendPacket(DefinedPacket packet) {
-        player.unsafe().sendPacket(packet);
+        if (((packet instanceof PlayerListItemUpdate) || (packet instanceof PlayerListItemRemove)) && (player.getPendingConnection().getVersion() < 761)) {
+            // error
+            if (!logVersionMismatch) {
+                logVersionMismatch = true;
+                logger.warning("Cannot correctly update tablist for player " + player.getName() + "\nThe client and server versions do not match. Client >= 1.19.3, server < 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
+            }
+        } else {
+            player.unsafe().sendPacket(packet);
+        }
     }
 
     @Override

@@ -107,7 +107,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
     }
 
-    private final Logger logger;
+    protected final Logger logger;
     private final int playerListSize;
     private final Executor eventLoopExecutor;
 

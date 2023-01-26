@@ -23,6 +23,7 @@ import de.codecrafter47.bungeetablistplus.bungee.compat.WaterfallCompat;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
 import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
@@ -34,6 +35,8 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
 
     private final ProxiedPlayer player;
 
+    private boolean logVersionMismatch = false;
+
     public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is18, boolean is13OrLater, boolean is119OrLater) {
         super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater, is119OrLater);
         this.player = player;
@@ -41,7 +44,15 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
 
     @Override
     protected void sendPacket(DefinedPacket packet) {
-        player.unsafe().sendPacket(packet);
+        if ((packet instanceof PlayerListItem) && (player.getPendingConnection().getVersion() >= 761)) {
+            // error
+            if (!logVersionMismatch) {
+                logVersionMismatch = true;
+                this.logger.warning("Cannot correctly update tablist for player " + player.getName() + "\nThe client and server versions do not match. Client < 1.19.3, server >= 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
+            }
+        } else {
+            player.unsafe().sendPacket(packet);
+        }
     }
 
     @Override
