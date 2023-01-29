@@ -30,6 +30,7 @@ import de.codecrafter47.taboverlay.config.context.Context;
 import de.codecrafter47.taboverlay.config.expression.ExpressionUpdateListener;
 import de.codecrafter47.taboverlay.config.expression.ToStringExpression;
 import de.codecrafter47.taboverlay.config.expression.template.ExpressionTemplate;
+import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.placeholder.*;
 import de.codecrafter47.taboverlay.config.player.Player;
 import de.codecrafter47.taboverlay.config.template.TemplateCreationContext;
@@ -108,9 +109,18 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("SimpleClans_ClanColorTag", create(BukkitData.SimpleClans_ClanColorTag));
         addPlaceholder("vault_primary_group", create(MinecraftData.Permissions_PermissionGroup));
         addPlaceholder("vault_prefix", create(MinecraftData.Permissions_Prefix));
+        addPlaceholder("vault_prefix_color", create(MinecraftData.Permissions_Prefix, p -> {
+            return ChatFormat.lastFormatCode(p);
+        }, TypeToken.STRING));
         addPlaceholder("vault_suffix", create(MinecraftData.Permissions_Suffix));
         addPlaceholder("vault_primary_group_prefix", create(MinecraftData.Permissions_PrimaryGroupPrefix));
+        addPlaceholder("vault_primary_group_prefix_color", create(MinecraftData.Permissions_PrimaryGroupPrefix, p -> {
+            return ChatFormat.lastFormatCode(p);
+        }, TypeToken.STRING));
         addPlaceholder("vault_player_prefix", create(MinecraftData.Permissions_PlayerPrefix));
+        addPlaceholder("vault_player_prefix_color", create(MinecraftData.Permissions_PlayerPrefix, p -> {
+            return ChatFormat.lastFormatCode(p);
+        }, TypeToken.STRING));
         addPlaceholder("vault_primary_group_weight", create(MinecraftData.Permissions_PermissionGroupWeight));
         addPlaceholder("health", create(MinecraftData.Health));
         addPlaceholder("max_health", create(MinecraftData.MaxHealth));
@@ -148,8 +158,6 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("paf_clans_clan_online_member_count", create(BungeeData.PAFClans_OnlineMemberCount));
         addPlaceholder("paf_clans_is_leader", create(BungeeData.PAFClans_IsLeader));
         addPlaceholder("permission", this::resolvePermissionPlaceholder);
-        addPlaceholder("nucleus_afk", create(SpongeData.Nucleus_IsAFK));
-        addPlaceholder("nucleus_nick", create(SpongeData.Nucleus_Nick));
 
         // Server
         addPlaceholder("server", this::resolveServerPlaceholder);

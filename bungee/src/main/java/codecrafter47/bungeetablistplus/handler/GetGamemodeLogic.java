@@ -22,6 +22,8 @@ import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
+import net.md_5.bungee.protocol.packet.PlayerListItemRemove;
+import net.md_5.bungee.protocol.packet.PlayerListItemUpdate;
 
 public class GetGamemodeLogic extends AbstractPacketHandler {
 
@@ -42,5 +44,22 @@ public class GetGamemodeLogic extends AbstractPacketHandler {
             }
         }
         return super.onPlayerListPacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+        if (packet.getActions().contains(PlayerListItemUpdate.Action.UPDATE_GAMEMODE)) {
+            for (PlayerListItem.Item item : packet.getItems()) {
+                if (userConnection.getUniqueId().equals(item.getUuid())) {
+                    userConnection.setGamemode(item.getGamemode());
+                }
+            }
+        }
+        return super.onPlayerListUpdatePacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+        return super.onPlayerListRemovePacket(packet);
     }
 }

@@ -17,13 +17,15 @@
 
 package codecrafter47.bungeetablistplus.protocol;
 
-import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.Team;
+import net.md_5.bungee.protocol.packet.*;
 
 public interface PacketHandler {
 
     PacketListenerResult onPlayerListPacket(PlayerListItem packet);
+
+    PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet);
+
+    PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet);
 
     PacketListenerResult onTeamPacket(Team packet);
 

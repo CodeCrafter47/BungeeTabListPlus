@@ -18,9 +18,7 @@
 package codecrafter47.bungeetablistplus.protocol;
 
 import lombok.NonNull;
-import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.Team;
+import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
 
@@ -48,6 +46,16 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     @Override
     public PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet) {
         return parent.onPlayerListHeaderFooterPacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+        return parent.onPlayerListUpdatePacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+        return parent.onPlayerListRemovePacket(packet);
     }
 
     @Override

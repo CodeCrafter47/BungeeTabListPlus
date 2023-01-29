@@ -18,12 +18,10 @@
 package codecrafter47.bungeetablistplus.managers;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.handler.GetGamemodeLogic;
-import codecrafter47.bungeetablistplus.handler.LegacyTabOverlayHandlerImpl;
-import codecrafter47.bungeetablistplus.handler.LowMemoryTabOverlayHandlerImpl;
-import codecrafter47.bungeetablistplus.handler.RewriteLogic;
+import codecrafter47.bungeetablistplus.handler.*;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListener;
+import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import de.codecrafter47.taboverlay.TabView;
@@ -74,19 +72,14 @@ public class TabViewManager implements Listener {
     }
 
     public TabView onPlayerDisconnect(ProxiedPlayer player) {
-        PlayerTabView tabView = playerTabViewMap.remove(player);
-
-        if (null == tabView) {
-            throw new AssertionError("Received PlayerDisconnectEvent for non-existent player " + player.getName());
-        }
-
-        tabView.deactivate();
-
-        return tabView;
+        return playerTabViewMap.remove(player);
     }
 
     @EventHandler
     public void onServerConnected(ServerSwitchEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
         try {
             ProxiedPlayer player = event.getPlayer();
 
@@ -125,7 +118,11 @@ public class TabViewManager implements Listener {
             Logger logger = new ChildLogger(btlp.getLogger(), player.getName());
             EventLoop eventLoop = ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop();
 
-            if (protocolVersionProvider.has18OrLater(player)) {
+            if (protocolVersionProvider.has1193OrLater(player)) {
+                NewTabOverlayHandler handler = new NewTabOverlayHandler(logger, eventLoop, player);
+                tabOverlayHandler = handler;
+                packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, (UserConnection) player));
+            } else if (protocolVersionProvider.has18OrLater(player)) {
                 LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player), protocolVersionProvider.has119OrLater(player));
                 tabOverlayHandler = tabOverlayHandlerImpl;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, ((UserConnection) player)));

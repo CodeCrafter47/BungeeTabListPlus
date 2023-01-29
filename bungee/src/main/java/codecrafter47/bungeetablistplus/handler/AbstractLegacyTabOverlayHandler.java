@@ -24,7 +24,6 @@ import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import de.codecrafter47.bungeetablistplus.bungee.compat.PropertyUtil;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
@@ -39,9 +38,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.PlayerListItem;
-import net.md_5.bungee.protocol.packet.Team;
+import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -69,16 +66,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     private static final Int2ObjectMap<Collection<RectangularTabOverlay.Dimension>> playerListSizeToSupportedSizesMap = new Int2ObjectOpenHashMap<>();
 
 
-    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
-
     static {
-        boolean classPresent = false;
-        try {
-            Class.forName("net.md_5.bungee.protocol.Property");
-            classPresent = true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        USE_PROTOCOL_PROPERTY_TYPE = classPresent;
 
         // add a random character to the player and team names to prevent issues in multi-bungee setup (stupid!).
         int random = ThreadLocalRandom.current().nextInt(0x1e00, 0x2c00);
@@ -94,7 +82,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
     }
 
-    private static String[][] EMPTY_PROPERTIES = new String[0][];
+    private static final String[][] EMPTY_PROPERTIES = new String[0][];
     private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
 
     private static Collection<RectangularTabOverlay.Dimension> getSupportedSizesByPlayerListSize(int playerListSize) {
@@ -119,7 +107,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
     }
 
-    private final Logger logger;
+    protected final Logger logger;
     private final int playerListSize;
     private final Executor eventLoopExecutor;
 
@@ -152,7 +140,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 if (item.getUuid() != null) {
                     modernServerPlayerList.put(item.getUuid(), new ModernPlayerListEntry(item.getUsername(), item.getPing(), item.getGamemode()));
                 } else {
-                    serverPlayerList.put(getName(item), item.getPing());
+                    serverPlayerList.put(getName(item), item.getPing().intValue());
                 }
             }
         } else {
@@ -165,6 +153,29 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             }
         }
         return activeHandler.onPlayerListPacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+        if (packet.getActions().contains(PlayerListItemUpdate.Action.ADD_PLAYER)) {
+            for (PlayerListItem.Item item : packet.getItems()) {
+                if (item.getUuid() != null) {
+                    modernServerPlayerList.put(item.getUuid(), new ModernPlayerListEntry(item.getUsername(), item.getPing(), item.getGamemode()));
+                } else {
+                    serverPlayerList.put(getName(item), item.getPing().intValue());
+                }
+            }
+        }
+        return activeHandler.onPlayerListUpdatePacket(packet);
+    }
+
+    @Override
+    public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+        for (UUID uuid : packet.getUuids()) {
+            modernServerPlayerList.remove(uuid);
+        }
+
+        return activeHandler.onPlayerListRemovePacket(packet);
     }
 
     @Override
@@ -260,6 +271,10 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         abstract void onDeactivated();
 
         abstract void onActivated();
+
+        public abstract PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet);
+
+        public abstract PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet);
     }
 
     private abstract static class AbstractTabOverlay implements TabOverlayHandle {
@@ -283,6 +298,16 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         @Override
+        public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+            return PacketListenerResult.PASS;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
+            return PacketListenerResult.PASS;
+        }
+
+        @Override
         void onActivated() {
             for (val entry : serverPlayerList.object2IntEntrySet()) {
                 PlayerListItem pli = new PlayerListItem();
@@ -300,11 +325,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 item.setUsername(entry.getValue().name);
                 item.setGamemode(entry.getValue().gamemode);
                 item.setPing(entry.getValue().latency);
-                if(USE_PROTOCOL_PROPERTY_TYPE) {
-                    Property119Handler.setProperties(item, EMPTY_PROPERTIES);
-                } else {
-                    PropertyUtil.setProperties(item, EMPTY_PROPERTIES);
-                }
+                Property119Handler.setProperties(item, EMPTY_PROPERTIES);
                 pli.setItems(new PlayerListItem.Item[]{item});
                 pli.setAction(PlayerListItem.Action.ADD_PLAYER);
                 sendPacket(pli);
@@ -357,6 +378,16 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
         @Override
         PacketListenerResult onPlayerListPacket(PlayerListItem packet) {
+            return PacketListenerResult.CANCEL;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+            return PacketListenerResult.CANCEL;
+        }
+
+        @Override
+        public PacketListenerResult onPlayerListRemovePacket(PlayerListItemRemove packet) {
             return PacketListenerResult.CANCEL;
         }
 
@@ -432,11 +463,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             PlayerListItem.Item item = new PlayerListItem.Item();
             item.setUuid(slotUUID[index]);
             item.setUsername(slotID[index]);
-            if(USE_PROTOCOL_PROPERTY_TYPE) {
-                Property119Handler.setProperties(item, EMPTY_PROPERTIES);
-            } else {
-                PropertyUtil.setProperties(item, EMPTY_PROPERTIES);
-            }
+            Property119Handler.setProperties(item, EMPTY_PROPERTIES);
             item.setDisplayName(slotID[index]);
             item.setPing(tabOverlay.ping[index]);
             pli.setItems(new PlayerListItem.Item[]{item});

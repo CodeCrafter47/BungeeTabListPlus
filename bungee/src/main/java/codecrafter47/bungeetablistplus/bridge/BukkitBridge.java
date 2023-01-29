@@ -28,6 +28,7 @@ import codecrafter47.bungeetablistplus.managers.BungeePlayerProvider;
 import codecrafter47.bungeetablistplus.placeholder.PlayerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.placeholder.ServerPlaceholderResolver;
 import codecrafter47.bungeetablistplus.player.BungeePlayer;
+import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.codecrafter47.data.api.DataCache;
