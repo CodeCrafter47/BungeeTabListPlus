@@ -9,48 +9,52 @@ import java.util.function.Function;
 
 public class GeyserCompat {
 
-    private static Function<UUID, Boolean> geyserHook;
-    private static Function<UUID, Boolean> floodgateHook;
+    private static Function<UUID, Boolean> geyserHook = uuid -> false;;
+    private static Function<UUID, Boolean> floodgateHook = uuid -> false;;
 
-    static {
+    public static void init() {
 
         // Geyser
         try {
             Class.forName("org.geysermc.api.connection.Connection");
-            geyserHook = uuid -> {
+            geyserHook = new Function<UUID, Boolean>() {
+                @Override
+                public Boolean apply(UUID uuid) {
 
-                // Geyser documentation says, this will return null when not initialized.
-                // In reality, it throws an exception
-                try {
+                    // Geyser documentation says, this will return null when not initialized.
+                    // In reality, it throws an exception
+                    try {
 
-                    GeyserApi instance = GeyserApi.api();
-                    if (instance == null) {
-                        return false;
+                        GeyserApi instance = GeyserApi.api();
+                        if (instance == null) {
+                            return false;
+                        }
+                        Connection session = instance.connectionByUuid(uuid);
+                        return session != null;
+                    } catch (Throwable ignored) {
+
                     }
-                    Connection session = instance.connectionByUuid(uuid);
-                    return session != null;
-                } catch (Throwable ignored) {
 
+                    return false;
                 }
-
-                return false;
             };
         } catch (Throwable ignored) {
-            geyserHook = uuid -> false;
         }
 
         // Floodgate
         try {
             Class.forName("org.geysermc.floodgate.api.FloodgateApi");
-            floodgateHook = uuid -> {
-                FloodgateApi api = FloodgateApi.getInstance();
-                if (api == null) {
-                    return false;
+            floodgateHook = new Function<UUID, Boolean>() {
+                @Override
+                public Boolean apply(UUID uuid) {
+                    FloodgateApi api = FloodgateApi.getInstance();
+                    if (api == null) {
+                        return false;
+                    }
+                    return api.isFloodgatePlayer(uuid);
                 }
-                return api.isFloodgatePlayer(uuid);
             };
         } catch (Throwable ignored) {
-            floodgateHook = uuid -> false;
         }
     }
 
