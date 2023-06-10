@@ -46,6 +46,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -109,7 +110,7 @@ public class FabricBridge implements ModInitializer {
 
         asyncScheduler.scheduleWithFixedDelay(() -> {
             try {
-                bridge.updateData();
+                bridge.updateData(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -246,6 +247,11 @@ public class FabricBridge implements ModInitializer {
                     e.printStackTrace();
                 }
             });
+        }
+
+        @Override
+        protected boolean requiresMainThread(@NotNull DataKey<?> key) {
+            return false;
         }
     }
 }

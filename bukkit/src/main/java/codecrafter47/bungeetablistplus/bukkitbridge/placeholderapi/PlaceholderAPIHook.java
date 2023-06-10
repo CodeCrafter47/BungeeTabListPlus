@@ -19,6 +19,7 @@ package codecrafter47.bungeetablistplus.bukkitbridge.placeholderapi;
 
 import com.google.common.collect.Lists;
 import de.codecrafter47.data.api.DataAccess;
+import de.codecrafter47.data.bukkit.AbstractBukkitDataAccess;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -32,7 +33,7 @@ public class PlaceholderAPIHook {
         this.plugin = plugin;
     }
 
-    public DataAccess<Player> getDataAccess() {
+    public AbstractBukkitDataAccess<Player> getDataAccess() {
         return new PlaceholderAPIDataAccess(plugin.getLogger(), plugin);
     }
 

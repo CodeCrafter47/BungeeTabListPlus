@@ -189,23 +189,26 @@ public abstract class AbstractBridge<Player, Server> {
 
                 bridgeData.nextIncomingMessageId++;
 
+                boolean newEntry = false;
                 int size = input.readInt();
                 for (int i = 0; i < size; i++) {
                     DataKey<?> key = DataStreamUtils.readDataKey(input, dataKeyRegistry);
                     int keyNetId = input.readInt();
 
                     if (key != null) {
-                        bridgeData.addRequest(key, keyNetId);
+                        newEntry |= bridgeData.addRequest(key, keyNetId);
                     }
                 }
 
-                runAsync(() -> {
-                    try {
-                        updatePlayerData(player, connectionInfo);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                if (newEntry) {
+                    runAsync(() -> {
+                        try {
+                            updatePlayerData(player, connectionInfo, false);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
             } else {
                 throw new IllegalArgumentException("Unexpected message id: " + messageId);
             }
@@ -285,7 +288,7 @@ public abstract class AbstractBridge<Player, Server> {
         }
     }
 
-    public void updateData() throws IOException {
+    public void updateData(boolean isMainThread) throws IOException {
         synchronized (updateDataLock) {
             Map<Integer, Player> proxyIds = new HashMap<>();
 
@@ -299,7 +302,7 @@ public abstract class AbstractBridge<Player, Server> {
 
                 proxyIds.putIfAbsent(connectionInfo.proxyIdentifier, player);
 
-                updatePlayerData(player, connectionInfo);
+                updatePlayerData(player, connectionInfo, isMainThread);
             }
 
             for (Map.Entry<Integer, Player> e : proxyIds.entrySet()) {
@@ -314,12 +317,15 @@ public abstract class AbstractBridge<Player, Server> {
                 int size = 0;
 
                 for (CacheEntry entry : bridgeData.requestedData) {
-                    Object value = serverDataAccess.get(entry.key, server);
-                    entry.dirty = !Objects.equals(value, entry.value);
-                    entry.value = value;
+                    DataKey<?> key = entry.key;
+                    if (requiresMainThread(key) == isMainThread) {
+                        Object value = serverDataAccess.get(key, server);
+                        entry.dirty = !Objects.equals(value, entry.value);
+                        entry.value = value;
 
-                    if (entry.dirty) {
-                        size++;
+                        if (entry.dirty) {
+                            size++;
+                        }
                     }
                 }
 
@@ -353,7 +359,7 @@ public abstract class AbstractBridge<Player, Server> {
         }
     }
 
-    private void updatePlayerData(@Nonnull Player player, @Nonnull PlayerConnectionInfo connectionInfo) throws IOException {
+    private void updatePlayerData(@Nonnull Player player, @Nonnull PlayerConnectionInfo connectionInfo, boolean isMainThread) throws IOException {
         synchronized (updateDataLock) {
             BridgeData bridgeData = connectionInfo.playerBridgeData;
 
@@ -364,12 +370,15 @@ public abstract class AbstractBridge<Player, Server> {
             int size = 0;
 
             for (CacheEntry entry : bridgeData.requestedData) {
-                Object value = playerDataAccess.get(entry.key, player);
-                entry.dirty = !Objects.equals(value, entry.value);
-                entry.value = value;
+                DataKey<?> key = entry.key;
+                if (requiresMainThread(key) == isMainThread) {
+                    Object value = playerDataAccess.get(key, player);
+                    entry.dirty = !Objects.equals(value, entry.value);
+                    entry.value = value;
 
-                if (entry.dirty) {
-                    size++;
+                    if (entry.dirty) {
+                        size++;
+                    }
                 }
             }
 
@@ -414,6 +423,8 @@ public abstract class AbstractBridge<Player, Server> {
     protected abstract void sendMessage(@Nonnull Player player, @Nonnull byte[] message);
 
     protected abstract void runAsync(@Nonnull Runnable task);
+    
+    protected abstract boolean requiresMainThread(@Nonnull DataKey<?> key);
 
     private static class PlayerConnectionInfo {
         boolean isConnectionValid = false;
@@ -451,14 +462,21 @@ public abstract class AbstractBridge<Player, Server> {
         int nextIncomingMessageId = 1;
         long lastMessageSent = 0;
 
-        private void addRequest(@Nonnull DataKey<?> key, int netId) {
+        /***
+         * 
+         * @param key
+         * @param netId
+         * @return true if a new entry has been created
+         */
+        private boolean addRequest(@Nonnull DataKey<?> key, int netId) {
             for (CacheEntry registration : requestedData) {
                 if (Objects.equals(registration.key, key)) {
-                    return;
+                    return false;
                 }
             }
 
             requestedData.add(new CacheEntry(key, netId));
+            return true;
         }
     }
 }

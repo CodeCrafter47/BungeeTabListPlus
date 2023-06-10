@@ -29,6 +29,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import de.codecrafter47.bungeetablistplus.bridge.AbstractBridge;
+import de.codecrafter47.data.api.DataAccess;
 import de.codecrafter47.data.api.DataKey;
 import de.codecrafter47.data.api.DataKeyRegistry;
 import de.codecrafter47.data.api.JoinedDataAccess;
@@ -53,7 +54,9 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -81,6 +84,8 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
     private final Multimap<Plugin, ServerVariable> serverVariablesByPlugin = HashMultimap.create();
 
     private Bridge bridge;
+    
+    private final List<AbstractBukkitDataAccess<?>> dataAccesses = new ArrayList<>();
 
     public BukkitBridge(Plugin plugin) {
         this.plugin = plugin;
@@ -125,7 +130,15 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         // start update task
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             try {
-                bridge.updateData();
+                bridge.updateData(false);
+            } catch (IOException e) {
+                rlExecutor.execute(() -> plugin.getLogger().log(Level.SEVERE, "An unexpected error occurred", e));
+            }
+        }, 10, 20);
+        // start sync update task
+        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            try {
+                bridge.updateData(true);
             } catch (IOException e) {
                 rlExecutor.execute(() -> plugin.getLogger().log(Level.SEVERE, "An unexpected error occurred", e));
             }
@@ -166,12 +179,24 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
             placeholderAPIHook = null;
         }
 
+
+        PlayerDataAccess playerDataAccess = new PlayerDataAccess(plugin);
+        ThirdPartyVariablesAccess thirdPartyVariablesAccess = new ThirdPartyVariablesAccess();
+        this.dataAccesses.clear();
+        this.dataAccesses.add(playerDataAccess);
+        this.dataAccesses.add(thirdPartyVariablesAccess);
         if (placeholderAPIHook != null) {
-            bridge.setPlayerDataAccess(JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess(), placeholderAPIHook.getDataAccess()));
+            AbstractBukkitDataAccess<Player> placeholderAPIHookDataAccess = placeholderAPIHook.getDataAccess();
+            this.dataAccesses.add(placeholderAPIHookDataAccess);
+            bridge.setPlayerDataAccess(JoinedDataAccess.of(playerDataAccess, thirdPartyVariablesAccess, placeholderAPIHookDataAccess));
         } else {
-            bridge.setPlayerDataAccess(JoinedDataAccess.of(new PlayerDataAccess(plugin), new ThirdPartyVariablesAccess()));
+            bridge.setPlayerDataAccess(JoinedDataAccess.of(playerDataAccess, thirdPartyVariablesAccess));
         }
-        bridge.setServerDataAccess(JoinedDataAccess.of(new ServerDataAccess(plugin), new BTLPServerDataKeyAccess()));
+        ServerDataAccess serverDataAccess = new ServerDataAccess(plugin);
+        BTLPServerDataKeyAccess btlpServerDataKeyAccess = new BTLPServerDataKeyAccess();
+        this.dataAccesses.add(serverDataAccess);
+        this.dataAccesses.add(btlpServerDataKeyAccess);
+        bridge.setServerDataAccess(JoinedDataAccess.of(serverDataAccess, btlpServerDataKeyAccess));
     }
 
     @EventHandler
@@ -352,6 +377,16 @@ public class BukkitBridge extends BungeeTabListPlusBukkitAPI implements Listener
         @Override
         protected void runAsync(@Nonnull Runnable task) {
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, task);
+        }
+
+        @Override
+        protected boolean requiresMainThread(@Nonnull DataKey<?> key) {
+            for (AbstractBukkitDataAccess<?> dataAccess : BukkitBridge.this.dataAccesses) {
+                if (dataAccess.requiresMainThread(key)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
