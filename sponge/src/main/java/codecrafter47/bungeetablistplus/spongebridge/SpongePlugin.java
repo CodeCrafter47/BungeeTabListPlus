@@ -142,7 +142,7 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
 
         game.getScheduler().createTaskBuilder().name("updateData").async().delay(1, TimeUnit.SECONDS).interval(1, TimeUnit.SECONDS).execute(() -> {
             try {
-                bridge.updateData();
+                bridge.updateData(false);
             } catch (Throwable e) {
                 rlExecutor.execute(() -> {
                     logger.error("Unexpected error", e);
@@ -367,6 +367,11 @@ public class SpongePlugin extends BungeeTabListPlusSpongeAPI {
         @Override
         protected void runAsync(@Nonnull Runnable task) {
             asyncExecutor.execute(task);
+        }
+
+        @Override
+        protected boolean requiresMainThread(@Nonnull DataKey<?> key) {
+            return false;
         }
     }
 

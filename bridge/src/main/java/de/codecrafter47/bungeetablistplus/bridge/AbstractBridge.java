@@ -189,23 +189,26 @@ public abstract class AbstractBridge<Player, Server> {
 
                 bridgeData.nextIncomingMessageId++;
 
+                boolean newEntry = false;
                 int size = input.readInt();
                 for (int i = 0; i < size; i++) {
                     DataKey<?> key = DataStreamUtils.readDataKey(input, dataKeyRegistry);
                     int keyNetId = input.readInt();
 
                     if (key != null) {
-                        bridgeData.addRequest(key, keyNetId);
+                        newEntry |= bridgeData.addRequest(key, keyNetId);
                     }
                 }
 
-                runAsync(() -> {
-                    try {
-                        updatePlayerData(player, connectionInfo);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                if (newEntry) {
+                    runAsync(() -> {
+                        try {
+                            updatePlayerData(player, connectionInfo, false);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
             } else {
                 throw new IllegalArgumentException("Unexpected message id: " + messageId);
             }
@@ -285,62 +288,65 @@ public abstract class AbstractBridge<Player, Server> {
         }
     }
 
-    public void updateData() throws IOException {
-        synchronized (updateDataLock) {
-            Map<Integer, Player> proxyIds = new HashMap<>();
+    public void updateData(boolean isMainThread) throws IOException {
+        Map<Integer, Player> proxyIds = new HashMap<>();
 
-            for (Map.Entry<Player, PlayerConnectionInfo> e : playerPlayerConnectionInfoMap.entrySet()) {
-                Player player = e.getKey();
-                PlayerConnectionInfo connectionInfo = e.getValue();
+        for (Map.Entry<Player, PlayerConnectionInfo> e : playerPlayerConnectionInfoMap.entrySet()) {
+            Player player = e.getKey();
+            PlayerConnectionInfo connectionInfo = e.getValue();
 
-                if (!connectionInfo.isConnectionValid) {
-                    continue;
-                }
-
-                proxyIds.putIfAbsent(connectionInfo.proxyIdentifier, player);
-
-                updatePlayerData(player, connectionInfo);
+            if (!connectionInfo.isConnectionValid) {
+                continue;
             }
 
-            for (Map.Entry<Integer, Player> e : proxyIds.entrySet()) {
-                Integer proxyIdentifier = e.getKey();
-                Player player = e.getValue();
-                BridgeData bridgeData = serverBridgeDataMap.get(proxyIdentifier);
+            proxyIds.putIfAbsent(connectionInfo.proxyIdentifier, player);
 
-                if (bridgeData == null) {
-                    continue;
-                }
+            updatePlayerData(player, connectionInfo, isMainThread);
+        }
 
-                int size = 0;
+        ArrayList<CacheEntry> dirtyEntries = new ArrayList<>();
 
-                for (CacheEntry entry : bridgeData.requestedData) {
-                    Object value = serverDataAccess.get(entry.key, server);
-                    entry.dirty = !Objects.equals(value, entry.value);
-                    entry.value = value;
+        for (Map.Entry<Integer, Player> e : proxyIds.entrySet()) {
+            dirtyEntries.clear();
+            Integer proxyIdentifier = e.getKey();
+            Player player = e.getValue();
+            BridgeData bridgeData = serverBridgeDataMap.get(proxyIdentifier);
 
-                    if (entry.dirty) {
-                        size++;
+            if (bridgeData == null) {
+                continue;
+            }
+
+            for (CacheEntry entry : bridgeData.requestedData) {
+                DataKey<?> key = entry.key;
+                if (requiresMainThread(key) == isMainThread) {
+                    Object value = serverDataAccess.get(key, server);
+                    synchronized (entry) {
+                        boolean dirty = !Objects.equals(value, entry.value);
+                        entry.value = value;
+
+                        if (dirty) {
+                            dirtyEntries.add(entry);
+                        }
                     }
                 }
+            }
 
+            synchronized (updateDataLock) {
                 ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();
                 DataOutput output = new DataOutputStream(byteArrayOutput);
-
                 output.writeByte(BridgeProtocolConstants.MESSAGE_ID_UPDATE_DATA_SERVER);
                 output.writeInt(proxyIdentifier + serverIdentifier);
                 output.writeInt(bridgeData.nextOutgoingMessageId++);
-                output.writeInt(size);
+                output.writeInt(dirtyEntries.size());
 
-                for (CacheEntry entry : bridgeData.requestedData) {
-                    if (entry.dirty) {
-                        output.writeInt(entry.netId);
-                        output.writeBoolean(entry.value == null);
-                        if (entry.value != null) {
-                            try {
-                                typeAdapterRegistry.getTypeAdapter((TypeToken<Object>) entry.key.getType()).write(output, entry.value);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
+                for (CacheEntry entry : dirtyEntries) {
+                    output.writeInt(entry.netId);
+                    output.writeBoolean(entry.value == null);
+                    if (entry.value != null) {
+                        try {
+                            typeAdapterRegistry.getTypeAdapter((TypeToken<Object>) entry.key.getType()).write(output, entry.value);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
                         }
                     }
                 }
@@ -353,44 +359,45 @@ public abstract class AbstractBridge<Player, Server> {
         }
     }
 
-    private void updatePlayerData(@Nonnull Player player, @Nonnull PlayerConnectionInfo connectionInfo) throws IOException {
-        synchronized (updateDataLock) {
-            BridgeData bridgeData = connectionInfo.playerBridgeData;
+    private void updatePlayerData(@Nonnull Player player, @Nonnull PlayerConnectionInfo connectionInfo, boolean isMainThread) throws IOException {
+        BridgeData bridgeData = connectionInfo.playerBridgeData;
 
-            if (bridgeData == null) {
-                return;
-            }
+        if (bridgeData == null) {
+            return;
+        }
 
-            int size = 0;
+        ArrayList<CacheEntry> dirtyEntries = new ArrayList<>();
 
-            for (CacheEntry entry : bridgeData.requestedData) {
-                Object value = playerDataAccess.get(entry.key, player);
-                entry.dirty = !Objects.equals(value, entry.value);
+        for (CacheEntry entry : bridgeData.requestedData) {
+            DataKey<?> key = entry.key;
+            if (requiresMainThread(key) == isMainThread) {
+                Object value = playerDataAccess.get(key, player);
+                boolean dirty = !Objects.equals(value, entry.value);
                 entry.value = value;
 
-                if (entry.dirty) {
-                    size++;
+                if (dirty) {
+                    dirtyEntries.add(entry);
                 }
             }
+        }
 
-            if (size != 0) {
+        if (!dirtyEntries.isEmpty()) {
+            synchronized (updateDataLock) {
                 ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();
                 DataOutput output = new DataOutputStream(byteArrayOutput);
                 output.writeByte(BridgeProtocolConstants.MESSAGE_ID_UPDATE_DATA);
                 output.writeInt(connectionInfo.connectionIdentifier);
                 output.writeInt(bridgeData.nextOutgoingMessageId++);
-                output.writeInt(size);
+                output.writeInt(dirtyEntries.size());
 
-                for (CacheEntry entry : bridgeData.requestedData) {
-                    if (entry.dirty) {
-                        output.writeInt(entry.netId);
-                        output.writeBoolean(entry.value == null);
-                        if (entry.value != null) {
-                            try {
-                                typeAdapterRegistry.getTypeAdapter((TypeToken<Object>) entry.key.getType()).write(output, entry.value);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
+                for (CacheEntry entry : dirtyEntries) {
+                    output.writeInt(entry.netId);
+                    output.writeBoolean(entry.value == null);
+                    if (entry.value != null) {
+                        try {
+                            typeAdapterRegistry.getTypeAdapter((TypeToken<Object>) entry.key.getType()).write(output, entry.value);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
                         }
                     }
                 }
@@ -415,6 +422,8 @@ public abstract class AbstractBridge<Player, Server> {
 
     protected abstract void runAsync(@Nonnull Runnable task);
 
+    protected abstract boolean requiresMainThread(@Nonnull DataKey<?> key);
+
     private static class PlayerConnectionInfo {
         boolean isConnectionValid = false;
         boolean hasReceived = false;
@@ -435,7 +444,6 @@ public abstract class AbstractBridge<Player, Server> {
         final int netId;
         @Nullable
         Object value = null;
-        boolean dirty = false;
 
         CacheEntry(@Nonnull DataKey<?> key, int netId) {
             this.key = key;
@@ -451,14 +459,21 @@ public abstract class AbstractBridge<Player, Server> {
         int nextIncomingMessageId = 1;
         long lastMessageSent = 0;
 
-        private void addRequest(@Nonnull DataKey<?> key, int netId) {
+        /***
+         *
+         * @param key
+         * @param netId
+         * @return true if a new entry has been created
+         */
+        private boolean addRequest(@Nonnull DataKey<?> key, int netId) {
             for (CacheEntry registration : requestedData) {
                 if (Objects.equals(registration.key, key)) {
-                    return;
+                    return false;
                 }
             }
 
             requestedData.add(new CacheEntry(key, netId));
+            return true;
         }
     }
 }

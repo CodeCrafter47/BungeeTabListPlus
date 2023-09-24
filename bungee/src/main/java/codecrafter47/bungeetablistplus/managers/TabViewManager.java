@@ -72,15 +72,7 @@ public class TabViewManager implements Listener {
     }
 
     public TabView onPlayerDisconnect(ProxiedPlayer player) {
-        PlayerTabView tabView = playerTabViewMap.remove(player);
-
-        if (null == tabView) {
-            throw new AssertionError("Received PlayerDisconnectEvent for non-existent player " + player.getName());
-        }
-
-        tabView.deactivate();
-
-        return tabView;
+        return playerTabViewMap.remove(player);
     }
 
     @EventHandler
