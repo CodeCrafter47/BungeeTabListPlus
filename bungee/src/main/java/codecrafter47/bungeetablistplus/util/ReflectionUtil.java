@@ -20,20 +20,11 @@ package codecrafter47.bungeetablistplus.util;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.netty.ChannelWrapper;
-import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.tab.TabList;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class ReflectionUtil {
-    public static final Method SEND_PACKET_QUEUED;
-
-    static {
-        SEND_PACKET_QUEUED = getMethodSilent(UserConnection.class, "sendPacketQueued", DefinedPacket.class);
-    }
-
     public static void setTablistHandler(ProxiedPlayer player, TabList tablistHandler) throws NoSuchFieldException, IllegalAccessException {
         setField(UserConnection.class, player, "tabListHandler", tablistHandler, 5);
     }
@@ -44,10 +35,6 @@ public class ReflectionUtil {
 
     public static ChannelWrapper getChannelWrapper(ProxiedPlayer player) throws NoSuchFieldException, IllegalAccessException {
         return getField(UserConnection.class, player, "ch", 50);
-    }
-
-    public static void sendPacketQueued(ProxiedPlayer player, Object packet) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        SEND_PACKET_QUEUED.invoke(player, packet);
     }
 
     public static void setField(Class<?> clazz, Object instance, String field, Object value) throws NoSuchFieldException, IllegalAccessException {
@@ -82,16 +69,5 @@ public class ReflectionUtil {
             }
         }
         return getField(clazz, instance, field);
-    }
-
-    public static Method getMethodSilent(Class<?> clazz, String method, Class<?>... parameterTypes) {
-        Method m;
-        try {
-            m = clazz.getDeclaredMethod(method, parameterTypes);
-        } catch (NoSuchMethodException | SecurityException e) {
-            return null;
-        }
-        m.setAccessible(true);
-        return m;
     }
 }

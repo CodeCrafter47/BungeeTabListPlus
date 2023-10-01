@@ -23,7 +23,6 @@ import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.BitSet;
 import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import codecrafter47.bungeetablistplus.util.Property119Handler;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -34,6 +33,7 @@ import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
+import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.*;
@@ -184,16 +184,10 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 logger.warning("Cannot correctly update tablist for player " + player.getName() + "\nThe client and server versions do not match. Client >= 1.19.3, server < 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
             }
         } else if (player.getPendingConnection().getVersion() >= 764) {
-            try {
-                // Ensure that unsafe packets are not sent in the config phase
-                // Why bungee doesn't expose this is beyond me...
-                // https://github.com/SpigotMC/BungeeCord/blob/1ef4d27dbea48a1d47501ad2be0d75e42cc2cc12/proxy/src/main/java/net/md_5/bungee/UserConnection.java#L182-L192
-                ReflectionUtil.sendPacketQueued(player, packet);
-            } catch (InvocationTargetException e) {
-                // Ignore as this likely means the player has disconnected
-            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
-                logger.warning("Failed to queue packet for player " + player.getName() + ": " + e);
-            }
+            // Ensure that unsafe packets are not sent in the config phase
+            // Why bungee doesn't expose this via api beyond me...
+            // https://github.com/SpigotMC/BungeeCord/blob/1ef4d27dbea48a1d47501ad2be0d75e42cc2cc12/proxy/src/main/java/net/md_5/bungee/UserConnection.java#L182-L192
+            ((UserConnection) player).sendPacketQueued(packet);
         } else {
             player.unsafe().sendPacket(packet);
         }
