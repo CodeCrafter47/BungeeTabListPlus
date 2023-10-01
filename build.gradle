@@ -10,7 +10,7 @@ buildscript {
 
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
-    bungeeVersion = '1.19-R0.1-SNAPSHOT'
+    bungeeVersion = '1.20-R0.2-SNAPSHOT'
     spongeVersion = '7.0.0'
     dataApiVersion = '1.0.2-SNAPSHOT'
 }
