@@ -558,6 +558,8 @@ public class BukkitBridge {
 
         boolean requestAll = false;
 
+        Set<DataKey<?>> requestedDataKeys = new HashSet<>();
+
         @Nullable
         abstract ServerConnection getConnection();
 
@@ -569,17 +571,20 @@ public class BukkitBridge {
                 synchronized (this) {
                     ServerConnection connection = getConnection();
                     if (connection != null) {
-                        ByteArrayDataOutput data = ByteStreams.newDataOutput();
-                        data.writeByte(this instanceof PlayerBridgeDataCache ? BridgeProtocolConstants.MESSAGE_ID_REQUEST_DATA : BridgeProtocolConstants.MESSAGE_ID_REQUEST_DATA_SERVER);
-                        data.writeInt(connectionId);
-                        data.writeInt(nextOutgoingMessageId++);
-                        data.writeInt(1);
-                        DataStreamUtils.writeDataKey(data, key);
-                        data.writeInt(idMap.getNetId(key));
-                        byte[] message = data.toByteArray();
-                        messagesPendingConfirmation.add(message);
-                        lastMessageSent = System.currentTimeMillis();
-                        connection.sendPluginMessage(btlp.getChannelIdentifier(), message);
+                        if (!requestedDataKeys.contains(key)) {
+                            requestedDataKeys.add(key);
+                            ByteArrayDataOutput data = ByteStreams.newDataOutput();
+                            data.writeByte(this instanceof PlayerBridgeDataCache ? BridgeProtocolConstants.MESSAGE_ID_REQUEST_DATA : BridgeProtocolConstants.MESSAGE_ID_REQUEST_DATA_SERVER);
+                            data.writeInt(connectionId);
+                            data.writeInt(nextOutgoingMessageId++);
+                            data.writeInt(1);
+                            DataStreamUtils.writeDataKey(data, key);
+                            data.writeInt(idMap.getNetId(key));
+                            byte[] message = data.toByteArray();
+                            messagesPendingConfirmation.add(message);
+                            lastMessageSent = System.currentTimeMillis();
+                            connection.sendPluginMessage(btlp.getChannelIdentifier(), message);
+                        }
                     } else {
                         requestAll = true;
                     }
@@ -601,6 +606,7 @@ public class BukkitBridge {
 
         void reset() {
             synchronized (this) {
+                requestedDataKeys.clear();
                 requestAll = true;
                 messagesPendingConfirmation.clear();
                 lastConfirmed = 0;
@@ -629,6 +635,7 @@ public class BukkitBridge {
                         data.writeInt(nextOutgoingMessageId++);
                         data.writeInt(keys.size());
                         for (DataKey<?> key : keys) {
+                            requestedDataKeys.add(key);
                             DataStreamUtils.writeDataKey(data, key);
                             data.writeInt(idMap.getNetId(key));
                         }

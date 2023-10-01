@@ -35,6 +35,8 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
 
     private final Player player;
 
+    private boolean logVersionMismatch = false;
+
     public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, Player player, boolean is18, boolean is13OrLater, boolean is119OrLater) {
         super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater, is119OrLater);
         this.player = player;
@@ -43,7 +45,15 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
     @SneakyThrows
     @Override
     protected void sendPacket(MinecraftPacket packet) {
-        ReflectionUtil.getChannelWrapper(player).write(packet);
+        if ((packet instanceof UpsertPlayerInfo) && (player.getProtocolVersion().getProtocol() >= 761)) {
+            // error
+            if (!logVersionMismatch) {
+                logVersionMismatch = true;
+                this.logger.warning("Cannot correctly update tablist for player " + player.getUsername() + "\nThe client and server versions do not match. Client < 1.19.3, server >= 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
+            }
+        } else {
+            ReflectionUtil.getChannelWrapper(player).write(packet);
+        }
     }
 
     @Override

@@ -163,7 +163,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         CUSTOM_SLOT_TEAMNAMES = ImmutableSet.copyOf(CUSTOM_SLOT_TEAMNAME);
     }
 
-    private final Logger logger;
+    protected final Logger logger;
     private final Executor eventLoopExecutor;
     private final UUID viewerUuid;
 

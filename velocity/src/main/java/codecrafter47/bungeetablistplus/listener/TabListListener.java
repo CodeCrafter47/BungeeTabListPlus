@@ -77,13 +77,15 @@ public class TabListListener {
             }
             
             TabView tabView = btlp.getTabViewManager().onPlayerDisconnect(e.getPlayer());
-            tabView.deactivate();
-            for (EventListener listener : btlp.getListeners()) {
-                listener.onTabViewRemoved(tabView);
+            if (tabView != null) {
+                tabView.deactivate();
+                for (EventListener listener : btlp.getListeners()) {
+                    listener.onTabViewRemoved(tabView);
+                }
             }
 
             // hack to revert changes from https://github.com/SpigotMC/BungeeCord/commit/830f18a35725f637d623594eaaad50b566376e59
-            e.getPlayer().getCurrentServer().ifPresent(server -> server.getPlayer().disconnect(Component.text("Quitting")));
+            e.getPlayer().getCurrentServer().ifPresent(server -> server.getPlayer().disconnect(Component.empty()));
             ((ConnectedPlayer) e.getPlayer()).setConnectedServer(null);
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);

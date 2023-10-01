@@ -28,9 +28,7 @@ import com.velocitypowered.proxy.protocol.StateRegistry;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_12;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_12_1;
@@ -40,6 +38,7 @@ import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_15;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_17;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_1;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_3;
+import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_4;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_9;
 
@@ -114,7 +113,8 @@ public class ReflectionUtil {
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x4C, MINECRAFT_1_15, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x55, MINECRAFT_1_17, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x58, MINECRAFT_1_19_1, null, false),
-                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x56, MINECRAFT_1_19_3, null, false)
+                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x56, MINECRAFT_1_19_3, null, false),
+                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x5A, MINECRAFT_1_19_4, null, false)
                 });
                 return;
             } catch (Exception e) {

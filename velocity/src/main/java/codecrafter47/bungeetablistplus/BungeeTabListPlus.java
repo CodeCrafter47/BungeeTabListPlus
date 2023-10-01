@@ -36,6 +36,7 @@ import codecrafter47.bungeetablistplus.tablist.ExcludedServersTabOverlayProvider
 import codecrafter47.bungeetablistplus.updater.UpdateChecker;
 import codecrafter47.bungeetablistplus.updater.UpdateNotifier;
 import codecrafter47.bungeetablistplus.util.ExceptionHandlingEventExecutor;
+import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import codecrafter47.bungeetablistplus.util.MatchingStringsCollection;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.util.VelocityPlugin;
@@ -345,6 +346,8 @@ public class BungeeTabListPlus {
         configTabOverlayManager.reloadConfigs(ImmutableSet.of(tabLists));
 
         getProxy().getEventManager().register(plugin, new TabListListener(this));
+
+        GeyserCompat.init();
     }
 
     private void updateTimeZoneAndGlobalCustomPlaceholders() {

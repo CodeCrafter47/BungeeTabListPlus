@@ -168,6 +168,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     protected boolean active;
 
+    private boolean logVersionMismatch = false;
+
     private final Player player;
 
     public NewTabOverlayHandler(Logger logger, Executor eventLoopExecutor, Player player) {
@@ -180,7 +182,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     @SneakyThrows
     private void sendPacket(MinecraftPacket packet) {
-        ReflectionUtil.getChannelWrapper(player).write(packet);
+        if (((packet instanceof UpsertPlayerInfo) || (packet instanceof RemovePlayerInfo)) && (player.getProtocolVersion().getProtocol() < 761)) {
+            // error
+            if (!logVersionMismatch) {
+                logVersionMismatch = true;
+                logger.warning("Cannot correctly update tablist for player " + player.getUsername() + "\nThe client and server versions do not match. Client >= 1.19.3, server < 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
+            }
+        } else {
+            ReflectionUtil.getChannelWrapper(player).write(packet);
+        }
     }
 
     @Override

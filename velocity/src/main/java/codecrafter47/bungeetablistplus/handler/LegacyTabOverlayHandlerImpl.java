@@ -17,11 +17,10 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
-import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
-
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.Executor;
@@ -31,6 +30,8 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
 
     private final Player player;
 
+    private boolean logVersionMismatch = false;
+
     public LegacyTabOverlayHandlerImpl(Logger logger, int playerListSize, Executor eventLoopExecutor, Player player, boolean is13OrLater) {
         super(logger, playerListSize, eventLoopExecutor, is13OrLater);
         this.player = player;
@@ -39,6 +40,14 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
     @SneakyThrows
     @Override
     protected void sendPacket(MinecraftPacket packet) {
-        ReflectionUtil.getChannelWrapper(player).write(packet);
+        if ((packet instanceof LegacyPlayerListItem) && (player.getProtocolVersion().getProtocol() >= 761)) {
+            // error
+            if (!logVersionMismatch) {
+                logVersionMismatch = true;
+                this.logger.warning("Cannot correctly update tablist for player " + player.getUsername() + "\nThe client and server versions do not match. Client <= 1.7.10, server >= 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
+            }
+        } else {
+            ReflectionUtil.getChannelWrapper(player).write(packet);
+        }
     }
 }

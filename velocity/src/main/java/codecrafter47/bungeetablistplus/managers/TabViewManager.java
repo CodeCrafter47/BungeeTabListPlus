@@ -70,15 +70,7 @@ public class TabViewManager {
     }
 
     public TabView onPlayerDisconnect(Player player) {
-        PlayerTabView tabView = playerTabViewMap.remove(player);
-
-        if (null == tabView) {
-            throw new AssertionError("Received PlayerDisconnectEvent for non-existent player " + player.getUsername());
-        }
-
-        tabView.deactivate();
-
-        return tabView;
+        return playerTabViewMap.remove(player);
     }
 
     @Subscribe
