@@ -189,7 +189,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 // Why bungee doesn't expose this is beyond me...
                 // https://github.com/SpigotMC/BungeeCord/blob/1ef4d27dbea48a1d47501ad2be0d75e42cc2cc12/proxy/src/main/java/net/md_5/bungee/UserConnection.java#L182-L192
                 ReflectionUtil.sendPacketQueued(player, packet);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
+            } catch (InvocationTargetException e) {
+                // Ignore as this likely means the player has disconnected
+            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
                 logger.warning("Failed to queue packet for player " + player.getName() + ": " + e);
             }
         } else {
