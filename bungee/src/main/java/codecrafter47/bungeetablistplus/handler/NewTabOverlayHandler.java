@@ -35,7 +35,9 @@ import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
@@ -265,41 +267,32 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     @Override
     public void onServerSwitch(boolean is13OrLater) {
-        if (!active) {
-            active = true;
-            update();
-        } else {
 
-            hasCreatedCustomTeams = false;
+        hasCreatedCustomTeams = false;
 
-            try {
-                this.activeContentHandler.onServerSwitch();
-            } catch (Throwable th) {
-                logger.log(Level.SEVERE, "Unexpected error", th);
-                // try recover
-                enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
-            }
-            try {
-                this.activeHeaderFooterHandler.onServerSwitch();
-            } catch (Throwable th) {
-                logger.log(Level.SEVERE, "Unexpected error", th);
-                // try recover
-                enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
-            }
+        try {
+            this.activeContentHandler.onServerSwitch();
+        } catch (Throwable th) {
+            logger.log(Level.SEVERE, "Unexpected error", th);
+        }
+        try {
+            this.activeHeaderFooterHandler.onServerSwitch();
+        } catch (Throwable th) {
+            logger.log(Level.SEVERE, "Unexpected error", th);
+        }
 
-            if (!serverPlayerListListed.isEmpty()) {
-                PlayerListItemRemove packet = new PlayerListItemRemove();
-                packet.setUuids(serverPlayerListListed.keySet().toArray(new UUID[0]));
-                sendPacket(packet);
-            }
+        if (!serverPlayerListListed.isEmpty()) {
+            PlayerListItemRemove packet = new PlayerListItemRemove();
+            packet.setUuids(serverPlayerListListed.keySet().toArray(new UUID[0]));
+            sendPacket(packet);
+        }
 
-            serverPlayerListListed.clear();
-            if (serverHeader != null) {
-                serverHeader = EMPTY_JSON_TEXT;
-            }
-            if (serverFooter != null) {
-                serverFooter = EMPTY_JSON_TEXT;
-            }
+        serverPlayerListListed.clear();
+        if (serverHeader != null) {
+            serverHeader = EMPTY_JSON_TEXT;
+        }
+        if (serverFooter != null) {
+            serverFooter = EMPTY_JSON_TEXT;
         }
     }
 
@@ -345,10 +338,12 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     }
 
     private void update() {
-        if (!active) {
+        updateScheduledFlag.set(false);
+
+        ChannelWrapper ch = ((UserConnection) player).getCh();
+        if (ch.isClosed() || ch.getEncodeProtocol() != Protocol.GAME) {
             return;
         }
-        updateScheduledFlag.set(false);
 
         // update content handler
         AbstractContentOperationModeHandler<?> contentHandler;
@@ -644,8 +639,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onServerSwitch() {
-
-            createTeamsIfNecessary();
+            // do nothing
         }
 
         @Override
@@ -706,6 +700,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void update() {
+
+            createTeamsIfNecessary();
+
             T tabOverlay = getTabOverlay();
 
             if (tabOverlay.dirtyFlagSize) {

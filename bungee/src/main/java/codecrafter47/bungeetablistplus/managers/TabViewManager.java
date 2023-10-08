@@ -31,6 +31,7 @@ import io.netty.channel.EventLoop;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -76,7 +77,30 @@ public class TabViewManager implements Listener {
     }
 
     @EventHandler
-    public void onServerConnected(ServerSwitchEvent event) {
+    public void onServerConnected(ServerConnectedEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
+        try {
+            ProxiedPlayer player = event.getPlayer();
+
+            PlayerTabView tabView = playerTabViewMap.get(player);
+
+            if (tabView == null) {
+                throw new AssertionError("Received ServerSwitchEvent for non-existent player " + player.getName());
+            }
+
+            PacketHandler packetHandler = tabView.packetHandler;
+
+            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
+
+        } catch (Exception ex) {
+            btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);
+        }
+    }
+
+    @EventHandler
+    public void onServerSwitch(ServerSwitchEvent event) {
         if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
             return;
         }
@@ -97,8 +121,6 @@ public class TabViewManager implements Listener {
             PacketListener packetListener = new PacketListener(server, packetHandler, player);
 
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "btlp-packet-listener", packetListener);
-
-            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
 
         } catch (Exception ex) {
             btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);
