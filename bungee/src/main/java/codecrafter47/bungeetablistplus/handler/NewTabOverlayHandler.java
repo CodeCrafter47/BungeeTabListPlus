@@ -205,6 +205,12 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     @Override
     public PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet) {
+
+        if (!active) {
+            active = true;
+            scheduleUpdate();
+        }
+
         if (packet.getActions().contains(PlayerListItemUpdate.Action.ADD_PLAYER)) {
             for (PlayerListItem.Item item : packet.getItems()) {
                 if (OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK) {
@@ -298,6 +304,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         if (serverFooter != null) {
             serverFooter = EMPTY_JSON_TEXT;
         }
+
+        active = false;
     }
 
     @Override
@@ -345,7 +353,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         updateScheduledFlag.set(false);
 
         ChannelWrapper ch = ((UserConnection) player).getCh();
-        if (ch.isClosed() || ch.getEncodeProtocol() != Protocol.GAME) {
+        if (!active || ch.isClosed() || ch.getEncodeProtocol() != Protocol.GAME) {
             return;
         }
 
