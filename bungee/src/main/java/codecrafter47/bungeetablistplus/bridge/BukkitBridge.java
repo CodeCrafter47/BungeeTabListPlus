@@ -572,7 +572,7 @@ public class BukkitBridge implements Listener {
             try {
                 synchronized (this) {
                     Server connection = getConnection();
-                    if (connection != null) {
+                    if (connection != null && connection.isConnected()) {
                         if (!requestedDataKeys.contains(key)) {
                             requestedDataKeys.add(key);
                             ByteArrayDataOutput data = ByteStreams.newDataOutput();
