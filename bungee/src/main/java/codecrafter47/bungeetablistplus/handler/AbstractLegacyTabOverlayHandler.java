@@ -85,8 +85,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     private static final String[][] EMPTY_PROPERTIES = new String[0][];
-    private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
-    private static final TextComponent EMPTY_COMPONENT_TEXT = new TextComponent();
+    private static final TextComponent EMPTY_TEXT_COMPONENT = new TextComponent();
 
     private static Collection<RectangularTabOverlay.Dimension> getSupportedSizesByPlayerListSize(int playerListSize) {
         Preconditions.checkArgument(playerListSize >= 0, "playerListSize is negative");
@@ -437,13 +436,13 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         t.setName(slotID[index]);
                         t.setMode((byte) 0);
                         t.setPrefix(ComponentSerializer.deserialize(tabOverlay.text0[index]));
-                        t.setDisplayName(EMPTY_COMPONENT_TEXT);
+                        t.setDisplayName(EMPTY_TEXT_COMPONENT);
                         t.setSuffix(ComponentSerializer.deserialize(tabOverlay.text1[index]));
                         t.setPlayers(new String[]{slotID[index]});
                         t.setNameTagVisibility("always");
                         t.setCollisionRule("always");
                         if (is13OrLater) {
-                            t.setDisplayName(EMPTY_COMPONENT_TEXT);
+                            t.setDisplayName(EMPTY_TEXT_COMPONENT);
                             t.setPrefix(ComponentSerializer.deserialize(tabOverlay.text0[index]));
                             t.setSuffix(ComponentSerializer.deserialize(tabOverlay.text1[index]));
                         }
@@ -481,12 +480,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 packet.setName(slotID[index]);
                 packet.setMode((byte) 2);
                 packet.setPrefix(ComponentSerializer.deserialize(tabOverlay.text0[index]));
-                packet.setDisplayName(EMPTY_COMPONENT_TEXT);
+                packet.setDisplayName(EMPTY_TEXT_COMPONENT);
                 packet.setSuffix(ComponentSerializer.deserialize(tabOverlay.text1[index]));
                 packet.setNameTagVisibility("always");
                 packet.setCollisionRule("always");
                 if (is13OrLater) {
-                    packet.setDisplayName(EMPTY_COMPONENT_TEXT);
+                    packet.setDisplayName(EMPTY_TEXT_COMPONENT);
                     packet.setPrefix(ComponentSerializer.deserialize(tabOverlay.text0[index]));
                     packet.setSuffix(ComponentSerializer.deserialize(tabOverlay.text1[index]));
                 }

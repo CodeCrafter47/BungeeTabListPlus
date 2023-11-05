@@ -60,7 +60,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final boolean OPTION_ENABLE_CONSISTENCY_CHECKS = true;
 
     private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
-    private static final BaseComponent EMPTY_JSON_COMPONENT = new TextComponent();
+    private static final BaseComponent EMPTY_TEXT_COMPONENT = new TextComponent();
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
 
     private static final boolean TEAM_COLLISION_RULE_SUPPORTED;
@@ -678,7 +678,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         void onServerSwitch() {
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_COMPONENT, EMPTY_JSON_COMPONENT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -761,7 +761,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         void onServerSwitch() {
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_COMPONENT, EMPTY_JSON_COMPONENT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -784,7 +784,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             // fix header/ footer
             sendPacket(new PlayerListHeaderFooter(serverHeader != null
                     ? ComponentSerializer.deserialize(serverHeader)
-                    : EMPTY_JSON_COMPONENT, serverFooter != null ? ComponentSerializer.deserialize(serverHeader) : EMPTY_JSON_COMPONENT));
+                    : EMPTY_TEXT_COMPONENT, serverFooter != null ? ComponentSerializer.deserialize(serverHeader) : EMPTY_TEXT_COMPONENT));
         }
     }
 
@@ -2454,7 +2454,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         @Override
         void onActivated(AbstractHeaderFooterOperationModeHandler<?> previous) {
             // remove header/ footer
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_COMPONENT, EMPTY_JSON_COMPONENT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
