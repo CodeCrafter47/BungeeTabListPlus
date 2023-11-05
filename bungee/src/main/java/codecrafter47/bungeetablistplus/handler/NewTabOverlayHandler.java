@@ -31,10 +31,14 @@ import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
-import it.unimi.dsi.fastutil.objects.*;
-import lombok.*;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+import lombok.NonNull;
+import lombok.val;
 import net.md_5.bungee.UserConnection;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.Protocol;
@@ -58,7 +62,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK = true;
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK = true;
 
-    private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
+    private static final String EMPTY_TEXT_JSON = "{\"text\":\"\"}";
+    private static final TextComponent EMPTY_TEXT_COMPONENT = new TextComponent();
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
 
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
@@ -269,8 +274,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.PASS_TROUGH);
         }
 
-        this.serverHeader = packet.getHeader() != null ? packet.getHeader() : EMPTY_JSON_TEXT;
-        this.serverFooter = packet.getFooter() != null ? packet.getFooter() : EMPTY_JSON_TEXT;
+        this.serverHeader = packet.getHeader() != null ? ((TextComponent)packet.getHeader()).getText() : EMPTY_TEXT_JSON;
+        this.serverFooter = packet.getFooter() != null ? ((TextComponent)packet.getFooter()).getText() : EMPTY_TEXT_JSON;
 
         return result;
     }
@@ -299,10 +304,10 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         serverPlayerListListed.clear();
         if (serverHeader != null) {
-            serverHeader = EMPTY_JSON_TEXT;
+            serverHeader = EMPTY_TEXT_JSON;
         }
         if (serverFooter != null) {
-            serverFooter = EMPTY_JSON_TEXT;
+            serverFooter = EMPTY_TEXT_JSON;
         }
 
         active = false;
@@ -511,7 +516,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onServerSwitch() {
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -566,7 +571,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onServerSwitch() {
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -587,7 +592,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             }
 
             // fix header/ footer
-            sendPacket(new PlayerListHeaderFooter(serverHeader != null ? serverHeader : EMPTY_JSON_TEXT, serverFooter != null ? serverFooter : EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(serverHeader != null
+                    ? ComponentSerializer.deserialize(serverHeader)
+                    : EMPTY_TEXT_COMPONENT, serverFooter != null ? ComponentSerializer.deserialize(serverFooter) : EMPTY_TEXT_COMPONENT));
         }
     }
 
@@ -681,7 +688,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 hasCreatedCustomTeams = true;
 
                 for (int i = 0; i < 80; i++) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_TEXT_JSON, EMPTY_TEXT_JSON,
+                            EMPTY_TEXT_JSON, "always", "always", 21, (byte) 1,
+                            new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                 }
             }
         }
@@ -747,7 +756,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                     item.setUuid(customSlotUuid);
                     item.setUsername(slotUsername[index] = getCustomSlotUsername(index));
                     Property119Handler.setProperties(item, toPropertiesArray(icon.getTextureProperty()));
-                    item.setDisplayName(tabOverlay.text[index]);
+                    item.setDisplayName(ComponentSerializer.deserialize(tabOverlay.text[index]));
                     item.setPing(tabOverlay.ping[index]);
                     item.setGamemode(0);
                     item.setListed(true);
@@ -761,7 +770,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 if (slotState[index] != SlotState.UNUSED) {
                     PlayerListItem.Item item = new PlayerListItem.Item();
                     item.setUuid(slotUuid[index]);
-                    item.setDisplayName(tabOverlay.text[index]);
+                    item.setDisplayName(ComponentSerializer.deserialize(tabOverlay.text[index]));
                     itemQueueUpdateDisplayName.add(item);
                 }
             }
@@ -839,7 +848,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             this.icon = new Icon[80];
             Arrays.fill(this.icon, Icon.DEFAULT_STEVE);
             this.text = new String[80];
-            Arrays.fill(this.text, EMPTY_JSON_TEXT);
+            Arrays.fill(this.text, EMPTY_TEXT_JSON);
             this.ping = new int[80];
             this.batchUpdateRecursionLevel = new AtomicInteger(0);
             this.dirtyFlagSize = true;
@@ -953,7 +962,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 for (int index = newUsedSlots.nextSetBit(0); index >= 0; index = newUsedSlots.nextSetBit(index + 1)) {
                     if (!oldUsedSlots.get(index)) {
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = EMPTY_JSON_TEXT;
+                        text[index] = EMPTY_TEXT_JSON;
                         ping[index] = 0;
                     }
                 }
@@ -963,7 +972,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 for (int index = oldUsedSlots.nextSetBit(0); index >= 0; index = oldUsedSlots.nextSetBit(index + 1)) {
                     if (!newUsedSlots.get(index)) {
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = EMPTY_JSON_TEXT;
+                        text[index] = EMPTY_TEXT_JSON;
                         ping[index] = 0;
                     }
                 }
@@ -1155,7 +1164,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         @Override
         void onActivated(AbstractHeaderFooterOperationModeHandler<?> previous) {
             // remove header/ footer
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -1163,14 +1172,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             CustomHeaderAndFooterImpl tabOverlay = getTabOverlay();
             if (tabOverlay.headerOrFooterDirty) {
                 tabOverlay.headerOrFooterDirty = false;
-                sendPacket(new PlayerListHeaderFooter(tabOverlay.header, tabOverlay.footer));
+                sendPacket(new PlayerListHeaderFooter(ComponentSerializer.deserialize(tabOverlay.header),
+                        ComponentSerializer.deserialize(tabOverlay.footer)));
             }
         }
     }
 
     private final class CustomHeaderAndFooterImpl extends AbstractHeaderFooterTabOverlay implements HeaderAndFooterHandle {
-        private String header = EMPTY_JSON_TEXT;
-        private String footer = EMPTY_JSON_TEXT;
+        private String header = EMPTY_TEXT_JSON;
+        private String footer = EMPTY_TEXT_JSON;
 
         private volatile boolean headerOrFooterDirty = false;
 
@@ -1244,9 +1254,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 0);
-        team.setDisplayName(displayName);
-        team.setPrefix(prefix);
-        team.setSuffix(suffix);
+        team.setDisplayName(ComponentSerializer.deserialize(displayName));
+        team.setPrefix(ComponentSerializer.deserialize(prefix));
+        team.setSuffix(ComponentSerializer.deserialize(suffix));
         team.setNameTagVisibility(nameTagVisibility);
         team.setCollisionRule(collisionRule);
         team.setColor(color);
