@@ -651,7 +651,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onServerSwitch() {
-            // do nothing
+            if (player.getPendingConnection().getVersion() >= 764) {
+                clearCustomSlots();
+            }
         }
 
         @Override
@@ -688,6 +690,10 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onDeactivated() {
+            clearCustomSlots();
+        }
+
+        private void clearCustomSlots() {
             int customSlots = 0;
             for (int index = 0; index < 80; index++) {
                 if (slotState[index] != SlotState.UNUSED) {
