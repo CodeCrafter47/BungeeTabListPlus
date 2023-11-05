@@ -66,8 +66,10 @@ import lombok.Getter;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import org.bstats.bungeecord.Metrics;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -185,19 +187,25 @@ public class BungeeTabListPlus {
         try {
             Class.forName("net.md_5.bungee.api.Title");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1671");
+            throw new RuntimeException("You need to run at least BungeeCord version #1760");
         }
 
         try {
             Connection.class.getMethod("isConnected");
         } catch (NoSuchMethodException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1671");
+            throw new RuntimeException("You need to run at least BungeeCord version #1760");
         }
 
         try {
             Class.forName("net.md_5.bungee.protocol.packet.PlayerListItemUpdate");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1671");
+            throw new RuntimeException("You need to run at least BungeeCord version #1760");
+        }
+
+        try {
+            PlayerListHeaderFooter.class.getMethod("setHeader", BaseComponent.class);
+        } catch (NoSuchMethodException ex) {
+            throw new RuntimeException("You need to run at least BungeeCord version #1760");
         }
 
         INSTANCE = this;
