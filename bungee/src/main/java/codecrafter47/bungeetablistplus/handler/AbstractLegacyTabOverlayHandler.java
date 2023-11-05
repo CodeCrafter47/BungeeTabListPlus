@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.packet.*;
 
@@ -248,7 +249,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         PlayerListItem.Item item = new PlayerListItem.Item();
         item.setUuid(uuid);
         item.setUsername(player);
-        item.setDisplayName(player);
+        item.setDisplayName(new TextComponent(player));
         item.setPing(9999);
         pli.setItems(new PlayerListItem.Item[]{item});
         pli.setAction(PlayerListItem.Action.REMOVE_PLAYER);
@@ -312,7 +313,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             for (val entry : serverPlayerList.object2IntEntrySet()) {
                 PlayerListItem pli = new PlayerListItem();
                 PlayerListItem.Item item = new PlayerListItem.Item();
-                item.setDisplayName(entry.getKey());
+                item.setDisplayName(new TextComponent(entry.getKey()));
                 item.setPing(entry.getIntValue());
                 pli.setItems(new PlayerListItem.Item[]{item});
                 pli.setAction(PlayerListItem.Action.ADD_PLAYER);
@@ -432,17 +433,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         Team t = new Team();
                         t.setName(slotID[index]);
                         t.setMode((byte) 0);
-                        t.setPrefix(tabOverlay.text0[index]);
-                        t.setDisplayName("");
-                        t.setSuffix(tabOverlay.text1[index]);
+                        t.setPrefix(new TextComponent(tabOverlay.text0[index]));
+                        t.setDisplayName(new TextComponent());
+                        t.setSuffix(new TextComponent(tabOverlay.text1[index]));
                         t.setPlayers(new String[]{slotID[index]});
                         t.setNameTagVisibility("always");
                         t.setCollisionRule("always");
-                        if (is13OrLater) {
-                            t.setDisplayName(EMPTY_JSON_TEXT);
-                            t.setPrefix("{\"text\":\"" + tabOverlay.text0[index] + "\"}");
-                            t.setSuffix("{\"text\":\"" + tabOverlay.text1[index] + "\"}");
-                        }
                         sendPacket(t);
                     }
                 } else {
@@ -464,7 +460,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             item.setUuid(slotUUID[index]);
             item.setUsername(slotID[index]);
             Property119Handler.setProperties(item, EMPTY_PROPERTIES);
-            item.setDisplayName(slotID[index]);
+            item.setDisplayName(new TextComponent(slotID[index]));
             item.setPing(tabOverlay.ping[index]);
             pli.setItems(new PlayerListItem.Item[]{item});
             pli.setAction(PlayerListItem.Action.ADD_PLAYER);
@@ -476,16 +472,11 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 Team packet = new Team();
                 packet.setName(slotID[index]);
                 packet.setMode((byte) 2);
-                packet.setPrefix(tabOverlay.text0[index]);
-                packet.setDisplayName("");
-                packet.setSuffix(tabOverlay.text1[index]);
+                packet.setPrefix(new TextComponent(tabOverlay.text0[index]));
+                packet.setDisplayName(new TextComponent());
+                packet.setSuffix(new TextComponent(tabOverlay.text1[index]));
                 packet.setNameTagVisibility("always");
                 packet.setCollisionRule("always");
-                if (is13OrLater) {
-                    packet.setDisplayName(EMPTY_JSON_TEXT);
-                    packet.setPrefix("{\"text\":\"" + tabOverlay.text0[index] + "\"}");
-                    packet.setSuffix("{\"text\":\"" + tabOverlay.text1[index] + "\"}");
-                }
                 sendPacket(packet);
             }
         }
@@ -828,7 +819,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
      */
     private static String getName(PlayerListItem.Item item) {
         if (item.getDisplayName() != null) {
-            return item.getDisplayName();
+            return item.getDisplayName().toLegacyText();
         } else if (item.getUsername() != null) {
             return item.getUsername();
         } else {
