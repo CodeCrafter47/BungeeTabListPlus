@@ -701,6 +701,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             for (int index = 0; index < 80; index++) {
                 if (slotState[index] != SlotState.UNUSED) {
                     customSlots++;
+                    dirtySlots.set(index);
                 }
             }
 
