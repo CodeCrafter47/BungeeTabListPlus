@@ -40,6 +40,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.Either;
 import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.packet.*;
 
@@ -62,6 +63,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK = true;
 
     private static final BaseComponent EMPTY_TEXT_COMPONENT = new TextComponent();
+    private static final Either<String, BaseComponent> EMPTY_EITHER_TEXT_COMPONENT = Either.right(new TextComponent());
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
 
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
@@ -686,7 +688,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 hasCreatedCustomTeams = true;
 
                 for (int i = 0; i < 80; i++) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                 }
             }
         }
@@ -1251,7 +1253,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
     }
 
-    private static Team createPacketTeamCreate(String name, BaseComponent displayName, BaseComponent prefix, BaseComponent suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
+    private static Team createPacketTeamCreate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 0);

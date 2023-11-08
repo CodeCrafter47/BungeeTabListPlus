@@ -39,6 +39,7 @@ import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.Either;
 import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
@@ -433,9 +434,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         Team t = new Team();
                         t.setName(slotID[index]);
                         t.setMode((byte) 0);
-                        t.setPrefix(new TextComponent(tabOverlay.text0[index]));
-                        t.setDisplayName(new TextComponent());
-                        t.setSuffix(new TextComponent(tabOverlay.text1[index]));
+                        t.setPrefix(Either.left(tabOverlay.text0[index]));
+                        t.setDisplayName(Either.left(""));
+                        t.setSuffix(Either.left(tabOverlay.text1[index]));
                         t.setPlayers(new String[]{slotID[index]});
                         t.setNameTagVisibility("always");
                         t.setCollisionRule("always");
@@ -472,9 +473,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 Team packet = new Team();
                 packet.setName(slotID[index]);
                 packet.setMode((byte) 2);
-                packet.setPrefix(new TextComponent(tabOverlay.text0[index]));
-                packet.setDisplayName(new TextComponent());
-                packet.setSuffix(new TextComponent(tabOverlay.text1[index]));
+                packet.setPrefix(Either.left(tabOverlay.text0[index]));
+                packet.setDisplayName(Either.left(""));
+                packet.setSuffix(Either.left(tabOverlay.text1[index]));
                 packet.setNameTagVisibility("always");
                 packet.setCollisionRule("always");
                 sendPacket(packet);

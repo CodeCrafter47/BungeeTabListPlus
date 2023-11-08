@@ -36,6 +36,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.Either;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
@@ -180,6 +181,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private boolean is119OrLater;
     protected boolean active;
 
+    private final Either<String, BaseComponent> emptyEither;
+
     public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is18, boolean is13OrLater, boolean is119OrLater) {
         this.logger = logger;
         this.eventLoopExecutor = eventLoopExecutor;
@@ -189,6 +192,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         this.is119OrLater = is119OrLater;
         this.activeContentHandler = new PassThroughContentHandler();
         this.activeHeaderFooterHandler = new PassThroughHeaderFooterHandler();
+        if (is13OrLater) {
+            emptyEither = Either.right(EMPTY_TEXT_COMPONENT);
+        } else {
+            emptyEither = Either.left("");
+        }
     }
 
     protected abstract void sendPacket(DefinedPacket packet);
@@ -975,7 +983,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                         // 2. add player to correct team
                                         sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                                         // 3. reset custom slot team
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                                     }
                                 }
 
@@ -1051,7 +1059,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             int slot = playerUsernameToSlotMap.getInt(playerName);
                             if (slot != -1) {
                                 // reset slot team
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                             }
                         }
                     }
@@ -1129,7 +1137,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     filteredPlayers[j++] = playerName;
                                 } else {
                                     // reset slot team
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                                 }
                             }
                             packet.setPlayers(filteredPlayers);
@@ -1203,7 +1211,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             // 1. remove player from team
                             sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
                             // reset slot team
-                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                         }
 
                         // 2. create new custom slot
@@ -1306,12 +1314,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (!hasCreatedCustomTeams) {
                 hasCreatedCustomTeams = true;
 
-                sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
+                sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
 
                 for (int i = 1; i < 80; i++) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                 }
-                sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
+                sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
             }
         }
 
@@ -1330,7 +1338,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             // 2. add player to correct team
                             sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                             // 3. reset custom slot team
-                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                         }
                     } else {
                         customSlots++;
@@ -1462,7 +1470,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     // 2. add player to correct team
                                     sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                                     // 3. reset custom slot team
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                                 } else {
                                     // 2. add player to overflow team
                                     sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{slotUsername[index]}));
@@ -1650,7 +1658,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     playerUsernameToSlotMap.removeInt(slotUsername[index]);
 
                                     // reset slot team
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                                 }
 
                                 // 2. update slot state
@@ -1671,7 +1679,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                         playerUsernameToSlotMap.removeInt(slotUsername[index]);
 
                                         // reset slot team
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT, "always", "always", 21, (byte) 1));
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", 21, (byte) 1));
                                     }
 
                                     freePlayers.add(slotUuid[index]);
@@ -2468,7 +2476,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
     }
 
-    private static Team createPacketTeamCreate(String name, BaseComponent displayName, BaseComponent prefix, BaseComponent suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
+    private static Team createPacketTeamCreate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 0);
@@ -2490,7 +2498,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         return team;
     }
 
-    private static Team createPacketTeamUpdate(String name, BaseComponent displayName, BaseComponent prefix, BaseComponent suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire) {
+    private static Team createPacketTeamUpdate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 2);
@@ -2543,9 +2551,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
     @Data
     static class TeamEntry {
-        private BaseComponent displayName;
-        private BaseComponent prefix;
-        private BaseComponent suffix;
+        private Either<String, BaseComponent> displayName;
+        private Either<String, BaseComponent> prefix;
+        private Either<String, BaseComponent> suffix;
         private byte friendlyFire;
         private String nameTagVisibility;
         private String collisionRule;
