@@ -32,7 +32,11 @@ import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.protocol.DefinedPacket;
+import net.md_5.bungee.protocol.Either;
 import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 import net.md_5.bungee.protocol.packet.Team;
@@ -56,11 +60,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK = true;
     private static final boolean OPTION_ENABLE_CONSISTENCY_CHECKS = true;
 
-    private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
+    private static final BaseComponent EMPTY_TEXT_COMPONENT = new TextComponent();
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
-
-    private static final boolean TEAM_COLLISION_RULE_SUPPORTED;
-    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
 
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
     private static final BitSet[] SIZE_TO_USED_SLOTS;
@@ -78,23 +79,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final Set<String> blockedTeams = new HashSet<>();
 
     static {
-        // check whether this BungeeCord version supports team's collision rule property
-        boolean methodPresent = false;
-        try {
-            Team.class.getDeclaredMethod("setCollisionRule", String.class);
-            methodPresent = true;
-        } catch (NoSuchMethodException ignored) {
-        }
-        TEAM_COLLISION_RULE_SUPPORTED = methodPresent;
-
-        methodPresent = false;
-        try {
-            Class.forName("net.md_5.bungee.protocol.Property");
-            methodPresent = true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        USE_PROTOCOL_PROPERTY_TYPE = methodPresent;
-
         // build the dimension to used slots map (for the rectangular tab overlay)
         val builder = ImmutableMap.<RectangularTabOverlay.Dimension, BitSet>builder();
         for (int columns = 1; columns <= 4; columns++) {
@@ -176,9 +160,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private final Object2ObjectMap<UUID, PlayerListEntry> serverPlayerList = new Object2ObjectOpenHashMap<>();
     protected final Set<String> serverTabListPlayers = new ObjectOpenHashSet<>();
     @Nullable
-    protected String serverHeader = null;
+    protected BaseComponent serverHeader = null;
     @Nullable
-    protected String serverFooter = null;
+    protected BaseComponent serverFooter = null;
     protected final Object2ObjectMap<String, TeamEntry> serverTeams = new Object2ObjectOpenHashMap<>();
     protected final Object2ObjectMap<String, String> playerToTeamMap = new Object2ObjectOpenHashMap<>();
 
@@ -188,7 +172,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private AbstractHeaderFooterOperationModeHandler<?> activeHeaderFooterHandler;
 
     private boolean hasCreatedCustomTeams = false;
-    private boolean areCustomSlotUsersPartOfTeams = false;
 
     private final AtomicBoolean updateScheduledFlag = new AtomicBoolean(false);
     private final Runnable updateTask = this::update;
@@ -197,6 +180,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private boolean is13OrLater;
     private boolean is119OrLater;
     protected boolean active;
+
+    private final Either<String, BaseComponent> emptyEither;
 
     public AbstractTabOverlayHandler(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, boolean is18, boolean is13OrLater, boolean is119OrLater) {
         this.logger = logger;
@@ -207,6 +192,11 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         this.is119OrLater = is119OrLater;
         this.activeContentHandler = new PassThroughContentHandler();
         this.activeHeaderFooterHandler = new PassThroughHeaderFooterHandler();
+        if (is13OrLater) {
+            emptyEither = Either.right(EMPTY_TEXT_COMPONENT);
+        } else {
+            emptyEither = Either.left("");
+        }
     }
 
     protected abstract void sendPacket(DefinedPacket packet);
@@ -285,6 +275,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             for (String player : packet.getPlayers()) {
                 if (player.equals("")) {
                     block = true;
+                    break;
                 }
             }
             if (block) {
@@ -328,9 +319,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     teamEntry.setSuffix(packet.getSuffix());
                     teamEntry.setFriendlyFire(packet.getFriendlyFire());
                     teamEntry.setNameTagVisibility(packet.getNameTagVisibility());
-                    if (TEAM_COLLISION_RULE_SUPPORTED) {
-                        teamEntry.setCollisionRule(packet.getCollisionRule());
-                    }
+                    teamEntry.setCollisionRule(packet.getCollisionRule());
                     teamEntry.setColor(packet.getColor());
                 }
                 if (packet.getPlayers() != null) {
@@ -378,8 +367,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.PASS_TROUGH);
         }
 
-        this.serverHeader = packet.getHeader() != null ? packet.getHeader() : EMPTY_JSON_TEXT;
-        this.serverFooter = packet.getFooter() != null ? packet.getFooter() : EMPTY_JSON_TEXT;
+        this.serverHeader = packet.getHeader() != null ? packet.getHeader() : EMPTY_TEXT_COMPONENT;
+        this.serverFooter = packet.getFooter() != null ? packet.getFooter() : EMPTY_TEXT_COMPONENT;
 
         return result;
     }
@@ -397,7 +386,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
             if (isUsingAltRespawn()) {
                 hasCreatedCustomTeams = false;
-                areCustomSlotUsersPartOfTeams = false;
             }
 
             try {
@@ -433,10 +421,10 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
             serverPlayerList.clear();
             if (serverHeader != null) {
-                serverHeader = EMPTY_JSON_TEXT;
+                serverHeader = EMPTY_TEXT_COMPONENT;
             }
             if (serverFooter != null) {
-                serverFooter = EMPTY_JSON_TEXT;
+                serverFooter = EMPTY_TEXT_COMPONENT;
             }
 
             serverTabListPlayers.clear();
@@ -674,7 +662,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         void onServerSwitch() {
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -757,7 +745,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         void onServerSwitch() {
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -778,7 +766,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
 
             // fix header/ footer
-            sendPacket(new PlayerListHeaderFooter(serverHeader != null ? serverHeader : EMPTY_JSON_TEXT, serverFooter != null ? serverFooter : EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(serverHeader != null ? serverHeader : EMPTY_TEXT_COMPONENT, serverFooter != null ? serverFooter : EMPTY_TEXT_COMPONENT));
         }
     }
 
@@ -995,11 +983,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                         // 2. add player to correct team
                                         sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                                         // 3. reset custom slot team
-                                        if (is13OrLater) {
-                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                        } else {
-                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
-                                        }
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                                     }
                                 }
 
@@ -1075,11 +1059,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             int slot = playerUsernameToSlotMap.getInt(playerName);
                             if (slot != -1) {
                                 // reset slot team
-                                if (is13OrLater) {
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                } else {
-                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 1));
-                                }
+                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                             }
                         }
                     }
@@ -1157,11 +1137,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     filteredPlayers[j++] = playerName;
                                 } else {
                                     // reset slot team
-                                    if (is13OrLater) {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                    } else {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], "", "", "", "always", "always", 0, (byte) 1));
-                                    }
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[slot], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                                 }
                             }
                             packet.setPlayers(filteredPlayers);
@@ -1235,11 +1211,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             // 1. remove player from team
                             sendPacket(createPacketTeamRemovePlayers(CUSTOM_SLOT_TEAMNAME[index], new String[]{slotUsername[index]}));
                             // reset slot team
-                            if (is13OrLater) {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                            } else {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
-                            }
+                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                         }
 
                         // 2. create new custom slot
@@ -1342,26 +1314,12 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (!hasCreatedCustomTeams) {
                 hasCreatedCustomTeams = true;
 
-                if (is13OrLater) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
-                } else {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
-                }
+                sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[0], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[0], CUSTOM_SLOT_USERNAME_SMILEYS[0], ""}));
 
                 for (int i = 1; i < 80; i++) {
-                    if (is13OrLater) {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
-                    } else {
-                        sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
-                    }
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                 }
-                if (is13OrLater) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
-                } else {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], "", "", "", "always", "always", 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
-                }
-
-                areCustomSlotUsersPartOfTeams = true;
+                sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[80], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[80]}));
             }
         }
 
@@ -1380,11 +1338,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             // 2. add player to correct team
                             sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                             // 3. reset custom slot team
-                            if (is13OrLater) {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                            } else {
-                                sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
-                            }
+                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                         }
                     } else {
                         customSlots++;
@@ -1516,11 +1470,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     // 2. add player to correct team
                                     sendPacket(createPacketTeamAddPlayers(playerTeamName, new String[]{slotUsername[index]}));
                                     // 3. reset custom slot team
-                                    if (is13OrLater) {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                    } else {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
-                                    }
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                                 } else {
                                     // 2. add player to overflow team
                                     sendPacket(createPacketTeamAddPlayers(CUSTOM_SLOT_TEAMNAME[80], new String[]{slotUsername[index]}));
@@ -1581,7 +1531,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         // restore player gamemode
                         PlayerListItem packet;
                         List<PlayerListItem.Item> items = new ArrayList<>(serverPlayerList.size());
-                        items.clear();
                         for (PlayerListEntry entry : serverPlayerList.values()) {
                             PlayerListItem.Item item = new PlayerListItem.Item();
                             item.setUuid(entry.getUuid());
@@ -1709,11 +1658,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                     playerUsernameToSlotMap.removeInt(slotUsername[index]);
 
                                     // reset slot team
-                                    if (is13OrLater) {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                    } else {
-                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
-                                    }
+                                    sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                                 }
 
                                 // 2. update slot state
@@ -1734,11 +1679,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                                         playerUsernameToSlotMap.removeInt(slotUsername[index]);
 
                                         // reset slot team
-                                        if (is13OrLater) {
-                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1));
-                                        } else {
-                                            sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], "", "", "", "always", "always", 0, (byte) 1));
-                                        }
+                                        sendPacket(createPacketTeamUpdate(CUSTOM_SLOT_TEAMNAME[index], emptyEither, emptyEither, emptyEither, "always", "always", is13OrLater ? 21 : 0, (byte) 1));
                                     }
 
                                     freePlayers.add(slotUuid[index]);
@@ -2064,7 +2005,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private abstract class CustomContentTabOverlay extends AbstractContentTabOverlay implements TabOverlayHandle.BatchModifiable {
         final UUID[] uuid;
         final Icon[] icon;
-        final String[] text;
+        final BaseComponent[] text;
         final int[] ping;
 
         final AtomicInteger batchUpdateRecursionLevel;
@@ -2078,8 +2019,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             this.uuid = new UUID[80];
             this.icon = new Icon[80];
             Arrays.fill(this.icon, Icon.DEFAULT_STEVE);
-            this.text = new String[80];
-            Arrays.fill(this.text, EMPTY_JSON_TEXT);
+            this.text = new BaseComponent[80];
+            Arrays.fill(this.text, EMPTY_TEXT_COMPONENT);
             this.ping = new int[80];
             this.batchUpdateRecursionLevel = new AtomicInteger(0);
             this.dirtyFlagSize = true;
@@ -2134,8 +2075,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         void setTextInternal(int index, @Nonnull @NonNull String text) {
             String jsonText = ChatFormat.formattedTextToJson(text);
-            if (!jsonText.equals(this.text[index])) {
-                this.text[index] = jsonText;
+            BaseComponent component = ComponentSerializer.deserialize(jsonText);
+            if (!component.equals(this.text[index])) {
+                this.text[index] = component;
                 dirtyFlagsText.set(index);
                 scheduleUpdateIfNotInBatch();
             }
@@ -2219,7 +2161,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     if (!oldUsedSlots.get(index)) {
                         uuid[index] = null;
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = EMPTY_JSON_TEXT;
+                        text[index] = EMPTY_TEXT_COMPONENT;
                         ping[index] = 0;
                     }
                 }
@@ -2230,7 +2172,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     if (!newUsedSlots.get(index)) {
                         uuid[index] = null;
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = EMPTY_JSON_TEXT;
+                        text[index] = EMPTY_TEXT_COMPONENT;
                         ping[index] = 0;
                     }
                 }
@@ -2448,7 +2390,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         @Override
         void onActivated(AbstractHeaderFooterOperationModeHandler<?> previous) {
             // remove header/ footer
-            sendPacket(new PlayerListHeaderFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new PlayerListHeaderFooter(EMPTY_TEXT_COMPONENT, EMPTY_TEXT_COMPONENT));
         }
 
         @Override
@@ -2462,8 +2404,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     }
 
     private final class CustomHeaderAndFooterImpl extends AbstractHeaderFooterTabOverlay implements HeaderAndFooterHandle {
-        private String header = EMPTY_JSON_TEXT;
-        private String footer = EMPTY_JSON_TEXT;
+        private BaseComponent header = EMPTY_TEXT_COMPONENT;
+        private BaseComponent footer = EMPTY_TEXT_COMPONENT;
 
         private volatile boolean headerOrFooterDirty = false;
 
@@ -2498,22 +2440,22 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
         @Override
         public void setHeaderFooter(@Nullable String header, @Nullable String footer) {
-            this.header = ChatFormat.formattedTextToJson(header);
-            this.footer = ChatFormat.formattedTextToJson(footer);
+            this.header = ComponentSerializer.deserialize(ChatFormat.formattedTextToJson(header));
+            this.footer = ComponentSerializer.deserialize(ChatFormat.formattedTextToJson(footer));
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setHeader(@Nullable String header) {
-            this.header = ChatFormat.formattedTextToJson(header);
+            this.header = ComponentSerializer.deserialize(ChatFormat.formattedTextToJson(header));
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setFooter(@Nullable String footer) {
-            this.footer = ChatFormat.formattedTextToJson(footer);
+            this.footer = ComponentSerializer.deserialize(ChatFormat.formattedTextToJson(footer));
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
@@ -2534,7 +2476,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         }
     }
 
-    private static Team createPacketTeamCreate(String name, String displayName, String prefix, String suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
+    private static Team createPacketTeamCreate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 0);
@@ -2542,9 +2484,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         team.setPrefix(prefix);
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
-        if (TEAM_COLLISION_RULE_SUPPORTED) {
-            team.setCollisionRule(collisionRule);
-        }
+        team.setCollisionRule(collisionRule);
         team.setColor(color);
         team.setFriendlyFire(friendlyFire);
         team.setPlayers(players);
@@ -2558,7 +2498,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         return team;
     }
 
-    private static Team createPacketTeamUpdate(String name, String displayName, String prefix, String suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire) {
+    private static Team createPacketTeamUpdate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 2);
@@ -2566,9 +2506,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         team.setPrefix(prefix);
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
-        if (TEAM_COLLISION_RULE_SUPPORTED) {
-            team.setCollisionRule(collisionRule);
-        }
+        team.setCollisionRule(collisionRule);
         team.setColor(color);
         team.setFriendlyFire(friendlyFire);
         return team;
@@ -2601,7 +2539,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         private UUID uuid;
         private String[][] properties;
         private String username;
-        private String displayName;
+        private BaseComponent displayName;
         private int ping;
         private int gamemode;
 
@@ -2613,9 +2551,9 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
 
     @Data
     static class TeamEntry {
-        private String displayName;
-        private String prefix;
-        private String suffix;
+        private Either<String, BaseComponent> displayName;
+        private Either<String, BaseComponent> prefix;
+        private Either<String, BaseComponent> suffix;
         private byte friendlyFire;
         private String nameTagVisibility;
         private String collisionRule;
