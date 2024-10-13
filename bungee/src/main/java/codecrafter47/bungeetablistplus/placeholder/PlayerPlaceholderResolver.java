@@ -140,6 +140,7 @@ public class PlayerPlaceholderResolver extends AbstractPlayerPlaceholderResolver
         addPlaceholder("session_duration_total_seconds", create(BungeeData.BungeeCord_SessionDuration, duration -> duration == null ? null : (int) duration.getSeconds(), TypeToken.INTEGER));
         addPlaceholder("session_duration_minutes", create(BungeeData.BungeeCord_SessionDuration, duration -> duration == null ? null : (int) ((duration.getSeconds() % 3600) / 60), TypeToken.INTEGER));
         addPlaceholder("session_duration_hours", create(BungeeData.BungeeCord_SessionDuration, duration -> duration == null ? null : (int) (duration.getSeconds() / 3600), TypeToken.INTEGER));
+        addPlaceholder("locale", create(BungeeData.BungeeCord_Locale));
         addPlaceholder("essentials_afk", create(BukkitData.Essentials_IsAFK));
         addPlaceholder("is_hidden", create(BTLPBungeeDataKeys.DATA_KEY_IS_HIDDEN));
         addPlaceholder("gamemode", create(BTLPBungeeDataKeys.DATA_KEY_GAMEMODE));
