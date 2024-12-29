@@ -140,7 +140,11 @@ public class TabViewManager implements Listener {
             Logger logger = new ChildLogger(btlp.getLogger(), player.getName());
             EventLoop eventLoop = ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop();
 
-            if (protocolVersionProvider.has1193OrLater(player)) {
+            if (protocolVersionProvider.has1214OrLater(player)) {
+                OrderedTabOverlayHandler handler = new OrderedTabOverlayHandler(logger, eventLoop, player);
+                tabOverlayHandler = handler;
+                packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, (UserConnection) player));
+            } else if (protocolVersionProvider.has1193OrLater(player)) {
                 NewTabOverlayHandler handler = new NewTabOverlayHandler(logger, eventLoop, player);
                 tabOverlayHandler = handler;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, (UserConnection) player));
