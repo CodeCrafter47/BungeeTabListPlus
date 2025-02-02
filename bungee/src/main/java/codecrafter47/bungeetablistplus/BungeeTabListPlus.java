@@ -187,31 +187,37 @@ public class BungeeTabListPlus {
         try {
             Class.forName("net.md_5.bungee.api.Title");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1766");
+            throw new RuntimeException("You need to run at least BungeeCord version #1899");
         }
 
         try {
             Connection.class.getMethod("isConnected");
         } catch (NoSuchMethodException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1766");
+            throw new RuntimeException("You need to run at least BungeeCord version #1899");
         }
 
         try {
             Class.forName("net.md_5.bungee.protocol.packet.PlayerListItemUpdate");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1766");
+            throw new RuntimeException("You need to run at least BungeeCord version #1899");
         }
 
         try {
             PlayerListHeaderFooter.class.getMethod("setHeader", BaseComponent.class);
         } catch (NoSuchMethodException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1766");
+            throw new RuntimeException("You need to run at least BungeeCord version #1899");
         }
 
         try {
             Class.forName("net.md_5.bungee.protocol.Either");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least BungeeCord version #1766");
+            throw new RuntimeException("You need to run at least BungeeCord version #1899");
+        }
+
+        try {
+            Class.forName("net.md_5.bungee.protocol.packet.Team");
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException("You need to run at least BungeeCord version #1899");
         }
 
         INSTANCE = this;
