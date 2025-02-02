@@ -43,17 +43,3 @@ jobs:
         with:
           name: BungeeTabListPlus Bukkit Bridge
           path: sponge/build/libs/BungeeTabListPlus_SpongeBridge-*-SNAPSHOT.jar
-
-      - name: Archive artifacts (Fabric 1.16.3)
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: BungeeTabListPlus Fabric 1.16.3 Bridge
-          path: fabric-bridge-1.16.3/build/libs/btlp-fabric-bridge-*-SNAPSHOT.jar
-
-      - name: Archive artifacts (Fabric 1.17)
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: BungeeTabListPlus Fabric 1.17 Bridge
-          path: fabric-bridge-1.17/build/libs/btlp-fabric-bridge-*-SNAPSHOT.jar
