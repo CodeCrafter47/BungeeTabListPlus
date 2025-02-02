@@ -41,5 +41,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: BungeeTabListPlus Bukkit Bridge
+          name: BungeeTabListPlus Sponge Bridge
           path: sponge/build/libs/BungeeTabListPlus_SpongeBridge-*-SNAPSHOT.jar
