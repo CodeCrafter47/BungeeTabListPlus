@@ -8,6 +8,11 @@ repositories {
     }
 }
 
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 dependencies {
     implementation "de.codecrafter47.data:api:${rootProject.ext.dataApiVersion}"
     implementation "de.codecrafter47.data.bukkit:api:${rootProject.ext.dataApiVersion}"
@@ -31,6 +36,10 @@ dependencies {
     compileOnly group: "org.geysermc.geyser", name: "api", version: "2.1.0-SNAPSHOT"
     compileOnly "org.geysermc.floodgate:api:2.0-SNAPSHOT"
     compileOnly "io.netty:netty-all:4.1.86.Final"
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
     // This imports velocity proxy
     compileOnly fileTree(dir: '../libs', include: '*.jar')
 }

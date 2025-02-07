@@ -54,5 +54,9 @@ public class VelocityProtocolVersionProvider implements ProtocolVersionProvider 
     public boolean has1193OrLater(Player player) {
         return player.getProtocolVersion().getProtocol() >= 761;
     }
+    @Override
+    public boolean has1203OrLater(Player player) {
+        return player.getProtocolVersion().getProtocol() >= 765;
+    }
 
 }

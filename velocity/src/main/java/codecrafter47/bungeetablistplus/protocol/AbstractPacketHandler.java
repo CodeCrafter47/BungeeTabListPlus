@@ -17,10 +17,10 @@
 
 package codecrafter47.bungeetablistplus.protocol;
 
-import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,7 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
+    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
         return parent.onPlayerListPacket(packet);
     }
 
@@ -47,17 +47,17 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet) {
+    public PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet) {
         return parent.onPlayerListHeaderFooterPacket(packet);
     }
 
     @Override
-    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
+    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
         return parent.onPlayerListUpdatePacket(packet);
     }
 
     @Override
-    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
         return parent.onPlayerListRemovePacket(packet);
     }
 

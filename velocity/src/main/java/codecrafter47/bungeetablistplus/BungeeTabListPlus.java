@@ -186,9 +186,9 @@ public class BungeeTabListPlus {
         }
 
         try {
-            Class.forName("com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo");
+            Class.forName("com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket");
         } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least Velocity version #196");
+            throw new RuntimeException("You need to run at least Velocity version #329");
         }
 
         INSTANCE = this;

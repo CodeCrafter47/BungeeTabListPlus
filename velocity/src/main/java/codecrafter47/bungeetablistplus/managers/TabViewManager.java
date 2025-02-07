@@ -120,7 +120,7 @@ public class TabViewManager {
                 tabOverlayHandler = handler;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, player.getUniqueId()));
             } else if (protocolVersionProvider.has18OrLater(player)) {
-                LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player), protocolVersionProvider.has119OrLater(player));
+                LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player), protocolVersionProvider.has119OrLater(player), protocolVersionProvider.has1203OrLater(player));
                 tabOverlayHandler = tabOverlayHandlerImpl;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, player.getUniqueId()));
             } else {

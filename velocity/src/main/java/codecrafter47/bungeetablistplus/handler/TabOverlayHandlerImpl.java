@@ -23,8 +23,8 @@ import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 import lombok.SneakyThrows;
 
 import java.util.UUID;
@@ -37,15 +37,15 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
 
     private boolean logVersionMismatch = false;
 
-    public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, Player player, boolean is18, boolean is13OrLater, boolean is119OrLater) {
-        super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater, is119OrLater);
+    public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, Player player, boolean is18, boolean is13OrLater, boolean is119OrLater, boolean is1203OrLater) {
+        super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater, is119OrLater, is1203OrLater);
         this.player = player;
     }
 
     @SneakyThrows
     @Override
     protected void sendPacket(MinecraftPacket packet) {
-        if ((packet instanceof UpsertPlayerInfo) && (player.getProtocolVersion().getProtocol() >= 761)) {
+        if ((packet instanceof UpsertPlayerInfoPacket) && (player.getProtocolVersion().getProtocol() >= 761)) {
             // error
             if (!logVersionMismatch) {
                 logVersionMismatch = true;
@@ -54,6 +54,11 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
         } else {
             ReflectionUtil.getChannelWrapper(player).write(packet);
         }
+    }
+
+    @Override
+    protected ProtocolVersion getProtocol(){
+        return player.getProtocolVersion();
     }
 
     @Override
@@ -74,12 +79,12 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
+    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
         return PacketListenerResult.PASS;
     }
 
     @Override
-    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
         return PacketListenerResult.PASS;
     }
 }

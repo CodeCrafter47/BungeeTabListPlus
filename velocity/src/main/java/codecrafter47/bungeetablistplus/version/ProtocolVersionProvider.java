@@ -33,4 +33,6 @@ public interface ProtocolVersionProvider {
     String getVersion(Player player);
 
     boolean has1193OrLater(Player player);
+
+    boolean has1203OrLater(Player player);
 }

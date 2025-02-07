@@ -20,7 +20,7 @@ package codecrafter47.bungeetablistplus.handler;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.Executor;
@@ -40,7 +40,7 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
     @SneakyThrows
     @Override
     protected void sendPacket(MinecraftPacket packet) {
-        if ((packet instanceof LegacyPlayerListItem) && (player.getProtocolVersion().getProtocol() >= 761)) {
+        if ((packet instanceof LegacyPlayerListItemPacket) && (player.getProtocolVersion().getProtocol() >= 761)) {
             // error
             if (!logVersionMismatch) {
                 logVersionMismatch = true;

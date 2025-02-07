@@ -17,12 +17,26 @@
 
 package codecrafter47.bungeetablistplus.protocol;
 
+import com.google.common.collect.ImmutableMap;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
+import com.velocitypowered.proxy.protocol.packet.chat.ComponentHolder;
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Team implements MinecraftPacket {
 
     public static final byte CREATE = 0;
@@ -32,27 +46,31 @@ public class Team implements MinecraftPacket {
     public static final byte REMOVE_PLAYER = 4;
 
     private String name;
+    /**
+     * 0 - create, 1 remove, 2 info update, 3 player add, 4 player remove.
+     */
     private byte mode;
-    private String displayName;
-    private String prefix;
-    private String suffix;
-    private String nameTagVisibility;
-    private String collisionRule;
+    private ComponentHolder displayName;
+    private ComponentHolder prefix;
+    private ComponentHolder suffix;
+    private NameTagVisibility nameTagVisibility;
+    private CollisionRule collisionRule;
     private int color;
     private byte friendlyFire;
     private String[] players;
 
-    public Team() {
-    }
+    // placeholder until release
+    private int MINECRAFT_1_21_5 = 770;
 
-    public Team(String name) {
+    /**
+     * Packet to destroy a team.
+     *
+     * @param name team name
+     */
+    public Team(String name)
+    {
         this.name = name;
-        this.mode = REMOVE;
-    }
-
-    public Team(String name, byte mode) {
-        this.name = name;
-        this.mode = mode;
+        this.mode = 1;
     }
 
     @Override
@@ -60,20 +78,30 @@ public class Team implements MinecraftPacket {
         name = ProtocolUtils.readString(buf);
         mode = buf.readByte();
         if (mode == CREATE || mode == UPDATE_INFO) {
-            displayName = ProtocolUtils.readString(buf);
+            displayName = ComponentHolder.read(buf, version);
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) < 0) {
-                prefix = ProtocolUtils.readString(buf);
-                suffix = ProtocolUtils.readString(buf);
+                prefix = ComponentHolder.read(buf, version);
+                suffix = ComponentHolder.read(buf, version);
             }
             friendlyFire = buf.readByte();
-            nameTagVisibility = ProtocolUtils.readString(buf);
-            if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
-                collisionRule = ProtocolUtils.readString(buf);
+            // TODO: Replace this when released
+            if (version.getProtocol() >= MINECRAFT_1_21_5) {
+                nameTagVisibility = NameTagVisibility.values()[ProtocolUtils.readVarInt(buf)];
+                collisionRule = CollisionRule.values()[ProtocolUtils.readVarInt(buf)];
+            } else {
+                String nameTagVisibilityStr = ProtocolUtils.readString(buf);
+                NameTagVisibility nameTagVisibility = NameTagVisibility.BY_NAME.get(nameTagVisibilityStr);
+
+
+                if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
+                    String collisionRuleStr = ProtocolUtils.readString(buf);
+                    collisionRule = CollisionRule.BY_NAME.get(collisionRuleStr);
+                }
             }
-            color = ( version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0 ) ? ProtocolUtils.readVarInt(buf) : buf.readByte();
-            if ( version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0 ) {
-                prefix = ProtocolUtils.readString(buf);
-                suffix = ProtocolUtils.readString(buf);
+            color = (version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) ? ProtocolUtils.readVarInt(buf) : buf.readByte();
+            if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) {
+                prefix = ComponentHolder.read(buf, version);
+                suffix = ComponentHolder.read(buf, version);
             }
         }
         if (mode == CREATE || mode == ADD_PLAYER || mode == REMOVE_PLAYER) {
@@ -90,23 +118,29 @@ public class Team implements MinecraftPacket {
         ProtocolUtils.writeString(buf, name);
         buf.writeByte(mode);
         if (mode == CREATE || mode == UPDATE_INFO) {
-            ProtocolUtils.writeString(buf, displayName);
+            displayName.write(buf);
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) < 0) {
-                ProtocolUtils.writeString(buf, prefix);
-                ProtocolUtils.writeString(buf, suffix);
+                prefix.write(buf);
+                suffix.write(buf);
             }
             buf.writeByte(friendlyFire);
-            ProtocolUtils.writeString(buf, nameTagVisibility);
-            if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
-                ProtocolUtils.writeString(buf, collisionRule);
+            // TODO: Replace this when released
+            if (version.getProtocol() >= MINECRAFT_1_21_5) {
+                ProtocolUtils.writeVarInt(buf, nameTagVisibility.ordinal());
+                ProtocolUtils.writeVarInt(buf, collisionRule.ordinal());
+            } else {
+                ProtocolUtils.writeString(buf, nameTagVisibility.getKey());
+                if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
+                    ProtocolUtils.writeString(buf, collisionRule.getKey());
+                }
             }
 
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) {
                 ProtocolUtils.writeVarInt(buf, color);
-                ProtocolUtils.writeString(buf, prefix);
-                ProtocolUtils.writeString(buf, suffix);
+                prefix.write(buf);
+                suffix.write(buf);
             } else {
-                buf.writeByte( color );
+                buf.writeByte(color);
             }
         }
         if (mode == CREATE || mode == ADD_PLAYER || mode == REMOVE_PLAYER) {
@@ -122,99 +156,53 @@ public class Team implements MinecraftPacket {
         return false;
     }
 
-    public String getName() {
-        return name;
+    @Getter
+    @RequiredArgsConstructor
+    public enum NameTagVisibility {
+
+        ALWAYS("always"),
+        NEVER("never"),
+        HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"),
+        HIDE_FOR_OWN_TEAM("hideForOwnTeam");
+        //
+        private final String key;
+        //
+        private static final Map<String, NameTagVisibility> BY_NAME;
+
+        static {
+            NameTagVisibility[] values = NameTagVisibility.values();
+            ImmutableMap.Builder<String, NameTagVisibility> builder = ImmutableMap.builderWithExpectedSize(values.length);
+
+            for (NameTagVisibility e : values) {
+                builder.put(e.key, e);
+            }
+
+            BY_NAME = builder.build();
+        }
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Getter
+    @RequiredArgsConstructor
+    public enum CollisionRule {
 
-    public byte getMode() {
-        return mode;
-    }
+        ALWAYS("always"),
+        NEVER("never"),
+        PUSH_OTHER_TEAMS("pushOtherTeams"),
+        PUSH_OWN_TEAM("pushOwnTeam");
+        //
+        private final String key;
+        //
+        private static final Map<String, CollisionRule> BY_NAME;
 
-    public void setMode(byte mode) {
-        this.mode = mode;
-    }
+        static {
+            CollisionRule[] values = CollisionRule.values();
+            ImmutableMap.Builder<String, CollisionRule> builder = ImmutableMap.builderWithExpectedSize(values.length);
 
-    public String getDisplayName() {
-        return displayName;
-    }
+            for (CollisionRule e : values) {
+                builder.put(e.key, e);
+            }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-
-    public String getNameTagVisibility() {
-        return nameTagVisibility;
-    }
-
-    public void setNameTagVisibility(String nameTagVisibility) {
-        this.nameTagVisibility = nameTagVisibility;
-    }
-
-    public String getCollisionRule() {
-        return collisionRule;
-    }
-
-    public void setCollisionRule(String collisionRule) {
-        this.collisionRule = collisionRule;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public byte getFriendlyFire() {
-        return friendlyFire;
-    }
-
-    public void setFriendlyFire(byte friendlyFire) {
-        this.friendlyFire = friendlyFire;
-    }
-
-    public String[] getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(String[] players) {
-        this.players = players;
-    }
-
-    @Override
-    public String toString() {
-        return "Team{" +
-                "name=" + name +
-                ", mode=" + mode +
-                ", displayName=" + displayName +
-                ", prefix=" + prefix +
-                ", suffix=" + suffix +
-                ", friendlyFire=" + friendlyFire +
-                ", nameTagVisibility=" + nameTagVisibility +
-                ", collisionRule=" + collisionRule +
-                ", color=" + color +
-                ", players=[" + String.join(",", players) + "]" +
-                '}';
+            BY_NAME = builder.build();
+        }
     }
 }

@@ -22,10 +22,10 @@ import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.connection.backend.VelocityServerConnection;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
@@ -59,17 +59,17 @@ public class PacketListener extends MessageToMessageDecoder<MinecraftPacket> {
                         if (result != PacketListenerResult.PASS) {
                             return;
                         }
-                    } else if (packet instanceof LegacyPlayerListItem) {
-                        result = handler.onPlayerListPacket((LegacyPlayerListItem) packet);
+                    } else if (packet instanceof LegacyPlayerListItemPacket) {
+                        result = handler.onPlayerListPacket((LegacyPlayerListItemPacket) packet);
                         handled = true;
-                    } else if (packet instanceof HeaderAndFooter) {
-                        result = handler.onPlayerListHeaderFooterPacket((HeaderAndFooter) packet);
+                    } else if (packet instanceof HeaderAndFooterPacket) {
+                        result = handler.onPlayerListHeaderFooterPacket((HeaderAndFooterPacket) packet);
                         handled = true;
-                    } else if (packet instanceof UpsertPlayerInfo) {
-                        result = handler.onPlayerListUpdatePacket((UpsertPlayerInfo) packet);
+                    } else if (packet instanceof UpsertPlayerInfoPacket) {
+                        result = handler.onPlayerListUpdatePacket((UpsertPlayerInfoPacket) packet);
                         handled = true;
-                    } else if (packet instanceof RemovePlayerInfo) {
-                        result = handler.onPlayerListRemovePacket((RemovePlayerInfo) packet);
+                    } else if (packet instanceof RemovePlayerInfoPacket) {
+                        result = handler.onPlayerListRemovePacket((RemovePlayerInfoPacket) packet);
                         handled = true;
                     }
 

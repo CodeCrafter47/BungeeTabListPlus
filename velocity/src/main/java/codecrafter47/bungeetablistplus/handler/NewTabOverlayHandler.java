@@ -30,10 +30,11 @@ import com.google.common.collect.ImmutableSet;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.chat.ComponentHolder;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
@@ -41,6 +42,7 @@ import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.*;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 import javax.annotation.Nonnull;
@@ -61,7 +63,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK = true;
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK = true;
 
-    private static final String EMPTY_JSON_TEXT = "{\"text\":\"\"}";
+    private static ComponentHolder EMPTY_COMPONENT;
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
 
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
@@ -152,9 +154,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     private final Object2BooleanMap<UUID> serverPlayerListListed = new Object2BooleanOpenHashMap<>();
     @Nullable
-    protected String serverHeader = null;
+    protected ComponentHolder serverHeader = null;
     @Nullable
-    protected String serverFooter = null;
+    protected ComponentHolder serverFooter = null;
 
     private final Queue<AbstractContentOperationModeHandler<?>> nextActiveContentHandlerQueue = new ConcurrentLinkedQueue<>();
     private final Queue<AbstractHeaderFooterOperationModeHandler<?>> nextActiveHeaderFooterHandlerQueue = new ConcurrentLinkedQueue<>();
@@ -178,11 +180,12 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         this.player = player;
         this.activeContentHandler = new PassThroughContentHandler();
         this.activeHeaderFooterHandler = new PassThroughHeaderFooterHandler();
+        EMPTY_COMPONENT = new ComponentHolder(player.getProtocolVersion(), Component.empty());
     }
 
     @SneakyThrows
     private void sendPacket(MinecraftPacket packet) {
-        if (((packet instanceof UpsertPlayerInfo) || (packet instanceof RemovePlayerInfo)) && (player.getProtocolVersion().getProtocol() < 761)) {
+        if (((packet instanceof UpsertPlayerInfoPacket) || (packet instanceof RemovePlayerInfoPacket)) && (player.getProtocolVersion().getProtocol() < 761)) {
             // error
             if (!logVersionMismatch) {
                 logVersionMismatch = true;
@@ -194,14 +197,14 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
+    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
         return PacketListenerResult.PASS;
     }
 
     @Override
-    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
-        if (packet.getActions().contains(UpsertPlayerInfo.Action.ADD_PLAYER)) {
-            for (UpsertPlayerInfo.Entry entry : packet.getEntries()) {
+    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
+        if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.ADD_PLAYER)) {
+            for (UpsertPlayerInfoPacket.Entry entry : packet.getEntries()) {
                 if (OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK) {
                     if (CUSTOM_SLOT_UUIDS.contains(entry.getProfileId())) {
                         throw new AssertionError("UUID collision " + entry.getProfileId());
@@ -215,8 +218,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 serverPlayerListListed.putIfAbsent(entry.getProfileId(), false);
             }
         }
-        if (packet.getActions().contains(UpsertPlayerInfo.Action.UPDATE_LISTED)) {
-            for (UpsertPlayerInfo.Entry entry : packet.getEntries()) {
+        if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.UPDATE_LISTED)) {
+            for (UpsertPlayerInfoPacket.Entry entry : packet.getEntries()) {
                 serverPlayerListListed.put(entry.getProfileId(), entry.isListed());
             }
         }
@@ -232,7 +235,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
         for (UUID uuid : packet.getProfilesToRemove()) {
             serverPlayerListListed.removeBoolean(uuid);
         }
@@ -245,7 +248,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet) {
+    public PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet) {
         PacketListenerResult result = PacketListenerResult.PASS;
         try {
             result = this.activeHeaderFooterHandler.onPlayerListHeaderFooterPacket(packet);
@@ -258,8 +261,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             enterHeaderAndFooterOperationMode(HeaderAndFooterOperationMode.PASS_TROUGH);
         }
 
-        this.serverHeader = packet.getHeader() != null ? packet.getHeader() : EMPTY_JSON_TEXT;
-        this.serverFooter = packet.getFooter() != null ? packet.getFooter() : EMPTY_JSON_TEXT;
+        this.serverHeader = packet.getHeader() != null ? packet.getHeader() : EMPTY_COMPONENT;
+        this.serverFooter = packet.getFooter() != null ? packet.getFooter() : EMPTY_COMPONENT;
 
         return result;
     }
@@ -289,17 +292,17 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             }
 
             if (!serverPlayerListListed.isEmpty()) {
-                RemovePlayerInfo packet = new RemovePlayerInfo();
+                RemovePlayerInfoPacket packet = new RemovePlayerInfoPacket();
                 packet.setProfilesToRemove(serverPlayerListListed.keySet());
                 sendPacket(packet);
             }
 
             serverPlayerListListed.clear();
             if (serverHeader != null) {
-                serverHeader = EMPTY_JSON_TEXT;
+                serverHeader = EMPTY_COMPONENT;
             }
             if (serverFooter != null) {
-                serverFooter = EMPTY_JSON_TEXT;
+                serverFooter = EMPTY_COMPONENT;
             }
         }
     }
@@ -373,11 +376,11 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private abstract static class AbstractContentOperationModeHandler<T extends AbstractContentTabOverlay> extends OperationModeHandler<T> {
 
         /**
-         * Called when the player receives a {@link LegacyPlayerListItem} packet.
+         * Called when the player receives a {@link LegacyPlayerListItemPacket} packet.
          * <p>
          * This method is called after this {@link NewTabOverlayHandler} has updated the {@code serverPlayerList}.
          */
-        abstract PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet);
+        abstract PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet);
 
         /**
          * Called when the player switches the server.
@@ -420,12 +423,12 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private abstract static class AbstractHeaderFooterOperationModeHandler<T extends AbstractHeaderFooterTabOverlay> extends OperationModeHandler<T> {
 
         /**
-         * Called when the player receives a {@link HeaderAndFooter} packet.
+         * Called when the player receives a {@link HeaderAndFooterPacket} packet.
          * <p>
          * This method is called before this {@link NewTabOverlayHandler} executes its own logic to update the
          * server player list info.
          */
-        abstract PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet);
+        abstract PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet);
 
         /**
          * Called when the player switches the server.
@@ -499,13 +502,13 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
 
         @Override
-        PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
+        PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
             return PacketListenerResult.PASS;
         }
 
         @Override
         void onServerSwitch() {
-            sendPacket(new HeaderAndFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new HeaderAndFooterPacket(EMPTY_COMPONENT, EMPTY_COMPONENT));
         }
 
         @Override
@@ -527,15 +530,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
             // update visibility
             if (!serverPlayerListListed.isEmpty()) {
-                List<UpsertPlayerInfo.Entry> items = new ArrayList<>(serverPlayerListListed.size());
+                List<UpsertPlayerInfoPacket.Entry> items = new ArrayList<>(serverPlayerListListed.size());
                 for (Object2BooleanMap.Entry<UUID> entry : serverPlayerListListed.object2BooleanEntrySet()) {
 
-                    UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(entry.getKey());
+                    UpsertPlayerInfoPacket.Entry item = new UpsertPlayerInfoPacket.Entry(entry.getKey());
                     item.setListed(entry.getBooleanValue());
                     items.add(item);
                 }
-                UpsertPlayerInfo packet = new UpsertPlayerInfo();
-                packet.addAction(UpsertPlayerInfo.Action.UPDATE_LISTED);
+                UpsertPlayerInfoPacket packet = new UpsertPlayerInfoPacket();
+                packet.addAction(UpsertPlayerInfoPacket.Action.UPDATE_LISTED);
                 packet.addAllEntries(items);
                 sendPacket(packet);
             }
@@ -554,13 +557,13 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
 
         @Override
-        PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet) {
+        PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet) {
             return PacketListenerResult.PASS;
         }
 
         @Override
         void onServerSwitch() {
-            sendPacket(new HeaderAndFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new HeaderAndFooterPacket(EMPTY_COMPONENT, EMPTY_COMPONENT));
         }
 
         @Override
@@ -581,7 +584,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             }
 
             // fix header/ footer
-            sendPacket(new HeaderAndFooter(serverHeader != null ? serverHeader : EMPTY_JSON_TEXT, serverFooter != null ? serverFooter : EMPTY_JSON_TEXT));
+            sendPacket(new HeaderAndFooterPacket(serverHeader != null ? serverHeader : EMPTY_COMPONENT, serverFooter != null ? serverFooter : EMPTY_COMPONENT));
         }
     }
 
@@ -604,10 +607,10 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
          */
         final String[] slotUsername;
 
-        private final List<UpsertPlayerInfo.Entry> itemQueueAddPlayer;
+        private final List<UpsertPlayerInfoPacket.Entry> itemQueueAddPlayer;
         private final List<UUID> itemQueueRemovePlayer;
-        private final List<UpsertPlayerInfo.Entry> itemQueueUpdateDisplayName;
-        private final List<UpsertPlayerInfo.Entry> itemQueueUpdatePing;
+        private final List<UpsertPlayerInfoPacket.Entry> itemQueueUpdateDisplayName;
+        private final List<UpsertPlayerInfoPacket.Entry> itemQueueUpdatePing;
 
         private final boolean experimentalTabCompleteSmileys = isExperimentalTabCompleteSmileys();
 
@@ -625,10 +628,10 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
 
         @Override
-        PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
+        PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
 
-            if (packet.getActions().contains(UpsertPlayerInfo.Action.UPDATE_LISTED)) {
-                for (UpsertPlayerInfo.Entry entry : packet.getEntries()) {
+            if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.UPDATE_LISTED)) {
+                for (UpsertPlayerInfoPacket.Entry entry : packet.getEntries()) {
                     entry.setListed(false);
                 }
             }
@@ -654,14 +657,14 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
             // make all players unlisted
             if (!serverPlayerListListed.isEmpty()) {
-                List<UpsertPlayerInfo.Entry> items = new ArrayList<>(serverPlayerListListed.size());
+                List<UpsertPlayerInfoPacket.Entry> items = new ArrayList<>(serverPlayerListListed.size());
                 for (Object2BooleanMap.Entry<UUID> entry : serverPlayerListListed.object2BooleanEntrySet()) {
-                    UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(entry.getKey());
+                    UpsertPlayerInfoPacket.Entry item = new UpsertPlayerInfoPacket.Entry(entry.getKey());
                     item.setListed(false);
                     items.add(item);
                 }
-                UpsertPlayerInfo packet = new UpsertPlayerInfo();
-                packet.addAction(UpsertPlayerInfo.Action.UPDATE_LISTED);
+                UpsertPlayerInfoPacket packet = new UpsertPlayerInfoPacket();
+                packet.addAction(UpsertPlayerInfoPacket.Action.UPDATE_LISTED);
                 packet.addAllEntries(items);
                 sendPacket(packet);
             }
@@ -675,7 +678,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 hasCreatedCustomTeams = true;
 
                 for (int i = 0; i < 80; i++) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, EMPTY_JSON_TEXT, "always", "always", 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_COMPONENT, EMPTY_COMPONENT, EMPTY_COMPONENT, Team.NameTagVisibility.ALWAYS, Team.CollisionRule.ALWAYS, 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                 }
             }
         }
@@ -698,7 +701,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                         uuids[i++] = slotUuid[index];
                     }
                 }
-                RemovePlayerInfo packet = new RemovePlayerInfo();
+                RemovePlayerInfoPacket packet = new RemovePlayerInfoPacket();
                 packet.setProfilesToRemove(Arrays.asList(uuids));
                 sendPacket(packet);
             }
@@ -734,10 +737,10 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                     tabOverlay.dirtyFlagsPing.clear(index);
                     slotState[index] = SlotState.CUSTOM;
                     slotUuid[index] = customSlotUuid;
-                    UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(customSlotUuid);
+                    UpsertPlayerInfoPacket.Entry item = new UpsertPlayerInfoPacket.Entry(customSlotUuid);
                     GameProfile profile = new GameProfile(customSlotUuid, slotUsername[index] = getCustomSlotUsername(index), toPropertiesList(icon.getTextureProperty()));
                     item.setProfile(profile);
-                    item.setDisplayName(GsonComponentSerializer.gson().deserialize(tabOverlay.text[index]));
+                    item.setDisplayName(new ComponentHolder(player.getProtocolVersion(), tabOverlay.text[index]));
                     item.setLatency(tabOverlay.ping[index]);
                     item.setGameMode(0);
                     item.setListed(true);
@@ -749,8 +752,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             dirtySlots.copyAndClear(tabOverlay.dirtyFlagsText);
             for (int index = dirtySlots.nextSetBit(0); index >= 0; index = dirtySlots.nextSetBit(index + 1)) {
                 if (slotState[index] != SlotState.UNUSED) {
-                    UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(slotUuid[index]);
-                    item.setDisplayName(GsonComponentSerializer.gson().deserialize(tabOverlay.text[index]));
+                    UpsertPlayerInfoPacket.Entry item = new UpsertPlayerInfoPacket.Entry(slotUuid[index]);
+                    item.setDisplayName(new ComponentHolder(player.getProtocolVersion(), tabOverlay.text[index]));
                     itemQueueUpdateDisplayName.add(item);
                 }
             }
@@ -759,7 +762,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             dirtySlots.copyAndClear(tabOverlay.dirtyFlagsPing);
             for (int index = dirtySlots.nextSetBit(0); index >= 0; index = dirtySlots.nextSetBit(index + 1)) {
                 if (slotState[index] != SlotState.UNUSED) {
-                    UpsertPlayerInfo.Entry item = new UpsertPlayerInfo.Entry(slotUuid[index]);
+                    UpsertPlayerInfoPacket.Entry item = new UpsertPlayerInfoPacket.Entry(slotUuid[index]);
                     item.setLatency(tabOverlay.ping[index]);
                     itemQueueUpdatePing.add(item);
                 }
@@ -773,28 +776,28 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         private void sendQueuedItems() {
             if (!itemQueueRemovePlayer.isEmpty()) {
-                RemovePlayerInfo packet = new RemovePlayerInfo();
+                RemovePlayerInfoPacket packet = new RemovePlayerInfoPacket();
                 packet.setProfilesToRemove(itemQueueRemovePlayer);
                 sendPacket(packet);
                 itemQueueRemovePlayer.clear();
             }
             if (!itemQueueAddPlayer.isEmpty()) {
-                UpsertPlayerInfo packet = new UpsertPlayerInfo();
-                packet.addAllActions(EnumSet.of(UpsertPlayerInfo.Action.ADD_PLAYER, UpsertPlayerInfo.Action.UPDATE_DISPLAY_NAME, UpsertPlayerInfo.Action.UPDATE_LATENCY, UpsertPlayerInfo.Action.UPDATE_LISTED));
+                UpsertPlayerInfoPacket packet = new UpsertPlayerInfoPacket();
+                packet.addAllActions(EnumSet.of(UpsertPlayerInfoPacket.Action.ADD_PLAYER, UpsertPlayerInfoPacket.Action.UPDATE_DISPLAY_NAME, UpsertPlayerInfoPacket.Action.UPDATE_LATENCY, UpsertPlayerInfoPacket.Action.UPDATE_LISTED));
                 packet.addAllEntries(itemQueueAddPlayer);
                 sendPacket(packet);
                 itemQueueAddPlayer.clear();
             }
             if (!itemQueueUpdateDisplayName.isEmpty()) {
-                UpsertPlayerInfo packet = new UpsertPlayerInfo();
-                packet.addAction(UpsertPlayerInfo.Action.UPDATE_DISPLAY_NAME);
+                UpsertPlayerInfoPacket packet = new UpsertPlayerInfoPacket();
+                packet.addAction(UpsertPlayerInfoPacket.Action.UPDATE_DISPLAY_NAME);
                 packet.addAllEntries(itemQueueUpdateDisplayName);
                 sendPacket(packet);
                 itemQueueUpdateDisplayName.clear();
             }
             if (!itemQueueUpdatePing.isEmpty()) {
-                UpsertPlayerInfo packet = new UpsertPlayerInfo();
-                packet.addAction(UpsertPlayerInfo.Action.UPDATE_LATENCY);
+                UpsertPlayerInfoPacket packet = new UpsertPlayerInfoPacket();
+                packet.addAction(UpsertPlayerInfoPacket.Action.UPDATE_LATENCY);
                 packet.addAllEntries(itemQueueUpdatePing);
                 sendPacket(packet);
                 itemQueueUpdatePing.clear();
@@ -814,7 +817,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     private abstract class CustomContentTabOverlay extends AbstractContentTabOverlay implements TabOverlayHandle.BatchModifiable {
         final Icon[] icon;
-        final String[] text;
+        final Component[] text;
         final int[] ping;
 
         final AtomicInteger batchUpdateRecursionLevel;
@@ -826,8 +829,8 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         private CustomContentTabOverlay() {
             this.icon = new Icon[80];
             Arrays.fill(this.icon, Icon.DEFAULT_STEVE);
-            this.text = new String[80];
-            Arrays.fill(this.text, EMPTY_JSON_TEXT);
+            this.text = new Component[80];
+            Arrays.fill(this.text, Component.empty());
             this.ping = new int[80];
             this.batchUpdateRecursionLevel = new AtomicInteger(0);
             this.dirtyFlagSize = true;
@@ -872,9 +875,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
 
         void setTextInternal(int index, @Nonnull @NonNull String text) {
-            String jsonText = ChatFormat.formattedTextToJson(text);
-            if (!jsonText.equals(this.text[index])) {
-                this.text[index] = jsonText;
+            Component component = GsonComponentSerializer.gson().deserialize(ChatFormat.formattedTextToJson(text));
+            if (!component.equals(this.text[index])) {
+                this.text[index] = component;
                 dirtyFlagsText.set(index);
                 scheduleUpdateIfNotInBatch();
             }
@@ -941,7 +944,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 for (int index = newUsedSlots.nextSetBit(0); index >= 0; index = newUsedSlots.nextSetBit(index + 1)) {
                     if (!oldUsedSlots.get(index)) {
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = EMPTY_JSON_TEXT;
+                        text[index] = Component.empty();
                         ping[index] = 0;
                     }
                 }
@@ -951,7 +954,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 for (int index = oldUsedSlots.nextSetBit(0); index >= 0; index = oldUsedSlots.nextSetBit(index + 1)) {
                     if (!newUsedSlots.get(index)) {
                         icon[index] = Icon.DEFAULT_STEVE;
-                        text[index] = EMPTY_JSON_TEXT;
+                        text[index] = Component.empty();
                         ping[index] = 0;
                     }
                 }
@@ -1126,7 +1129,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
 
         @Override
-        PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet) {
+        PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet) {
             return PacketListenerResult.CANCEL;
         }
 
@@ -1143,7 +1146,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         @Override
         void onActivated(AbstractHeaderFooterOperationModeHandler<?> previous) {
             // remove header/ footer
-            sendPacket(new HeaderAndFooter(EMPTY_JSON_TEXT, EMPTY_JSON_TEXT));
+            sendPacket(new HeaderAndFooterPacket(EMPTY_COMPONENT, EMPTY_COMPONENT));
         }
 
         @Override
@@ -1151,14 +1154,14 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             CustomHeaderAndFooterImpl tabOverlay = getTabOverlay();
             if (tabOverlay.headerOrFooterDirty) {
                 tabOverlay.headerOrFooterDirty = false;
-                sendPacket(new HeaderAndFooter(tabOverlay.header, tabOverlay.footer));
+                sendPacket(new HeaderAndFooterPacket(tabOverlay.header, tabOverlay.footer));
             }
         }
     }
 
     private final class CustomHeaderAndFooterImpl extends AbstractHeaderFooterTabOverlay implements HeaderAndFooterHandle {
-        private String header = EMPTY_JSON_TEXT;
-        private String footer = EMPTY_JSON_TEXT;
+        private ComponentHolder header = EMPTY_COMPONENT;
+        private ComponentHolder footer = EMPTY_COMPONENT;
 
         private volatile boolean headerOrFooterDirty = false;
 
@@ -1193,22 +1196,22 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         public void setHeaderFooter(@Nullable String header, @Nullable String footer) {
-            this.header = ChatFormat.formattedTextToJson(header);
-            this.footer = ChatFormat.formattedTextToJson(footer);
+            this.header = new ComponentHolder(player.getProtocolVersion(), ChatFormat.formattedTextToJson(header));
+            this.footer = new ComponentHolder(player.getProtocolVersion(), ChatFormat.formattedTextToJson(footer));
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setHeader(@Nullable String header) {
-            this.header = ChatFormat.formattedTextToJson(header);
+            this.header = new ComponentHolder(player.getProtocolVersion(), ChatFormat.formattedTextToJson(header));
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
 
         @Override
         public void setFooter(@Nullable String footer) {
-            this.footer = ChatFormat.formattedTextToJson(footer);
+            this.footer = new ComponentHolder(player.getProtocolVersion(), ChatFormat.formattedTextToJson(footer));
             headerOrFooterDirty = true;
             scheduleUpdateIfNotInBatch();
         }
@@ -1228,7 +1231,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
     }
 
-    private static Team createPacketTeamCreate(String name, String displayName, String prefix, String suffix, String nameTagVisibility, String collisionRule, int color, byte friendlyFire, String[] players) {
+    private static Team createPacketTeamCreate(String name, ComponentHolder displayName, ComponentHolder prefix, ComponentHolder suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 0);

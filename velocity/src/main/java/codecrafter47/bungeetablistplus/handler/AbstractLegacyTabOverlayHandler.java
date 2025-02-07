@@ -25,11 +25,13 @@ import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import codecrafter47.bungeetablistplus.util.Property119Handler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.chat.ComponentHolder;
 import de.codecrafter47.taboverlay.Icon;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
@@ -139,9 +141,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     protected abstract void sendPacket(MinecraftPacket packet);
 
     @Override
-    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
-        if (packet.getAction() == LegacyPlayerListItem.ADD_PLAYER) {
-            for (LegacyPlayerListItem.Item item : packet.getItems()) {
+    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
+        if (packet.getAction() == LegacyPlayerListItemPacket.ADD_PLAYER) {
+            for (LegacyPlayerListItemPacket.Item item : packet.getItems()) {
                 if (item.getUuid() != null) {
                     modernServerPlayerList.put(item.getUuid(), new ModernPlayerListEntry(item.getName(), item.getLatency(), item.getGameMode()));
                 } else {
@@ -149,7 +151,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 }
             }
         } else {
-            for (LegacyPlayerListItem.Item item : packet.getItems()) {
+            for (LegacyPlayerListItemPacket.Item item : packet.getItems()) {
                 if (item.getUuid() != null) {
                     modernServerPlayerList.remove(item.getUuid());
                 } else {
@@ -161,9 +163,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     @Override
-    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
-        if (packet.getActions().contains(UpsertPlayerInfo.Action.ADD_PLAYER)) {
-            for (UpsertPlayerInfo.Entry entry : packet.getEntries()) {
+    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
+        if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.ADD_PLAYER)) {
+            for (UpsertPlayerInfoPacket.Entry entry : packet.getEntries()) {
                 if (entry.getProfileId() != null) {
                     modernServerPlayerList.put(entry.getProfileId(), new ModernPlayerListEntry(entry.getProfile().getName(), entry.getLatency(), entry.getGameMode()));
                 } else {
@@ -175,7 +177,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     @Override
-    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
         for (UUID uuid : packet.getProfilesToRemove()) {
             modernServerPlayerList.remove(uuid);
         }
@@ -193,7 +195,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     @Override
-    public PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet) {
+    public PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet) {
         logger.log(Level.WARNING, "1.7 players should not receive tab list header/ footer");
         return PacketListenerResult.CANCEL;
     }
@@ -249,17 +251,17 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     private void removeEntry(UUID uuid, String player) {
-        LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item();
+        LegacyPlayerListItemPacket.Item item = new LegacyPlayerListItemPacket.Item(uuid);
         item.setName(player);
         item.setDisplayName(GsonComponentSerializer.gson().deserialize(player));
         item.setLatency(9999);
-        LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.REMOVE_PLAYER, List.of(item));
+        LegacyPlayerListItemPacket pli = new LegacyPlayerListItemPacket(LegacyPlayerListItemPacket.REMOVE_PLAYER, List.of(item));
         sendPacket(pli);
     }
 
     private abstract static class AbstractContentOperationModeHandler<T extends AbstractTabOverlay> extends OperationModeHandler<T> {
 
-        abstract PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet);
+        abstract PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet);
 
         abstract void onServerSwitch();
 
@@ -274,9 +276,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
 
         abstract void onActivated();
 
-        public abstract PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet);
+        public abstract PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet);
 
-        public abstract PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet);
+        public abstract PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet);
     }
 
     private abstract static class AbstractTabOverlay implements TabOverlayHandle {
@@ -295,36 +297,36 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     private class PassThroughHandlerContent extends AbstractContentOperationModeHandler<PassThroughTabOverlay> {
 
         @Override
-        PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
+        PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
             return PacketListenerResult.PASS;
         }
 
         @Override
-        public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
+        public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
             return PacketListenerResult.PASS;
         }
 
         @Override
-        public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+        public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
             return PacketListenerResult.PASS;
         }
 
         @Override
         void onActivated() {
             for (val entry : serverPlayerList.object2IntEntrySet()) {
-                LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item();
+                LegacyPlayerListItemPacket.Item item = new LegacyPlayerListItemPacket.Item();
                 item.setDisplayName(GsonComponentSerializer.gson().deserialize(entry.getKey())); // TODO: Check Formatting
                 item.setLatency(entry.getIntValue());
-                LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, List.of(item));
+                LegacyPlayerListItemPacket pli = new LegacyPlayerListItemPacket(LegacyPlayerListItemPacket.ADD_PLAYER, List.of(item));
                 sendPacket(pli);
             }
             for (val entry : modernServerPlayerList.entrySet()) {
-                LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item(entry.getKey());
+                LegacyPlayerListItemPacket.Item item = new LegacyPlayerListItemPacket.Item(entry.getKey());
                 item.setName(entry.getValue().name);
                 item.setGameMode(entry.getValue().gamemode);
                 item.setLatency(entry.getValue().latency);
                 Property119Handler.setProperties(item, EMPTY_PROPERTIES);
-                LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, List.of(item));
+                LegacyPlayerListItemPacket pli = new LegacyPlayerListItemPacket(LegacyPlayerListItemPacket.ADD_PLAYER, List.of(item));
                 sendPacket(pli);
             }
         }
@@ -374,17 +376,17 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         @Override
-        PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
+        PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
             return PacketListenerResult.CANCEL;
         }
 
         @Override
-        public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
+        public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
             return PacketListenerResult.CANCEL;
         }
 
         @Override
-        public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+        public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
             return PacketListenerResult.CANCEL;
         }
 
@@ -429,17 +431,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         Team t = new Team();
                         t.setName(slotID[index]);
                         t.setMode((byte) 0);
-                        t.setPrefix(tabOverlay.text0[index]);
-                        t.setDisplayName("");
-                        t.setSuffix(tabOverlay.text1[index]);
+                        t.setPrefix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text0[index]));
+                        t.setDisplayName(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, ""));
+                        t.setSuffix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text1[index]));
                         t.setPlayers(new String[]{slotID[index]});
-                        t.setNameTagVisibility("always");
-                        t.setCollisionRule("always");
-                        if (is13OrLater) {
-                            t.setDisplayName(EMPTY_JSON_TEXT);
-                            t.setPrefix("{\"text\":\"" + tabOverlay.text0[index] + "\"}");
-                            t.setSuffix("{\"text\":\"" + tabOverlay.text1[index] + "\"}");
-                        }
+                        t.setNameTagVisibility(Team.NameTagVisibility.ALWAYS);
+                        t.setCollisionRule(Team.CollisionRule.ALWAYS);
                         sendPacket(t);
                     }
                 } else {
@@ -456,12 +453,12 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
 
         private void updateSlot(CustomTabOverlay tabOverlay, int index) {
-            LegacyPlayerListItem.Item item = new LegacyPlayerListItem.Item(slotUUID[index]);
+            LegacyPlayerListItemPacket.Item item = new LegacyPlayerListItemPacket.Item(slotUUID[index]);
             item.setName(slotID[index]);
             Property119Handler.setProperties(item, EMPTY_PROPERTIES);
             item.setDisplayName(GsonComponentSerializer.gson().deserialize(slotID[index])); // TODO: Check Formatting
             item.setLatency(tabOverlay.ping[index]);
-            LegacyPlayerListItem pli = new LegacyPlayerListItem(LegacyPlayerListItem.ADD_PLAYER, List.of(item));
+            LegacyPlayerListItemPacket pli = new LegacyPlayerListItemPacket(LegacyPlayerListItemPacket.ADD_PLAYER, List.of(item));
             sendPacket(pli);
         }
 
@@ -470,16 +467,11 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 Team packet = new Team();
                 packet.setName(slotID[index]);
                 packet.setMode((byte) 2);
-                packet.setPrefix(tabOverlay.text0[index]);
-                packet.setDisplayName("");
-                packet.setSuffix(tabOverlay.text1[index]);
-                packet.setNameTagVisibility("always");
-                packet.setCollisionRule("always");
-                if (is13OrLater) {
-                    packet.setDisplayName(EMPTY_JSON_TEXT);
-                    packet.setPrefix("{\"text\":\"" + tabOverlay.text0[index] + "\"}");
-                    packet.setSuffix("{\"text\":\"" + tabOverlay.text1[index] + "\"}");
-                }
+                packet.setPrefix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text0[index]));
+                packet.setDisplayName(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, ""));
+                packet.setSuffix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text1[index]));
+                packet.setNameTagVisibility(Team.NameTagVisibility.ALWAYS);
+                packet.setCollisionRule(Team.CollisionRule.ALWAYS);
                 sendPacket(packet);
             }
         }
@@ -815,14 +807,14 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
     }
 
     /**
-     * Utility method to get the name from an {@link LegacyPlayerListItem.Item}.
+     * Utility method to get the name from an {@link LegacyPlayerListItemPacket.Item}.
      *
      * @param item the item
      * @return the name
      */
-    private static String getName(LegacyPlayerListItem.Item item) {
+    private static String getName(LegacyPlayerListItemPacket.Item item) {
         if (item.getDisplayName() != null) {
-            return GsonComponentSerializer.gson().serialize(item.getDisplayName());
+            return LegacyComponentSerializer.legacySection().serialize(item.getDisplayName());
         } else if (item.getName() != null) {
             return item.getName();
         } else {
@@ -830,9 +822,9 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
         }
     }
 
-    private static String getName(UpsertPlayerInfo.Entry entry) {
+    private static String getName(UpsertPlayerInfoPacket.Entry entry) {
         if (entry.getDisplayName() != null) {
-            return GsonComponentSerializer.gson().serialize(entry.getDisplayName());
+            return entry.getDisplayName().getJson();
         } else if (entry.getProfile().getName() != null) {
             return entry.getProfile().getName();
         } else {

@@ -52,6 +52,11 @@ public class ViaVersionProtocolVersionProvider implements ProtocolVersionProvide
     }
 
     @Override
+    public boolean has1203OrLater(Player player) {
+        return Via.getAPI().getPlayerVersion(player) >= 765;
+    }
+
+    @Override
     public String getVersion(Player player) {
         return ProtocolVersion.getProtocol(Via.getAPI().getPlayerVersion(player)).getName();
     }

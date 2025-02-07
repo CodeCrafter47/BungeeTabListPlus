@@ -1,8 +1,8 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.0.1"
-    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.10"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 dependencies {
@@ -10,11 +10,6 @@ dependencies {
     compileOnly "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
     annotationProcessor "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
     implementation "org.bstats:bstats-velocity:3.0.0"
-}
-
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
 }
 
 task processSource(type: Sync) {
@@ -26,6 +21,8 @@ task processSource(type: Sync) {
 
 compileJava {
     source = processSource.outputs
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 shadowJar {

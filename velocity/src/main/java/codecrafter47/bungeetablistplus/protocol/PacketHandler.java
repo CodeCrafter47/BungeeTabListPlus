@@ -17,22 +17,22 @@
 
 package codecrafter47.bungeetablistplus.protocol;
 
-import com.velocitypowered.proxy.protocol.packet.HeaderAndFooter;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 
 public interface PacketHandler {
 
-    PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet);
+    PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet);
 
-    PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet);
+    PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet);
 
-    PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet);
+    PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet);
 
     PacketListenerResult onTeamPacket(Team packet);
 
-    PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooter packet);
+    PacketListenerResult onPlayerListHeaderFooterPacket(HeaderAndFooterPacket packet);
 
     void onServerSwitch(boolean is13OrLater);
 }

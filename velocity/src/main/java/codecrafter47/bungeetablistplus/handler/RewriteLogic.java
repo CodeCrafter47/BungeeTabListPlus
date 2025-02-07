@@ -24,9 +24,9 @@ import codecrafter47.bungeetablistplus.util.Property119Handler;
 import codecrafter47.bungeetablistplus.util.ProxyServer;
 import com.google.common.base.MoreObjects;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -42,10 +42,10 @@ public class RewriteLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
+    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
 
-        if (packet.getAction() == LegacyPlayerListItem.ADD_PLAYER) {
-            for (LegacyPlayerListItem.Item item : packet.getItems()) {
+        if (packet.getAction() == LegacyPlayerListItemPacket.ADD_PLAYER) {
+            for (LegacyPlayerListItemPacket.Item item : packet.getItems()) {
                 UUID uuid = item.getUuid();
                 Player player = ProxyServer.getInstance().getPlayer(uuid).orElse(null);
                 if (player != null) {
@@ -56,22 +56,22 @@ public class RewriteLogic extends AbstractPacketHandler {
 
         boolean modified = false;
 
-        if (packet.getAction() == LegacyPlayerListItem.REMOVE_PLAYER) {
-            ListIterator<LegacyPlayerListItem.Item> it = packet.getItems().listIterator();
+        if (packet.getAction() == LegacyPlayerListItemPacket.REMOVE_PLAYER) {
+            ListIterator<LegacyPlayerListItemPacket.Item> it = packet.getItems().listIterator();
             while(it.hasNext()){
-                LegacyPlayerListItem.Item item = it.next();
+                LegacyPlayerListItemPacket.Item item = it.next();
                 UUID uuid = rewriteMap.remove(item.getUuid());
                 modified |= uuid != null;
                 it.set(copyToNewItem(MoreObjects.firstNonNull(uuid, item.getUuid()), item));
             }
         } else {
-            ListIterator<LegacyPlayerListItem.Item> it = packet.getItems().listIterator();
+            ListIterator<LegacyPlayerListItemPacket.Item> it = packet.getItems().listIterator();
             while(it.hasNext()){
-                LegacyPlayerListItem.Item item = it.next();
+                LegacyPlayerListItemPacket.Item item = it.next();
                 UUID uuid = rewriteMap.get(item.getUuid());
                 if (uuid != null) {
                     modified = true;
-                    if (packet.getAction() == LegacyPlayerListItem.ADD_PLAYER) {
+                    if (packet.getAction() == LegacyPlayerListItemPacket.ADD_PLAYER) {
                         Player player = ProxyServer.getInstance().getPlayer(item.getUuid()).orElse(null);
                         if (player != null) {
                             String[][] properties = Property119Handler.getProperties(player.getGameProfile());
@@ -88,9 +88,9 @@ public class RewriteLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
-        if (packet.getActions().contains(UpsertPlayerInfo.Action.ADD_PLAYER)) {
-            for (UpsertPlayerInfo.Entry item : packet.getEntries()) {
+    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
+        if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.ADD_PLAYER)) {
+            for (UpsertPlayerInfoPacket.Entry item : packet.getEntries()) {
                 UUID uuid = item.getProfileId();
                 Player player = ProxyServer.getInstance().getPlayer(uuid).orElse(null);
                 if (player != null) {
@@ -101,9 +101,9 @@ public class RewriteLogic extends AbstractPacketHandler {
             }
         }
         boolean modified = false;
-        ListIterator<UpsertPlayerInfo.Entry> it = packet.getEntries().listIterator();
+        ListIterator<UpsertPlayerInfoPacket.Entry> it = packet.getEntries().listIterator();
         while(it.hasNext()){
-            UpsertPlayerInfo.Entry item = it.next();
+            UpsertPlayerInfoPacket.Entry item = it.next();
             UUID uuid = rewriteMap.get(item.getProfileId());
             if (uuid != null) {
                 modified = true;
@@ -115,7 +115,7 @@ public class RewriteLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
         boolean modified = false;
 
         UUID[] uuids = packet.getProfilesToRemove().toArray(new UUID[0]);
@@ -138,8 +138,8 @@ public class RewriteLogic extends AbstractPacketHandler {
         super.onServerSwitch(is13OrLater);
     }
 
-    private LegacyPlayerListItem.Item copyToNewItem(UUID uuid, LegacyPlayerListItem.Item item){
-        LegacyPlayerListItem.Item newItem = new LegacyPlayerListItem.Item(uuid);
+    private LegacyPlayerListItemPacket.Item copyToNewItem(UUID uuid, LegacyPlayerListItemPacket.Item item){
+        LegacyPlayerListItemPacket.Item newItem = new LegacyPlayerListItemPacket.Item(uuid);
         newItem.setName(item.getName());
         newItem.setLatency(item.getLatency());
         newItem.setGameMode(item.getGameMode());
@@ -149,8 +149,8 @@ public class RewriteLogic extends AbstractPacketHandler {
         return newItem;
     }
 
-    private UpsertPlayerInfo.Entry copyToNewEntry(UUID uuid, UpsertPlayerInfo.Entry item){
-        UpsertPlayerInfo.Entry newItem = new UpsertPlayerInfo.Entry(uuid);
+    private UpsertPlayerInfoPacket.Entry copyToNewEntry(UUID uuid, UpsertPlayerInfoPacket.Entry item){
+        UpsertPlayerInfoPacket.Entry newItem = new UpsertPlayerInfoPacket.Entry(uuid);
         newItem.setProfile(item.getProfile());
         newItem.setLatency(item.getLatency());
         newItem.setGameMode(item.getGameMode());

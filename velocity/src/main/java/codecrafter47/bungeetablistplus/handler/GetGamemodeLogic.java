@@ -20,9 +20,9 @@ package codecrafter47.bungeetablistplus.handler;
 import codecrafter47.bungeetablistplus.protocol.AbstractPacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
-import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItem;
-import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfo;
-import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfo;
+import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
+import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
+import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,9 +41,9 @@ public class GetGamemodeLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItem packet) {
-        if (packet.getAction() == LegacyPlayerListItem.ADD_PLAYER || packet.getAction() == LegacyPlayerListItem.UPDATE_GAMEMODE) {
-            for (LegacyPlayerListItem.Item item : packet.getItems()) {
+    public PacketListenerResult onPlayerListPacket(LegacyPlayerListItemPacket packet) {
+        if (packet.getAction() == LegacyPlayerListItemPacket.ADD_PLAYER || packet.getAction() == LegacyPlayerListItemPacket.UPDATE_GAMEMODE) {
+            for (LegacyPlayerListItemPacket.Item item : packet.getItems()) {
                 if (uuid.equals(item.getUuid())) {
                     gameModes.put(uuid, item.getGameMode());
                 }
@@ -53,9 +53,9 @@ public class GetGamemodeLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfo packet) {
-        if (packet.getActions().contains(UpsertPlayerInfo.Action.UPDATE_GAME_MODE)) {
-            for (UpsertPlayerInfo.Entry entry : packet.getEntries()) {
+    public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
+        if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.UPDATE_GAME_MODE)) {
+            for (UpsertPlayerInfoPacket.Entry entry : packet.getEntries()) {
                 if (uuid.equals(entry.getProfileId())) {
                     gameModes.put(uuid, entry.getGameMode());
                 }
@@ -65,7 +65,7 @@ public class GetGamemodeLogic extends AbstractPacketHandler {
     }
 
     @Override
-    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfo packet) {
+    public PacketListenerResult onPlayerListRemovePacket(RemovePlayerInfoPacket packet) {
         return super.onPlayerListRemovePacket(packet);
     }
 

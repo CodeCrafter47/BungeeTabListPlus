@@ -63,20 +63,23 @@ subprojects {
         maven {
             url = 'https://oss.sonatype.org/content/repositories/snapshots'
         }
+
+        maven {
+            url = 'https://nexus.prgm.in/repository/maven-public/'
+        }
     }
 
     dependencies {
-
-        compileOnly 'org.projectlombok:lombok:1.18.20'
-        annotationProcessor 'org.projectlombok:lombok:1.18.20'
-        testCompileOnly 'org.projectlombok:lombok:1.18.20'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+        compileOnly 'org.projectlombok:lombok:1.18.34'
+        annotationProcessor 'org.projectlombok:lombok:1.18.34'
+        testCompileOnly 'org.projectlombok:lombok:1.18.34'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
         compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
     }
 
     compileJava {
-        sourceCompatibility = '11'
-        targetCompatibility = '11'
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     publishing {
