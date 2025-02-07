@@ -17,7 +17,6 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
-import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.BitSet;
@@ -31,8 +30,10 @@ import de.codecrafter47.taboverlay.ProfileProperty;
 import de.codecrafter47.taboverlay.config.misc.ChatFormat;
 import de.codecrafter47.taboverlay.config.misc.Unchecked;
 import de.codecrafter47.taboverlay.handler.*;
-import it.unimi.dsi.fastutil.objects.*;
-import lombok.*;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+import lombok.NonNull;
+import lombok.val;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -50,20 +51,17 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
+public class OrderedTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     // some options
-    private static final boolean OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK = true;
     private static final boolean OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK = true;
 
     private static final BaseComponent EMPTY_TEXT_COMPONENT = new TextComponent();
-    private static final Either<String, BaseComponent> EMPTY_EITHER_TEXT_COMPONENT = Either.right(new TextComponent());
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
 
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
@@ -73,11 +71,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static final UUID[] CUSTOM_SLOT_UUID_ALEX;
     @Nonnull
     private static final Set<UUID> CUSTOM_SLOT_UUIDS;
-    private static final String[] CUSTOM_SLOT_USERNAME;
-    private static final String[] CUSTOM_SLOT_USERNAME_SMILEYS;
-    @Nonnull
-    private static final Set<String> CUSTOM_SLOT_USERNAMES;
-    private static final String[] CUSTOM_SLOT_TEAMNAME;
 
     static {
 
@@ -124,29 +117,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         } else {
             CUSTOM_SLOT_UUIDS = Collections.emptySet();
         }
-
-        // generate usernames for custom slots
-        int unique = ThreadLocalRandom.current().nextInt();
-        CUSTOM_SLOT_USERNAME = new String[81];
-        for (int i = 0; i < 81; i++) {
-            CUSTOM_SLOT_USERNAME[i] = String.format("~BTLP%08x %02d", unique, i);
-        }
-        if (OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK) {
-            CUSTOM_SLOT_USERNAMES = ImmutableSet.copyOf(CUSTOM_SLOT_USERNAME);
-        } else {
-            CUSTOM_SLOT_USERNAMES = Collections.emptySet();
-        }
-        CUSTOM_SLOT_USERNAME_SMILEYS = new String[80];
-        String emojis = "\u263a\u2639\u2620\u2763\u2764\u270c\u261d\u270d\u2618\u2615\u2668\u2693\u2708\u231b\u231a\u2600\u2b50\u2601\u2602\u2614\u26a1\u2744\u2603\u2604\u2660\u2665\u2666\u2663\u265f\u260e\u2328\u2709\u270f\u2712\u2702\u2692\u2694\u2699\u2696\u2697\u26b0\u26b1\u267f\u26a0\u2622\u2623\u2640\u2642\u267e\u267b\u269c\u303d\u2733\u2734\u2747\u203c\u2b1c\u2b1b\u25fc\u25fb\u25aa\u25ab\u2049\u26ab\u26aa\u3030\u00a9\u00ae\u2122\u2139\u24c2\u3297\u2716\u2714\u2611\u2695\u2b06\u2197\u27a1\u2198\u2b07\u2199\u3299\u2b05\u2196\u2195\u2194\u21a9\u21aa\u2934\u2935\u269b\u2721\u2638\u262f\u271d\u2626\u262a\u262e\u2648\u2649\u264a\u264b\u264c\u264d\u264e\u264f\u2650\u2651\u2652\u2653\u25b6\u25c0\u23cf";
-        for (int i = 0; i < 80; i++) {
-            CUSTOM_SLOT_USERNAME_SMILEYS[i] = String.format("" + emojis.charAt(i), unique, i);
-        }
-
-        // generate teams for custom slots
-        CUSTOM_SLOT_TEAMNAME = new String[81];
-        for (int i = 0; i < 81; i++) {
-            CUSTOM_SLOT_TEAMNAME[i] = String.format(" BTLP%08x %02d", unique, i);
-        }
     }
 
     private final Logger logger;
@@ -163,18 +133,16 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private AbstractContentOperationModeHandler<?> activeContentHandler;
     private AbstractHeaderFooterOperationModeHandler<?> activeHeaderFooterHandler;
 
-    private boolean hasCreatedCustomTeams = false;
-
     private final AtomicBoolean updateScheduledFlag = new AtomicBoolean(false);
     private final Runnable updateTask = this::update;
 
     protected boolean active;
-    
+
     private boolean logVersionMismatch = false;
 
     private final ProxiedPlayer player;
 
-    public NewTabOverlayHandler(Logger logger, Executor eventLoopExecutor, ProxiedPlayer player) {
+    public OrderedTabOverlayHandler(Logger logger, Executor eventLoopExecutor, ProxiedPlayer player) {
         this.logger = logger;
         this.eventLoopExecutor = eventLoopExecutor;
         this.player = player;
@@ -221,11 +189,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 if (OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK) {
                     if (CUSTOM_SLOT_UUIDS.contains(item.getUuid())) {
                         throw new AssertionError("UUID collision " + item.getUuid());
-                    }
-                }
-                if (OPTION_ENABLE_CUSTOM_SLOT_USERNAME_COLLISION_CHECK) {
-                    if (CUSTOM_SLOT_USERNAMES.contains(item.getUsername())) {
-                        throw new AssertionError("Username collision" + item.getUsername());
                     }
                 }
                 serverPlayerListListed.putIfAbsent(item.getUuid(), false);
@@ -282,8 +245,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     @Override
     public void onServerSwitch(boolean is13OrLater) {
-
-        hasCreatedCustomTeams = false;
 
         try {
             this.activeContentHandler.onServerSwitch();
@@ -386,14 +347,14 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         /**
          * Called when the player receives a {@link PlayerListItem} packet.
          * <p>
-         * This method is called after this {@link NewTabOverlayHandler} has updated the {@code serverPlayerList}.
+         * This method is called after this {@link OrderedTabOverlayHandler} has updated the {@code serverPlayerList}.
          */
         abstract PacketListenerResult onPlayerListUpdatePacket(PlayerListItemUpdate packet);
 
         /**
          * Called when the player switches the server.
          * <p>
-         * This method is called before this {@link NewTabOverlayHandler} executes its own logic to clear the
+         * This method is called before this {@link OrderedTabOverlayHandler} executes its own logic to clear the
          * server player list info.
          */
         abstract void onServerSwitch();
@@ -433,7 +394,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         /**
          * Called when the player receives a {@link PlayerListHeaderFooter} packet.
          * <p>
-         * This method is called before this {@link NewTabOverlayHandler} executes its own logic to update the
+         * This method is called before this {@link OrderedTabOverlayHandler} executes its own logic to update the
          * server player list info.
          */
         abstract PacketListenerResult onPlayerListHeaderFooterPacket(PlayerListHeaderFooter packet);
@@ -441,7 +402,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         /**
          * Called when the player switches the server.
          * <p>
-         * This method is called before this {@link NewTabOverlayHandler} executes its own logic to clear the
+         * This method is called before this {@link OrderedTabOverlayHandler} executes its own logic to clear the
          * server player list info.
          */
         abstract void onServerSwitch();
@@ -610,17 +571,11 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
          * Uuid of the player list entry used for the slot.
          */
         final UUID[] slotUuid;
-        /**
-         * Username of the player list entry used for the slot.
-         */
-        final String[] slotUsername;
 
         private final List<PlayerListItem.Item> itemQueueAddPlayer;
         private final List<UUID> itemQueueRemovePlayer;
         private final List<PlayerListItem.Item> itemQueueUpdateDisplayName;
         private final List<PlayerListItem.Item> itemQueueUpdatePing;
-
-        private final boolean experimentalTabCompleteSmileys = isExperimentalTabCompleteSmileys();
 
         private CustomContentTabOverlayHandler() {
             this.dirtySlots = new BitSet(80);
@@ -628,7 +583,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             this.slotState = new SlotState[80];
             Arrays.fill(this.slotState, SlotState.UNUSED);
             this.slotUuid = new UUID[80];
-            this.slotUsername = new String[80];
             this.itemQueueAddPlayer = new ArrayList<>(80);
             this.itemQueueRemovePlayer = new ArrayList<>(80);
             this.itemQueueUpdateDisplayName = new ArrayList<>(80);
@@ -644,14 +598,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 }
             }
             return PacketListenerResult.MODIFIED;
-        }
-
-        private String getCustomSlotUsername(int index) {
-            if (experimentalTabCompleteSmileys) {
-                return CUSTOM_SLOT_USERNAME_SMILEYS[index];
-            } else {
-                return CUSTOM_SLOT_USERNAME[index];
-            }
         }
 
         @Override
@@ -677,19 +623,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.UPDATE_LISTED));
                 packet.setItems(items.toArray(new PlayerListItem.Item[0]));
                 sendPacket(packet);
-            }
-            
-            createTeamsIfNecessary();
-        }
-
-        private void createTeamsIfNecessary() {
-            // create teams if not already created
-            if (!hasCreatedCustomTeams) {
-                hasCreatedCustomTeams = true;
-
-                for (int i = 0; i < 80; i++) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, Team.NameTagVisibility.ALWAYS, Team.CollisionRule.ALWAYS, 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
-                }
             }
         }
 
@@ -725,8 +658,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         @Override
         void update() {
 
-            createTeamsIfNecessary();
-
             T tabOverlay = getTabOverlay();
 
             if (tabOverlay.dirtyFlagSize) {
@@ -757,12 +688,13 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                     slotUuid[index] = customSlotUuid;
                     PlayerListItem.Item item = new PlayerListItem.Item();
                     item.setUuid(customSlotUuid);
-                    item.setUsername(slotUsername[index] = getCustomSlotUsername(index));
+                    item.setUsername("");
                     Property119Handler.setProperties(item, toPropertiesArray(icon.getTextureProperty()));
                     item.setDisplayName(tabOverlay.text[index]);
                     item.setPing(tabOverlay.ping[index]);
                     item.setGamemode(0);
                     item.setListed(true);
+                    item.setListOrder(-index);
                     itemQueueAddPlayer.add(item);
                 }
             }
@@ -804,7 +736,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
             }
             if (!itemQueueAddPlayer.isEmpty()) {
                 PlayerListItemUpdate packet = new PlayerListItemUpdate();
-                packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.ADD_PLAYER, PlayerListItemUpdate.Action.UPDATE_DISPLAY_NAME, PlayerListItemUpdate.Action.UPDATE_LATENCY, PlayerListItemUpdate.Action.UPDATE_LISTED));
+                packet.setActions(EnumSet.of(PlayerListItemUpdate.Action.ADD_PLAYER, PlayerListItemUpdate.Action.UPDATE_DISPLAY_NAME, PlayerListItemUpdate.Action.UPDATE_LATENCY, PlayerListItemUpdate.Action.UPDATE_LISTED, PlayerListItemUpdate.Action.UPDATE_LIST_ORDER));
                 packet.setItems(itemQueueAddPlayer.toArray(new PlayerListItem.Item[0]));
                 sendPacket(packet);
                 itemQueueAddPlayer.clear();
@@ -830,10 +762,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
          * and removed slots.
          */
         abstract void updateSize();
-    }
-
-    private boolean isExperimentalTabCompleteSmileys() {
-        return BungeeTabListPlus.getInstance().getConfig().experimentalTabCompleteSmileys;
     }
 
     private abstract class CustomContentTabOverlay extends AbstractContentTabOverlay implements TabOverlayHandle.BatchModifiable {
@@ -1251,21 +1179,6 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         } else {
             return new String[][]{{textureProperty.getName(), textureProperty.getValue()}};
         }
-    }
-
-    private static Team createPacketTeamCreate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire, String[] players) {
-        Team team = new Team();
-        team.setName(name);
-        team.setMode((byte) 0);
-        team.setDisplayName(displayName);
-        team.setPrefix(prefix);
-        team.setSuffix(suffix);
-        team.setNameTagVisibility(nameTagVisibility);
-        team.setCollisionRule(collisionRule);
-        team.setColor(color);
-        team.setFriendlyFire(friendlyFire);
-        team.setPlayers(players);
-        return team;
     }
 
     private enum SlotState {

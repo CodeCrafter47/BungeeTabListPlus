@@ -10,15 +10,15 @@ buildscript {
 
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
-    bungeeVersion = '1.19-R0.1-SNAPSHOT'
-    velocityVersion = '3.2.0-SNAPSHOT'
+    bungeeVersion = '1.21-R0.1-SNAPSHOT'
+    velocityVersion = '3.4.0-SNAPSHOT'
     spongeVersion = '7.0.0'
     dataApiVersion = '1.0.2-SNAPSHOT'
 }
 
 allprojects {
     group = 'codecrafter47.bungeetablistplus'
-    version = '3.6.1-SNAPSHOT'
+    version = '3.6.7-SNAPSHOT'
 }
 
 subprojects {

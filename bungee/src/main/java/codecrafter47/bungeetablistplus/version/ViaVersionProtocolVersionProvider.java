@@ -46,6 +46,11 @@ public class ViaVersionProtocolVersionProvider implements ProtocolVersionProvide
     }
 
     @Override
+    public boolean has1214OrLater(ProxiedPlayer player) {
+        return Via.getAPI().getPlayerVersion(player) >= 769;
+    }
+
+    @Override
     public boolean is18(ProxiedPlayer player) {
         return Via.getAPI().getPlayerVersion(player) == 47;
     }

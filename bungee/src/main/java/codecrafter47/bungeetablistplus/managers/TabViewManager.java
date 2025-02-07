@@ -31,6 +31,7 @@ import io.netty.channel.EventLoop;
 import net.md_5.bungee.ServerConnection;
 import net.md_5.bungee.UserConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -76,7 +77,30 @@ public class TabViewManager implements Listener {
     }
 
     @EventHandler
-    public void onServerConnected(ServerSwitchEvent event) {
+    public void onServerConnected(ServerConnectedEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
+        try {
+            ProxiedPlayer player = event.getPlayer();
+
+            PlayerTabView tabView = playerTabViewMap.get(player);
+
+            if (tabView == null) {
+                throw new AssertionError("Received ServerSwitchEvent for non-existent player " + player.getName());
+            }
+
+            PacketHandler packetHandler = tabView.packetHandler;
+
+            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
+
+        } catch (Exception ex) {
+            btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);
+        }
+    }
+
+    @EventHandler
+    public void onServerSwitch(ServerSwitchEvent event) {
         if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
             return;
         }
@@ -98,8 +122,6 @@ public class TabViewManager implements Listener {
 
             wrapper.getHandle().pipeline().addBefore(PipelineUtils.BOSS_HANDLER, "btlp-packet-listener", packetListener);
 
-            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
-
         } catch (Exception ex) {
             btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);
         }
@@ -118,7 +140,11 @@ public class TabViewManager implements Listener {
             Logger logger = new ChildLogger(btlp.getLogger(), player.getName());
             EventLoop eventLoop = ReflectionUtil.getChannelWrapper(player).getHandle().eventLoop();
 
-            if (protocolVersionProvider.has1193OrLater(player)) {
+            if (protocolVersionProvider.has1214OrLater(player)) {
+                OrderedTabOverlayHandler handler = new OrderedTabOverlayHandler(logger, eventLoop, player);
+                tabOverlayHandler = handler;
+                packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, (UserConnection) player));
+            } else if (protocolVersionProvider.has1193OrLater(player)) {
                 NewTabOverlayHandler handler = new NewTabOverlayHandler(logger, eventLoop, player);
                 tabOverlayHandler = handler;
                 packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, (UserConnection) player));
