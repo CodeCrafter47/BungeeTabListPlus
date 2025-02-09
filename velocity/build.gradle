@@ -30,6 +30,12 @@ dependencies {
     compileOnly "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
     testImplementation "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
     annotationProcessor "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    compileOnly "com.velocitypowered:velocity-proxy:${rootProject.ext.velocityVersion}"
+    annotationProcessor "com.velocitypowered:velocity-proxy:${rootProject.ext.velocityVersion}"
+    compileOnly "net.kyori:adventure-api:${rootProject.ext.adventureVersion}"
+    compileOnly "net.kyori:adventure-nbt:${rootProject.ext.adventureVersion}"
+    compileOnly "net.kyori:adventure-text-serializer-legacy:${rootProject.ext.adventureVersion}"
+    compileOnly "net.kyori:adventure-text-serializer-gson:${rootProject.ext.adventureVersion}"
     compileOnly "com.github.proxiodev.redisbungee:RedisBungee-Velocity:0.10.1"
     compileOnly 'com.google.guava:guava:23.0'
     testImplementation 'com.google.guava:guava:23.0'
@@ -41,8 +47,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
-    // This imports velocity proxy
-    compileOnly fileTree(dir: '../libs', include: '*.jar')
 }
 
 processResources {
