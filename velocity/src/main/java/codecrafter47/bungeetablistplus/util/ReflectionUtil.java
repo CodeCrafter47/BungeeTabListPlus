@@ -19,10 +19,6 @@ package codecrafter47.bungeetablistplus.util;
 
 import codecrafter47.bungeetablistplus.protocol.Team;
 import com.velocitypowered.api.network.ProtocolVersion;
-import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.player.TabList;
-import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.StateRegistry;
 
 import java.lang.reflect.Constructor;
@@ -47,34 +43,6 @@ import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
 import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_9;
 
 public class ReflectionUtil {
-    public static void setTablistHandler(Player player, TabList tablistHandler) throws NoSuchFieldException, IllegalAccessException {
-        setField(ConnectedPlayer.class, player, "tabList", tablistHandler, 5);
-    }
-
-    public static TabList getTablistHandler(Player player) throws NoSuchFieldException, IllegalAccessException {
-        return getField(ConnectedPlayer.class, player, "tabList", 5);
-    }
-
-    public static MinecraftConnection getChannelWrapper(Player player) throws NoSuchFieldException, IllegalAccessException {
-        return getField(ConnectedPlayer.class, player, "connection", 50);
-    }
-
-    public static void setField(Class<?> clazz, Object instance, String field, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field f = clazz.getDeclaredField(field);
-        f.setAccessible(true);
-        f.set(instance, value);
-    }
-
-    public static void setField(Class<?> clazz, Object instance, String field, Object value, int tries) throws NoSuchFieldException, IllegalAccessException {
-        while (--tries > 0) {
-            try {
-                setField(clazz, instance, field, value);
-                return;
-            } catch (NoSuchFieldException | IllegalAccessException ignored) {
-            }
-        }
-        setField(clazz, instance, field, value);
-    }
 
     @SuppressWarnings("unchecked")
     public static <T> T getField(Class<?> clazz, Object instance, String field) throws NoSuchFieldException, IllegalAccessException {

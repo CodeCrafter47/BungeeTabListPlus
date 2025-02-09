@@ -19,17 +19,21 @@ package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
+import codecrafter47.bungeetablistplus.protocol.PacketListener;
 import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.protocol.Team;
 import codecrafter47.bungeetablistplus.util.BitSet;
 import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.util.GameProfile;
+import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
+import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
 import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
@@ -191,8 +195,11 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 logVersionMismatch = true;
                 logger.warning("Cannot correctly update tablist for player " + player.getUsername() + "\nThe client and server versions do not match. Client >= 1.19.3, server < 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
             }
+//        }  else if (player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0) {
+//            // queue packet?
+//            ReflectionUtil.getChannelWrapper(player).write(packet);
         } else {
-            ReflectionUtil.getChannelWrapper(player).write(packet);
+            PacketListener.sendPacket(player, packet);
         }
     }
 
@@ -203,6 +210,12 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     @Override
     public PacketListenerResult onPlayerListUpdatePacket(UpsertPlayerInfoPacket packet) {
+
+        if (!active) {
+            active = true;
+            scheduleUpdate();
+        }
+
         if (packet.getActions().contains(UpsertPlayerInfoPacket.Action.ADD_PLAYER)) {
             for (UpsertPlayerInfoPacket.Entry entry : packet.getEntries()) {
                 if (OPTION_ENABLE_CUSTOM_SLOT_UUID_COLLISION_CHECK) {
@@ -269,42 +282,35 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     @Override
     public void onServerSwitch(boolean is13OrLater) {
-        if (!active) {
-            active = true;
-            update();
-        } else {
 
-            hasCreatedCustomTeams = false;
+        hasCreatedCustomTeams = false;
 
-            try {
-                this.activeContentHandler.onServerSwitch();
-            } catch (Throwable th) {
-                logger.log(Level.SEVERE, "Unexpected error", th);
-                // try recover
-                enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
-            }
-            try {
-                this.activeHeaderFooterHandler.onServerSwitch();
-            } catch (Throwable th) {
-                logger.log(Level.SEVERE, "Unexpected error", th);
-                // try recover
-                enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
-            }
-
-            if (!serverPlayerListListed.isEmpty()) {
-                RemovePlayerInfoPacket packet = new RemovePlayerInfoPacket();
-                packet.setProfilesToRemove(serverPlayerListListed.keySet());
-                sendPacket(packet);
-            }
-
-            serverPlayerListListed.clear();
-            if (serverHeader != null) {
-                serverHeader = EMPTY_COMPONENT;
-            }
-            if (serverFooter != null) {
-                serverFooter = EMPTY_COMPONENT;
-            }
+        try {
+            this.activeContentHandler.onServerSwitch();
+        } catch (Throwable th) {
+            logger.log(Level.SEVERE, "Unexpected error", th);
         }
+        try {
+            this.activeHeaderFooterHandler.onServerSwitch();
+        } catch (Throwable th) {
+            logger.log(Level.SEVERE, "Unexpected error", th);
+        }
+
+        if (!serverPlayerListListed.isEmpty()) {
+            RemovePlayerInfoPacket packet = new RemovePlayerInfoPacket();
+            packet.setProfilesToRemove(serverPlayerListListed.keySet());
+            sendPacket(packet);
+        }
+
+        serverPlayerListListed.clear();
+        if (serverHeader != null) {
+            serverHeader = EMPTY_COMPONENT;
+        }
+        if (serverFooter != null) {
+            serverFooter = EMPTY_COMPONENT;
+        }
+
+        active = false;
     }
 
     @Override
@@ -349,10 +355,12 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     }
 
     private void update() {
-        if (!active) {
+        updateScheduledFlag.set(false);
+
+        MinecraftConnection connection = ((ConnectedPlayer) player).getConnection();
+        if(!active || connection.isClosed() || connection.getState() != StateRegistry.PLAY){
             return;
         }
-        updateScheduledFlag.set(false);
 
         // update content handler
         AbstractContentOperationModeHandler<?> contentHandler;
@@ -376,7 +384,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private abstract static class AbstractContentOperationModeHandler<T extends AbstractContentTabOverlay> extends OperationModeHandler<T> {
 
         /**
-         * Called when the player receives a {@link LegacyPlayerListItemPacket} packet.
+         * Called when the player receives a {@link UpsertPlayerInfoPacket} packet.
          * <p>
          * This method is called after this {@link NewTabOverlayHandler} has updated the {@code serverPlayerList}.
          */
@@ -648,8 +656,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onServerSwitch() {
-
-            createTeamsIfNecessary();
+            if(player.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_2) >= 0){
+                clearCustomSlots();
+            }
         }
 
         @Override
@@ -685,10 +694,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void onDeactivated() {
+            clearCustomSlots();
+        }
+
+        private void clearCustomSlots() {
             int customSlots = 0;
             for (int index = 0; index < 80; index++) {
                 if (slotState[index] != SlotState.UNUSED) {
                     customSlots++;
+                    dirtySlots.set(index);
                 }
             }
 
@@ -709,6 +723,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
         @Override
         void update() {
+
+            createTeamsIfNecessary();
+
             T tabOverlay = getTabOverlay();
 
             if (tabOverlay.dirtyFlagSize) {

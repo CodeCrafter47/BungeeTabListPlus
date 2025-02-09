@@ -35,4 +35,6 @@ public interface ProtocolVersionProvider {
     boolean has1193OrLater(Player player);
 
     boolean has1203OrLater(Player player);
+
+    boolean has1214OrLater(Player player);
 }

@@ -113,7 +113,7 @@ public class ServerStateManager {
 
         @Override
         public void run() {
-            if (!plugin.isProxyRunning()) return;
+            if (plugin.getProxy().isShuttingDown()) return;
             server.ping().whenComplete((serverPing, throwable) -> {
                 if (throwable != null) {
                     online = false;

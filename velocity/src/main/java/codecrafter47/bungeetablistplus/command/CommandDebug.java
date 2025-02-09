@@ -21,13 +21,13 @@ import codecrafter47.bungeetablistplus.BungeeTabListPlus;
 import codecrafter47.bungeetablistplus.data.BTLPVelocityDataKeys;
 import codecrafter47.bungeetablistplus.player.VelocityPlayer;
 import codecrafter47.bungeetablistplus.util.ProxyServer;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.util.chat.ChatUtil;
 import com.google.common.base.Joiner;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.backend.VelocityServerConnection;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import io.netty.channel.ChannelHandler;
@@ -105,7 +105,8 @@ public class CommandDebug {
         Player player = (Player) context.getSource();
         ConnectedPlayer userConnection = (ConnectedPlayer) player;
         List<String> userPipeline = new ArrayList<>();
-        for (Map.Entry<String, ChannelHandler> entry : ReflectionUtil.getChannelWrapper(userConnection).getChannel().pipeline()) {
+        MinecraftConnection connection = ((ConnectedPlayer) player).getConnection();
+        for (Map.Entry<String, ChannelHandler> entry : connection.getChannel().pipeline()) {
             userPipeline.add(entry.getKey());
         }
 

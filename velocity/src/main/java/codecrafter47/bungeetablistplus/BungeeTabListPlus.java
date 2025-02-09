@@ -46,8 +46,10 @@ import codecrafter47.bungeetablistplus.version.ViaVersionProtocolVersionProvider
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.codecrafter47.data.bukkit.api.BukkitData;
 import de.codecrafter47.data.velocity.api.VelocityData;
 import de.codecrafter47.data.sponge.api.SpongeData;
@@ -120,6 +122,7 @@ public class BungeeTabListPlus {
     private HiddenPlayersManager hiddenPlayersManager;
     private PlayerPlaceholderResolver playerPlaceholderResolver;
     private API api;
+    @Getter
     private Logger logger = Logger.getLogger(BungeeTabListPlus.class.getSimpleName());
 
     public BungeeTabListPlus(VelocityPlugin plugin) {
@@ -186,9 +189,9 @@ public class BungeeTabListPlus {
         }
 
         try {
-            Class.forName("com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket");
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("You need to run at least Velocity version #329");
+            plugin.getProxy().isShuttingDown();
+        } catch (NoSuchMethodError ex) {
+            throw new RuntimeException("You need to run at least Velocity version #464");
         }
 
         INSTANCE = this;
@@ -458,6 +461,9 @@ public class BungeeTabListPlus {
     public void onDisable() {
         // save cache
         cache.save();
+        plugin.getProxy().getScheduler().tasksByPlugin(plugin).forEach(ScheduledTask::cancel);
+        mainThreadExecutor.shutdownGracefully();
+        asyncExecutor.shutdownGracefully();
     }
 
     /**
@@ -546,10 +552,6 @@ public class BungeeTabListPlus {
                         + "following StackTrace to the developer in order to help"
                         + " resolving the problem",
                 th);
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public com.velocitypowered.api.proxy.ProxyServer getProxy() {

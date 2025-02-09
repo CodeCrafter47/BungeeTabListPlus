@@ -25,10 +25,12 @@ import codecrafter47.bungeetablistplus.util.GeyserCompat;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.backend.VelocityServerConnection;
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.network.Connections;
 import de.codecrafter47.taboverlay.TabView;
 import de.codecrafter47.taboverlay.config.misc.ChildLogger;
@@ -74,6 +76,29 @@ public class TabViewManager {
     }
 
     @Subscribe
+    public void onServerConnected(ServerConnectedEvent event) {
+        if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
+            return;
+        }
+        try {
+            Player player = event.getPlayer();
+
+            PlayerTabView tabView = playerTabViewMap.get(player);
+
+            if (tabView == null) {
+                throw new AssertionError("Received ServerSwitchEvent for non-existent player " + player.getUsername());
+            }
+
+            PacketHandler packetHandler = tabView.packetHandler;
+
+            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
+
+        } catch (Exception ex) {
+            btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);
+        }
+    }
+
+    @Subscribe
     public void onServerConnected(ServerPostConnectEvent event) {
         if (GeyserCompat.isBedrockPlayer(event.getPlayer().getUniqueId())) {
             return;
@@ -93,9 +118,8 @@ public class TabViewManager {
 
             PacketHandler packetHandler = tabView.packetHandler;
             PacketListener packetListener = new PacketListener(server, packetHandler, player);
-            wrapper.getChannel().pipeline().addBefore(Connections.HANDLER, "btlp-packet-listener", packetListener);
 
-            packetHandler.onServerSwitch(protocolVersionProvider.has113OrLater(player));
+            wrapper.getChannel().pipeline().addBefore(Connections.HANDLER, "btlp-packet-listener", packetListener);
 
         } catch (Exception ex) {
             btlp.getLogger().log(Level.SEVERE, "Failed to inject packet listener", ex);
@@ -108,32 +132,32 @@ public class TabViewManager {
     }
 
     private PlayerTabView createTabView(Player player) {
-        try {
-            TabOverlayHandler tabOverlayHandler;
-            PacketHandler packetHandler;
+        TabOverlayHandler tabOverlayHandler;
+        PacketHandler packetHandler;
 
-            Logger logger = new ChildLogger(btlp.getLogger(), player.getUsername());
-            EventLoop eventLoop = ReflectionUtil.getChannelWrapper(player).eventLoop();
+        Logger logger = new ChildLogger(btlp.getLogger(), player.getUsername());
+        EventLoop eventLoop = ((ConnectedPlayer) player).getConnection().eventLoop();
 
-            if (protocolVersionProvider.has1193OrLater(player)) {
-                NewTabOverlayHandler handler = new NewTabOverlayHandler(logger, eventLoop, player);
-                tabOverlayHandler = handler;
-                packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, player.getUniqueId()));
-            } else if (protocolVersionProvider.has18OrLater(player)) {
-                LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player), protocolVersionProvider.has119OrLater(player), protocolVersionProvider.has1203OrLater(player));
-                tabOverlayHandler = tabOverlayHandlerImpl;
-                packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, player.getUniqueId()));
-            } else {
-                LegacyTabOverlayHandlerImpl legacyTabOverlayHandler = new LegacyTabOverlayHandlerImpl(logger, ReflectionUtil.getTablistHandler(player).getEntries().size(), eventLoop, player, protocolVersionProvider.has113OrLater(player));
-                tabOverlayHandler = legacyTabOverlayHandler;
-                packetHandler = legacyTabOverlayHandler;
-            }
-
-            return new PlayerTabView(tabOverlayHandler, logger, btlp.getAsyncExecutor(), packetHandler);
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new AssertionError("Failed to create tab view", e);
+        if (protocolVersionProvider.has1214OrLater(player)) {
+            OrderedTabOverlayHandler handler = new OrderedTabOverlayHandler(logger, eventLoop, player);
+            tabOverlayHandler = handler;
+            packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, player.getUniqueId()));
+        } else if (protocolVersionProvider.has1193OrLater(player)) {
+            NewTabOverlayHandler handler = new NewTabOverlayHandler(logger, eventLoop, player);
+            tabOverlayHandler = handler;
+            packetHandler = new RewriteLogic(new GetGamemodeLogic(handler, player.getUniqueId()));
+        } else if (protocolVersionProvider.has18OrLater(player)) {
+            LowMemoryTabOverlayHandlerImpl tabOverlayHandlerImpl = new LowMemoryTabOverlayHandlerImpl(logger, eventLoop, player.getUniqueId(), player, protocolVersionProvider.is18(player), protocolVersionProvider.has113OrLater(player), protocolVersionProvider.has119OrLater(player), protocolVersionProvider.has1203OrLater(player));
+            tabOverlayHandler = tabOverlayHandlerImpl;
+            packetHandler = new RewriteLogic(new GetGamemodeLogic(tabOverlayHandlerImpl, player.getUniqueId()));
+        } else {
+            LegacyTabOverlayHandlerImpl legacyTabOverlayHandler = new LegacyTabOverlayHandlerImpl(logger, ((ConnectedPlayer) player).getTabList().getEntries().size(), eventLoop, player, protocolVersionProvider.has113OrLater(player));
+            tabOverlayHandler = legacyTabOverlayHandler;
+            packetHandler = legacyTabOverlayHandler;
         }
+
+        return new PlayerTabView(tabOverlayHandler, logger, btlp.getAsyncExecutor(), packetHandler);
+
     }
 
     private static class PlayerTabView extends TabView {

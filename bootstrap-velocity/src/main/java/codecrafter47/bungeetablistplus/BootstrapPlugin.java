@@ -24,9 +24,11 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
@@ -46,22 +48,38 @@ import java.nio.file.Path;
         @Dependency(id = "viaversion", optional = true)
     }
 )
-public class BootstrapPlugin extends VelocityPlugin {
+public class BootstrapPlugin implements VelocityPlugin {
 
     private final Metrics.Factory metricsFactory;
 
     private static final String NO_RELOAD_PLAYERS = "Cannot reload BungeeTabListPlus while players are online.";
 
+    @Getter
+    private final Logger logger;
+
+    @Getter
+    private final ProxyServer proxy;
+
+    @Getter
+    private final Path dataDirectory;
+
+    @Getter
+    private final String version;
+
+
     @Inject
-    public BootstrapPlugin(final ProxyServer server, final Logger logger, final @DataDirectory Path dataDirectory, final Metrics.Factory metricsFactory) {
-        super(server, logger, dataDirectory, BootstrapPlugin.class.getAnnotation(Plugin.class).version());
+    public BootstrapPlugin(final ProxyServer proxy, final Logger logger, final @DataDirectory Path dataDirectory, final Metrics.Factory metricsFactory) {
+        this.proxy = proxy;
+        this.logger = logger;
+        this.dataDirectory = dataDirectory;
+        this.version = BootstrapPlugin.class.getAnnotation(Plugin.class).version();
         this.metricsFactory = metricsFactory;
     }
 
     @Subscribe
     public void onProxyInitialization(final ProxyInitializeEvent event) {
-        if (Float.parseFloat(System.getProperty("java.class.version")) < 55.0) {
-            getLogger().error("§cBungeeTabListPlus requires Java 11 or above. Please download and install it!");
+        if (Float.parseFloat(System.getProperty("java.class.version")) < 61.0) {
+            getLogger().error("§cBungeeTabListPlus requires Java 17 or above. Please download and install it!");
             getLogger().error("Disabling plugin!");
             return;
         }
@@ -80,7 +98,7 @@ public class BootstrapPlugin extends VelocityPlugin {
     @Subscribe
     public void onProxyShutdown(final ProxyShutdownEvent event) {
         BungeeTabListPlus.getInstance().onDisable();
-        if (isProxyRunning()) {
+        if (!getProxy().isShuttingDown()) {
             getLogger().error("You cannot use ServerUtils to reload BungeeTabListPlus. Use /btlp reload instead.");
             if (!getProxy().getAllPlayers().isEmpty()) {
                 for (Player proxiedPlayer : getProxy().getAllPlayers()) {

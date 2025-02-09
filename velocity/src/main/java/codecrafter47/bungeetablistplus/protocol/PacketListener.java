@@ -18,9 +18,9 @@
 package codecrafter47.bungeetablistplus.protocol;
 
 import codecrafter47.bungeetablistplus.BungeeTabListPlus;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.connection.backend.VelocityServerConnection;
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.HeaderAndFooterPacket;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
@@ -28,6 +28,7 @@ import com.velocitypowered.proxy.protocol.packet.RemovePlayerInfoPacket;
 import com.velocitypowered.proxy.protocol.packet.UpsertPlayerInfoPacket;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class PacketListener extends MessageToMessageDecoder<MinecraftPacket> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, MinecraftPacket packet, List<Object> out) {
+        boolean shouldRelease = true;
         try {
             if (connection.isActive()) {
                 if (packet != null) {
@@ -54,10 +56,7 @@ public class PacketListener extends MessageToMessageDecoder<MinecraftPacket> {
                     if (packet instanceof Team) {
                         result = handler.onTeamPacket((Team) packet);
                         if (result == PacketListenerResult.MODIFIED) {
-                            ReflectionUtil.getChannelWrapper(player).getChannel().write(packet);
-                        }
-                        if (result != PacketListenerResult.PASS) {
-                            return;
+                            sendPacket(player, packet);
                         }
                     } else if (packet instanceof LegacyPlayerListItemPacket) {
                         result = handler.onPlayerListPacket((LegacyPlayerListItemPacket) packet);
@@ -73,17 +72,23 @@ public class PacketListener extends MessageToMessageDecoder<MinecraftPacket> {
                         handled = true;
                     }
 
-                    if (handled) {
-                        if (result != PacketListenerResult.CANCEL) {
-                            ReflectionUtil.getChannelWrapper(player).getChannel().write(packet);
-                        }
-                        return;
+                    if (handled && result != PacketListenerResult.CANCEL) {
+                        sendPacket(player, packet);
                     }
                 }
             }
             out.add(packet);
+            shouldRelease = false;
         } catch (Throwable th) {
             BungeeTabListPlus.getInstance().reportError(th);
+        } finally {
+            if(!shouldRelease){
+                ReferenceCountUtil.retain(packet);
+            }
         }
+    }
+
+    public static void sendPacket(Player player, MinecraftPacket packet) {
+        ((ConnectedPlayer) player).getConnection().write(packet);
     }
 }

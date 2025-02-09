@@ -105,9 +105,9 @@ public class RedisPlayerManager implements PlayerProvider {
         RedisBungeeAPI.getRedisBungeeApi().registerPubSubChannels(CHANNEL_REQUEST_DATA_OLD, CHANNEL_DATA_OLD);
         RedisBungeeAPI.getRedisBungeeApi().registerPubSubChannels(CHANNEL_DATA_REQUEST, CHANNEL_DATA_UPDATE);
 
-        plugin.getProxy().getScheduler().buildTask(BungeeTabListPlus.getInstance().getPlugin(), this::updatePlayers).delay(5, TimeUnit.SECONDS).repeat(5, TimeUnit.SECONDS).schedule();
+        plugin.getProxy().getScheduler().buildTask(plugin, this::updatePlayers).delay(5, TimeUnit.SECONDS).repeat(5, TimeUnit.SECONDS).schedule();
 
-        plugin.getProxy().getEventManager().register(BungeeTabListPlus.getInstance().getPlugin(), this);
+        plugin.getProxy().getEventManager().register(plugin, this);
     }
 
     @Override

@@ -17,6 +17,7 @@
 
 package codecrafter47.bungeetablistplus.protocol;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
@@ -31,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @Data
@@ -86,16 +88,12 @@ public class Team implements MinecraftPacket {
             friendlyFire = buf.readByte();
             // TODO: Replace this when released
             if (version.getProtocol() >= MINECRAFT_1_21_5) {
-                nameTagVisibility = NameTagVisibility.values()[ProtocolUtils.readVarInt(buf)];
-                collisionRule = CollisionRule.values()[ProtocolUtils.readVarInt(buf)];
+                nameTagVisibility = NameTagVisibility.BY_ID[ProtocolUtils.readVarInt( buf )];
+                collisionRule = CollisionRule.BY_ID[ProtocolUtils.readVarInt( buf )];
             } else {
-                String nameTagVisibilityStr = ProtocolUtils.readString(buf);
-                NameTagVisibility nameTagVisibility = NameTagVisibility.BY_NAME.get(nameTagVisibilityStr);
-
-
+                nameTagVisibility =readStringMapKey( buf, NameTagVisibility.BY_NAME );
                 if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
-                    String collisionRuleStr = ProtocolUtils.readString(buf);
-                    collisionRule = CollisionRule.BY_NAME.get(collisionRuleStr);
+                    collisionRule = readStringMapKey( buf, CollisionRule.BY_NAME );
                 }
             }
             color = (version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) ? ProtocolUtils.readVarInt(buf) : buf.readByte();
@@ -134,7 +132,6 @@ public class Team implements MinecraftPacket {
                     ProtocolUtils.writeString(buf, collisionRule.getKey());
                 }
             }
-
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) {
                 ProtocolUtils.writeVarInt(buf, color);
                 prefix.write(buf);
@@ -163,11 +160,15 @@ public class Team implements MinecraftPacket {
         ALWAYS("always"),
         NEVER("never"),
         HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"),
-        HIDE_FOR_OWN_TEAM("hideForOwnTeam");
+        HIDE_FOR_OWN_TEAM("hideForOwnTeam"),
+        // 1.9 (and possibly other versions) appear to treat unknown values differently (always render rather than subject to spectator mode, friendly invisibles, etc).
+        // we allow the empty value to achieve this in case it is potentially useful even though this is unsupported and its usage may be a bug (#3780).
+        UNKNOWN( "" );
         //
         private final String key;
         //
         private static final Map<String, NameTagVisibility> BY_NAME;
+        private static final NameTagVisibility[] BY_ID;
 
         static {
             NameTagVisibility[] values = NameTagVisibility.values();
@@ -178,6 +179,7 @@ public class Team implements MinecraftPacket {
             }
 
             BY_NAME = builder.build();
+            BY_ID = Arrays.copyOf( values, values.length - 1 ); // Ignore dummy UNKNOWN value
         }
     }
 
@@ -193,10 +195,11 @@ public class Team implements MinecraftPacket {
         private final String key;
         //
         private static final Map<String, CollisionRule> BY_NAME;
+        private static final CollisionRule[] BY_ID;
 
         static {
-            CollisionRule[] values = CollisionRule.values();
-            ImmutableMap.Builder<String, CollisionRule> builder = ImmutableMap.builderWithExpectedSize(values.length);
+            CollisionRule[] values = BY_ID = CollisionRule.values();
+            ImmutableMap.Builder<String, CollisionRule> builder = ImmutableMap.builderWithExpectedSize( values.length );
 
             for (CollisionRule e : values) {
                 builder.put(e.key, e);
@@ -204,5 +207,13 @@ public class Team implements MinecraftPacket {
 
             BY_NAME = builder.build();
         }
+    }
+
+    public static <T> T readStringMapKey(ByteBuf buf, Map<String, T> map) {
+        String string = ProtocolUtils.readString( buf );
+        T result = map.get( string );
+        Preconditions.checkArgument( result != null, "Unknown string key %s", string );
+
+        return result;
     }
 }

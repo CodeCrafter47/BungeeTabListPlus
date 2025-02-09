@@ -17,8 +17,10 @@
 
 package codecrafter47.bungeetablistplus.handler;
 
+import codecrafter47.bungeetablistplus.protocol.PacketListener;
 import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
 import lombok.SneakyThrows;
@@ -47,7 +49,7 @@ public class LegacyTabOverlayHandlerImpl extends AbstractLegacyTabOverlayHandler
                 this.logger.warning("Cannot correctly update tablist for player " + player.getUsername() + "\nThe client and server versions do not match. Client <= 1.7.10, server >= 1.19.3.\nUse ViaVersion on the spigot server for the best experience.");
             }
         } else {
-            ReflectionUtil.getChannelWrapper(player).write(packet);
+            PacketListener.sendPacket(player, packet);
         }
     }
 }

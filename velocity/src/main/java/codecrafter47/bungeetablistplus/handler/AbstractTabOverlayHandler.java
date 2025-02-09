@@ -69,9 +69,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static ComponentHolder EMPTY_COMPONENT;
     protected static final String[][] EMPTY_PROPERTIES_ARRAY = new String[0][];
 
-    private static final boolean TEAM_COLLISION_RULE_SUPPORTED;
-    private static final boolean USE_PROTOCOL_PROPERTY_TYPE;
-
     private static final ImmutableMap<RectangularTabOverlay.Dimension, BitSet> DIMENSION_TO_USED_SLOTS;
     private static final BitSet[] SIZE_TO_USED_SLOTS;
 
@@ -88,9 +85,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static final Set<String> blockedTeams = new HashSet<>();
 
     static {
-        TEAM_COLLISION_RULE_SUPPORTED = true;
-        USE_PROTOCOL_PROPERTY_TYPE = true;
-
         // build the dimension to used slots map (for the rectangular tab overlay)
         val builder = ImmutableMap.<RectangularTabOverlay.Dimension, BitSet>builder();
         for (int columns = 1; columns <= 4; columns++) {
@@ -329,9 +323,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     teamEntry.setSuffix(packet.getSuffix());
                     teamEntry.setFriendlyFire(packet.getFriendlyFire());
                     teamEntry.setNameTagVisibility(packet.getNameTagVisibility());
-                    if (TEAM_COLLISION_RULE_SUPPORTED) {
-                        teamEntry.setCollisionRule(packet.getCollisionRule());
-                    }
+                    teamEntry.setCollisionRule(packet.getCollisionRule());
                     teamEntry.setColor(packet.getColor());
                 }
                 if (packet.getPlayers() != null) {
@@ -1500,7 +1492,6 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                         // restore player gamemode
                         LegacyPlayerListItemPacket packet;
                         List<LegacyPlayerListItemPacket.Item> items = new ArrayList<>(serverPlayerList.size());
-                        items.clear();
                         for (PlayerListEntry entry : serverPlayerList.values()) {
                             LegacyPlayerListItemPacket.Item item = new LegacyPlayerListItemPacket.Item(entry.getUuid());
                             item.setGameMode(entry.getGamemode());
@@ -2423,9 +2414,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         team.setPrefix(prefix);
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
-        if (TEAM_COLLISION_RULE_SUPPORTED) {
-            team.setCollisionRule(collisionRule);
-        }
+        team.setCollisionRule(collisionRule);
         team.setColor(color);
         team.setFriendlyFire(friendlyFire);
         team.setPlayers(players);
@@ -2447,9 +2436,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         team.setPrefix(prefix);
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
-        if (TEAM_COLLISION_RULE_SUPPORTED) {
-            team.setCollisionRule(collisionRule);
-        }
+        team.setCollisionRule(collisionRule);
         team.setColor(color);
         team.setFriendlyFire(friendlyFire);
         return team;
