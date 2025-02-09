@@ -19,10 +19,14 @@ task processSource(type: Sync) {
     into "$buildDir/src"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 compileJava {
     source = processSource.outputs
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 }
 
 shadowJar {

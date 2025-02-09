@@ -77,9 +77,10 @@ subprojects {
         compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
     }
 
-    compileJava {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
     }
 
     publishing {

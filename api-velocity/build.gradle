@@ -5,9 +5,10 @@ dependencies {
     api "de.codecrafter47.taboverlay:taboverlaycommon-api:1.0-SNAPSHOT"
 }
 
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 java {
