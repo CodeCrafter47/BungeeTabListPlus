@@ -88,7 +88,6 @@ public class BootstrapPlugin implements VelocityPlugin {
                 player.disconnect(Component.text(NO_RELOAD_PLAYERS));
             }
         }
-        getProxy().getPluginManager().getPlugin("BungeeTabListPlus");
         BungeeTabListPlus.getInstance(this).onLoad();
         BungeeTabListPlus.getInstance(this).onEnable();
         // Metrics
