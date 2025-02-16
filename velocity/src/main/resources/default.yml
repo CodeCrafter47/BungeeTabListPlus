@@ -1,0 +1,93 @@
+# This is the default configuration file of BungeeTabListPlus.
+#
+# Since the configuration of the plugin is quite complex you
+# might want to have a look at the wiki from time to time.
+#
+# Wiki: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki
+#  Placeholders: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Placeholders
+#  Examples: https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Examples
+#
+
+showTo: all
+priority: 0
+
+showHeaderFooter: true
+header:
+  - "&cWelcome &f${viewer name}"
+  - "&eW&celcome &f${viewer name}"
+  - "&eWe&clcome &f${viewer name}"
+  - "&eWel&ccome &f${viewer name}"
+  - "&eWelc&come &f${viewer name}"
+  - "&eWelco&cme &f${viewer name}"
+  - "&eWelcom&ce &f${viewer name}"
+  - "&eWelcome &f${viewer name}"
+  - "&cW&eelcome &f${viewer name}"
+  - "&cWe&elcome &f${viewer name}"
+  - "&cWel&ecome &f${viewer name}"
+  - "&cWelc&eome &f${viewer name}"
+  - "&cWelco&eme &f${viewer name}"
+  - "&cWelcom&ee &f${viewer name}"
+  - "&cWelcome &f${viewer name}"
+headerAnimationUpdateInterval: 0.2
+footer: |-
+  &4Powered by BungeeTabListPlus
+  &fWiki:&7 https://github.com/CodeCrafter47/BungeeTabListPlus/wiki
+
+# Configure whether hidden players appear on the tab list
+# see https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Hidden-Players
+hiddenPlayers: VISIBLE_TO_ADMINS
+
+playerSets:
+  all_players: all
+
+type: FIXED_SIZE
+size: 60
+
+defaultIcon: colors/dark_gray.png
+defaultPing: 1000
+
+components:
+  - {text: "&cServer: &6${viewer server}", icon: "default/server.png", ping: 0}
+  - {text: "&cRank: &6${viewer vault_primary_group}", icon: "default/rank.png", ping: 0}
+  - {text: "&cPing: ${viewer_colored_ping}ms", icon: "default/ping.png", ping: 0}
+  -
+  -
+  -
+  - !players_by_server
+    playerSet: all_players
+    serverHeader:
+      - {text: "&e&n${server}&f&o (${server_player_count}):", icon: "colors/yellow.png", ping: 0}
+    serverSeparator:
+      -
+      -
+      -
+    showServers: ALL
+    playerComponent: "${player vault_prefix}${player name}${afk_tag}"
+    morePlayersComponent: {text: "&7... and &e${other_count} &7others", icon: "colors/gray.png", ping: 0}
+  - !spacer {}
+  -
+  -
+  -
+  - {text: "&cTime: &6${time H:mm:ss}", icon: "default/clock.png", ping: 0}
+  - {text: "&cPlayers: &6${playerset:all_players size}", icon: "default/players.png", ping: 0}
+  - {text: "&cBalance: &6${viewer vault_balance}", icon: "default/balance.png", ping: 0}
+
+# Custom placeholders are a powerful mechanism to add more dynamic content
+# to the tab list.
+# See https://github.com/CodeCrafter47/BungeeTabListPlus/wiki/Custom=Placeholders
+customPlaceholders:
+  afk_tag:
+    !conditional
+    condition: ${player essentials_afk}
+    true: "&7|&oaway"
+    false: ""
+  viewer_colored_ping:
+    !conditional
+    condition: "${viewer ping} < 150"
+    true: ${viewer_colored_ping0}
+    false: "&c${viewer ping}"
+  viewer_colored_ping0:
+    !conditional
+    condition: "${viewer ping} < 50"
+    true: "&a${viewer ping}"
+    false: "&e${viewer ping}"
