@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2020 Florian Stober
+ *     Copyright (C) 2025 proferabg
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -413,7 +413,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 removeEntry(slotUUID[index], slotID[index]);
                 Team t = new Team();
                 t.setName(slotID[index]);
-                t.setMode((byte) 1);
+                t.setMode(Team.Mode.REMOVE);
                 sendPacket(t);
             }
         }
@@ -430,7 +430,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         updateSlot(tabOverlay, index);
                         Team t = new Team();
                         t.setName(slotID[index]);
-                        t.setMode((byte) 0);
+                        t.setMode(Team.Mode.CREATE);
                         t.setPrefix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text0[index]));
                         t.setDisplayName(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, ""));
                         t.setSuffix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text1[index]));
@@ -444,7 +444,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         removeEntry(slotUUID[index], slotID[index]);
                         Team t = new Team();
                         t.setName(slotID[index]);
-                        t.setMode((byte) 1);
+                        t.setMode(Team.Mode.REMOVE);
                         sendPacket(t);
                     }
                 }
@@ -466,7 +466,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             if (index < size) {
                 Team packet = new Team();
                 packet.setName(slotID[index]);
-                packet.setMode((byte) 2);
+                packet.setMode(Team.Mode.UPDATE_INFO);
                 packet.setPrefix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text0[index]));
                 packet.setDisplayName(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, ""));
                 packet.setSuffix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text1[index]));

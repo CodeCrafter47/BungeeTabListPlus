@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2020 Florian Stober
+ *     Copyright (C) 2025 proferabg
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -91,7 +90,7 @@ public class BootstrapPlugin implements VelocityPlugin {
         BungeeTabListPlus.getInstance(this).onLoad();
         BungeeTabListPlus.getInstance(this).onEnable();
         // Metrics
-        metricsFactory.make(this, 4332);
+        metricsFactory.make(this, 24808);
     }
 
     @Subscribe

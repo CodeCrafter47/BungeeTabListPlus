@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2020 Florian Stober
+ *     Copyright (C) 2025 proferabg
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import codecrafter47.bungeetablistplus.handler.*;
 import codecrafter47.bungeetablistplus.protocol.PacketHandler;
 import codecrafter47.bungeetablistplus.protocol.PacketListener;
 import codecrafter47.bungeetablistplus.util.GeyserCompat;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import codecrafter47.bungeetablistplus.version.ProtocolVersionProvider;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;

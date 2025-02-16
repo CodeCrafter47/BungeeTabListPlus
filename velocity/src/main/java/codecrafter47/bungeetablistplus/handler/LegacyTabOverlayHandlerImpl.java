@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2020 Florian Stober
+ *     Copyright (C) 2025 proferabg
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@
 package codecrafter47.bungeetablistplus.handler;
 
 import codecrafter47.bungeetablistplus.protocol.PacketListener;
-import codecrafter47.bungeetablistplus.util.ReflectionUtil;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.LegacyPlayerListItemPacket;
 import lombok.SneakyThrows;

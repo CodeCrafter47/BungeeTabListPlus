@@ -1,5 +1,5 @@
 /*
- *     Copyright (C) 2020 Florian Stober
+ *     Copyright (C) 2025 proferabg
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -1251,7 +1251,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static Team createPacketTeamCreate(String name, ComponentHolder displayName, ComponentHolder prefix, ComponentHolder suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
-        team.setMode((byte) 0);
+        team.setMode(Team.Mode.CREATE);
         team.setDisplayName(displayName);
         team.setPrefix(prefix);
         team.setSuffix(suffix);

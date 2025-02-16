@@ -1,24 +1,23 @@
 /*
- * Copyright (C) 2018-2023 Velocity Contributors
+ *     Copyright (C) 2025 proferabg
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package codecrafter47.bungeetablistplus.protocol;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
@@ -34,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -41,17 +41,16 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 public class Team implements MinecraftPacket {
 
-    public static final byte CREATE = 0;
-    public static final byte REMOVE = 1;
-    public static final byte UPDATE_INFO = 2;
-    public static final byte ADD_PLAYER = 3;
-    public static final byte REMOVE_PLAYER = 4;
+    public enum Mode {
+        CREATE,
+        REMOVE,
+        UPDATE_INFO,
+        ADD_PLAYER,
+        REMOVE_PLAYER
+    }
 
     private String name;
-    /**
-     * 0 - create, 1 remove, 2 info update, 3 player add, 4 player remove.
-     */
-    private byte mode;
+    private Mode mode;
     private ComponentHolder displayName;
     private ComponentHolder prefix;
     private ComponentHolder suffix;
@@ -61,25 +60,20 @@ public class Team implements MinecraftPacket {
     private byte friendlyFire;
     private String[] players;
 
-    // placeholder until release
+    // TODO: placeholder until release
     private int MINECRAFT_1_21_5 = 770;
 
-    /**
-     * Packet to destroy a team.
-     *
-     * @param name team name
-     */
     public Team(String name)
     {
         this.name = name;
-        this.mode = 1;
+        this.mode = Mode.REMOVE;
     }
 
     @Override
     public void decode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion version) {
         name = ProtocolUtils.readString(buf);
-        mode = buf.readByte();
-        if (mode == CREATE || mode == UPDATE_INFO) {
+        mode = Mode.values()[buf.readByte()];
+        if (mode == Mode.CREATE || mode == Mode.UPDATE_INFO) {
             displayName = ComponentHolder.read(buf, version);
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) < 0) {
                 prefix = ComponentHolder.read(buf, version);
@@ -91,9 +85,9 @@ public class Team implements MinecraftPacket {
                 nameTagVisibility = NameTagVisibility.BY_ID[ProtocolUtils.readVarInt( buf )];
                 collisionRule = CollisionRule.BY_ID[ProtocolUtils.readVarInt( buf )];
             } else {
-                nameTagVisibility =readStringMapKey( buf, NameTagVisibility.BY_NAME );
+                nameTagVisibility = readStringToMap( buf, NameTagVisibility.BY_NAME );
                 if (version.compareTo(ProtocolVersion.MINECRAFT_1_9) >= 0) {
-                    collisionRule = readStringMapKey( buf, CollisionRule.BY_NAME );
+                    collisionRule = readStringToMap( buf, CollisionRule.BY_NAME );
                 }
             }
             color = (version.compareTo(ProtocolVersion.MINECRAFT_1_13) >= 0) ? ProtocolUtils.readVarInt(buf) : buf.readByte();
@@ -102,7 +96,7 @@ public class Team implements MinecraftPacket {
                 suffix = ComponentHolder.read(buf, version);
             }
         }
-        if (mode == CREATE || mode == ADD_PLAYER || mode == REMOVE_PLAYER) {
+        if (mode == Mode.CREATE || mode == Mode.ADD_PLAYER || mode == Mode.REMOVE_PLAYER) {
             int len = ProtocolUtils.readVarInt(buf);
             players = new String[len];
             for (int i = 0; i < len; i++) {
@@ -114,8 +108,8 @@ public class Team implements MinecraftPacket {
     @Override
     public void encode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion version) {
         ProtocolUtils.writeString(buf, name);
-        buf.writeByte(mode);
-        if (mode == CREATE || mode == UPDATE_INFO) {
+        buf.writeByte(mode.ordinal());
+        if (mode == Mode.CREATE || mode == Mode.UPDATE_INFO) {
             displayName.write(buf);
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) < 0) {
                 prefix.write(buf);
@@ -140,7 +134,7 @@ public class Team implements MinecraftPacket {
                 buf.writeByte(color);
             }
         }
-        if (mode == CREATE || mode == ADD_PLAYER || mode == REMOVE_PLAYER) {
+        if (mode == Mode.CREATE || mode == Mode.ADD_PLAYER || mode == Mode.REMOVE_PLAYER) {
             ProtocolUtils.writeVarInt(buf, players.length);
             for (String player : players) {
                 ProtocolUtils.writeString(buf, player);
@@ -161,25 +155,16 @@ public class Team implements MinecraftPacket {
         NEVER("never"),
         HIDE_FOR_OTHER_TEAMS("hideForOtherTeams"),
         HIDE_FOR_OWN_TEAM("hideForOwnTeam"),
-        // 1.9 (and possibly other versions) appear to treat unknown values differently (always render rather than subject to spectator mode, friendly invisibles, etc).
-        // we allow the empty value to achieve this in case it is potentially useful even though this is unsupported and its usage may be a bug (#3780).
         UNKNOWN( "" );
-        //
+
         private final String key;
-        //
         private static final Map<String, NameTagVisibility> BY_NAME;
         private static final NameTagVisibility[] BY_ID;
 
         static {
             NameTagVisibility[] values = NameTagVisibility.values();
-            ImmutableMap.Builder<String, NameTagVisibility> builder = ImmutableMap.builderWithExpectedSize(values.length);
-
-            for (NameTagVisibility e : values) {
-                builder.put(e.key, e);
-            }
-
-            BY_NAME = builder.build();
-            BY_ID = Arrays.copyOf( values, values.length - 1 ); // Ignore dummy UNKNOWN value
+            BY_ID = Arrays.copyOf( values, values.length - 1 );
+            BY_NAME = Arrays.stream(values).collect(Collectors.toUnmodifiableMap(e -> e.key, e -> e));
         }
     }
 
@@ -199,17 +184,11 @@ public class Team implements MinecraftPacket {
 
         static {
             CollisionRule[] values = BY_ID = CollisionRule.values();
-            ImmutableMap.Builder<String, CollisionRule> builder = ImmutableMap.builderWithExpectedSize( values.length );
-
-            for (CollisionRule e : values) {
-                builder.put(e.key, e);
-            }
-
-            BY_NAME = builder.build();
+            BY_NAME = Arrays.stream(values).collect(Collectors.toUnmodifiableMap(e -> e.key, e -> e));
         }
     }
 
-    public static <T> T readStringMapKey(ByteBuf buf, Map<String, T> map) {
+    public static <T> T readStringToMap(ByteBuf buf, Map<String, T> map) {
         String string = ProtocolUtils.readString( buf );
         T result = map.get( string );
         Preconditions.checkArgument( result != null, "Unknown string key %s", string );
