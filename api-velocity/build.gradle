@@ -1,0 +1,25 @@
+
+dependencies {
+    compileOnly "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    annotationProcessor "com.velocitypowered:velocity-api:${rootProject.ext.velocityVersion}"
+    api "de.codecrafter47.taboverlay:taboverlaycommon-api:1.0-SNAPSHOT"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}

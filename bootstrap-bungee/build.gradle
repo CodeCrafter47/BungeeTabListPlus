@@ -1,17 +1,18 @@
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
 }
 
 dependencies {
     implementation project(':bungee-plugin')
     compileOnly "net.md-5:bungeecord-api:${rootProject.ext.bungeeVersion}"
     compileOnly "net.md-5:bungeecord-proxy:${rootProject.ext.bungeeVersion}"
-}
-
-compileJava {
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
 }
 
 shadowJar {

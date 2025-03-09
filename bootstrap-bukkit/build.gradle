@@ -1,16 +1,11 @@
 
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 dependencies {
     implementation project(':bukkit-plugin')
     compileOnly "org.spigotmc:spigot-api:${rootProject.ext.spigotVersion}"
-}
-
-compileJava {
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
 }
 
 shadowJar {

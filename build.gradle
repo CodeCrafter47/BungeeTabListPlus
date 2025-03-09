@@ -11,6 +11,8 @@ buildscript {
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
     bungeeVersion = '1.21-R0.1-SNAPSHOT'
+    velocityVersion = '3.4.0-SNAPSHOT'
+    adventureVersion = '4.18.0'
     spongeVersion = '7.0.0'
     dataApiVersion = '1.0.2-SNAPSHOT'
 }
@@ -48,6 +50,10 @@ subprojects {
         }
 
         maven {
+            url = 'https://repo.papermc.io/repository/maven-public/'
+        }
+
+        maven {
             url = 'https://repo.spongepowered.org/maven'
         }
 
@@ -58,20 +64,24 @@ subprojects {
         maven {
             url = 'https://oss.sonatype.org/content/repositories/snapshots'
         }
+
+        maven {
+            url = 'https://nexus.prgm.in/repository/maven-public/'
+        }
     }
 
     dependencies {
-
-        compileOnly 'org.projectlombok:lombok:1.18.20'
-        annotationProcessor 'org.projectlombok:lombok:1.18.20'
-        testCompileOnly 'org.projectlombok:lombok:1.18.20'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+        compileOnly 'org.projectlombok:lombok:1.18.34'
+        annotationProcessor 'org.projectlombok:lombok:1.18.34'
+        testCompileOnly 'org.projectlombok:lombok:1.18.34'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
         compileOnly 'com.google.code.findbugs:jsr305:3.0.1'
     }
 
-    compileJava {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
     }
 
     publishing {
