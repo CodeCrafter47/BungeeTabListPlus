@@ -19,6 +19,7 @@ package codecrafter47.bungeetablistplus;
 
 import codecrafter47.bungeetablistplus.util.VelocityPlugin;
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -75,8 +76,8 @@ public class BootstrapPlugin implements VelocityPlugin {
         this.metricsFactory = metricsFactory;
     }
 
-    @Subscribe
-    public void onProxyInitialization(final ProxyInitializeEvent event) {
+    @Subscribe(order = PostOrder.EARLY)
+    public void onProxyInitializationEarly(final ProxyInitializeEvent event) {
         if (Float.parseFloat(System.getProperty("java.class.version")) < 61.0) {
             getLogger().error("§cBungeeTabListPlus requires Java 17 or above. Please download and install it!");
             getLogger().error("Disabling plugin!");
@@ -88,6 +89,10 @@ public class BootstrapPlugin implements VelocityPlugin {
             }
         }
         BungeeTabListPlus.getInstance(this).onLoad();
+    }
+
+    @Subscribe(order = PostOrder.LATE)
+    public void onProxyInitializationLate(final ProxyInitializeEvent event) {
         BungeeTabListPlus.getInstance(this).onEnable();
         // Metrics
         metricsFactory.make(this, 24808);
