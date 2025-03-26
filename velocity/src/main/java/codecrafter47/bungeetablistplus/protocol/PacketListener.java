@@ -51,29 +51,24 @@ public class PacketListener extends MessageToMessageDecoder<MinecraftPacket> {
                 if (packet != null) {
 
                     PacketListenerResult result = PacketListenerResult.PASS;
-                    boolean handled = false;
 
                     if (packet instanceof Team) {
                         result = handler.onTeamPacket((Team) packet);
+                    } else if (packet instanceof LegacyPlayerListItemPacket) {
+                        result = handler.onPlayerListPacket((LegacyPlayerListItemPacket) packet);
+                    } else if (packet instanceof HeaderAndFooterPacket) {
+                        result = handler.onPlayerListHeaderFooterPacket((HeaderAndFooterPacket) packet);
+                    } else if (packet instanceof UpsertPlayerInfoPacket) {
+                        result = handler.onPlayerListUpdatePacket((UpsertPlayerInfoPacket) packet);
+                    } else if (packet instanceof RemovePlayerInfoPacket) {
+                        result = handler.onPlayerListRemovePacket((RemovePlayerInfoPacket) packet);
+                    }
+
+                    if (result != PacketListenerResult.PASS) {
                         if (result == PacketListenerResult.MODIFIED) {
                             sendPacket(player, packet);
                         }
-                    } else if (packet instanceof LegacyPlayerListItemPacket) {
-                        result = handler.onPlayerListPacket((LegacyPlayerListItemPacket) packet);
-                        handled = true;
-                    } else if (packet instanceof HeaderAndFooterPacket) {
-                        result = handler.onPlayerListHeaderFooterPacket((HeaderAndFooterPacket) packet);
-                        handled = true;
-                    } else if (packet instanceof UpsertPlayerInfoPacket) {
-                        result = handler.onPlayerListUpdatePacket((UpsertPlayerInfoPacket) packet);
-                        handled = true;
-                    } else if (packet instanceof RemovePlayerInfoPacket) {
-                        result = handler.onPlayerListRemovePacket((RemovePlayerInfoPacket) packet);
-                        handled = true;
-                    }
-
-                    if (handled && result != PacketListenerResult.CANCEL) {
-                        sendPacket(player, packet);
+                        return;
                     }
                 }
             }
