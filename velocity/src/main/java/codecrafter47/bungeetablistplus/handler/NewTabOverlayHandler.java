@@ -1251,7 +1251,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static Team createPacketTeamCreate(String name, ComponentHolder displayName, ComponentHolder prefix, ComponentHolder suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
-        team.setMode(Team.Mode.CREATE);
+        team.setMode(0);
         team.setDisplayName(displayName);
         team.setPrefix(prefix);
         team.setSuffix(suffix);

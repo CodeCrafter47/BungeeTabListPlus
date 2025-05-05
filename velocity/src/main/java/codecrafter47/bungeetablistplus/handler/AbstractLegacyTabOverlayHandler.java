@@ -413,7 +413,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                 removeEntry(slotUUID[index], slotID[index]);
                 Team t = new Team();
                 t.setName(slotID[index]);
-                t.setMode(Team.Mode.REMOVE);
+                t.setMode(1);
                 sendPacket(t);
             }
         }
@@ -430,7 +430,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         updateSlot(tabOverlay, index);
                         Team t = new Team();
                         t.setName(slotID[index]);
-                        t.setMode(Team.Mode.CREATE);
+                        t.setMode(0);
                         t.setPrefix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text0[index]));
                         t.setDisplayName(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, ""));
                         t.setSuffix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text1[index]));
@@ -444,7 +444,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
                         removeEntry(slotUUID[index], slotID[index]);
                         Team t = new Team();
                         t.setName(slotID[index]);
-                        t.setMode(Team.Mode.REMOVE);
+                        t.setMode(1);
                         sendPacket(t);
                     }
                 }
@@ -466,7 +466,7 @@ public abstract class AbstractLegacyTabOverlayHandler implements PacketHandler, 
             if (index < size) {
                 Team packet = new Team();
                 packet.setName(slotID[index]);
-                packet.setMode(Team.Mode.UPDATE_INFO);
+                packet.setMode(2);
                 packet.setPrefix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text0[index]));
                 packet.setDisplayName(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, ""));
                 packet.setSuffix(new ComponentHolder(is13OrLater ? ProtocolVersion.MINECRAFT_1_13 : ProtocolVersion.MINECRAFT_1_12_2, tabOverlay.text1[index]));

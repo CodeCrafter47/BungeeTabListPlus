@@ -41,16 +41,8 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = false)
 public class Team implements MinecraftPacket {
 
-    public enum Mode {
-        CREATE,
-        REMOVE,
-        UPDATE_INFO,
-        ADD_PLAYER,
-        REMOVE_PLAYER
-    }
-
     private String name;
-    private Mode mode;
+    private int mode;
     private ComponentHolder displayName;
     private ComponentHolder prefix;
     private ComponentHolder suffix;
@@ -60,28 +52,24 @@ public class Team implements MinecraftPacket {
     private byte friendlyFire;
     private String[] players;
 
-    // TODO: placeholder until release
-    private int MINECRAFT_1_21_5 = 770;
-
     public Team(String name)
     {
         this.name = name;
-        this.mode = Mode.REMOVE;
+        this.mode = 1;
     }
 
     @Override
     public void decode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion version) {
         name = ProtocolUtils.readString(buf);
-        mode = Mode.values()[buf.readByte()];
-        if (mode == Mode.CREATE || mode == Mode.UPDATE_INFO) {
+        mode = buf.readByte();
+        if (mode == 0 || mode == 2) {
             displayName = ComponentHolder.read(buf, version);
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) < 0) {
                 prefix = ComponentHolder.read(buf, version);
                 suffix = ComponentHolder.read(buf, version);
             }
             friendlyFire = buf.readByte();
-            // TODO: Replace this when released
-            if (version.getProtocol() >= MINECRAFT_1_21_5) {
+            if (version.compareTo(ProtocolVersion.MINECRAFT_1_21_5) >= 0) {
                 nameTagVisibility = NameTagVisibility.BY_ID[ProtocolUtils.readVarInt( buf )];
                 collisionRule = CollisionRule.BY_ID[ProtocolUtils.readVarInt( buf )];
             } else {
@@ -96,7 +84,7 @@ public class Team implements MinecraftPacket {
                 suffix = ComponentHolder.read(buf, version);
             }
         }
-        if (mode == Mode.CREATE || mode == Mode.ADD_PLAYER || mode == Mode.REMOVE_PLAYER) {
+        if (mode == 0 || mode == 3 || mode == 4) {
             int len = ProtocolUtils.readVarInt(buf);
             players = new String[len];
             for (int i = 0; i < len; i++) {
@@ -108,16 +96,15 @@ public class Team implements MinecraftPacket {
     @Override
     public void encode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion version) {
         ProtocolUtils.writeString(buf, name);
-        buf.writeByte(mode.ordinal());
-        if (mode == Mode.CREATE || mode == Mode.UPDATE_INFO) {
+        buf.writeByte(mode);
+        if (mode == 0 || mode == 2) {
             displayName.write(buf);
             if (version.compareTo(ProtocolVersion.MINECRAFT_1_13) < 0) {
                 prefix.write(buf);
                 suffix.write(buf);
             }
             buf.writeByte(friendlyFire);
-            // TODO: Replace this when released
-            if (version.getProtocol() >= MINECRAFT_1_21_5) {
+            if (version.compareTo(ProtocolVersion.MINECRAFT_1_21_5) >= 0) {
                 ProtocolUtils.writeVarInt(buf, nameTagVisibility.ordinal());
                 ProtocolUtils.writeVarInt(buf, collisionRule.ordinal());
             } else {
@@ -134,7 +121,7 @@ public class Team implements MinecraftPacket {
                 buf.writeByte(color);
             }
         }
-        if (mode == Mode.CREATE || mode == Mode.ADD_PLAYER || mode == Mode.REMOVE_PLAYER) {
+        if (mode == 0 || mode == 3 || mode == 4) {
             ProtocolUtils.writeVarInt(buf, players.length);
             for (String player : players) {
                 ProtocolUtils.writeString(buf, player);

@@ -299,7 +299,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             enterContentOperationMode(ContentOperationMode.PASS_TROUGH);
         }
 
-        if (Team.Mode.REMOVE.equals(packet.getMode())) {
+        if (packet.getMode() == 1) {
             TeamEntry team = serverTeams.remove(packet.getName());
             if (team != null) {
                 for (String player : team.getPlayers()) {
@@ -309,7 +309,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         } else {
             // Create or get old team
             TeamEntry teamEntry;
-            if (Team.Mode.CREATE.equals(packet.getMode())) {
+            if (packet.getMode() == 0) {
                 teamEntry = new TeamEntry();
                 serverTeams.put(packet.getName(), teamEntry);
             } else {
@@ -317,7 +317,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             }
 
             if (teamEntry != null) {
-                if (Team.Mode.CREATE.equals(packet.getMode()) || Team.Mode.UPDATE_INFO.equals(packet.getMode())) {
+                if (packet.getMode() == 0 || packet.getMode() == 2) {
                     teamEntry.setDisplayName(packet.getDisplayName());
                     teamEntry.setPrefix(packet.getPrefix());
                     teamEntry.setSuffix(packet.getSuffix());
@@ -328,7 +328,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                 }
                 if (packet.getPlayers() != null) {
                     for (String s : packet.getPlayers()) {
-                        if (Team.Mode.CREATE.equals(packet.getMode()) || Team.Mode.ADD_PLAYER.equals(packet.getMode())) {
+                        if (packet.getMode() == 0 || packet.getMode() == 3) {
                             if (playerToTeamMap.containsKey(s)) {
                                 TeamEntry previousTeam = serverTeams.get(playerToTeamMap.get(s));
                                 // previousTeam shouldn't be null (that's inconsistent with playerToTeamMap, but apparently it happens)
@@ -1032,7 +1032,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         @Override
         void onTeamPacketPreprocess(Team packet) {
             if (!using80Slots) {
-                if (Team.Mode.REMOVE.equals(packet.getMode())) {
+                if (packet.getMode() == 1) {
                     TeamEntry teamEntry = serverTeams.get(packet.getName());
                     if (teamEntry != null) {
                         for (String playerName : teamEntry.getPlayers()) {
@@ -1045,7 +1045,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     }
                 }
             } else {
-                if (Team.Mode.REMOVE.equals(packet.getMode())) {
+                if (packet.getMode() == 1) {
                     TeamEntry teamEntry = serverTeams.get(packet.getName());
                     if (teamEntry != null) {
                         for (String playerName : teamEntry.getPlayers()) {
@@ -1067,8 +1067,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             if (!using80Slots) {
                 boolean modified = false;
                 switch (packet.getMode()) {
-                    case CREATE:
-                    case ADD_PLAYER:
+                    case 0:
+                    case 3:
                         int count = 0;
                         String[] players = packet.getPlayers();
                         for (int i = 0; i < players.length; i++) {
@@ -1097,7 +1097,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             packet.setPlayers(filteredPlayers);
                         }
                         break;
-                    case REMOVE_PLAYER:
+                    case 4:
                         count = 0;
                         players = packet.getPlayers();
                         for (int i = 0; i < players.length; i++) {
@@ -1123,7 +1123,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             packet.setPlayers(filteredPlayers);
                         }
                         break;
-                    case UPDATE_INFO:
+                    case 2:
                         TeamEntry teamEntry = serverTeams.get(packet.getName());
                         if (teamEntry != null) {
                             for (String playerName : teamEntry.getPlayers()) {
@@ -1143,8 +1143,8 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
             } else {
 
                 switch (packet.getMode()) {
-                    case CREATE:
-                    case ADD_PLAYER:
+                    case 0:
+                    case 3:
                         /*
                         // Don't need this. Adding the player to another team will remove him from the current one.
                         String[] players = packet.getPlayers();
@@ -1156,7 +1156,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                             }
                         }*/
                         break;
-                    case REMOVE_PLAYER:
+                    case 4:
                         String[] players = packet.getPlayers();
                         for (int i = 0; i < players.length; i++) {
                             String playerName = players[i];
@@ -2409,7 +2409,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static Team createPacketTeamCreate(String name, ComponentHolder displayName, ComponentHolder prefix, ComponentHolder suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
-        team.setMode(Team.Mode.CREATE);
+        team.setMode(0);
         team.setDisplayName(displayName);
         team.setPrefix(prefix);
         team.setSuffix(suffix);
@@ -2424,14 +2424,14 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static Team createPacketTeamRemove(String name) {
         Team team = new Team();
         team.setName(name);
-        team.setMode(Team.Mode.REMOVE);
+        team.setMode(1);
         return team;
     }
 
     private static Team createPacketTeamUpdate(String name, ComponentHolder displayName, ComponentHolder prefix, ComponentHolder suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire) {
         Team team = new Team();
         team.setName(name);
-        team.setMode(Team.Mode.UPDATE_INFO);
+        team.setMode(2);
         team.setDisplayName(displayName);
         team.setPrefix(prefix);
         team.setSuffix(suffix);
@@ -2445,7 +2445,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static Team createPacketTeamAddPlayers(String name, String[] players) {
         Team team = new Team();
         team.setName(name);
-        team.setMode(Team.Mode.ADD_PLAYER);
+        team.setMode(3);
         team.setPlayers(players);
         return team;
     }
@@ -2453,7 +2453,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
     private static Team createPacketTeamRemovePlayers(String name, String[] players) {
         Team team = new Team();
         team.setName(name);
-        team.setMode(Team.Mode.REMOVE_PLAYER);
+        team.setMode(4);
         team.setPlayers(players);
         return team;
     }
