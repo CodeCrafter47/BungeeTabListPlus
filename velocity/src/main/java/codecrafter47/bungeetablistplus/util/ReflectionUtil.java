@@ -26,21 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_12;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_12_1;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_14;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_15;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_17;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_1;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_3;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_4;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_20_2;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_20_3;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_20_5;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_21_2;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_9;
+import static com.velocitypowered.api.network.ProtocolVersion.*;
 
 public class ReflectionUtil {
 
@@ -90,7 +76,8 @@ public class ReflectionUtil {
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x5C, MINECRAFT_1_20_2, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x5E, MINECRAFT_1_20_3, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x60, MINECRAFT_1_20_5, null, false),
-                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x67, MINECRAFT_1_21_2, null, false)
+                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x67, MINECRAFT_1_21_2, null, false),
+                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x66, MINECRAFT_1_21_5, null, false)
                 });
                 return;
             } catch (Exception e) {
