@@ -10,7 +10,7 @@ buildscript {
 
 ext {
     spigotVersion = '1.11-R0.1-SNAPSHOT'
-    bungeeVersion = '1.21-R0.1-SNAPSHOT'
+    bungeeVersion = '1.21-R0.4-SNAPSHOT'
     velocityVersion = '3.4.0-SNAPSHOT'
     adventureVersion = '4.18.0'
     spongeVersion = '7.0.0'

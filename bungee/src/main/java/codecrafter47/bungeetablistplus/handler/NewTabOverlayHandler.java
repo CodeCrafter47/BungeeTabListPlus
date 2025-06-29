@@ -79,6 +79,9 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     private static final Set<String> CUSTOM_SLOT_USERNAMES;
     private static final String[] CUSTOM_SLOT_TEAMNAME;
 
+    private final Either<String, Team.NameTagVisibility> nameTagVisibilityAlways;
+    private final Either<String, Team.CollisionRule> collisionRuleAlways;
+
     static {
 
         // build the dimension to used slots map (for the rectangular tab overlay)
@@ -174,12 +177,19 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
 
     private final ProxiedPlayer player;
 
-    public NewTabOverlayHandler(Logger logger, Executor eventLoopExecutor, ProxiedPlayer player) {
+    public NewTabOverlayHandler(Logger logger, Executor eventLoopExecutor, ProxiedPlayer player, boolean is1215OrLater) {
         this.logger = logger;
         this.eventLoopExecutor = eventLoopExecutor;
         this.player = player;
         this.activeContentHandler = new PassThroughContentHandler();
         this.activeHeaderFooterHandler = new PassThroughHeaderFooterHandler();
+        if (is1215OrLater) {
+            nameTagVisibilityAlways = Either.right(Team.NameTagVisibility.ALWAYS);
+            collisionRuleAlways = Either.right(Team.CollisionRule.ALWAYS);
+        } else {
+            nameTagVisibilityAlways = Either.left("always");
+            collisionRuleAlways = Either.left("always");
+        }
     }
 
     private void sendPacket(DefinedPacket packet) {
@@ -688,7 +698,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
                 hasCreatedCustomTeams = true;
 
                 for (int i = 0; i < 80; i++) {
-                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, Team.NameTagVisibility.ALWAYS, Team.CollisionRule.ALWAYS, 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
+                    sendPacket(createPacketTeamCreate(CUSTOM_SLOT_TEAMNAME[i], EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, EMPTY_EITHER_TEXT_COMPONENT, nameTagVisibilityAlways, collisionRuleAlways, 21, (byte) 1, new String[]{CUSTOM_SLOT_USERNAME[i], CUSTOM_SLOT_USERNAME_SMILEYS[i]}));
                 }
             }
         }
@@ -1253,7 +1263,7 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         }
     }
 
-    private static Team createPacketTeamCreate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, Team.NameTagVisibility nameTagVisibility, Team.CollisionRule collisionRule, int color, byte friendlyFire, String[] players) {
+    private static Team createPacketTeamCreate(String name, Either<String, BaseComponent> displayName, Either<String, BaseComponent> prefix, Either<String, BaseComponent> suffix, Either<String, Team.NameTagVisibility> nameTagVisibility, Either<String, Team.CollisionRule> collisionRule, int color, byte friendlyFire, String[] players) {
         Team team = new Team();
         team.setName(name);
         team.setMode((byte) 0);

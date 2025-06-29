@@ -37,8 +37,8 @@ public class TabOverlayHandlerImpl extends AbstractTabOverlayHandler {
 
     private boolean logVersionMismatch = false;
 
-    public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is18, boolean is13OrLater, boolean is119OrLater) {
-        super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater, is119OrLater);
+    public TabOverlayHandlerImpl(Logger logger, Executor eventLoopExecutor, UUID viewerUuid, ProxiedPlayer player, boolean is18, boolean is13OrLater, boolean is119OrLater, boolean is1215OrLater) {
+        super(logger, eventLoopExecutor, viewerUuid, is18, is13OrLater, is119OrLater, is1215OrLater);
         this.player = player;
     }
 
