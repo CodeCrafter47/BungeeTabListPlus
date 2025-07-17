@@ -1,7 +1,7 @@
 package codecrafter47.bungeetablistplus.util;
 
 import net.md_5.bungee.connection.LoginResult;
-import net.md_5.bungee.protocol.Property;
+import net.md_5.bungee.protocol.data.Property;
 import net.md_5.bungee.protocol.packet.PlayerListItem;
 
 import java.util.Arrays;

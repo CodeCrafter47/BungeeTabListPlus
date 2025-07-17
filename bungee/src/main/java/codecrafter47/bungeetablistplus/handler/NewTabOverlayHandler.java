@@ -40,7 +40,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.md_5.bungee.netty.ChannelWrapper;
 import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.Either;
+import net.md_5.bungee.protocol.util.Either;
 import net.md_5.bungee.protocol.Protocol;
 import net.md_5.bungee.protocol.packet.*;
 

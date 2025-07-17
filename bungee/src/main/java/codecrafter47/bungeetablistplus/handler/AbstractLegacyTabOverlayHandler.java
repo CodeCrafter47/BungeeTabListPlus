@@ -39,7 +39,7 @@ import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.Either;
+import net.md_5.bungee.protocol.util.Either;
 import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
