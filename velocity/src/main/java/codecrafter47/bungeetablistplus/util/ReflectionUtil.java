@@ -77,7 +77,8 @@ public class ReflectionUtil {
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x5E, MINECRAFT_1_20_3, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x60, MINECRAFT_1_20_5, null, false),
                         (StateRegistry.PacketMapping) packetMapping.newInstance(0x67, MINECRAFT_1_21_2, null, false),
-                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x66, MINECRAFT_1_21_5, null, false)
+                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x66, MINECRAFT_1_21_5, null, false),
+                        (StateRegistry.PacketMapping) packetMapping.newInstance(0x6B, MINECRAFT_1_21_9, null, false)
                 });
                 return;
             } catch (Exception e) {
