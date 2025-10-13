@@ -263,7 +263,6 @@ public class BungeeTabListPlus {
         hiddenPlayersManager.addVanishProvider("SuperVanish", BukkitData.SuperVanish_IsVanished);
         hiddenPlayersManager.addVanishProvider("CMI", BukkitData.CMI_IsVanished);
         hiddenPlayersManager.addVanishProvider("Essentials", BukkitData.Essentials_IsVanished);
-        hiddenPlayersManager.addVanishProvider("ProtocolVanish", BukkitData.ProtocolVanish_IsVanished);
         hiddenPlayersManager.addVanishProvider("Bukkit Player Metadata `vanished`", BukkitData.BukkitPlayerMetadataVanished);
         hiddenPlayersManager.addVanishProvider("Sponge VANISH", SpongeData.Sponge_IsVanished);
         hiddenPlayersManager.enable();
