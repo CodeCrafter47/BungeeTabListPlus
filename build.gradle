@@ -46,10 +46,6 @@ subprojects {
         }
 
         maven {
-            url = 'https://papermc.io/repo/repository/maven-snapshots/'
-        }
-
-        maven {
             url = 'https://repo.papermc.io/repository/maven-public/'
         }
 
@@ -66,7 +62,7 @@ subprojects {
         }
 
         maven {
-            url = 'https://nexus.prgm.in/repository/maven-public/'
+            url = 'https://repo.viaversion.com'
         }
     }
 
