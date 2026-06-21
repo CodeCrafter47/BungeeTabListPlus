@@ -46,6 +46,7 @@ import net.md_5.bungee.protocol.packet.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -78,6 +79,11 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
     @Nonnull
     private static final Set<String> CUSTOM_SLOT_USERNAMES;
     private static final String[] CUSTOM_SLOT_TEAMNAME;
+
+    // The latest BungeeCord uses Optional<Integer> instead of int for the team color.
+    // If that setter is present we invoke it via reflection, otherwise we fall back to Team.setColor(int).
+    @Nullable
+    private static final Method TEAM_SET_COLOR_OPTIONAL;
 
     private final Either<String, Team.NameTagVisibility> nameTagVisibilityAlways;
     private final Either<String, Team.CollisionRule> collisionRuleAlways;
@@ -150,6 +156,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         for (int i = 0; i < 81; i++) {
             CUSTOM_SLOT_TEAMNAME[i] = String.format(" BTLP%08x %02d", unique, i);
         }
+
+        // Newer BungeeCord versions changed Team.setColor to accept Optional<Integer>.
+        Method setColorOptional;
+        try {
+            setColorOptional = Team.class.getMethod("setColor", Optional.class);
+        } catch (NoSuchMethodException e) {
+            setColorOptional = null;
+        }
+        TEAM_SET_COLOR_OPTIONAL = setColorOptional;
     }
 
     private final Logger logger;
@@ -1272,7 +1287,15 @@ public class NewTabOverlayHandler implements PacketHandler, TabOverlayHandler {
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
         team.setCollisionRule(collisionRule);
-        team.setColor(color);
+        if (TEAM_SET_COLOR_OPTIONAL != null) {
+            try {
+                TEAM_SET_COLOR_OPTIONAL.invoke(team, Optional.of(color));
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("Failed to set team color", e);
+            }
+        } else {
+            team.setColor(color);
+        }
         team.setFriendlyFire(friendlyFire);
         team.setPlayers(players);
         return team;
