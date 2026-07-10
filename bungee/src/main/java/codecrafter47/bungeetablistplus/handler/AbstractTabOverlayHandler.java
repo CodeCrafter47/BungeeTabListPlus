@@ -22,6 +22,7 @@ import codecrafter47.bungeetablistplus.protocol.PacketListenerResult;
 import codecrafter47.bungeetablistplus.util.BitSet;
 import codecrafter47.bungeetablistplus.util.ConcurrentBitSet;
 import codecrafter47.bungeetablistplus.util.Property119Handler;
+import codecrafter47.bungeetablistplus.util.TeamUtil;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -2494,7 +2495,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
         team.setCollisionRule(collisionRule);
-        team.setColor(color);
+        TeamUtil.setColor(team, color);
         team.setFriendlyFire(friendlyFire);
         team.setPlayers(players);
         return team;
@@ -2516,7 +2517,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
         team.setSuffix(suffix);
         team.setNameTagVisibility(nameTagVisibility);
         team.setCollisionRule(collisionRule);
-        team.setColor(color);
+        TeamUtil.setColor(team, color);
         team.setFriendlyFire(friendlyFire);
         return team;
     }
