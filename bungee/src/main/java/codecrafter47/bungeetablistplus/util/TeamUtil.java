@@ -13,15 +13,14 @@ public class TeamUtil {
     @Nullable
     private static final Method TEAM_SET_COLOR_OPTIONAL;
 
+    //Same as above but just to fetch the team color, returning an optional instead of an int
+    @Nullable
+    private static final Method TEAM_GET_COLOR_OPTIONAL;
+
     static {
         // Newer BungeeCord versions changed Team.setColor to accept Optional<Integer>.
-        Method setColorOptional;
-        try {
-            setColorOptional = Team.class.getMethod("setColor", Optional.class);
-        } catch (NoSuchMethodException e) {
-            setColorOptional = null;
-        }
-        TEAM_SET_COLOR_OPTIONAL = setColorOptional;
+        TEAM_SET_COLOR_OPTIONAL = initSetColorMethod();
+        TEAM_GET_COLOR_OPTIONAL = initGetColorMethod();
     }
 
     public static void setColor(Team team, int color) {
@@ -37,4 +36,33 @@ public class TeamUtil {
 
     }
 
+    @SuppressWarnings("unchecked")
+    public static int getColor(Team team) {
+        if (TEAM_GET_COLOR_OPTIONAL != null) {
+            try {
+                Optional<Integer> colorOpt = (Optional<Integer>) TEAM_GET_COLOR_OPTIONAL.invoke(team);
+                return colorOpt.orElse(0);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("Failed to set team color", e);
+            }
+        }
+        return team.getColor();
+    }
+
+    private static @Nullable Method initGetColorMethod() {
+        try {
+            Method m = Team.class.getMethod("getColor");
+            return m.getReturnType() == Optional.class ? m : null;
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private static @Nullable Method initSetColorMethod() {
+        try {
+            return Team.class.getMethod("setColor", Optional.class);
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
 }
