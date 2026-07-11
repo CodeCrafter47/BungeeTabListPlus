@@ -330,7 +330,7 @@ public abstract class AbstractTabOverlayHandler implements PacketHandler, TabOve
                     teamEntry.setFriendlyFire(packet.getFriendlyFire());
                     teamEntry.setNameTagVisibility(packet.getNameTagVisibility());
                     teamEntry.setCollisionRule(packet.getCollisionRule());
-                    teamEntry.setColor(packet.getColor());
+                    teamEntry.setColor(TeamUtil.getColor(packet));
                 }
                 if (packet.getPlayers() != null) {
                     for (String s : packet.getPlayers()) {
