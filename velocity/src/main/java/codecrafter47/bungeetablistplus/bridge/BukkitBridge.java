@@ -261,7 +261,7 @@ public class BukkitBridge {
             output.writeInt(0);
 
             byte[] message = byteArrayOutput.toByteArray();
-            server.sendPluginMessage(btlp.getChannelIdentifier(), message);
+            sendPluginMessage(server, message);
         } else {
 
             if (!connectionInfo.isConnectionValid) {
@@ -342,7 +342,7 @@ public class BukkitBridge {
                     output.writeInt(bridgeData.nextIncomingMessageId - 1);
 
                     byte[] message = byteArrayOutput.toByteArray();
-                    server.sendPluginMessage(btlp.getChannelIdentifier(), message);
+                    sendPluginMessage(server, message);
                 } else {
                     throw new IllegalArgumentException("Unexpected message id: " + messageId);
                 }
@@ -425,7 +425,7 @@ public class BukkitBridge {
                         output.writeUTF(plugin.getVersion());
 
                         byte[] message = byteArrayOutput.toByteArray();
-                        server.sendPluginMessage(btlp.getChannelIdentifier(), message);
+                        sendPluginMessage(server, message);
                     } catch (Throwable th) {
                         rlExecutor.execute(() -> {
                             logger.log(Level.SEVERE, "Unexpected error", th);
@@ -460,9 +460,7 @@ public class BukkitBridge {
             }
 
             if (server != null && bridgeData.messagesPendingConfirmation.size() > 0 && (now > bridgeData.lastMessageSent + 1000 || bridgeData.messagesPendingConfirmation.size() > 5)) {
-                for (byte[] message : bridgeData.messagesPendingConfirmation) {
-                    server.sendPluginMessage(btlp.getChannelIdentifier(), message);
-                }
+                resendMessages(server, bridgeData);
             }
         }
 
@@ -470,10 +468,29 @@ public class BukkitBridge {
             ServerConnection server = bridgeData.getConnection();
 
             if (server != null && bridgeData.messagesPendingConfirmation.size() > 0 && (now > bridgeData.lastMessageSent + 1000 || bridgeData.messagesPendingConfirmation.size() > 5)) {
-                for (byte[] message : bridgeData.messagesPendingConfirmation) {
-                    server.sendPluginMessage(btlp.getChannelIdentifier(), message);
-                }
+                resendMessages(server, bridgeData);
             }
+        }
+    }
+
+    private void resendMessages(ServerConnection server, BridgeData bridgeData) {
+        // catch all exceptions to avoid cancelling the resend task
+        try {
+            for (byte[] message : bridgeData.messagesPendingConfirmation) {
+                sendPluginMessage(server, message);
+            }
+        } catch (Throwable th) {
+            rlExecutor.execute(() -> {
+                logger.log(Level.SEVERE, "Unexpected error", th);
+            });
+        }
+    }
+
+    private void sendPluginMessage(ServerConnection server, byte[] message) {
+        try {
+            server.sendPluginMessage(btlp.getChannelIdentifier(), message);
+        } catch (IllegalStateException ignored) {
+            // the connection has closed; silently ignore this
         }
     }
 
@@ -594,7 +611,7 @@ public class BukkitBridge {
                             byte[] message = data.toByteArray();
                             messagesPendingConfirmation.add(message);
                             lastMessageSent = System.currentTimeMillis();
-                            connection.sendPluginMessage(btlp.getChannelIdentifier(), message);
+                            sendPluginMessage(connection, message);
                         }
                     } else {
                         requestAll = true;
@@ -654,7 +671,7 @@ public class BukkitBridge {
                         byte[] message = data.toByteArray();
                         messagesPendingConfirmation.add(message);
                         lastMessageSent = System.currentTimeMillis();
-                        connection.sendPluginMessage(btlp.getChannelIdentifier(), message);
+                        sendPluginMessage(connection, message);
                     }
                     requestAll = false;
                 }

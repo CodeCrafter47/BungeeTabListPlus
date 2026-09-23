@@ -461,9 +461,7 @@ public class BukkitBridge implements Listener {
             }
 
             if (server != null && bridgeData.messagesPendingConfirmation.size() > 0 && (now > bridgeData.lastMessageSent + 1000 || bridgeData.messagesPendingConfirmation.size() > 5)) {
-                for (byte[] message : bridgeData.messagesPendingConfirmation) {
-                    server.sendData(BridgeProtocolConstants.CHANNEL, message);
-                }
+                resendMessages(server, bridgeData);
             }
         }
 
@@ -471,10 +469,21 @@ public class BukkitBridge implements Listener {
             Server server = bridgeData.getConnection();
 
             if (server != null && bridgeData.messagesPendingConfirmation.size() > 0 && (now > bridgeData.lastMessageSent + 1000 || bridgeData.messagesPendingConfirmation.size() > 5)) {
-                for (byte[] message : bridgeData.messagesPendingConfirmation) {
-                    server.sendData(BridgeProtocolConstants.CHANNEL, message);
-                }
+                resendMessages(server, bridgeData);
             }
+        }
+    }
+
+    private void resendMessages(Server server, BridgeData bridgeData) {
+        // catch all exceptions to avoid cancelling the resend task
+        try {
+            for (byte[] message : bridgeData.messagesPendingConfirmation) {
+                server.sendData(BridgeProtocolConstants.CHANNEL, message);
+            }
+        } catch (Throwable th) {
+            rlExecutor.execute(() -> {
+                logger.log(Level.SEVERE, "Unexpected error", th);
+            });
         }
     }
 
