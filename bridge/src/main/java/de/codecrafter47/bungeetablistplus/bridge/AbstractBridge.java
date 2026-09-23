@@ -33,6 +33,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class AbstractBridge<Player, Server> {
 
+    private static final int MAX_MESSAGES_PENDING_CONFIRMATION = 10;
+
     @Nonnull
     private final DataKeyRegistry dataKeyRegistry;
     @Nonnull
@@ -316,6 +318,11 @@ public abstract class AbstractBridge<Player, Server> {
                 continue;
             }
 
+            if (bridgeData.messagesPendingConfirmation.size() >= MAX_MESSAGES_PENDING_CONFIRMATION) {
+                // wait for the proxy to catch up
+                continue;
+            }
+
             for (CacheEntry entry : bridgeData.requestedData) {
                 DataKey<?> key = entry.key;
                 if (requiresMainThread(key) == isMainThread) {
@@ -329,6 +336,10 @@ public abstract class AbstractBridge<Player, Server> {
                         }
                     }
                 }
+            }
+
+            if (dirtyEntries.isEmpty()) {
+                continue;
             }
 
             synchronized (updateDataLock) {
@@ -363,6 +374,11 @@ public abstract class AbstractBridge<Player, Server> {
         BridgeData bridgeData = connectionInfo.playerBridgeData;
 
         if (bridgeData == null) {
+            return;
+        }
+
+        if (bridgeData.messagesPendingConfirmation.size() >= MAX_MESSAGES_PENDING_CONFIRMATION) {
+            // wait for the proxy to catch up
             return;
         }
 
