@@ -44,6 +44,8 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.codecrafter47.data.api.DataCache;
 import de.codecrafter47.data.api.DataHolder;
 import de.codecrafter47.data.api.DataKey;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
@@ -60,6 +62,7 @@ public class BukkitBridge {
 
     private static final TypeAdapterRegistry typeAdapterRegistry = TypeAdapterRegistry.DEFAULT_TYPE_ADAPTERS;
     private static final RateLimitedExecutor rlExecutor = new RateLimitedExecutor(5000);
+    private static final int MAX_OUT_OF_ORDER_MESSAGES = 64;
 
     private final Map<Player, PlayerConnectionInfo> playerPlayerConnectionInfoMap = new ConcurrentHashMap<>();
     private final Map<String, ServerBridgeDataCache> serverInformation = new ConcurrentHashMap<>();
@@ -309,31 +312,37 @@ public class BukkitBridge {
                 } else if (messageId == BridgeProtocolConstants.MESSAGE_ID_UPDATE_DATA) {
 
                     if (sequenceNumber > bridgeData.nextIncomingMessageId) {
-                        // ignore messages from the future
+                        // keep messages from the future until the messages before them have been received
+                        if (sequenceNumber - bridgeData.nextIncomingMessageId <= MAX_OUT_OF_ORDER_MESSAGES) {
+                            bridgeData.messagesReceivedOutOfOrder.put(sequenceNumber, input);
+                        }
                         return;
                     }
 
+                    if (sequenceNumber == bridgeData.nextIncomingMessageId) {
+                        do {
+                            bridgeData.nextIncomingMessageId++;
+
+                            int size = input.readInt();
+                            if (size > 0) {
+                                onDataReceived(bridgeData, input, size);
+                            }
+
+                            // continue with messages from the future that are now in sequence
+                            input = bridgeData.messagesReceivedOutOfOrder.remove(bridgeData.nextIncomingMessageId);
+                        } while (input != null);
+                    }
+
+                    // ACK all messages processed so far
                     ByteArrayOutputStream byteArrayOutput = new ByteArrayOutputStream();
                     DataOutput output = new DataOutputStream(byteArrayOutput);
 
                     output.writeByte(BridgeProtocolConstants.MESSAGE_ID_ACK | (isServerMessage ? 0x80 : 0x00));
                     output.writeInt(connectionId);
-                    output.writeInt(sequenceNumber);
+                    output.writeInt(bridgeData.nextIncomingMessageId - 1);
 
                     byte[] message = byteArrayOutput.toByteArray();
                     server.sendPluginMessage(btlp.getChannelIdentifier(), message);
-
-                    if (sequenceNumber < bridgeData.nextIncomingMessageId) {
-                        // ignore messages from the past after sending ACK
-                        return;
-                    }
-
-                    bridgeData.nextIncomingMessageId++;
-
-                    int size = input.readInt();
-                    if (size > 0) {
-                        onDataReceived(bridgeData, input, size);
-                    }
                 } else {
                     throw new IllegalArgumentException("Unexpected message id: " + messageId);
                 }
@@ -554,6 +563,7 @@ public class BukkitBridge {
         int lastConfirmed = 0;
         int nextOutgoingMessageId = 1;
         int nextIncomingMessageId = 1;
+        final Int2ObjectMap<DataInput> messagesReceivedOutOfOrder = new Int2ObjectOpenHashMap<>();
         long lastMessageSent = 0;
         int connectionId;
 
@@ -613,6 +623,7 @@ public class BukkitBridge {
                 lastConfirmed = 0;
                 nextOutgoingMessageId = 1;
                 nextIncomingMessageId = 1;
+                messagesReceivedOutOfOrder.clear();
                 lastMessageSent = 0;
                 Collection<DataKey<?>> queriedKeys = new ArrayList<>(getActiveKeys());
                 mainLoop.execute(() -> {
