@@ -677,13 +677,12 @@ public class BukkitBridge {
             synchronized (this) {
                 ObjectIterator<ServerConnection> iterator = connections.iterator();
                 while (iterator.hasNext()) {
-                    try {
-                        ServerConnection server = iterator.next();
-                        if (server.getServer().ping().join() != null) {
-                            return server;
-                        }
-                    } catch (Exception ignored){}
-                    iterator.remove();
+                    ServerConnection server = iterator.next();
+                    if (isConnected(server)) {
+                        return server;
+                    } else {
+                        iterator.remove();
+                    }
                 }
                 return null;
             }
@@ -694,15 +693,17 @@ public class BukkitBridge {
                 ObjectIterator<ServerConnection> iterator = connections.iterator();
                 while (iterator.hasNext()) {
                     ServerConnection server = iterator.next();
-                    try {
-                        if (server.getServer().ping().join() == null) {
-                            iterator.remove();
-                        }
-                    } catch (Exception ignored) {
+                    if (!isConnected(server)) {
                         iterator.remove();
                     }
                 }
             }
+        }
+
+        private boolean isConnected(ServerConnection server) {
+            // the player must still be online and connected to this server via this connection
+            Player player = server.getPlayer();
+            return player.isActive() && player.getCurrentServer().orElse(null) == server;
         }
 
         @Override
